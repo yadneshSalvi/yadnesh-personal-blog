@@ -1,6 +1,7 @@
 import * as React from "react";
 import CodeBlock from "@/components/CodeBlock";
 import Tweet from "@/components/mdx/Tweet";
+import Callout from "@/components/mdx/Callout";
 import type { ReactNode } from "react";
 
 type CodeChildProps = { className?: string; children?: ReactNode; mdxType?: string; originalType?: string };
@@ -33,6 +34,7 @@ function parseMeta(meta?: string): Record<string, string | boolean> {
 
 const MDXComponents: Record<string, (props: unknown) => React.ReactNode> = {
   Tweet: (props) => <Tweet {...(props as Record<string, unknown>)} />,
+  Callout: (props) => <Callout {...(props as Record<string, unknown>)} />,
   pre: (props) => {
     const p = props as { children?: ReactNode };
     const candidate = firstChild(p.children);
