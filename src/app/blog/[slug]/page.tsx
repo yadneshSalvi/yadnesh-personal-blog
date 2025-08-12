@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import TOC from "@/components/TOC";
 import { getAllPostSlugs, getPostBySlug } from "@/lib/posts";
 
 export const dynamic = "force-static";
@@ -14,8 +15,10 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   if (!post) return notFound();
   const { meta, content } = post;
   return (
-    <main className="mx-auto max-w-3xl p-6 space-y-6">
-      <article className="space-y-6">
+    <main className="mx-auto max-w-6xl p-6">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[16rem_1fr]">
+        <TOC contentSelector="#post-content" />
+        <article className="space-y-6">
         <header className="space-y-2">
           <h1 className="text-3xl font-semibold">{meta.title}</h1>
           {meta.subtitle ? (
@@ -39,10 +42,11 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             />
           </div>
         ) : null}
-        <div className="prose prose-invert max-w-none">
+        <div id="post-content" className="prose prose-invert max-w-none scroll-smooth">
           {content}
         </div>
-      </article>
+        </article>
+      </div>
     </main>
   );
 }
