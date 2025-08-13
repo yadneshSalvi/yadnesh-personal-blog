@@ -11,6 +11,7 @@ export type PostMeta = {
   image?: string;
   createdAt: string;
   updatedAt: string;
+  tags?: string[];
 };
 
 const POSTS_DIR = path.join(process.cwd(), "content", "posts");
@@ -36,7 +37,10 @@ export function getAllPostsMeta(): PostMeta[] {
       const image = data.image ? String(data.image) : undefined;
       const createdAt = String(data.createdAt || new Date().toISOString());
       const updatedAt = String(data.updatedAt || createdAt);
-      const meta: PostMeta = { slug, title, subtitle, image, createdAt, updatedAt };
+      const tags = Array.isArray(data.tags)
+        ? data.tags.map((t: unknown) => String(t)).filter(Boolean)
+        : undefined;
+      const meta: PostMeta = { slug, title, subtitle, image, createdAt, updatedAt, tags };
       return meta;
     })
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
@@ -48,7 +52,14 @@ export async function getPostBySlug(slug: string): Promise<{ content: React.Reac
   const mdxPath = path.join(POSTS_DIR, `${slug}.mdx`);
   if (!fs.existsSync(mdxPath)) return null;
   const source = fs.readFileSync(mdxPath, "utf8");
-  const { content, frontmatter } = await compileMDX<{ title: string; subtitle?: string; image?: string; createdAt: string; updatedAt?: string }>({
+  const { content, frontmatter } = await compileMDX<{
+    title: string;
+    subtitle?: string;
+    image?: string;
+    createdAt: string;
+    updatedAt?: string;
+    tags?: string[];
+  }>({
     source,
     options: { parseFrontmatter: true },
     components: MDXComponents,
@@ -61,6 +72,9 @@ export async function getPostBySlug(slug: string): Promise<{ content: React.Reac
     image: frontmatter.image ? String(frontmatter.image) : undefined,
     createdAt: String(frontmatter.createdAt || new Date().toISOString()),
     updatedAt: String(frontmatter.updatedAt || frontmatter.createdAt || new Date().toISOString()),
+    tags: Array.isArray(frontmatter.tags)
+      ? frontmatter.tags.map((t) => String(t)).filter(Boolean)
+      : undefined,
   };
 
   return { content, meta };
