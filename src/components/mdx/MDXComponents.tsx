@@ -3,6 +3,7 @@ import CodeBlock from "@/components/CodeBlock";
 import Tweet from "@/components/mdx/Tweet";
 import Callout from "@/components/mdx/Callout";
 import YouTube from "@/components/mdx/YouTube";
+import Mermaid from "@/components/mdx/Mermaid";
 import type { ReactNode } from "react";
 
 type CodeChildProps = { className?: string; children?: ReactNode; mdxType?: string; originalType?: string };
@@ -37,6 +38,7 @@ const MDXComponents: Record<string, (props: unknown) => React.ReactNode> = {
   Tweet: (props) => <Tweet {...(props as Record<string, unknown>)} />,
   Callout: (props) => <Callout {...(props as Record<string, unknown>)} />,
   YouTube: (props) => <YouTube {...(props as { id: string })} />,
+  Mermaid: (props) => <Mermaid {...(props as { chart: string })} />,
   pre: (props) => {
     const p = props as { children?: ReactNode };
     const candidate = firstChild(p.children);
@@ -48,8 +50,26 @@ const MDXComponents: Record<string, (props: unknown) => React.ReactNode> = {
       if (isCode) {
         const className = candidate.props.className;
         const match = /language-([\w-]+)/.exec(className || "");
-        const language = match?.[1] || "tsx";
-        const code = String(candidate.props.children || "");
+      const language = match?.[1] || "tsx";
+      const code = String(candidate.props.children || "");
+      // If mermaid fenced code block, render as diagram
+      if (language.toLowerCase() === "mermaid") {
+        const metastring: string | undefined = (candidate.props as { metastring?: string }).metastring;
+        const meta = parseMeta(metastring);
+        const title = (meta.title as string) || (meta.filename as string) || "Mermaid";
+        const noCopy = meta.nocopy === true || meta.copy === "false";
+        const noCollapse = meta.nocollapse === true || meta.collapsible === "false";
+        const collapsed = meta.collapsed === true || meta.collapse === true;
+        return (
+          <Mermaid
+            chart={code}
+            title={title}
+            showCopy={!noCopy}
+            collapsible={!noCollapse}
+            initialCollapsed={collapsed}
+          />
+        );
+      }
         const metastring: string | undefined = (candidate.props as { metastring?: string }).metastring;
         const meta = parseMeta(metastring);
         const filename = (meta.filename as string) || (meta.title as string) || undefined;
