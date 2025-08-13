@@ -33,7 +33,7 @@ export default function BlogTable({ posts }: BlogTableProps) {
     if (selectedTags.length === 0) return posts;
     return posts.filter((p) => {
       const pTags = p.tags ?? [];
-      return selectedTags.every((t) => pTags.includes(t));
+      return selectedTags.some((t) => pTags.includes(t));
     });
   }, [posts, selectedTags]);
 
