@@ -14,7 +14,7 @@ export default function BlogIndex() {
       </header>
       <ul className="space-y-6">
         {posts.map((post) => (
-          <li key={post.slug} className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
+          <li key={post.slug} className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900/50">
             <Link href={`/blog/${post.slug}`} className="block">
               <div className="flex gap-4">
                 {post.image ? (
@@ -27,9 +27,9 @@ export default function BlogIndex() {
                   />
                 ) : null}
                 <div className="flex-1">
-                  <h2 className="text-lg font-medium">{post.title}</h2>
+                  <h2 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">{post.title}</h2>
                   {post.subtitle ? (
-                    <p className="text-sm text-zinc-400">{post.subtitle}</p>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">{post.subtitle}</p>
                   ) : null}
                   <div className="mt-2 text-xs text-zinc-500">
                     <time dateTime={post.createdAt}>Created: {new Date(post.createdAt).toLocaleDateString()}</time>

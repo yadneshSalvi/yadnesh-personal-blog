@@ -42,7 +42,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             />
           </div>
         ) : null}
-        <div id="post-content" className="prose prose-invert max-w-none scroll-smooth">
+        <div id="post-content" className="prose dark:prose-invert max-w-none scroll-smooth">
           {content}
         </div>
         </article>

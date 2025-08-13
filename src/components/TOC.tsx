@@ -55,16 +55,16 @@ export default function TOC({ contentSelector = "#post-content" }: { contentSele
   if (items.length === 0) return null;
 
   return (
-    <nav className="sticky top-6 hidden h-[calc(100vh-3rem)] w-64 shrink-0 overflow-auto pr-4 text-sm text-zinc-400 lg:block">
-      <div className="mb-2 text-xs uppercase tracking-wide text-zinc-500">On this page</div>
+    <nav className="sticky top-6 hidden h-[calc(100vh-3rem)] w-64 shrink-0 overflow-auto pr-4 text-sm text-zinc-600 dark:text-zinc-400 lg:block">
+      <div className="mb-2 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-500">On this page</div>
       <ul className="space-y-1">
         {items.map((h) => (
           <li key={h.id} className={clsx({})}>
             <a
               href={`#${h.id}`}
               className={clsx(
-                "block rounded px-2 py-1 hover:text-zinc-200",
-                activeId === h.id ? "bg-zinc-800 text-zinc-100" : "text-zinc-400",
+                "block rounded px-2 py-1 hover:text-zinc-800 dark:hover:text-zinc-200",
+                activeId === h.id ? "bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100" : "text-zinc-600 dark:text-zinc-400",
                 h.level === 1 && "pl-2 font-medium",
                 h.level === 2 && "pl-4",
                 h.level === 3 && "pl-6",
