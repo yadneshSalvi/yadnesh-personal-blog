@@ -1,10 +1,11 @@
 import Fuse from 'fuse.js';
+import type { IFuseOptions } from 'fuse.js';
 import { SearchablePost, SearchResult, SearchOptions, SearchResponse } from './types';
 
 /**
  * Fuse.js configuration for fuzzy search
  */
-const fuseOptions: Fuse.IFuseOptions<SearchablePost> = {
+const fuseOptions: IFuseOptions<SearchablePost> = {
   // Search keys with weights (higher weight = more important)
   keys: [
     { name: 'title', weight: 0.4 },
@@ -47,7 +48,7 @@ export function performSearch(
   const { query, limit = 10, tags, sortBy = 'relevance', dateRange } = options;
 
   // Prepare search query
-  let searchQuery = query.trim();
+  const searchQuery = query.trim();
   
   // Handle empty query
   if (!searchQuery) {
@@ -62,13 +63,19 @@ export function performSearch(
   }
 
   // Perform the search
-  let fuseResults = fuse.search(searchQuery, { limit: limit * 2 }); // Get more results for filtering
+  const fuseResults = fuse.search(searchQuery, { limit: limit * 2 }); // Get more results for filtering
 
   // Convert Fuse results to our SearchResult format
-  let results: SearchResult[] = fuseResults.map(result => ({
-    item: result.item,
-    score: result.score,
-    matches: result.matches,
+  let results: SearchResult[] = fuseResults.map(fr => ({
+    item: fr.item,
+    score: fr.score,
+    matches: fr.matches
+      ? fr.matches.map(m => ({
+          indices: m.indices.map(([start, end]) => [start, end]),
+          value: m.value ?? '',
+          key: m.key ?? '',
+        }))
+      : undefined,
   }));
 
   // Apply tag filtering

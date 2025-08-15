@@ -25,8 +25,8 @@ export default function CalendarBooking() {
       <div className="p-4">
         <div className="space-y-3">
           <div className="font-mono text-xs text-zinc-600 dark:text-zinc-400">
-            <p>// book a 30-minute slot</p>
-            <p>/* let's sync up and build something awesome */</p>
+            <p>{'// book a 30-minute slot'}</p>
+            <p>{'/* let\u2019s sync up and build something awesome */'}</p>
           </div>
           
           <div className="rounded-md border border-zinc-200 bg-zinc-50/50 p-1 dark:border-zinc-700 dark:bg-zinc-900/50">

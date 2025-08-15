@@ -255,9 +255,7 @@ function TimelineItem({ role, company, location, period, children, collapsible =
   );
 }
 
-function Subsection({ title }: { title: string }) {
-  return <h4 className="mt-3 text-[13px] font-semibold text-zinc-800 dark:text-zinc-200">{title}</h4>;
-}
+// Removed unused Subsection component
 
 function Bullet({ children }: { children: ReactNode }) {
   return <li className="leading-6">{children}</li>;

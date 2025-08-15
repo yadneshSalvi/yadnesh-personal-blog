@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSearch } from "@/hooks/useSearch";
 import { useSearchShortcut } from "@/hooks/useKeyboardShortcut";
-import SearchResults from "./SearchResults";
 import SearchErrorBoundary from "./SearchErrorBoundary";
 
 interface SearchBarProps {
@@ -28,11 +27,11 @@ export default function SearchBar({
   const { 
     searchResults, 
     isLoading, 
-    error, 
+    
     search, 
     clearResults,
     suggestions,
-    isLoadingSuggestions 
+    
   } = useSearch({ 
     debounceMs: 300, 
     minQueryLength: 2,
@@ -121,10 +120,7 @@ export default function SearchBar({
     search(suggestion);
   };
 
-  const handleTagClick = (tag: string) => {
-    setSearchQuery(tag);
-    search(tag);
-  };
+  // Removed unused handleTagClick
 
   const handleResultClick = () => {
     setIsExpanded(false);
@@ -339,7 +335,7 @@ export default function SearchBar({
             ) : searchQuery.length >= 2 && (
               <div className="p-4 text-center">
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  No results found for "{searchQuery}"
+                  No results found for &quot;{searchQuery}&quot;
                 </p>
               </div>
             )}

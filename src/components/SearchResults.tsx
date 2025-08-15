@@ -68,20 +68,19 @@ export default function SearchResults({
       <div className="text-sm text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800 pb-4">
         <p>
           Found <span className="font-medium text-zinc-900 dark:text-zinc-100">{total}</span> result{total !== 1 ? 's' : ''} for 
-          <span className="font-medium text-zinc-900 dark:text-zinc-100"> "{query}"</span>
+          <span className="font-medium text-zinc-900 dark:text-zinc-100"> &quot;{query}&quot;</span>
           <span className="ml-2">({executionTime}ms)</span>
         </p>
       </div>
 
       {/* Search Results */}
       <div className="space-y-6">
-        {results.map((result, index) => (
+        {results.map((result) => (
           <SearchResultItem 
             key={result.item.slug} 
             result={result} 
             query={query}
             onTagClick={onTagClick}
-            index={index}
           />
         ))}
       </div>
@@ -101,13 +100,11 @@ export default function SearchResults({
 function SearchResultItem({ 
   result, 
   query, 
-  onTagClick, 
-  index 
+  onTagClick 
 }: { 
   result: SearchResult; 
   query: string; 
   onTagClick?: (tag: string) => void;
-  index: number;
 }) {
   const { item } = result;
   
@@ -210,7 +207,7 @@ function NoResultsFound({
           No results found
         </h3>
         <p className="text-zinc-600 dark:text-zinc-400">
-          No posts found for <span className="font-medium">"{query}"</span>
+          No posts found for <span className="font-medium">&quot;{query}&quot;</span>
         </p>
       </div>
 

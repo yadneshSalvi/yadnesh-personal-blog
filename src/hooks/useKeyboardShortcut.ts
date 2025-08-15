@@ -12,7 +12,7 @@ interface UseKeyboardShortcutOptions {
 export function useKeyboardShortcut(
   options: UseKeyboardShortcutOptions,
   callback: (event: KeyboardEvent) => void,
-  dependencies: any[] = []
+  dependencies: ReadonlyArray<unknown> = []
 ) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -49,7 +49,7 @@ export function useKeyboardShortcut(
 }
 
 // Specific hook for search shortcut (Cmd/Ctrl + K)
-export function useSearchShortcut(callback: () => void, dependencies: any[] = []) {
+export function useSearchShortcut(callback: () => void, dependencies: ReadonlyArray<unknown> = []) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Check for Cmd+K on Mac or Ctrl+K on Windows/Linux

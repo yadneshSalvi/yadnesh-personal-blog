@@ -14,7 +14,7 @@ class SearchCache {
   /**
    * Creates a cache key from search parameters
    */
-  private createKey(query: string, options?: any): string {
+  private createKey(query: string, options?: unknown): string {
     const normalizedQuery = query.toLowerCase().trim();
     const optionsStr = options ? JSON.stringify(options) : '';
     return `${normalizedQuery}:${optionsStr}`;
@@ -23,7 +23,7 @@ class SearchCache {
   /**
    * Gets cached search results
    */
-  get(query: string, options?: any): SearchResponse | null {
+  get(query: string, options?: unknown): SearchResponse | null {
     const key = this.createKey(query, options);
     const entry = this.cache.get(key);
 
@@ -43,7 +43,7 @@ class SearchCache {
   /**
    * Sets cached search results
    */
-  set(query: string, data: SearchResponse, options?: any, ttl?: number): void {
+  set(query: string, data: SearchResponse, options?: unknown, ttl?: number): void {
     const key = this.createKey(query, options);
     const now = Date.now();
     const expiresAt = now + (ttl || this.defaultTTL);

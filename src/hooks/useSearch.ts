@@ -57,7 +57,6 @@ export function useSearch(options: UseSearchOptions = {}): UseSearchReturn {
 
         try {
           // Check cache first
-          const cacheKey = { query, ...searchOptions };
           const cachedResult = searchCache.get(query, searchOptions);
           
           if (cachedResult) {
@@ -208,7 +207,7 @@ export function usePopularTags() {
 
 // Hook for getting recent posts
 export function useRecentPosts(limit: number = 5) {
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Array<Record<string, unknown>>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
