@@ -153,8 +153,8 @@ export default function AboutPage() {
           <Card>
             <SectionTitle Icon={TrophyIcon} title="Awards" />
             <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-2"><TrophyMini className="mt-0.5" /><span><span className="font-medium">GATE (CS) 2019</span>: All-India percentile 99.78</span></li>
-              <li className="flex items-start gap-2"><TrophyMini className="mt-0.5" /><span><span className="font-medium">SHE Scholarship</span>: Top 1% in School Board (Class XII), 2014</span></li>
+              <li className="flex items-start gap-2"><TrophyMini className="mt-0.5 h-3.5 w-3.5 shrink-0" /><span><span className="font-medium">GATE (CS) 2019</span>: All-India percentile 99.78</span></li>
+              <li className="flex items-start gap-2"><TrophyMini className="mt-0.5 h-3.5 w-3.5 shrink-0" /><span><span className="font-medium">SHE Scholarship</span>: Top 1% in School Board (Class XII), 2014</span></li>
             </ul>
           </Card>
         </aside>
