@@ -27,11 +27,11 @@ export default function SearchBar({
   const { 
     searchResults, 
     isLoading, 
-    
+    getSuggestions,
     search, 
     clearResults,
     suggestions,
-    
+    isLoadingSuggestions,
   } = useSearch({ 
     debounceMs: 300, 
     minQueryLength: 2,
@@ -50,11 +50,12 @@ export default function SearchBar({
     if (searchQuery.length >= 2) {
       search(searchQuery);
       setShowSuggestions(true);
+      getSuggestions(searchQuery);
     } else {
       clearResults();
       setShowSuggestions(false);
     }
-  }, [searchQuery, search, clearResults]);
+  }, [searchQuery, search, clearResults, getSuggestions]);
 
   // Handle click outside to close
   useEffect(() => {
@@ -259,7 +260,7 @@ export default function SearchBar({
       {isExpanded && showResults && showSuggestions && (searchResults || isLoading || suggestions.length > 0) && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg max-h-96 overflow-y-auto z-50 hidden md:block">
           {/* Quick Suggestions */}
-          {suggestions.length > 0 && !isLoading && (
+          {suggestions.length > 0 && !isLoading && !isLoadingSuggestions && (
             <div className="p-3 border-b border-zinc-200 dark:border-zinc-800">
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-2">Suggestions</p>
               <div className="flex flex-wrap gap-1">

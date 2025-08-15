@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { SearchResponse, SearchOptions } from '@/lib/search/types';
+import { SearchResponse, SearchOptions, SearchablePost } from '@/lib/search/types';
 import { searchCache } from '@/lib/search/cache';
 import { searchAnalytics } from '@/lib/search/analytics';
 
@@ -17,13 +17,13 @@ interface UseSearchReturn {
   clearResults: () => void;
   suggestions: string[];
   isLoadingSuggestions: boolean;
+  getSuggestions: (query: string) => Promise<void>;
 }
 
 export function useSearch(options: UseSearchOptions = {}): UseSearchReturn {
   const {
     debounceMs = 300,
     minQueryLength = 2,
-    autoSearch = true,
   } = options;
 
   const [searchResults, setSearchResults] = useState<SearchResponse | null>(null);
@@ -143,16 +143,6 @@ export function useSearch(options: UseSearchOptions = {}): UseSearchReturn {
     }
   }, []);
 
-  // Debounced suggestions
-  const debouncedGetSuggestions = useMemo(() => {
-    let timeoutId: NodeJS.Timeout;
-
-    return (query: string) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => getSuggestions(query), 150);
-    };
-  }, [getSuggestions]);
-
   const clearResults = useCallback(() => {
     setSearchResults(null);
     setError(null);
@@ -168,6 +158,7 @@ export function useSearch(options: UseSearchOptions = {}): UseSearchReturn {
     clearResults,
     suggestions,
     isLoadingSuggestions,
+    getSuggestions,
   };
 }
 
@@ -207,7 +198,7 @@ export function usePopularTags() {
 
 // Hook for getting recent posts
 export function useRecentPosts(limit: number = 5) {
-  const [posts, setPosts] = useState<Array<Record<string, unknown>>>([]);
+  const [posts, setPosts] = useState<SearchablePost[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
