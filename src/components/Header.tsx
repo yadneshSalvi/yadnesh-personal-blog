@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import SearchBar from "./SearchBar";
 
 export default function Header() {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -25,16 +26,22 @@ export default function Header() {
         </Link>
         
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6 text-sm">
-          <Link href="/blog" className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-            Blog
-          </Link>
-          <Link href="/about" className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-            About
-          </Link>
-          <Link href="/contact" className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-            Contact
-          </Link>
+        <div className="hidden md:flex items-center gap-6">
+          <nav className="flex items-center gap-6 text-sm">
+            <Link href="/blog" className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+              Blog
+            </Link>
+            <Link href="/about" className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+              About
+            </Link>
+            <Link href="/contact" className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+              Contact
+            </Link>
+          </nav>
+          
+          {/* Search Bar */}
+          <SearchBar />
+          
           {/* <button
             type="button"
             aria-label="Toggle theme"
@@ -43,19 +50,22 @@ export default function Header() {
           >
             {mounted ? (isDark ? "Dark" : "Light") : "Theme"}
           </button> */}
-        </nav>
+        </div>
 
-        {/* Mobile Hamburger Button */}
-        <button
-          type="button"
-          className="md:hidden flex flex-col items-center justify-center w-6 h-6 space-y-1"
-          onClick={toggleMobileMenu}
-          aria-label="Toggle mobile menu"
-        >
-          <span className={`block w-5 h-0.5 bg-zinc-700 dark:bg-zinc-300 transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
-          <span className={`block w-5 h-0.5 bg-zinc-700 dark:bg-zinc-300 transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`}></span>
-          <span className={`block w-5 h-0.5 bg-zinc-700 dark:bg-zinc-300 transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
-        </button>
+        {/* Mobile Search and Menu */}
+        <div className="md:hidden flex items-center gap-2">
+          <SearchBar />
+          <button
+            type="button"
+            className="flex flex-col items-center justify-center w-6 h-6 space-y-1"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+          >
+            <span className={`block w-5 h-0.5 bg-zinc-700 dark:bg-zinc-300 transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
+            <span className={`block w-5 h-0.5 bg-zinc-700 dark:bg-zinc-300 transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`}></span>
+            <span className={`block w-5 h-0.5 bg-zinc-700 dark:bg-zinc-300 transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
+          </button>
+        </div>
       </div>
 
       {/* Mobile Navigation Menu */}

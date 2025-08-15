@@ -33,3 +33,23 @@ html, body {
 .prose :where(table) {
   @apply bg-white dark:bg-zinc-900/40;
 }
+
+/* Search-specific utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Search result highlighting */
+mark {
+  @apply bg-yellow-200 dark:bg-yellow-800/50 px-1 rounded text-inherit;
+}
