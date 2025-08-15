@@ -113,7 +113,9 @@ function processPost(slug: string): SearchablePost | null {
     const strippedContent = stripMDXSyntax(content);
     const excerpt = createExcerpt(content);
     const wordCount = countWords(content);
-    const readingTime = calculateReadingTime(content);
+    const readingTime = data.readingTime 
+      ? Number(data.readingTime) 
+      : calculateReadingTime(content);
 
     const searchablePost: SearchablePost = {
       slug,

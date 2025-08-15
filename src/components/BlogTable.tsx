@@ -88,7 +88,8 @@ export default function BlogTable({ posts }: BlogTableProps) {
         <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
           {filteredPosts.map((post) => {
             const updated = new Date(post.updatedAt);
-            const updatedLabel = updated.toLocaleDateString(undefined, {
+            const updatedLabel = updated.toLocaleDateString('en-US', {
+              timeZone: 'UTC',
               year: "numeric",
               month: "short",
               day: "2-digit",

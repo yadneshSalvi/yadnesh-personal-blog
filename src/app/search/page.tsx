@@ -217,7 +217,7 @@ function SearchPageContent() {
                         {post.title}
                       </h4>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                        {new Date(post.createdAt).toLocaleDateString()} • {post.readingTime} min read
+                        {new Date(post.createdAt).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'short', day: '2-digit' })} • {post.readingTime} min read
                       </p>
                     </a>
                   ))}

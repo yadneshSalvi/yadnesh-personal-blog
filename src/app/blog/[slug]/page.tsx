@@ -25,9 +25,15 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             <p className="text-zinc-400">{meta.subtitle}</p>
           ) : null}
           <div className="text-xs text-zinc-500">
-            <time dateTime={meta.createdAt}>Created: {new Date(meta.createdAt).toLocaleDateString()}</time>
+            <time dateTime={meta.createdAt}>Created: {new Date(meta.createdAt).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'short', day: '2-digit' })}</time>
             <span className="mx-2">·</span>
-            <time dateTime={meta.updatedAt}>Updated: {new Date(meta.updatedAt).toLocaleDateString()}</time>
+            <time dateTime={meta.updatedAt}>Updated: {new Date(meta.updatedAt).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'short', day: '2-digit' })}</time>
+            {meta.readingTime && (
+              <>
+                <span className="mx-2">·</span>
+                <span>{meta.readingTime} min read</span>
+              </>
+            )}
           </div>
         </header>
         {meta.image ? (

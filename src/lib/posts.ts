@@ -4,6 +4,15 @@ import matter from "gray-matter";
 import { compileMDX } from "next-mdx-remote/rsc";
 import MDXComponents from "@/components/mdx/MDXComponents";
 
+/**
+ * Calculates reading time based on word count
+ */
+function calculateReadingTime(content: string): number {
+  const wordsPerMinute = 200;
+  const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
+  return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+}
+
 export type PostMeta = {
   slug: string;
   title: string;
@@ -12,6 +21,7 @@ export type PostMeta = {
   createdAt: string;
   updatedAt: string;
   tags?: string[];
+  readingTime?: number;
 };
 
 const POSTS_DIR = path.join(process.cwd(), "content", "posts");
@@ -31,7 +41,7 @@ export function getAllPostsMeta(): PostMeta[] {
     .map((slug) => {
       const fullPath = path.join(POSTS_DIR, `${slug}.mdx`);
       const source = fs.readFileSync(fullPath, "utf8");
-      const { data } = matter(source);
+      const { data, content } = matter(source);
       const title = String(data.title || slug);
       const subtitle = data.subtitle ? String(data.subtitle) : undefined;
       const image = data.image ? String(data.image) : undefined;
@@ -40,7 +50,10 @@ export function getAllPostsMeta(): PostMeta[] {
       const tags = Array.isArray(data.tags)
         ? data.tags.map((t: unknown) => String(t)).filter(Boolean)
         : undefined;
-      const meta: PostMeta = { slug, title, subtitle, image, createdAt, updatedAt, tags };
+      const readingTime = data.readingTime 
+        ? Number(data.readingTime) 
+        : calculateReadingTime(content);
+      const meta: PostMeta = { slug, title, subtitle, image, createdAt, updatedAt, tags, readingTime };
       return meta;
     })
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
@@ -59,11 +72,18 @@ export async function getPostBySlug(slug: string): Promise<{ content: React.Reac
     createdAt: string;
     updatedAt?: string;
     tags?: string[];
+    readingTime?: number;
   }>({
     source,
     options: { parseFrontmatter: true },
     components: MDXComponents,
   });
+
+  // Calculate reading time from content if not manually specified
+  const contentForReadingTime = source.split('---').slice(2).join('---'); // Remove frontmatter
+  const readingTime = frontmatter.readingTime 
+    ? Number(frontmatter.readingTime) 
+    : calculateReadingTime(contentForReadingTime);
 
   const meta: PostMeta = {
     slug,
@@ -75,6 +95,7 @@ export async function getPostBySlug(slug: string): Promise<{ content: React.Reac
     tags: Array.isArray(frontmatter.tags)
       ? frontmatter.tags.map((t) => String(t)).filter(Boolean)
       : undefined,
+    readingTime,
   };
 
   return { content, meta };

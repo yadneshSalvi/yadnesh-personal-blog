@@ -1,36 +1,18 @@
 {
   "posts": [
     {
-      "slug": "second-post",
-      "title": "Second Post: More Examples",
-      "excerpt": "Minimal frontmatter using defaults for subtitle and image. This article shows multiple fenced code examples and headings. The info callout renders via MDX.",
-      "content": "Minimal frontmatter using defaults for subtitle and image. This article shows multiple fenced code examples and headings. The info callout renders via MDX. Video Diagram graph TD A[Start] --> B{Is it working?} B -- Yes --> C[Ship it] B -- No --> D[Fix it] D --> B Programming Languages Let's try out different Programming Languages TypeScript export default function Component() { return Click ; } export default function Component() { return Click ; } Python from functools import wraps def mydecorator(func): @wraps(func) def decorator(args, kwargs): print(\"do something before\") result = func(args, **kwargs) print(\"do something after\") return result return decorator",
-      "tags": [
-        "RAG",
-        "AI Workflows"
-      ],
-      "createdAt": "2025-08-12T11:00:00.000Z",
-      "updatedAt": "2025-08-12T11:30:00.000Z",
-      "wordCount": 99,
-      "readingTime": 1,
-      "url": "/blog/second-post"
-    },
-    {
-      "slug": "first-post",
-      "title": "First Post: Code Blocks",
-      "subtitle": "Demonstrating code highlighting, copy, and collapse",
-      "excerpt": "Welcome to my blog. Below are some code examples. TypeScript type User = { id: string; name: string }; export function greet(user: User) { return Hello, ${user.",
-      "content": "Welcome to my blog! Below are some code examples. TypeScript type User = { id: string; name: string }; export function greet(user: User) { return Hello, ${user.name}!; } console.log(greet({ id: \"1\", name: \"Ada\" })); npm ci npm run dev Tweets or",
-      "tags": [
-        "AI Agents"
-      ],
-      "createdAt": "2025-08-12T10:00:00.000Z",
-      "updatedAt": "2025-08-12T10:00:00.000Z",
-      "wordCount": 41,
-      "readingTime": 1,
-      "url": "/blog/first-post"
+      "slug": "getting-started",
+      "title": "Getting Started",
+      "excerpt": "Hey there, welcome to my blog. I'm Yadnesh and you can get read more about me in the About section. I like coding.",
+      "content": "Hey there, welcome to my blog! I'm Yadnesh and you can get read more about me in the About section. I like coding. I'm sold on the idea that the future is Agentic. And I'm excited to code new Agents, learn from the process and share the learnings with you. Why this blog? The home page says \"An opinionated blog on AI Engineering\", this blog site is going to be just that. As of 2025, I have been working as a Data Scientist in NLP domain for last 4 years. Of which the last 2.5 years have been into RAG systems, AI Workflow and AI Agents. I have formed some opinions along the way, and they way AI is progressing, each week feels like a year of advancements, so I'm definitely going to make more opinons with time. This site will be my outlet for sharing such opinions, and any other tutorials, projects that I work on, or reviews of tools or libraries that I use.",
+      "tags": [],
+      "createdAt": "2025-08-15T20:37:00.000Z",
+      "updatedAt": "2025-08-15T20:37:00.000Z",
+      "wordCount": 166,
+      "readingTime": 2,
+      "url": "/blog/getting-started"
     }
   ],
-  "lastUpdated": "2025-08-15T05:15:21.960Z",
+  "lastUpdated": "2025-08-15T17:58:54.404Z",
   "version": "1.0.0"
 }

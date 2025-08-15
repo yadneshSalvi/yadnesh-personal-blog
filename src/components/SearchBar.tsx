@@ -308,7 +308,7 @@ export default function SearchBar({
                         {result.item.excerpt}
                       </p>
                       <div className="flex items-center mt-2 text-xs text-zinc-400">
-                        <span>{new Date(result.item.createdAt).toLocaleDateString()}</span>
+                        <span>{new Date(result.item.createdAt).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'short', day: '2-digit' })}</span>
                         <span className="mx-2">•</span>
                         <span>{result.item.readingTime} min read</span>
                         {result.item.tags.length > 0 && (

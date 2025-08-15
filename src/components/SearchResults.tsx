@@ -158,7 +158,7 @@ function SearchResultItem({
           <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
             <div className="flex items-center space-x-4">
               <time dateTime={item.createdAt}>
-                {new Date(item.createdAt).toLocaleDateString()}
+                {new Date(item.createdAt).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'short', day: '2-digit' })}
               </time>
               <span>{item.readingTime} min read</span>
               <span>{item.wordCount} words</span>

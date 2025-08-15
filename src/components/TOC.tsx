@@ -55,7 +55,7 @@ export default function TOC({ contentSelector = "#post-content" }: { contentSele
   if (items.length === 0) return null;
 
   return (
-    <nav className="sticky top-6 hidden h-[calc(100vh-3rem)] w-64 shrink-0 overflow-auto pr-4 text-sm text-zinc-600 dark:text-zinc-400 lg:block">
+    <nav className="sticky top-20 self-start hidden max-h-[calc(100vh-6rem)] w-64 shrink-0 overflow-auto pr-4 text-sm text-zinc-600 dark:text-zinc-400 lg:block">
       <div className="mb-2 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-500">On this page</div>
       <ul className="space-y-1">
         {items.map((h) => (
