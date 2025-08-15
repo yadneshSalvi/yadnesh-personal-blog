@@ -78,9 +78,9 @@ export default function BlogTable({ posts }: BlogTableProps) {
 
       <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/40">
         <div className="border-b border-zinc-200 bg-zinc-50/70 px-4 py-2 text-xs uppercase tracking-wider text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-400">
-          <div className="grid grid-cols-[1fr_1fr_160px] items-center gap-3">
+          <div className="grid grid-cols-[1fr_120px] items-center gap-3 sm:grid-cols-[1fr_1fr_160px]">
             <span className="font-mono">post</span>
-            <span className="font-mono">tags</span>
+            <span className="hidden font-mono sm:block">tags</span>
             <span className="font-mono text-right">last modified</span>
           </div>
         </div>
@@ -100,7 +100,7 @@ export default function BlogTable({ posts }: BlogTableProps) {
                   href={`/blog/${post.slug}`}
                   className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
                 >
-                  <div className="grid grid-cols-[1fr_1fr_160px] items-center gap-3 px-4 py-3 transition-colors hover:bg-zinc-50/70 dark:hover:bg-zinc-900/60">
+                  <div className="grid grid-cols-[1fr_120px] items-center gap-3 px-4 py-3 transition-colors hover:bg-zinc-50/70 dark:hover:bg-zinc-900/60 sm:grid-cols-[1fr_1fr_160px]">
                     <div className="flex items-start gap-3">
                       <div className="mt-1 h-4 w-1.5 rounded bg-gradient-to-b from-blue-500 to-cyan-400 opacity-60 transition-opacity group-hover:opacity-100" />
                       <div className="min-w-0">
@@ -112,7 +112,7 @@ export default function BlogTable({ posts }: BlogTableProps) {
                         ) : null}
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="hidden flex-wrap gap-1.5 sm:flex">
                       {(post.tags ?? []).map((tag) => (
                         <span
                           key={tag}
@@ -130,7 +130,7 @@ export default function BlogTable({ posts }: BlogTableProps) {
                     <div className="text-right">
                       <time
                         dateTime={post.updatedAt}
-                        className="font-mono text-xs text-zinc-600 dark:text-zinc-400"
+                        className="font-mono text-xs text-zinc-600 dark:text-zinc-400 whitespace-nowrap"
                         title={updated.toLocaleString()}
                       >
                         {updatedLabel}
