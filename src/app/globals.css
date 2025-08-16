@@ -1,3 +1,6 @@
+/* Use class-based dark mode in Tailwind v4 (define BEFORE importing Tailwind) */
+@custom-variant dark (&:where(.dark &));
+
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -7,7 +10,7 @@ html, body {
   color: rgb(24 24 27); /* zinc-900 */
 }
 
-.dark html, .dark body {
+html.dark, html.dark body {
   background-color: rgb(9 9 11); /* zinc-950 */
   color: rgb(244 244 245); /* zinc-100 */
 }
