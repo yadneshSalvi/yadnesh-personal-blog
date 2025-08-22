@@ -36,12 +36,24 @@ export default function YouTube({ id, title, start, params, poster = "hqdefault"
     hostRef.current.setAttribute("playlabel", title || "Play video");
     hostRef.current.setAttribute("poster", poster);
     if (paramsString) hostRef.current.setAttribute("params", paramsString);
-  }, [id, title, poster, paramsString]);
+    // Also set explicit start attribute as supported by lite-youtube
+    if (typeof start === "number" && start > 0) {
+      hostRef.current.setAttribute("start", String(start));
+    } else {
+      hostRef.current.removeAttribute("start");
+    }
+  }, [id, title, poster, paramsString, start]);
 
   return React.createElement("lite-youtube", {
     ref: hostRef as unknown as React.Ref<HTMLElement>,
     style: { display: "block" },
     className: className,
+    // Set attributes at creation so the web component sees them in connectedCallback
+    videoid: id,
+    playlabel: title || "Play video",
+    poster: poster,
+    ...(paramsString ? { params: paramsString } : {}),
+    ...(typeof start === "number" && start > 0 ? { start: String(start) } : {}),
   }) as unknown as React.ReactElement;
 }
 
