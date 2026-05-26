@@ -61,7 +61,7 @@ export default function Hero() {
                 <p className="mt-1">
                   <span className="text-cyan-500 dark:text-cyan-400">›</span>{" "}
                   AI/ML Engineer ·{" "}
-                  <span className="text-zinc-900 dark:text-zinc-100">5+ yrs</span> shipping NLP, AI Agents &amp; Full-stack applications
+                  <span className="text-zinc-900 dark:text-zinc-100">5+ yrs exp </span> shipping NLP, AI Agents &amp; Full-stack applications
                   <br />
                   <span className="text-cyan-500 dark:text-cyan-400">›</span>{" "}
                   IISc Bangalore · IIT Delhi
