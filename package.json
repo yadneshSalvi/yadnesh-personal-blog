@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "node scripts/build-search-index.js && next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "build-index": "node scripts/build-search-index.js"
   },
   "dependencies": {
@@ -18,7 +18,7 @@
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
     "mermaid": "^11.9.0",
-    "next": "15.4.6",
+    "next": "^16.2.6",
     "next-mdx-remote": "^5.0.0",
     "next-themes": "^0.4.6",
     "nodemailer": "^6.9.14",
@@ -32,10 +32,10 @@
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^20",
     "@types/nodemailer": "^6.4.17",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
     "eslint": "^9",
-    "eslint-config-next": "15.4.6",
+    "eslint-config-next": "^16.2.6",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

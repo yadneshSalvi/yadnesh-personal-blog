@@ -1,7 +1,13 @@
 import Fuse from 'fuse.js';
 import { SearchablePost, SearchOptions, SearchResponse, SearchIndex } from './types';
 import { createSearchEngine, performSearch, getAutocompleteSuggestions } from './fuzzy';
-import { loadSearchIndex, generateSearchIndex } from './indexer';
+import { loadSearchIndex } from './load';
+// NOTE: ./indexer (build-time index generation, pulls in gray-matter + fs reads)
+// is intentionally NOT statically imported. It's loaded via dynamic import() in
+// the fallback paths below so it stays out of the runtime API route bundle and
+// out of Turbopack's NFT trace. In production the pre-built JSON always exists
+// (scripts/build-search-index.js runs before next build), so these fallbacks
+// never fire at runtime.
 
 let searchEngine: Fuse<SearchablePost> | null = null;
 let searchIndex: SearchIndex | null = null;
@@ -25,9 +31,12 @@ async function initializeSearchEngine(): Promise<Fuse<SearchablePost>> {
     // Try to load existing index
     let index = loadSearchIndex();
     
-    // If no index exists or it's too old, generate a new one
+    // If no index exists or it's too old, generate a new one.
+    // Dynamic import keeps the heavyweight build-time generator out of the
+    // runtime bundle when the pre-built JSON is present (the normal case).
     if (!index) {
       console.log('No search index found, generating new one...');
+      const { generateSearchIndex } = await import('./indexer');
       index = generateSearchIndex();
     }
 
@@ -162,6 +171,7 @@ export async function getSearchStats(): Promise<{
 export async function refreshSearchIndex(): Promise<void> {
   try {
     console.log('Refreshing search index...');
+    const { generateSearchIndex } = await import('./indexer');
     const newIndex = generateSearchIndex();
     
     searchIndex = newIndex;
