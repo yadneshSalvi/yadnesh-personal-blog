@@ -75,7 +75,16 @@ export async function getPostBySlug(slug: string): Promise<{ content: React.Reac
     readingTime?: number;
   }>({
     source,
-    options: { parseFrontmatter: true },
+    options: {
+      parseFrontmatter: true,
+      // next-mdx-remote v6 defaults to blockJS: true, which strips ALL {…}
+      // expressions in MDX — including JSX prop expressions like
+      // `<YouTube start={1146} />`. We author our own MDX in content/posts so
+      // the content is trusted; opt out of the strip. `blockDangerousJS` keeps
+      // its default of true, so eval/Function/process/require are still blocked
+      // as defense-in-depth.
+      blockJS: false,
+    },
     components: MDXComponents,
   });
 
