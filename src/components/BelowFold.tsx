@@ -18,8 +18,8 @@ export default function BelowFold({ posts }: { posts: PostMeta[] }) {
           className="pointer-events-none absolute inset-0 opacity-70 [background:linear-gradient(to_right,rgba(0,0,0,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.06)_1px,transparent_1px)] [background-size:28px_28px] dark:[background:linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)]"
         />
         <div className="relative">
-          <p className="font-[var(--font-geist-mono)] text-[11px] uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
-            // the blog
+          <p className="font-[var(--font-geist-mono)] text-xs uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
+            {"// the blog"}
           </p>
           <h2 className="mt-3 font-[var(--font-geist-mono)] text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl">
             <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
@@ -28,7 +28,7 @@ export default function BelowFold({ posts }: { posts: PostMeta[] }) {
               AI Engineering
             </span>
           </h2>
-          <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
             Notes &amp; experiments on AI Agents, RAG, Fine-tuning, and more.
           </p>
           <Link
@@ -44,7 +44,7 @@ export default function BelowFold({ posts }: { posts: PostMeta[] }) {
       <section id="latest">
         <div className="mb-4 flex items-baseline justify-between">
           <h2 className="font-[var(--font-geist-mono)] text-sm uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
-            // latest
+            {"// latest"}
           </h2>
           <Link
             href="/blog"
@@ -54,8 +54,8 @@ export default function BelowFold({ posts }: { posts: PostMeta[] }) {
           </Link>
         </div>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 font-[var(--font-geist-mono)] text-sm dark:border-zinc-800 dark:bg-zinc-950">
-          <p className="mb-4 text-[11px] uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 font-[var(--font-geist-mono)] text-[15px] dark:border-zinc-800 dark:bg-zinc-950">
+          <p className="mb-4 text-xs uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
             $ ls ./posts
           </p>
           <ul className="space-y-3">
@@ -78,7 +78,7 @@ export default function BelowFold({ posts }: { posts: PostMeta[] }) {
                   {p.title}
                 </Link>
                 {typeof p.readingTime === "number" && (
-                  <span className="ml-auto whitespace-nowrap text-[11px] text-zinc-400">
+                  <span className="ml-auto whitespace-nowrap text-xs text-zinc-400">
                     {p.readingTime} min
                   </span>
                 )}
@@ -86,7 +86,7 @@ export default function BelowFold({ posts }: { posts: PostMeta[] }) {
             ))}
           </ul>
           {topPost && (
-            <p className="mt-5 text-[11px] text-zinc-400">
+            <p className="mt-5 text-xs text-zinc-400">
               <span className="select-none">$</span>{" "}
               <span className="text-zinc-500">
                 cat ./posts/

@@ -28,7 +28,7 @@ export default function Hero() {
           </div>
 
           {/* body */}
-          <div className="p-6 sm:p-8 font-[var(--font-geist-mono)] text-sm leading-7 text-zinc-700 dark:text-zinc-300">
+          <div className="p-6 sm:p-8 font-[var(--font-geist-mono)] text-[15px] leading-8 text-zinc-700 dark:text-zinc-300">
             <div className="flex items-start gap-6 sm:gap-7">
               {/* YS monogram avatar */}
               <div className="hidden shrink-0 sm:block">
@@ -51,7 +51,7 @@ export default function Hero() {
                 <p>
                   <span className="select-none text-zinc-400">$</span> whoami
                 </p>
-                <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-50">
+                <h1 className="mt-1 text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
                   Yadnesh Salvi
                 </h1>
 
@@ -61,7 +61,7 @@ export default function Hero() {
                 <p className="mt-1">
                   <span className="text-cyan-500 dark:text-cyan-400">›</span>{" "}
                   AI/ML Engineer ·{" "}
-                  <span className="text-zinc-900 dark:text-zinc-100">4+ yrs</span> shipping NLP, RAG &amp; agents
+                  <span className="text-zinc-900 dark:text-zinc-100">5+ yrs</span> shipping NLP, AI Agents &amp; Full-stack applications
                   <br />
                   <span className="text-cyan-500 dark:text-cyan-400">›</span>{" "}
                   IISc Bangalore · IIT Delhi
@@ -77,7 +77,7 @@ export default function Hero() {
                   {STACK.map((s) => (
                     <span
                       key={s}
-                      className="rounded border border-zinc-200 bg-zinc-100/70 px-2 py-0.5 text-[11px] text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-300"
+                      className="rounded border border-zinc-200 bg-zinc-100/70 px-2 py-1 text-xs text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-300"
                     >
                       {s}
                     </span>
@@ -148,7 +148,7 @@ export default function Hero() {
 
         {/* scroll hint */}
         <div className="mt-6 text-center">
-          <span className="font-[var(--font-geist-mono)] text-[11px] uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">
+          <span className="font-[var(--font-geist-mono)] text-xs uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">
             ↓ scroll for /blog
           </span>
         </div>
