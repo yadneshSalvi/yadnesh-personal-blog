@@ -6,20 +6,20 @@ import { useEffect, useState } from "react";
 import SearchBar from "./SearchBar";
 
 export default function Header() {
-  const { theme, resolvedTheme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
-  const isDark = (mounted ? resolvedTheme : theme) === "dark";
+  const isDark = mounted && resolvedTheme === "dark";
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
   return (
-    <header data-is-dark={isDark ? 'true' : 'false'} className="sticky top-0 z-40 border-b border-zinc-200/80 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/50 dark:border-zinc-800/80 dark:bg-zinc-950/70 dark:supports-[backdrop-filter]:bg-zinc-950/50">
+    <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/50 dark:border-zinc-800/80 dark:bg-zinc-950/70 dark:supports-[backdrop-filter]:bg-zinc-950/50">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         <Link href="/" className="select-none text-lg font-semibold text-zinc-900 dark:text-zinc-100">
           YS

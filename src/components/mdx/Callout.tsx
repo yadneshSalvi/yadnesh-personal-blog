@@ -12,9 +12,9 @@ export type CalloutProps = {
 
 const typeStyles: Record<CalloutType, { border: string; bg: string; text: string; icon: ReactNode; label: string }> = {
   note: {
-    border: "border-zinc-700",
-    bg: "bg-zinc-900/50",
-    text: "text-zinc-200",
+    border: "border-zinc-200 dark:border-zinc-700",
+    bg: "bg-zinc-50 dark:bg-zinc-900/50",
+    text: "text-zinc-800 dark:text-zinc-200",
     icon: (
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden>
         <path d="M11 7h2v2h-2zM11 11h2v6h-2z" />
@@ -24,9 +24,9 @@ const typeStyles: Record<CalloutType, { border: string; bg: string; text: string
     label: "Note",
   },
   info: {
-    border: "border-sky-700/50",
-    bg: "bg-sky-900/30",
-    text: "text-sky-100",
+    border: "border-sky-200 dark:border-sky-700/50",
+    bg: "bg-sky-50 dark:bg-sky-900/30",
+    text: "text-sky-800 dark:text-sky-100",
     icon: (
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden>
         <path d="M11 10h2v8h-2zM11 6h2v2h-2z" />
@@ -36,9 +36,9 @@ const typeStyles: Record<CalloutType, { border: string; bg: string; text: string
     label: "Info",
   },
   tip: {
-    border: "border-emerald-700/50",
-    bg: "bg-emerald-900/30",
-    text: "text-emerald-100",
+    border: "border-emerald-200 dark:border-emerald-700/50",
+    bg: "bg-emerald-50 dark:bg-emerald-900/30",
+    text: "text-emerald-800 dark:text-emerald-100",
     icon: (
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden>
         <path d="M9 21h6v-2H9v2Zm3-19A7 7 0 0 0 5 9c0 2.76 2 4.5 3 5v3h8v-3c1-.5 3-2.24 3-5a7 7 0 0 0-7-7Z" />
@@ -47,9 +47,9 @@ const typeStyles: Record<CalloutType, { border: string; bg: string; text: string
     label: "Tip",
   },
   success: {
-    border: "border-green-700/50",
-    bg: "bg-green-900/30",
-    text: "text-green-100",
+    border: "border-green-200 dark:border-green-700/50",
+    bg: "bg-green-50 dark:bg-green-900/30",
+    text: "text-green-800 dark:text-green-100",
     icon: (
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden>
         <path d="M9 16.17 5.53 12.7l-1.41 1.41L9 19 20.88 7.12l-1.41-1.41z" />
@@ -58,9 +58,9 @@ const typeStyles: Record<CalloutType, { border: string; bg: string; text: string
     label: "Success",
   },
   warning: {
-    border: "border-amber-700/50",
-    bg: "bg-amber-900/30",
-    text: "text-amber-100",
+    border: "border-amber-200 dark:border-amber-700/50",
+    bg: "bg-amber-50 dark:bg-amber-900/30",
+    text: "text-amber-800 dark:text-amber-100",
     icon: (
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden>
         <path d="M1 21h22L12 2 1 21Zm12-3h-2v-2h2v2Zm0-4h-2v-4h2v4Z" />
@@ -69,9 +69,9 @@ const typeStyles: Record<CalloutType, { border: string; bg: string; text: string
     label: "Warning",
   },
   caution: {
-    border: "border-orange-700/50",
-    bg: "bg-orange-900/30",
-    text: "text-orange-100",
+    border: "border-orange-200 dark:border-orange-700/50",
+    bg: "bg-orange-50 dark:bg-orange-900/30",
+    text: "text-orange-800 dark:text-orange-100",
     icon: (
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden>
         <path d="M12 5 1 21h22L12 5Zm0 6h2v5h-2v-5Zm0 7h2v2h-2v-2Z" />
@@ -80,9 +80,9 @@ const typeStyles: Record<CalloutType, { border: string; bg: string; text: string
     label: "Caution",
   },
   error: {
-    border: "border-rose-700/50",
-    bg: "bg-rose-900/30",
-    text: "text-rose-100",
+    border: "border-rose-200 dark:border-rose-700/50",
+    bg: "bg-rose-50 dark:bg-rose-900/30",
+    text: "text-rose-800 dark:text-rose-100",
     icon: (
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden>
         <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm3.54 13.54-1.41 1.41L12 13.41l-2.12 2.12-1.41-1.41L10.59 12 8.46 9.88l1.41-1.41L12 10.59l2.12-2.12 1.41 1.41L13.41 12l2.13 2.12Z" />
@@ -109,7 +109,7 @@ export default function Callout({ type = "note", title, children, className }: C
         <span className={clsx("inline-flex h-5 w-5 items-center justify-center", styles.text)}>{styles.icon}</span>
         <span className={clsx("text-sm font-medium", styles.text)}>{title ?? styles.label}</span>
       </div>
-      <div className="text-sm text-zinc-200">{children}</div>
+      <div className="text-sm text-zinc-700 dark:text-zinc-200">{children}</div>
     </aside>
   );
 }
