@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Slugger from "github-slugger";
 import clsx from "clsx";
 
@@ -25,59 +25,124 @@ function collectHeadings(container: HTMLElement): Heading[] {
 }
 
 export default function TOC({ contentSelector = "#post-content" }: { contentSelector?: string }) {
-  const containerRef = useRef<HTMLElement | null>(null);
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     const el = document.querySelector(contentSelector) as HTMLElement | null;
     if (!el) return;
-    containerRef.current = el;
-    setHeadings(collectHeadings(el));
+    const collected = collectHeadings(el);
+    setHeadings(collected);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => (a.target as HTMLElement).offsetTop - (b.target as HTMLElement).offsetTop);
-        if (visible[0]) setActiveId((visible[0].target as HTMLElement).id);
-      },
-      { rootMargin: "0px 0px -70% 0px", threshold: [0, 1] }
-    );
+    // The active section is the last heading scrolled past the reading line
+    // (just below the sticky header), so highlighting tracks long sections too.
+    let ticking = false;
+    const updateActive = () => {
+      ticking = false;
+      let current: string | null = null;
+      for (const h of collected) {
+        const node = document.getElementById(h.id);
+        if (!node) continue;
+        if (node.getBoundingClientRect().top <= 104) current = h.id;
+        else break;
+      }
+      setActiveId(current ?? collected[0]?.id ?? null);
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(updateActive);
+      }
+    };
 
-    const hs = el.querySelectorAll("h1, h2, h3, h4, h5, h6");
-    hs.forEach((h) => observer.observe(h));
-    return () => observer.disconnect();
+    updateActive();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, [contentSelector]);
 
-  const items = useMemo(() => headings, [headings]);
-
-  if (items.length === 0) return null;
+  if (headings.length === 0) return null;
 
   return (
-    <nav className="sticky top-20 self-start hidden max-h-[calc(100vh-6rem)] w-64 shrink-0 overflow-auto pr-4 text-sm text-zinc-600 dark:text-zinc-400 lg:block">
-      <div className="mb-2 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-500">On this page</div>
-      <ul className="space-y-1">
-        {items.map((h) => (
-          <li key={h.id} className={clsx({})}>
-            <a
-              href={`#${h.id}`}
-              className={clsx(
-                "block rounded px-2 py-1 hover:text-zinc-800 dark:hover:text-zinc-200",
-                activeId === h.id ? "bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100" : "text-zinc-600 dark:text-zinc-400",
-                h.level === 1 && "pl-2 font-medium",
-                h.level === 2 && "pl-4",
-                h.level === 3 && "pl-6",
-                h.level >= 4 && "pl-8"
-              )}
+    <nav
+      className={clsx(
+        "sticky top-20 hidden shrink-0 self-start transition-[width] duration-300 lg:block",
+        collapsed
+          ? "w-0 overflow-visible"
+          : "max-h-[calc(100vh-6rem)] w-64 overflow-auto pr-10"
+      )}
+    >
+      {collapsed ? (
+        <button
+          type="button"
+          onClick={() => setCollapsed(false)}
+          aria-label="Expand contents"
+          title="Expand contents"
+          className="rounded p-1 text-faint transition-colors hover:bg-surface hover:text-ink"
+        >
+          <PanelIcon open={false} />
+        </button>
+      ) : (
+        <>
+          <div className="mb-4 flex items-center justify-between">
+            <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
+              Contents
+            </span>
+            <button
+              type="button"
+              onClick={() => setCollapsed(true)}
+              aria-label="Collapse contents"
+              title="Collapse contents"
+              className="rounded p-1 text-faint transition-colors hover:bg-surface hover:text-ink"
             >
-              {h.text}
-            </a>
-          </li>
-        ))}
-      </ul>
+              <PanelIcon open />
+            </button>
+          </div>
+          <ul className="space-y-1 border-l border-line">
+            {headings.map((h) => (
+              <li key={h.id}>
+                <a
+                  href={`#${h.id}`}
+                  className={clsx(
+                    "-ml-px block border-l py-1 text-[13px] leading-snug transition-colors",
+                    activeId === h.id
+                      ? "border-accent text-accent"
+                      : "border-transparent text-muted hover:text-ink",
+                    h.level <= 2 && "pl-3",
+                    h.level === 3 && "pl-6",
+                    h.level >= 4 && "pl-9"
+                  )}
+                >
+                  {h.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </nav>
   );
 }
 
-
+function PanelIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+      aria-hidden
+    >
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <path d="M9 4v16" />
+      {open ? <path d="M15.5 10l-2 2 2 2" /> : <path d="M14 10l2 2-2 2" />}
+    </svg>
+  );
+}

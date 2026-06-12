@@ -7,34 +7,33 @@ export const dynamic = "force-static";
 
 export default function AboutPage() {
   return (
-    <main className="mx-auto max-w-5xl p-6">
-      <header className="mb-8">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-semibold tracking-tight">
-            <span className="bg-gradient-to-r from-zinc-900 via-zinc-600 to-zinc-900 bg-clip-text text-transparent dark:from-zinc-100 dark:via-zinc-400 dark:to-zinc-100">
-              Yadnesh Salvi
-            </span>
-          </h1>
-          <div className="mt-2 space-y-2 text-sm">
-            <div className="flex flex-wrap gap-2">
-              <ContactItem href="https://github.com/yadneshSalvi" label="yadneshSalvi" Icon={GitHubIcon} />
-              <ContactItem href="https://www.linkedin.com/in/yadnesh-salvi-bb5151ba" label="LinkedIn" Icon={LinkedInIcon} />
-              <ContactItem href="https://x.com/yadnesh_sa88965" label="Twitter" Icon={XIcon} />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <ContactBadge label="(+91) 9971733565" Icon={PhoneIcon} />
-              <ContactBadge label="yadneshujwal@gmail.com" Icon={MailIcon} />
-              <ContactBadge label="Mumbai, Maharashtra, India" Icon={PinIcon} />
-            </div>
+    <main className="mx-auto max-w-5xl px-6 py-16 sm:py-20">
+      <header className="mb-12">
+        <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-faint">
+          About
+        </p>
+        <h1 className="mt-4 font-serif text-5xl tracking-tight text-ink">
+          Yadnesh Salvi
+        </h1>
+        <div className="mt-6 space-y-2 text-sm">
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <ContactItem href="https://github.com/yadneshSalvi" label="yadneshSalvi" Icon={GitHubIcon} />
+            <ContactItem href="https://www.linkedin.com/in/yadnesh-salvi-bb5151ba" label="LinkedIn" Icon={LinkedInIcon} />
+            <ContactItem href="https://x.com/yadnesh_sa88965" label="Twitter" Icon={XIcon} />
+          </div>
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <ContactBadge label="(+91) 9971733565" Icon={PhoneIcon} />
+            <ContactBadge label="yadneshujwal@gmail.com" Icon={MailIcon} />
+            <ContactBadge label="Mumbai, Maharashtra, India" Icon={PinIcon} />
           </div>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <section className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 gap-x-12 gap-y-10 lg:grid-cols-3">
+        <section className="lg:col-span-2 space-y-10">
           <Card>
             <SectionTitle Icon={SparklesIcon} title="Summary" />
-            <p className="text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+            <p className="max-w-xl font-serif text-lg leading-relaxed text-ink">
               AI/ML Engineer with expertise in NLP, Agentic AI, LLMs, and RAG systems. Proven track record of implementing production-scale AI solutions that reduce costs and accelerate business processes. Passionate about translating AI research into practical applications.
             </p>
           </Card>
@@ -133,7 +132,7 @@ export default function AboutPage() {
           </Card>
         </section>
 
-        <aside className="space-y-6">
+        <aside className="space-y-10">
           <Card>
             <SectionTitle Icon={GraduationIcon} title="Education" />
             <div className="space-y-4 text-sm">
@@ -152,18 +151,18 @@ export default function AboutPage() {
 
           <Card>
             <SectionTitle Icon={TrophyIcon} title="Awards" />
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-2"><TrophyMini className="mt-0.5 h-3.5 w-3.5 shrink-0" /><span><span className="font-medium">GATE (CS) 2019</span>: All-India percentile 99.78</span></li>
-              <li className="flex items-start gap-2"><TrophyMini className="mt-0.5 h-3.5 w-3.5 shrink-0" /><span><span className="font-medium">SHE Scholarship</span>: Top 1% in School Board (Class XII), 2014</span></li>
+            <ul className="space-y-3 text-sm text-muted">
+              <li className="flex items-start gap-2"><TrophyMini className="mt-0.5 h-3.5 w-3.5 shrink-0 text-faint" /><span><span className="font-medium text-ink">GATE (CS) 2019</span>: All-India percentile 99.78</span></li>
+              <li className="flex items-start gap-2"><TrophyMini className="mt-0.5 h-3.5 w-3.5 shrink-0 text-faint" /><span><span className="font-medium text-ink">SHE Scholarship</span>: Top 1% in School Board (Class XII), 2014</span></li>
             </ul>
           </Card>
         </aside>
       </div>
-      <div className="mt-8">
+      <div className="mt-12 border-t border-line pt-6">
         <a
           href="/YadneshSalviDataScientistResume.pdf"
           download
-          className="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white/70 px-4 py-2 text-sm font-medium text-zinc-800 transition hover:bg-white dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-100 dark:hover:bg-zinc-900"
+          className="inline-flex items-center gap-2 rounded-sm border border-line px-4 py-2 font-mono text-xs uppercase tracking-[0.15em] text-muted transition-colors hover:border-accent hover:text-accent"
         >
           <DownloadIcon className="h-4 w-4" />
           <span>Download Resume (PDF)</span>
@@ -177,18 +176,14 @@ export default function AboutPage() {
 type IconProps = SVGProps<SVGSVGElement> & { className?: string };
 
 function Card({ children }: { children: ReactNode }) {
-  return (
-    <div className="rounded-xl border border-zinc-200 bg-white/60 p-5 shadow-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/50">
-      {children}
-    </div>
-  );
+  return <div className="border-t border-line pt-5">{children}</div>;
 }
 
 function SectionTitle({ Icon, title }: { Icon: ComponentType<IconProps>; title: string }) {
   return (
-    <div className="mb-3 flex items-center gap-2">
-      <Icon className="h-4 w-4 text-zinc-500" />
-      <h2 className="text-sm font-semibold tracking-wide text-zinc-800 dark:text-zinc-200">{title}</h2>
+    <div className="mb-5 flex items-center gap-2">
+      <Icon className="h-3.5 w-3.5 text-faint" />
+      <h2 className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">{title}</h2>
     </div>
   );
 }
@@ -197,7 +192,7 @@ function ContactItem({ href, label, Icon }: { href: string; label: string; Icon:
   return (
     <a
       href={href}
-      className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white/70 px-2 py-1 text-zinc-700 transition hover:bg-white dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-200 dark:hover:bg-zinc-900"
+      className="inline-flex items-center gap-1.5 font-mono text-xs text-muted transition-colors hover:text-accent"
       target={href.startsWith("http") ? "_blank" : undefined}
       rel={href.startsWith("http") ? "noreferrer" : undefined}
     >
@@ -209,7 +204,7 @@ function ContactItem({ href, label, Icon }: { href: string; label: string; Icon:
 
 function ContactBadge({ label, Icon }: { label: string; Icon: ComponentType<IconProps> }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white/70 px-2 py-1 text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-200">
+    <span className="inline-flex items-center gap-1.5 font-mono text-xs text-faint">
       <Icon className="h-3.5 w-3.5" />
       <span>{label}</span>
     </span>
@@ -221,17 +216,21 @@ function TimelineItem({ role, company, location, period, children, collapsible =
   const left = (
     <div className="flex items-center gap-2">
       {collapsible && (
-        <ChevronIcon className={`h-3 w-3 transition-transform ${open ? "rotate-90" : "rotate-0"}`} />
+        <ChevronIcon className={`h-3 w-3 text-faint transition-transform ${open ? "rotate-90" : "rotate-0"}`} />
       )}
       <div>
-        <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{role}</h3>
-        <p className="text-xs text-zinc-600 dark:text-zinc-400">{company} • {location}</p>
+        <h3 className="font-serif text-lg leading-snug tracking-tight text-ink">{role}</h3>
+        <p className="text-xs text-muted">{company} · {location}</p>
       </div>
     </div>
   );
   return (
-    <div className="relative rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+    <div className="relative border-l border-line pl-5">
+      <span
+        aria-hidden
+        className="absolute -left-[3px] top-1.5 h-[5px] w-[5px] rounded-full bg-accent"
+      />
+      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
         {collapsible ? (
           <button
             type="button"
@@ -244,7 +243,7 @@ function TimelineItem({ role, company, location, period, children, collapsible =
         ) : (
           left
         )}
-        <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">{period}</span>
+        <span className="whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.1em] text-faint">{period}</span>
       </div>
       {(!collapsible || open) && (
         <div className="prose prose-sm dark:prose-invert">
@@ -264,21 +263,21 @@ function Bullet({ children }: { children: ReactNode }) {
 function Project({ title, period, bullets }: { title: string; period: string; bullets: string[] }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-      <div className="mb-1 flex items-center justify-between gap-3">
+    <div className="border-l border-line pl-5">
+      <div className="mb-1 flex items-baseline justify-between gap-3">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           className="group inline-flex items-center gap-2 text-left"
         >
-          <ChevronIcon className={`h-3 w-3 transition-transform ${open ? "rotate-90" : "rotate-0"}`} />
-          <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{title}</h3>
+          <ChevronIcon className={`h-3 w-3 text-faint transition-transform ${open ? "rotate-90" : "rotate-0"}`} />
+          <h3 className="font-serif text-lg leading-snug tracking-tight text-ink">{title}</h3>
         </button>
-        <span className="shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">{period}</span>
+        <span className="shrink-0 whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.1em] text-faint">{period}</span>
       </div>
       {open && (
-        <ul className="list-disc pl-5 text-sm">
+        <ul className="list-disc pl-5 text-sm text-muted">
           {bullets.map((b, i) => (
             <li key={i} className="leading-6">{b}</li>
           ))}
@@ -296,13 +295,13 @@ function ExpandableSection({ title, children }: { title: string; children: React
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="group inline-flex items-center gap-2 rounded-md px-1 py-1 hover:bg-zinc-50 dark:hover:bg-zinc-800/40"
+        className="group inline-flex items-center gap-2 rounded-md px-1 py-1 transition-colors hover:bg-surface"
       >
-        <ChevronIcon className={`h-3 w-3 transition-transform ${open ? "rotate-90" : "rotate-0"}`} />
-        <h4 className="text-[13px] font-semibold text-zinc-800 dark:text-zinc-200">{title}</h4>
+        <ChevronIcon className={`h-3 w-3 text-faint transition-transform ${open ? "rotate-90" : "rotate-0"}`} />
+        <h4 className="text-[13px] font-medium text-ink">{title}</h4>
       </button>
       {open && (
-        <ul className="mt-1 list-disc pl-5 text-sm">
+        <ul className="mt-1 list-disc pl-5 text-sm text-muted">
           {children}
         </ul>
       )}
@@ -313,9 +312,9 @@ function ExpandableSection({ title, children }: { title: string; children: React
 function EduItem({ degree, org, period }: { degree: string; org: string; period: string }) {
   return (
     <div>
-      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{degree}</p>
-      <p className="text-xs text-zinc-600 dark:text-zinc-400">{org}</p>
-      <p className="text-xs text-zinc-500 dark:text-zinc-500">{period}</p>
+      <p className="font-serif text-base leading-snug tracking-tight text-ink">{degree}</p>
+      <p className="mt-0.5 text-xs text-muted">{org}</p>
+      <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.1em] text-faint">{period}</p>
     </div>
   );
 }
@@ -323,12 +322,8 @@ function EduItem({ degree, org, period }: { degree: string; org: string; period:
 function SkillGroup({ title, items }: { title: string; items: string[] }) {
   return (
     <div>
-      <p className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-600 dark:text-zinc-400">{title}</p>
-      <div className="flex flex-wrap gap-2">
-        {items.map((i) => (
-          <span key={i} className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">{i}</span>
-        ))}
-      </div>
+      <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.15em] text-faint">{title}</p>
+      <p className="font-mono text-xs leading-6 text-muted">{items.join(" · ")}</p>
     </div>
   );
 }

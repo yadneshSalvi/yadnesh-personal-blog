@@ -4,37 +4,117 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-html, body {
+/* ———————————————————————————————————————————————
+   Editorial design tokens — "ink & paper"
+   Semantic colors flip with .dark; utilities like
+   bg-paper / text-ink / border-line / text-accent
+   resolve through these variables.
+   ——————————————————————————————————————————————— */
+:root {
+  --paper: #faf9f6;
+  --surface: #f1efe9;
+  --ink: #1f1c19;
+  --muted: #5b554c;
+  --faint: #8f887a;
+  --line: #e7e3d9;
+  --accent: #b3441a;
+}
+
+.dark {
+  --paper: #151311;
+  --surface: #1d1a17;
+  --ink: #ebe7df;
+  --muted: #a49c90;
+  --faint: #756d62;
+  --line: #2b2723;
+  --accent: #e5825a;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+}
+
+html,
+body {
   min-height: 100%;
-  background-color: rgb(250 250 250); /* zinc-50 */
-  color: rgb(24 24 27); /* zinc-900 */
+  background-color: var(--paper);
+  color: var(--ink);
 }
 
-html.dark, html.dark body {
-  background-color: rgb(9 9 11); /* zinc-950 */
-  color: rgb(244 244 245); /* zinc-100 */
+html {
+  scroll-behavior: smooth;
 }
 
-/* Code selection colors for better UX */
+/* Anchor targets land below the sticky header (h-14 + breathing room) */
+.prose :where(h1, h2, h3, h4, h5, h6) {
+  scroll-margin-top: 5.5rem;
+}
+
 ::selection {
-  background: rgba(59, 130, 246, 0.25);
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
 }
 
-/* Tailwind Typography defaults for dark mode */
-.prose :where(code):not(:where(pre code)) { @apply rounded bg-zinc-100 px-1 py-0.5 text-zinc-800; }
-.dark .prose :where(code):not(:where(pre code)) { @apply bg-zinc-800/70 text-zinc-200; }
-.prose :where(a) { @apply text-blue-600 underline-offset-2 hover:underline dark:text-blue-400; }
+/* ———————————————————————————————————————————————
+   Article prose
+   ——————————————————————————————————————————————— */
+.prose :where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.prose {
+  color: var(--ink);
+}
+.prose :where(p, li) {
+  color: color-mix(in srgb, var(--ink) 88%, var(--muted));
+}
+.prose :where(strong) {
+  color: var(--ink);
+}
+.prose :where(code):not(:where(pre code)) {
+  @apply rounded px-1 py-0.5;
+  background: var(--surface);
+  color: var(--ink);
+}
+.prose :where(a) {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  text-underline-offset: 3px;
+}
+.prose :where(a:hover) {
+  text-decoration-color: var(--accent);
+}
 .prose :where(hr) {
-  @apply border-zinc-200 dark:border-zinc-800;
+  border-color: var(--line);
 }
 .prose :where(blockquote) {
-  @apply border-l-4 border-zinc-200 bg-zinc-50/80 dark:border-zinc-700 dark:bg-zinc-900/50;
+  border-left: 2px solid var(--accent);
+  background: transparent;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--muted);
 }
 .prose :where(th, td) {
-  @apply border border-zinc-200 dark:border-zinc-800;
+  border: 1px solid var(--line);
 }
 .prose :where(table) {
-  @apply bg-white dark:bg-zinc-900/40;
+  background: transparent;
+}
+.prose :where(figcaption) {
+  color: var(--faint);
 }
 
 /* Search-specific utilities */
@@ -54,5 +134,7 @@ html.dark, html.dark body {
 
 /* Search result highlighting */
 mark {
-  @apply bg-yellow-200 dark:bg-yellow-800/50 px-1 rounded text-inherit;
+  @apply rounded px-0.5;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: inherit;
 }

@@ -1,10 +1,23 @@
+import Link from "next/link";
+
 export default function NotFound() {
   return (
-    <main className="mx-auto max-w-3xl p-6 text-center">
-      <h1 className="text-2xl font-semibold">Page not found</h1>
-      <p className="text-zinc-600 dark:text-zinc-400">The page you are looking for does not exist.</p>
+    <main className="mx-auto max-w-3xl px-6 py-32 text-center">
+      <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-faint">
+        404
+      </p>
+      <h1 className="mt-4 font-serif text-5xl italic tracking-tight text-ink">
+        Lost in the weights.
+      </h1>
+      <p className="mt-5 text-muted">
+        This page doesn&apos;t exist — or it was pruned during training.
+      </p>
+      <Link
+        href="/"
+        className="mt-10 inline-block font-mono text-xs uppercase tracking-[0.18em] text-accent"
+      >
+        ← Back home
+      </Link>
     </main>
   );
 }
-
-

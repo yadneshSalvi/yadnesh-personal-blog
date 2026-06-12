@@ -104,16 +104,19 @@ function SearchPageContent() {
   };
 
   return (
-    <main className="mx-auto max-w-6xl p-6">
-      <div className="space-y-8">
+    <main className="mx-auto max-w-6xl px-6 py-16">
+      <div className="space-y-10">
         {/* Header */}
-        <div className="space-y-4">
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+        <div>
+          <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-faint">
+            Archive
+          </p>
+          <h1 className="mt-4 font-serif text-5xl tracking-tight text-ink">
             Search
           </h1>
-          
+
           {/* Search Input */}
-          <div className="relative max-w-2xl">
+          <div className="relative mt-8 max-w-2xl">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -126,7 +129,7 @@ function SearchPageContent() {
               <input
                 name="query"
                 type="text"
-                placeholder="Search posts..."
+                placeholder="Search the writing…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => {
@@ -135,11 +138,11 @@ function SearchPageContent() {
                     handleSearch(query);
                   }
                 }}
-                className="w-full px-4 py-3 pl-12 pr-4 text-lg border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border-b-2 border-line bg-transparent py-3 pl-9 pr-4 font-serif text-2xl text-ink placeholder:text-faint focus:border-accent focus:outline-none"
               />
-              <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                <svg className="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <div className="absolute left-0 top-1/2 -translate-y-1/2">
+                <svg className="h-5 w-5 text-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
             </form>
@@ -151,23 +154,23 @@ function SearchPageContent() {
           <div className="lg:col-span-1 space-y-6">
             {/* Filter by Tags */}
             {popularTags.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
-                  Filter by Tags
+              <div className="border-t border-line pt-5">
+                <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
+                  Filter by tag
                 </h3>
-                <div className="space-y-2">
+                <div className="mt-3 space-y-1">
                   {popularTags.slice(0, 10).map(({ tag, count }) => (
                     <button
                       key={tag}
                       onClick={() => handleTagToggle(tag)}
-                      className={`flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg transition-colors ${
+                      className={`flex w-full items-baseline justify-between py-1 text-left font-mono text-xs transition-colors ${
                         selectedTags.includes(tag)
-                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                          : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                          ? 'text-accent'
+                          : 'text-muted hover:text-ink'
                       }`}
                     >
                       <span>{tag}</span>
-                      <span className="text-xs opacity-60">({count})</span>
+                      <span className="tabular-nums text-faint">{String(count).padStart(2, '0')}</span>
                     </button>
                   ))}
                 </div>
@@ -175,11 +178,11 @@ function SearchPageContent() {
             )}
 
             {/* Sort Options */}
-            <div className="space-y-3">
-              <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
+            <div className="border-t border-line pt-5">
+              <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
                 Sort by
               </h3>
-              <div className="space-y-1">
+              <div className="mt-3 space-y-1">
                 {[
                   { value: 'relevance', label: 'Relevance' },
                   { value: 'date', label: 'Date' },
@@ -188,10 +191,10 @@ function SearchPageContent() {
                   <button
                     key={value}
                     onClick={() => handleSortChange(value as 'relevance' | 'date' | 'title')}
-                    className={`block w-full px-3 py-2 text-sm text-left rounded-lg transition-colors ${
+                    className={`block w-full py-1 text-left font-mono text-xs transition-colors ${
                       sortBy === value
-                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                        : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                        ? 'text-accent'
+                        : 'text-muted hover:text-ink'
                     }`}
                   >
                     {label}
@@ -202,22 +205,18 @@ function SearchPageContent() {
 
             {/* Recent Posts */}
             {!query && recentPosts.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
-                  Recent Posts
+              <div className="border-t border-line pt-5">
+                <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
+                  Recent
                 </h3>
-                <div className="space-y-2">
+                <div className="mt-3 space-y-4">
                   {recentPosts.map((post) => (
-                    <a
-                      key={post.slug}
-                      href={post.url}
-                      className="block p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                    >
-                      <h4 className="font-medium text-sm text-zinc-900 dark:text-zinc-100 line-clamp-2">
+                    <a key={post.slug} href={post.url} className="group block">
+                      <h4 className="line-clamp-2 font-serif text-base leading-snug text-ink transition-colors group-hover:text-accent">
                         {post.title}
                       </h4>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                        {new Date(post.createdAt).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'short', day: '2-digit' })} • {post.readingTime} min read
+                      <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.1em] text-faint">
+                        {new Date(post.createdAt).toLocaleDateString('en-US', { timeZone: 'UTC', year: 'numeric', month: 'short', day: '2-digit' })} · {post.readingTime} min
                       </p>
                     </a>
                   ))}
@@ -230,22 +229,20 @@ function SearchPageContent() {
           <div className="lg:col-span-3">
             {/* Active Filters */}
             {selectedTags.length > 0 && (
-              <div className="mb-6 space-y-2">
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">Active filters:</p>
-                <div className="flex flex-wrap gap-2">
-                  {selectedTags.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => handleTagToggle(tag)}
-                      className="flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
-                    >
-                      {tag}
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  ))}
-                </div>
+              <div className="mb-6 flex flex-wrap items-baseline gap-x-4 gap-y-2">
+                <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">Filtering</p>
+                {selectedTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => handleTagToggle(tag)}
+                    className="inline-flex items-center gap-1.5 rounded-sm border border-line px-2.5 py-1 font-mono text-xs text-accent transition-colors hover:border-accent"
+                  >
+                    {tag}
+                    <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                ))}
               </div>
             )}
 
@@ -266,10 +263,10 @@ function SearchPageContent() {
 export default function SearchPage() {
   return (
     <Suspense fallback={
-      <div className="mx-auto max-w-6xl p-6">
+      <div className="mx-auto max-w-6xl px-6 py-16">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-zinc-200 dark:bg-zinc-700 rounded w-32"></div>
-          <div className="h-12 bg-zinc-200 dark:bg-zinc-700 rounded max-w-2xl"></div>
+          <div className="h-10 w-40 rounded bg-surface"></div>
+          <div className="h-12 max-w-2xl rounded bg-surface"></div>
         </div>
       </div>
     }>

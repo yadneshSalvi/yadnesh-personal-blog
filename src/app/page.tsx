@@ -1,14 +1,29 @@
+import Link from "next/link";
 import { getAllPostsMeta } from "@/lib/posts";
 import Hero from "@/components/Hero";
-import BelowFold from "@/components/BelowFold";
+import PostList from "@/components/PostList";
 
 export default function Home() {
   const posts = getAllPostsMeta();
   return (
     <>
       <Hero />
-      <div className="h-px w-full bg-zinc-200/80 dark:bg-zinc-800/80" />
-      <BelowFold posts={posts} />
+      <section id="blog" className="px-6 pb-28">
+        <div className="mx-auto max-w-3xl">
+          <div className="flex items-baseline justify-between border-b border-line pb-4">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.25em] text-faint">
+              Writing
+            </h2>
+            <Link
+              href="/blog"
+              className="font-mono text-[11px] uppercase tracking-[0.15em] text-muted transition-colors hover:text-accent"
+            >
+              All posts →
+            </Link>
+          </div>
+          <PostList posts={posts.slice(0, 5)} />
+        </div>
+      </section>
     </>
   );
 }
