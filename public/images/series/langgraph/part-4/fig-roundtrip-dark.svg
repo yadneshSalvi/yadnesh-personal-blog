@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="560" viewBox="0 0 1180 560">
+  <rect width="1180" height="560" fill="#151311"/>
+
+  <!-- left: the browser -->
+  <rect x="70" y="150" width="360" height="200" rx="14" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="98" y="188" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2" fill="#756d62">BROWSER &#183; localhost:3000</text>
+  <rect x="98" y="210" width="304" height="44" rx="10" fill="#2a201a" stroke="#5e463a" stroke-width="1.5"/>
+  <text x="114" y="238" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#e5825a">"Explain recursion."</text>
+  <rect x="98" y="268" width="240" height="36" rx="8" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="114" y="291" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#756d62">type a message...</text>
+  <rect x="346" y="268" width="56" height="36" rx="8" fill="#ebe7df"/>
+  <text x="374" y="291" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#151311" text-anchor="middle">Send</text>
+  <text x="98" y="334" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#a49c90">useState: messages, input</text>
+
+  <!-- right: the server -->
+  <rect x="750" y="150" width="360" height="200" rx="14" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <rect x="750" y="150" width="6" height="200" rx="3" fill="#e5825a"/>
+  <text x="780" y="188" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2" fill="#756d62">SERVER &#183; localhost:8000</text>
+  <text x="780" y="234" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="20" font-weight="700" fill="#ebe7df">POST /chat</text>
+  <text x="780" y="268" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#a49c90">graph.invoke(...)</text>
+  <text x="780" y="306" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a49c90">the one-node LangGraph,</text>
+  <text x="780" y="328" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a49c90">calling a real model (Part 3)</text>
+
+  <!-- request arrow (top) -->
+  <line x1="438" y1="214" x2="733" y2="214" stroke="#e5825a" stroke-width="2.5"/>
+  <path d="M 732 208 L 732 220 L 742 214 Z" fill="#e5825a"/>
+  <text x="590" y="194" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" fill="#e5825a" text-anchor="middle">fetch( /chat )</text>
+  <text x="590" y="238" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#756d62" text-anchor="middle">{ message }</text>
+
+  <!-- response arrow (bottom) -->
+  <line x1="742" y1="300" x2="447" y2="300" stroke="#a49c90" stroke-width="2.5"/>
+  <path d="M 448 294 L 448 306 L 438 300 Z" fill="#a49c90"/>
+  <text x="590" y="288" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#756d62" text-anchor="middle">200 OK</text>
+  <text x="590" y="326" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" fill="#ebe7df" text-anchor="middle">{ reply }</text>
+
+  <!-- bottom band -->
+  <line x1="70" y1="430" x2="1110" y2="430" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="70" y="476" font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#ebe7df">Your click sends the words out; the reply <tspan font-style="italic" fill="#e5825a">rides back</tspan> and becomes a bubble.</text>
+  <text x="70" y="508" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#a49c90">Same trip as your Part 2 curl, except a browser makes it now, and React paints the answer on screen.</text>
+</svg>

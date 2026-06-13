@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="510" viewBox="0 0 1120 510" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="510" fill="#0c0a09"/>
+
+  <!-- browser chrome -->
+  <rect x="0" y="0" width="1120" height="64" fill="#211e1a"/>
+  <line x1="0" y1="64" x2="1120" y2="64" stroke="#2b2723" stroke-width="1.5"/>
+  <circle cx="32" cy="32" r="8" fill="#3a3530"/><circle cx="60" cy="32" r="8" fill="#3a3530"/><circle cx="88" cy="32" r="8" fill="#3a3530"/>
+  <rect x="300" y="14" width="520" height="36" rx="18" fill="#1a1816" stroke="#3a3530"/>
+  <text x="560" y="38" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#a49c90" text-anchor="middle">localhost:3000</text>
+
+  <!-- chat card -->
+  <rect x="200" y="98" width="720" height="378" rx="16" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="228" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#fafaf9">Chatbot</text>
+  <line x1="200" y1="164" x2="920" y2="164" stroke="#242020" stroke-width="1.5"/>
+  
+  <rect x="567" y="190" width="325" height="47" rx="16" fill="#fafaf9"/>
+  <text x="585" y="219" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1c1917">Explain recursion in one sentence.</text>
+  <rect x="224" y="342" width="672" height="40" rx="8" fill="#211113" stroke="#7f1d1d" stroke-width="1.5"/>
+  <text x="242" y="367" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#f7a8a8">Could not reach the backend. Is it running on :8000?</text>
+
+  <!-- footer: input + send -->
+  <line x1="200" y1="388" x2="920" y2="388" stroke="#242020" stroke-width="1.5"/>
+  <rect x="224" y="412" width="580" height="44" rx="10" fill="#0c0a09" stroke="#292524" stroke-width="1.5"/>
+  <text x="242" y="440" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#78716c">Ask me anything...</text>
+  <rect x="820" y="412" width="76" height="44" rx="10" fill="#fafaf9"/>
+  <text x="858" y="440" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917" text-anchor="middle">Send</text>
+</svg>

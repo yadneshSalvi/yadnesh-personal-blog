@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="639" viewBox="0 0 1120 639" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="639" fill="#f5f5f4"/>
+
+  <!-- browser chrome -->
+  <rect x="0" y="0" width="1120" height="64" fill="#f3f1ec"/>
+  <line x1="0" y1="64" x2="1120" y2="64" stroke="#e2ded4" stroke-width="1.5"/>
+  <circle cx="32" cy="32" r="8" fill="#d6d1c5"/><circle cx="60" cy="32" r="8" fill="#d6d1c5"/><circle cx="88" cy="32" r="8" fill="#d6d1c5"/>
+  <rect x="300" y="14" width="520" height="36" rx="18" fill="#ffffff" stroke="#e2ded4"/>
+  <text x="560" y="38" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#5b554c" text-anchor="middle">localhost:3000</text>
+
+  <!-- chat card -->
+  <rect x="200" y="98" width="720" height="507" rx="16" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="228" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#1c1917">Chatbot</text>
+  <line x1="200" y1="164" x2="920" y2="164" stroke="#eceae8" stroke-width="1.5"/>
+  
+  <rect x="813" y="190" width="79" height="47" rx="16" fill="#1c1917"/>
+  <text x="831" y="219" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#fafaf9">hello</text>
+  <rect x="228" y="253" width="334" height="70" rx="16" fill="#f5f5f4"/>
+  <text x="246" y="282" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1c1917">Hello! Nice to meet you. What would</text>
+  <text x="246" y="305" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1c1917">you like to talk about?</text>
+  <rect x="567" y="339" width="325" height="47" rx="16" fill="#1c1917"/>
+  <text x="585" y="368" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#fafaf9">Explain recursion in one sentence.</text>
+  <rect x="228" y="402" width="359" height="93" rx="16" fill="#f5f5f4"/>
+  <text x="246" y="431" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1c1917">Recursion is when a function solves a</text>
+  <text x="246" y="454" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1c1917">problem by calling itself on a smaller</text>
+  <text x="246" y="477" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1c1917">version of the same problem.</text>
+  
+
+  <!-- footer: input + send -->
+  <line x1="200" y1="517" x2="920" y2="517" stroke="#eceae8" stroke-width="1.5"/>
+  <rect x="224" y="541" width="580" height="44" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="242" y="569" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#a8a29e">Ask me anything...</text>
+  <rect x="820" y="541" width="76" height="44" rx="10" fill="#1c1917"/>
+  <text x="858" y="569" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#fafaf9" text-anchor="middle">Send</text>
+</svg>

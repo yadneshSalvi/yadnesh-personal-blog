@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="440" viewBox="0 0 980 440" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="980" height="440" fill="#1a1816"/>
+  <rect width="980" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="490" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal 3 &#183; frontend</text>
+  <g font-size="15" fill="#d8d2c6" xml:space="preserve">
+    <text x="32" y="92"><tspan fill="#756d62">$</tspan> npm run dev</text>
+    <text x="32" y="124"><tspan fill="#6fa8dc">&#9650; Next.js 16.2.9</tspan> (Turbopack)</text>
+    <text x="32" y="152" fill="#756d62">- Local:   http://localhost:3000</text>
+    <text x="32" y="188"><tspan fill="#8fb573">&#10003; Ready</tspan> in 1180ms</text>
+    <text x="32" y="220"><tspan fill="#e5825a">&#10799;</tspan> ./app/page.tsx:4:34</text>
+    <text x="32" y="252">You're importing a component that needs <tspan fill="#e5825a">useState</tspan>. This</text>
+    <text x="32" y="280">React hook only works in a Client Component. To fix,</text>
+    <text x="32" y="308">mark the file (or its parent) with the <tspan fill="#8fb573">"use client"</tspan></text>
+    <text x="32" y="336">directive.</text>
+    <text x="32" y="384" fill="#756d62">  3 | export default function Chat() {</text>
+    <text x="32" y="412" fill="#756d62">&gt; 4 |   const [messages, setMessages] = <tspan fill="#e5825a">useState</tspan>&lt;Message[]&gt;([]);</text>
+  </g>
+</svg>

@@ -49,3 +49,4 @@ next-env.d.ts
 /scripts/generate-image.mjs
 /scripts/gen-part2-svgs.mjs
 /scripts/gen-part3-svgs.mjs
+/scripts/gen-part4-svgs.mjs
