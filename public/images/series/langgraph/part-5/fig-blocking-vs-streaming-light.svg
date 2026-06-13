@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="520" viewBox="0 0 1180 520">
+  <rect width="1180" height="520" fill="#faf9f6"/>
+
+  <text x="64" y="64" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" letter-spacing="2.5" fill="#8f887a">SAME MODEL &#183; SAME THREE SECONDS &#183; TWO VERY DIFFERENT WAITS</text>
+
+  <!-- lane labels -->
+  <text x="64" y="140" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" letter-spacing="1.5" fill="#5b554c">WITHOUT</text>
+  <text x="64" y="158" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" letter-spacing="1.5" fill="#5b554c">STREAMING</text>
+  <text x="64" y="378" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" letter-spacing="1.5" fill="#b3441a">WITH</text>
+  <text x="64" y="396" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" letter-spacing="1.5" fill="#b3441a">STREAMING</text>
+
+  <line x1="300" y1="168" x2="1108" y2="168" stroke="#e7e3d9" stroke-width="1.5"/><line x1="300" y1="388" x2="1108" y2="388" stroke="#e7e3d9" stroke-width="1.5"/>
+  <line x1="380.8" y1="194" x2="380.8" y2="362" stroke="#dcb09a" stroke-width="1.5" stroke-dasharray="4 5"/>
+  <rect x="300" y="152" width="808" height="32" rx="6" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="704" y="173" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#8f887a" text-anchor="middle">a blank screen, a spinner, nothing to read</text>
+  <rect x="1098" y="142" width="14" height="52" rx="3" fill="#b3441a"/>
+  <text x="1108" y="216" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1f1c19" text-anchor="end">the whole reply,</text>
+  <text x="1108" y="236" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#5b554c" text-anchor="end">all at once, at 3.0s</text>
+  <circle cx="380.8" cy="388" r="4.5" fill="#b3441a"/><circle cx="448.1333333333333" cy="388" r="4.5" fill="#b3441a"/><circle cx="515.4666666666667" cy="388" r="4.5" fill="#b3441a"/><circle cx="582.8" cy="388" r="4.5" fill="#b3441a"/><circle cx="650.1333333333333" cy="388" r="4.5" fill="#b3441a"/><circle cx="730.9333333333334" cy="388" r="4.5" fill="#b3441a"/><circle cx="825.2" cy="388" r="4.5" fill="#b3441a"/><circle cx="946.4" cy="388" r="4.5" fill="#b3441a"/><circle cx="1040.6666666666665" cy="388" r="4.5" fill="#b3441a"/><rect x="374.8" y="362" width="12" height="52" rx="3" fill="#b3441a"/>
+  <text x="396.8" y="374" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1f1c19">first word,</text>
+  <text x="396.8" y="394" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#5b554c">at 0.3s</text><text x="300" y="334" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#5b554c">Recursion is when a function calls itself <tspan fill="#b3441a" font-style="italic">(still arriving...)</tspan></text>
+  <line x1="300" y1="406" x2="300" y2="416" stroke="#8f887a" stroke-width="1.5"/>
+    <text x="300" y="436" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#8f887a" text-anchor="middle">0.0s</text><line x1="569.3333333333333" y1="406" x2="569.3333333333333" y2="416" stroke="#8f887a" stroke-width="1.5"/>
+    <text x="569.3333333333333" y="436" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#8f887a" text-anchor="middle">1.0s</text><line x1="838.6666666666666" y1="406" x2="838.6666666666666" y2="416" stroke="#8f887a" stroke-width="1.5"/>
+    <text x="838.6666666666666" y="436" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#8f887a" text-anchor="middle">2.0s</text><line x1="1108" y1="406" x2="1108" y2="416" stroke="#8f887a" stroke-width="1.5"/>
+    <text x="1108" y="436" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#8f887a" text-anchor="middle">3.0s</text>
+
+  <line x1="64" y1="466" x2="1116" y2="466" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="64" y="500" font-family="Georgia, 'Times New Roman', serif" font-size="19" fill="#1f1c19">Both finish at the same second. Only one of them lets you start reading at <tspan font-style="italic" fill="#b3441a">0.3</tspan>.</text>
+</svg>

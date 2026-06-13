@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1000" height="560" fill="#1a1816"/>
+  <rect width="1000" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="500" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; backend</text>
+  <g font-size="15" fill="#d8d2c6" xml:space="preserve">
+    <text x="32" y="92"><tspan fill="#756d62">$</tspan> curl <tspan fill="#e5825a">-N</tspan> -X POST http://localhost:8000/chat \</text>
+    <text x="32" y="120" fill="#d8d2c6">    -H "Content-Type: application/json" \</text>
+    <text x="32" y="148" fill="#d8d2c6">    -d '{"message": "explain recursion in one sentence"}'</text>
+    <text x="32" y="190" fill="#756d62"># -N turns off curl's buffering, so each line lands as it streams</text>
+    <text x="32" y="232"><tspan fill="#756d62">data:</tspan> {"type": <tspan fill="#c08fd6">"token"</tspan>, "content": <tspan fill="#8fb573">"Recursion"</tspan>}</text>
+    <text x="32" y="262"><tspan fill="#756d62">data:</tspan> {"type": <tspan fill="#c08fd6">"token"</tspan>, "content": <tspan fill="#8fb573">" is"</tspan>}</text>
+    <text x="32" y="292"><tspan fill="#756d62">data:</tspan> {"type": <tspan fill="#c08fd6">"token"</tspan>, "content": <tspan fill="#8fb573">" when"</tspan>}</text>
+    <text x="32" y="322"><tspan fill="#756d62">data:</tspan> {"type": <tspan fill="#c08fd6">"token"</tspan>, "content": <tspan fill="#8fb573">" a"</tspan>}</text>
+    <text x="32" y="352"><tspan fill="#756d62">data:</tspan> {"type": <tspan fill="#c08fd6">"token"</tspan>, "content": <tspan fill="#8fb573">" function"</tspan>}</text>
+    <text x="32" y="382"><tspan fill="#756d62">data:</tspan> {"type": <tspan fill="#c08fd6">"token"</tspan>, "content": <tspan fill="#8fb573">" calls"</tspan>}</text>
+    <text x="32" y="412"><tspan fill="#756d62">data:</tspan> {"type": <tspan fill="#c08fd6">"token"</tspan>, "content": <tspan fill="#8fb573">" itself."</tspan>}</text>
+    <text x="32" y="442"><tspan fill="#756d62">data:</tspan> {"type": <tspan fill="#c08fd6">"done"</tspan>}</text>
+  </g>
+</svg>

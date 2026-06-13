@@ -1,0 +1,585 @@
+---
+title: "LangGraph from Scratch, Part 5: Streaming Responses"
+subtitle: "Replace the 'Thinking...' pause with words that appear as the model writes them. Server-Sent Events, a tiny wire format you design yourself, and a Stop button, end to end."
+image: "/images/series/langgraph/part-5/cover-light.svg"
+imageDark: "/images/series/langgraph/part-5/cover-dark.svg"
+createdAt: "2026-06-13T00:00:00.000Z"
+updatedAt: "2026-06-13T00:00:00.000Z"
+tags: ["langgraph", "fastapi", "streaming", "tutorial"]
+series: "langgraph-fastapi-nextjs"
+seriesPart: 5
+---
+
+In Part 4 your bot made you wait. You hit Send, the word "Thinking..." sat there doing nothing, and a few seconds later the whole reply dropped in at once, like a vending machine. Real chat apps don't do that. The words appear as the model writes them, and you start reading before it has finished its sentence.
+
+By the end of this page, yours does too. Same backend graph from Part 3, same chat UI from Part 4. The only thing that changes is when the words show up.
+
+<Figure
+  src="/images/series/langgraph/part-5/browser-stream-filmstrip-light.svg"
+  srcDark="/images/series/langgraph/part-5/browser-stream-filmstrip-dark.svg"
+  alt="Three frames of the same chat, left to right. In the first, at 0.3 seconds, the assistant bubble reads 'Recursion is' with a blinking cursor. In the second, at 0.7 seconds, it has grown to 'Recursion is when a function' with the cursor still going. In the third, at 1.2 seconds, it reads the full sentence 'Recursion is when a function calls itself.' with no cursor. The user's question 'Explain recursion.' sits above in each frame."
+  caption="Today's destination. One reply, landing a word at a time. The Part 3 graph is untouched; it just narrates itself now instead of making you wait for the end."
+  width={1180}
+  height={470}
+/>
+
+Nothing new to install today. `StreamingResponse` has shipped with FastAPI since your Part 1 setup, and `astream_events` is already inside the LangGraph you installed. This part is all wiring, split evenly between the backend and the browser.
+
+## Why three seconds feels like forever
+
+Here's the uncomfortable truth about the Part 4 version: the model was never the slow part. A small model writes that recursion answer in about three seconds whether you stream it or not. Streaming doesn't make the model faster. It makes the *wait* feel different.
+
+When the whole reply lands at once, you stare at a spinner for three seconds and read for one. When it streams, the first word shows up in a blink and you read along while the rest arrives. Same three seconds of work. Completely different experience.
+
+<Figure
+  src="/images/series/langgraph/part-5/fig-blocking-vs-streaming-light.svg"
+  srcDark="/images/series/langgraph/part-5/fig-blocking-vs-streaming-dark.svg"
+  alt="Two timelines over the same three seconds. The top one, labeled WITHOUT STREAMING, is one long bar reading 'a blank screen, a spinner, nothing to read' with the whole reply arriving in a single block at 3.0 seconds. The bottom one, labeled WITH STREAMING, has the first word arriving at 0.3 seconds and then a steady run of words across the whole three seconds, with the sentence already readable partway through."
+  caption="Same model, same total time. Streaming just stops hiding the first 2.7 seconds behind a spinner."
+  width={1180}
+  height={520}
+/>
+
+It's the difference between waiting at a restaurant table for a finished plate and watching the chef build it through the kitchen pass. The food takes the same time either way. One of them feels like service; the other feels like a closed door. We're moving your bot to the pass.
+
+## Two pipes, and why we pick the simpler one
+
+There are two common ways for a server to push data to a browser as it happens. A **WebSocket** is a two-way phone call: both sides can talk at any time. **Server-Sent Events** (SSE) is a one-way radio broadcast: the server talks, the browser listens.
+
+For an LLM reply you only need one direction. The model talks; you don't need to whisper back to it mid-word. (Stopping it, which we'll add later, is a separate cancel, not a message sent up the same pipe.) SSE also rides plain HTTP, the exact protocol your `fetch` already speaks, so there's no new handshake and no new library. When five ways exist and one is enough, take the simple one.
+
+<Callout type="info" title="What an SSE message looks like on the wire">
+An SSE stream is just text with a convention. Each message is one or more `field: value` lines, followed by a blank line. We only use the `data:` field, so each of our messages is literally `data: <something>` and then an empty line. That blank line, a `\n\n` in the bytes, is the terminator: it tells the reader "this message is done, the next one starts after me." Hold onto that blank line. It's about to be the hero of this whole part.
+</Callout>
+
+## The shape of one streamed word
+
+Before any code, one design decision worth thirty seconds. Each `data:` message could just carry a bare token, like `data: Re`. It would work today. But in Part 6 your bot grows tools, and the stream will need to carry other things too: "started searching the web," "calculator returned 4." If tokens are bare strings, every new kind of event means a new parser on the frontend.
+
+So we wrap each token in a tiny envelope with a `type` field:
+
+```text
+data: {"type": "token", "content": "Re"}
+
+data: {"type": "token", "content": "cursion"}
+
+data: {"type": "done"}
+```
+
+Now the frontend reads one shape forever: parse the JSON, look at `type`, react. A `token` grows the bubble. A `done` says the reply is complete. When Part 6 adds `{"type": "tool_start", ...}`, the parser you're about to write doesn't change by a line; it just learns one more `type`. Designing the envelope before you need it is the cheapest insurance in the series.
+
+## Teach the backend to hand over each word
+
+Open `app/main.py`. Your `/chat` endpoint currently calls `graph.invoke(...)`, which waits for the entire reply and returns it in one piece. You're going to swap that for a generator that yields one envelope per token as the model produces it.
+
+First, a one-line helper that formats an envelope, and the generator itself. Add these above your `/chat` endpoint:
+
+```python filename="backend/app/main.py"
+import json
+from fastapi.responses import StreamingResponse
+
+
+def sse(payload: dict) -> str:
+    return f"data: {json.dumps(payload)}\n\n"
+
+
+async def token_stream(message: str):
+    inputs = {"messages": [HumanMessage(content=message)]}
+    async for event in graph.astream_events(inputs, version="v2"):
+        if event["event"] == "on_chat_model_stream":
+            token = event["data"]["chunk"].content
+            if token:
+                yield sse({"type": "token", "content": token})
+    yield sse({"type": "done"})
+```
+
+`sse` does exactly what the wire format demands: JSON, prefixed with `data: `, terminated by the blank line. The real work is `graph.astream_events`. Instead of running the graph and handing you the final tray, it narrates the run as a series of events while it happens. You loop over them with `async for` and watch for one kind: `on_chat_model_stream`, which fires once per token the model emits. You pull `chunk.content`, the token's text, and yield it as an envelope. When the loop ends, one last `done` envelope closes the stream.
+
+<Callout type="info" title="What is astream_events?">
+`graph.invoke` is a closed door: you knock, you wait, it opens with the finished answer. `graph.astream_events` is a glass door. It reports everything the graph does as it does it, as a stream of typed events, and `on_chat_model_stream` is the one that means "the model just produced another token." The same firehose carries tool events too, which is exactly why Part 6 plugs into it without rebuilding anything. The `version="v2"` argument just pins the event format so a library update can't quietly change the shape on you.
+</Callout>
+
+Now the endpoint. It stops returning a single object and starts returning a stream, so the `-> ChatResponse` annotation comes off and `StreamingResponse` takes over. Replace your old `/chat`:
+
+```python filename="backend/app/main.py"
+@app.post("/chat")
+async def chat(request: ChatRequest):
+    return StreamingResponse(
+        token_stream(request.message),
+        media_type="text/event-stream",
+    )
+```
+
+`StreamingResponse` takes your generator and feeds whatever it yields straight down the HTTP connection, one chunk at a time, without waiting for it to finish. The `media_type="text/event-stream"` is the official "this is SSE" label; it tells the browser, and any proxy in between, not to buffer the response and to let the bytes flow as they arrive.
+
+Save it, and let's look at the raw stream before a browser ever touches it. From any terminal that isn't running the server, curl it with the `-N` flag:
+
+```bash
+curl -N -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "explain recursion in one sentence"}'
+```
+
+<Figure
+  src="/images/series/langgraph/part-5/term-curl-stream.svg"
+  alt="A dark terminal running curl with the -N flag against localhost:8000/chat. After a comment noting that -N turns off curl's buffering, the output is a run of lines: data: {'type': 'token', 'content': 'Recursion'}, then 'is', 'when', 'a', 'function', 'calls', 'itself.', each on its own data line, and finally data: {'type': 'done'}."
+  caption="The raw stream, before any browser touches it. The -N flag turns off curl's own buffering so each line prints the instant it lands. Each line is one envelope; the blank line between them is the part that matters next."
+  width={1000}
+  height={560}
+/>
+
+The words appear one by one in your terminal, with real pauses between them. That's the model thinking out loud over an open HTTP connection. The backend is done. Now the harder half: teaching the browser to read this.
+
+## Teach the browser to read a firehose
+
+Back in `frontend/app/page.tsx`. In Part 4, the relevant lines of `sendMessage` waited for the whole reply and appended it as one finished bubble:
+
+```tsx filename="frontend/app/page.tsx"
+const data = await res.json();
+setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+```
+
+`res.json()` is the problem now. It waits for the entire response body before it gives you anything, which is the exact pause we're deleting. The new plan has two moves: add an *empty* assistant bubble up front, then grow its text as tokens arrive.
+
+Start with a small helper that grows the last message. Add it inside the component, next to `sendMessage`:
+
+```tsx filename="frontend/app/page.tsx"
+function appendToken(token: string) {
+  setMessages((prev) => {
+    const next = [...prev];
+    const last = next[next.length - 1];
+    next[next.length - 1] = { ...last, content: last.content + token };
+    return next;
+  });
+}
+```
+
+It's the same immutability rule from Part 4: build a *new* array, with a *new* object for the last message whose `content` is the old content plus the new token. React sees fresh references and repaints, so the bubble visibly grows with every call.
+
+Next, when the user sends, add both the user's message and an empty assistant bubble in one shot. That empty bubble is the thing `appendToken` will fill:
+
+```tsx filename="frontend/app/page.tsx"
+setMessages((prev) => [
+  ...prev,
+  { role: "user", content: text },
+  { role: "assistant", content: "" },
+]);
+```
+
+Now the part that reads the stream. The instinct is to read each chunk and parse it. Let's write that instinct out in full, run it, and watch it fail, because the way it fails teaches the fix:
+
+```tsx filename="frontend/app/page.tsx"
+const res = await fetch(`${API_BASE}/chat`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message: text }),
+});
+if (!res.ok || !res.body) throw new Error();
+
+const reader = res.body.getReader();
+const decoder = new TextDecoder();
+while (true) {
+  const { value, done } = await reader.read();
+  if (done) break;
+  const chunk = decoder.decode(value);
+  const envelope = JSON.parse(chunk.replace("data: ", "")); // hopeful
+  appendToken(envelope.content);
+}
+```
+
+<Callout type="info" title="What's a ReadableStream and a reader?">
+`res.json()` hands you finished text. `res.body` hands you a `ReadableStream`, a tap you open and pull from. `.getReader()` gives you the handle, and each `await reader.read()` returns a clump of raw bytes (a `Uint8Array`), not a string, which is why a `TextDecoder` turns the bytes back into text. The catch, and the whole lesson of this section: those clumps are sized for the network's convenience, not yours. They do not line up with your messages.
+</Callout>
+
+Save, send a message, and open your browser's dev tools console. Instead of a smooth reply, you get this:
+
+<Figure
+  src="/images/series/langgraph/part-5/console-json-error.svg"
+  alt="A dark browser dev tools Console tab. A console.log shows a chunk reading 'data: {type: token, content:  fun' that ends mid-word with no closing brace. Below it, a red error: Uncaught (in promise) SyntaxError: Unexpected end of JSON input, with a stack trace pointing at sendMessage in page.tsx line 46. A comment notes that JSON.parse got half a parcel because the chunk ended mid-envelope."
+  caption="The error you will hit, met on purpose. A read handed you half a parcel, the JSON ended mid-object, and parse choked on the brace that never came."
+  width={1000}
+  height={430}
+/>
+
+Read it like the errors from Parts 3 and 4: `SyntaxError: Unexpected end of JSON input`. Your `JSON.parse` got handed a string like `data: {"type": "token", "content": " fun` with no closing brace. The network split one envelope across two reads. The other failure mode is just as common: one read arrives holding *two* envelopes glued together, and parse trips on the second `{`. The bytes are fine. Your assumption that one read equals one message is what's wrong.
+
+This is why you put a blank line after every envelope. The `\n\n` is a fence between messages, and the fix is to respect the fence: pile every chunk into a buffer, cut it on `\n\n`, handle the complete pieces, and keep the unfinished tail for next time.
+
+```tsx filename="frontend/app/page.tsx"
+const reader = res.body.getReader();
+const decoder = new TextDecoder();
+let buffer = "";
+
+while (true) {
+  const { value, done } = await reader.read();
+  if (done) break;
+  buffer += decoder.decode(value, { stream: true });
+  const parts = buffer.split("\n\n");
+  buffer = parts.pop() ?? "";          // the unfinished tail waits here
+  for (const part of parts) {
+    if (!part.startsWith("data: ")) continue;
+    const envelope = JSON.parse(part.slice(6));
+    if (envelope.type === "token") appendToken(envelope.content);
+  }
+}
+```
+
+Two lines carry the whole idea. `buffer.split("\n\n")` cuts on the fences, giving you an array of pieces. `parts.pop()` lifts off the *last* piece and parks it back in `buffer`, because the last piece after a split is whatever came after the final fence, which might be a half-finished envelope still arriving. Everything before it is guaranteed complete, so you parse those with confidence. Next read appends to the tail, and a partial envelope quietly completes itself. The `if (envelope.type === "token")` is your forward-compat seatbelt: a `done` envelope sails through untouched, and so will Part 6's tool events.
+
+Save and send. The reply crawls across the screen, word by word, exactly like the terminal but inside a real chat bubble. It streams.
+
+<Figure
+  src="/images/series/langgraph/part-5/fig-stream-pipeline-light.svg"
+  srcDark="/images/series/langgraph/part-5/fig-stream-pipeline-dark.svg"
+  alt="A pipeline diagram, left to right. On the left, a box labeled THE MODEL runs astream_events and emits an on_chat_model_stream event per word. In the middle, ONE BELT labeled text/event-stream carries four labeled envelopes reading 'Re', 'cursion', 'is', 'when', with a backslash-n-backslash-n marker between each. On the right, a box labeled THE BROWSER runs body.getReader, cuts on the blank line, and a chat bubble reads 'Recursion is when' with a cursor. A caption says the model plates each word, the belt carries it, the bubble grows a word at a time."
+  caption="The whole pipeline. The model plates a word, the belt carries one labeled envelope, the reader cuts on the blank line and grows the bubble. Hold this picture; Part 6 reuses every piece of it."
+  width={1240}
+  height={600}
+/>
+
+There's a particular relief the first time the words start crawling across the screen on their own. The app stops feeling like a form you submit and starts feeling like something thinking back at you. You built that with about forty lines and one blank-line convention.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, 1536x1024, quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 2-panel comic, panels side by side with a thin black divider, about getting each word the instant it arrives instead of waiting for the whole message. Panel 1: a cheerful mailman in a blue cap and blue uniform reaches over a little garden fence and hands Yad a single large white card with one big bold letter "H" on it; Yad's eyes go wide with delight, both arms thrown up in joy; Yad's speech bubble: "IT BEGINS!". Panel 2: a moment later Yad happily holds up a row of five white cards spelling "HELLO" left to right, grinning ear to ear with one small happy tear, while the mailman waves goodbye walking off; Yad's speech bubble: "I READ IT AS IT CAME!". Clean readable hand-lettered speech bubbles, large clear lettering, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/langgraph/part-5/comic-mailman.png"
+  alt="Comic in two panels. Panel one: a cheerful mailman hands Yad, a bearded developer with headphones, a single large card with the letter H on it over a garden fence; Yad throws his arms up, delighted, and says 'IT BEGINS!'. Panel two: a moment later Yad happily holds up five cards spelling HELLO while the mailman walks off waving; Yad, beaming with a happy tear, says 'I READ IT AS IT CAME!'."
+  caption="Streaming, taken literally. You don't wait for the whole word HELLO in a sealed box; you get the H, then the E, and you're already reading. Value arrives with the first token, not the last."
+  width={1536}
+  height={1024}
+/>
+
+## A button that says enough
+
+Streaming opens a new problem. A long answer might run for fifteen seconds, and sometimes you can tell from the first line that the bot misread you. You want a way out. Right now there isn't one: the only button is Send, and it's disabled while a reply streams.
+
+The browser's tool for canceling an in-flight `fetch` is an `AbortController`. You make one per request, hand its `signal` to `fetch`, and calling `.abort()` tears the connection down. Add a piece of state to hold the current controller, and a `stop` function:
+
+```tsx filename="frontend/app/page.tsx"
+const [controller, setController] = useState<AbortController | null>(null);
+
+function stop() {
+  controller?.abort();
+}
+```
+
+In `sendMessage`, create a controller before the fetch, pass its signal, and remember it so `stop` can reach it:
+
+```tsx filename="frontend/app/page.tsx"
+const controller = new AbortController();
+setController(controller);
+
+const res = await fetch(`${API_BASE}/chat`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message: text }),
+  signal: controller.signal,        // the cancel wire
+});
+```
+
+When you abort, `fetch` throws an `AbortError`. That's not a real failure, so your `catch` should ignore it instead of flashing the red "could not reach the backend" banner from Part 4. Adjust the `catch` and `finally`:
+
+```tsx filename="frontend/app/page.tsx"
+} catch (err) {
+  if ((err as Error).name !== "AbortError") {
+    setError("Could not reach the backend. Is it running on :8000?");
+  }
+} finally {
+  setLoading(false);
+  setController(null);
+}
+```
+
+Last, swap the footer button while a reply is streaming. Send becomes Stop:
+
+```tsx filename="frontend/app/page.tsx"
+{loading ? (
+  <Button type="button" variant="outline" onClick={stop}>
+    Stop
+  </Button>
+) : (
+  <Button type="submit">Send</Button>
+)}
+```
+
+<Callout type="info" title="Why bother with AbortController?">
+Think of it as a remote with one button. You hold the remote (`controller`), hand its `signal` to `fetch`, and pressing the button (`controller.abort()`) tells `fetch` to give up. Without it, hitting Stop would hide the activity in the UI, but the model would keep generating on the server and you'd keep paying for tokens nobody will ever read. The abort actually closes the connection, and the backend notices.
+</Callout>
+
+<Figure
+  src="/images/series/langgraph/part-5/browser-chat-stop-light.svg"
+  srcDark="/images/series/langgraph/part-5/browser-chat-stop-dark.svg"
+  alt="The chat card at localhost:3000. The user asked 'Explain recursion in one sentence.' and the assistant bubble is mid-stream, reading 'Recursion is when a function solves a problem by calling itself on a smaller' with a blinking cursor at the end. The footer button now reads 'Stop' as an outline button instead of the filled 'Send'."
+  caption="Mid-stream, Send becomes Stop. One click aborts the fetch, the words stop, and you stop paying for an answer you don't want."
+  width={1120}
+  height={462}
+/>
+
+Watch the backend terminal while you do it. The instant you hit Stop, Uvicorn notices the client went away and the `async for` loop stops pulling tokens from the model. You didn't just hide the reply; you genuinely called it off.
+
+## Give it a cursor and a self-scroll
+
+Two small touches separate "it works" from "it feels alive." First, that blinking cursor you saw in every screenshot. It's the honest version of Part 4's "Thinking..." line: delete that line, because the answer writing itself is a better indicator than any spinner, and add a cursor to the streaming bubble instead. Inside your `messages.map`, render it on the last assistant bubble while `loading` is true:
+
+```tsx filename="frontend/app/page.tsx"
+<span className={/* the bubble classes from Part 4 */}>
+  {m.content}
+  {loading && m.role === "assistant" && i === messages.length - 1 && (
+    <span className="ml-0.5 animate-pulse">▍</span>
+  )}
+</span>
+```
+
+Second, auto-scroll. As the bubble grows past the bottom of the window, the newest words slide out of view and the reader has to chase them. Fix it by keeping an empty marker pinned to the bottom of the list and scrolling to it whenever the messages change. This needs a `useRef`:
+
+```tsx filename="frontend/app/page.tsx"
+const bottomRef = useRef<HTMLDivElement>(null);
+
+useEffect(() => {
+  bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+}, [messages]);
+```
+
+Then drop the marker at the very end of the scrolling messages `<div>`, just after the `.map(...)`:
+
+```tsx filename="frontend/app/page.tsx"
+<div ref={bottomRef} />
+```
+
+<Callout type="info" title="What's useRef?">
+`useState` is for values the screen should react to. `useRef` is for values it shouldn't. `useRef(null)` hands you a small box with a `.current` property that survives re-renders but never triggers one. Point it at a DOM node, like that empty marker div, and React fills `.current` with the real element, so you can call browser methods on it directly. Here that's `scrollIntoView`, which nudges the page down to keep the latest word in sight.
+</Callout>
+
+Remember to widen your React import for the two new hooks:
+
+```tsx filename="frontend/app/page.tsx"
+import { useState, useRef, useEffect, type FormEvent } from "react";
+```
+
+Send one more message and watch it land: the cursor blinks at the empty bubble, words stream in to fill it, the window scrolls itself to follow, and the cursor vanishes when the `done` envelope arrives and `loading` flips off. That's a real chat app.
+
+Right now you have: a backend that streams a model's reply token by token over SSE, a frontend that reads that stream through a buffer that never trips on a chunk boundary, a Stop button that genuinely cancels the work, and a UI that scrolls and blinks like the apps you use every day. Here's the full `page.tsx`, in case a piece drifted while you built it up:
+
+```tsx filename="frontend/app/page.tsx" collapsed
+"use client";
+
+import { useState, useRef, useEffect, type FormEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+export default function Chat() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [controller, setController] = useState<AbortController | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  function appendToken(token: string) {
+    setMessages((prev) => {
+      const next = [...prev];
+      const last = next[next.length - 1];
+      next[next.length - 1] = { ...last, content: last.content + token };
+      return next;
+    });
+  }
+
+  function stop() {
+    controller?.abort();
+  }
+
+  async function sendMessage(e: FormEvent) {
+    e.preventDefault();
+    const text = input.trim();
+    if (!text || loading) return;
+
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: text },
+      { role: "assistant", content: "" },
+    ]);
+    setInput("");
+    setLoading(true);
+    setError(null);
+
+    const controller = new AbortController();
+    setController(controller);
+
+    try {
+      const res = await fetch(`${API_BASE}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }),
+        signal: controller.signal,
+      });
+      if (!res.ok || !res.body) throw new Error();
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split("\n\n");
+        buffer = parts.pop() ?? "";
+        for (const part of parts) {
+          if (!part.startsWith("data: ")) continue;
+          const envelope = JSON.parse(part.slice(6));
+          if (envelope.type === "token") appendToken(envelope.content);
+        }
+      }
+    } catch (err) {
+      if ((err as Error).name !== "AbortError") {
+        setError("Could not reach the backend. Is it running on :8000?");
+      }
+    } finally {
+      setLoading(false);
+      setController(null);
+    }
+  }
+
+  return (
+    <main className="mx-auto flex h-dvh max-w-2xl flex-col p-4">
+      <Card className="flex flex-1 flex-col overflow-hidden">
+        <div className="border-b px-5 py-4 font-semibold">Chatbot</div>
+        <div className="flex-1 space-y-4 overflow-y-auto p-5">
+          {messages.map((m, i) => (
+            <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
+              <span className={`inline-block max-w-[75%] rounded-2xl px-4 py-2 ${
+                m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+              }`}>
+                {m.content}
+                {loading && m.role === "assistant" && i === messages.length - 1 && (
+                  <span className="ml-0.5 animate-pulse">▍</span>
+                )}
+              </span>
+            </div>
+          ))}
+          <div ref={bottomRef} />
+        </div>
+        {error && (
+          <p className="mx-5 mb-2 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">
+            {error}
+          </p>
+        )}
+        <form onSubmit={sendMessage} className="flex gap-2 border-t p-4">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask me anything..."
+            disabled={loading}
+          />
+          {loading ? (
+            <Button type="button" variant="outline" onClick={stop}>
+              Stop
+            </Button>
+          ) : (
+            <Button type="submit">Send</Button>
+          )}
+        </form>
+      </Card>
+    </main>
+  );
+}
+```
+
+<Recap
+  part={5}
+  items={[
+    "A streaming backend: `/chat` now returns a `StreamingResponse` that yields one SSE envelope per token, read straight off the graph with `astream_events`.",
+    "A wire format you designed on purpose: `data: {type, content}` envelopes framed by a blank line, built to carry Part 6's tool events without a parser rewrite.",
+    "A frontend that reads a stream: `getReader()` plus a buffer that splits on `\\n\\n` and keeps the unfinished tail, so a chunk boundary never breaks `JSON.parse` again.",
+    "The buffering bug met head-on: you know why parsing a raw chunk fails, and you know the blank-line fence is the fix.",
+    "A Stop button that truly cancels the work with an `AbortController`, plus a blinking cursor and auto-scroll that make the whole thing feel alive.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "Why wrap each streamed token in an envelope like `{'type': 'token', 'content': '...'}` instead of sending the bare token text?",
+      options: [
+        "JSON streams faster than plain text over HTTP",
+        "So the frontend reads one shape forever; new event kinds (like Part 6's tools) become a new `type`, not a new parser",
+        "Bare tokens are not valid SSE",
+        "It encrypts the token in transit",
+      ],
+      answer: 1,
+      explain: "The envelope's `type` field is the extensibility hinge. The reader parses one JSON shape and branches on `type`, so when Part 6 adds tool events the existing parser just learns one more value instead of being rewritten.",
+    },
+    {
+      q: "Your first reader loop does `JSON.parse(chunk.replace('data: ', ''))` on every read and throws `Unexpected end of JSON input`. What's actually wrong?",
+      options: [
+        "The backend forgot to send valid JSON",
+        "`JSON.parse` can't handle the `data:` prefix",
+        "A network read doesn't line up with a message; it can split one envelope across two reads or carry several at once",
+        "`TextDecoder` corrupts the bytes",
+      ],
+      answer: 2,
+      explain: "Reads are sized for the network, not your messages. One envelope can arrive in two reads (so the JSON ends mid-object) or two can arrive glued together. The fix is to buffer and cut on the `\\n\\n` fence, parsing only complete pieces.",
+    },
+    {
+      q: "After splitting the buffer on `\\n\\n`, why do you `parts.pop()` and stash that last piece back in the buffer instead of parsing it?",
+      options: [
+        "The last piece is always the `done` envelope",
+        "Popping makes the loop run faster",
+        "The piece after the final fence may be an unfinished envelope still arriving, so it waits for the next read",
+        "`JSON.parse` can only handle one piece per loop",
+      ],
+      answer: 2,
+      explain: "Everything before the final `\\n\\n` is a complete message; whatever follows it might be a half-sent envelope. Parking it in the buffer lets the next read append to it and complete it, so you never parse a fragment.",
+    },
+    {
+      q: "Between WebSockets and Server-Sent Events, why does this chat use SSE for the model's reply?",
+      options: [
+        "WebSockets can't carry text",
+        "The reply only flows one way (server to browser), and SSE rides plain HTTP with no new handshake",
+        "SSE is the only one browsers support",
+        "WebSockets don't work with FastAPI",
+      ],
+      answer: 1,
+      explain: "Streaming a reply is one-directional: the model talks, the browser listens. SSE fits that exactly and runs over the same HTTP your `fetch` already uses, so there's no second protocol to set up. Stopping the stream is a separate cancel, not a message sent back up.",
+    },
+    {
+      q: "The Part 3 graph didn't change at all to make streaming work. So what did?",
+      options: [
+        "The graph was secretly rewritten to support tokens",
+        "The endpoint reads the graph's events with `astream_events` and forwards each token, instead of calling `graph.invoke` and waiting for the whole result",
+        "Streaming is a setting you toggle on the model object",
+        "The frontend now talks to the model directly, skipping the graph",
+      ],
+      answer: 1,
+      explain: "The same compiled graph runs either way. `graph.invoke` waits and returns the final tray; `graph.astream_events` narrates the run as it happens, and the endpoint forwards the `on_chat_model_stream` tokens down the SSE connection.",
+    },
+  ]}
+/>
+
+The commit, from the project root, in any terminal that isn't hosting a server:
+
+```bash
+git add .
+git commit -m "part 5: stream tokens over SSE with a Stop button"
+```
+
+Your bot answers fast now, but it only knows what the model already carries in its head. Ask it for today's news or to multiply two big numbers exactly, and it will cheerfully make something up. In Part 6 you'll hand it tools, real functions it can call mid-answer, and they'll ride the exact belt you just built.
+
+{/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-5-streaming) in the intro once it exists. */}
+
+{/* TODO once the Concepts page (langgraph-concepts.mdx) ships: link "SSE", "ReadableStream", and "AbortController" to /blog/langgraph-concepts#sse, #readable-stream, and #abort-controller instead of defining only inline. */}
+
+{/* ANECDOTE slot (optional upgrade, WRITING-STYLE §6): a real first-person story from Yadnesh about the first time he got tokens streaming into a UI, or a streaming bug that came down to a chunk boundary / missing blank-line framing, 3 beats, 5 sentences max. If provided, it replaces the "particular relief" relatable beat right after the pipeline figure. */}

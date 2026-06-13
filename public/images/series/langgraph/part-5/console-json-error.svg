@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="430" viewBox="0 0 1000 430" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1000" height="430" fill="#1a1816"/>
+  <rect width="1000" height="44" fill="#211e1a"/>
+  <text x="28" y="29" font-size="14" fill="#756d62">Elements</text>
+  <text x="116" y="29" font-size="14" fill="#d8d2c6" font-weight="700">Console</text>
+  <line x1="110" y1="36" x2="178" y2="36" stroke="#e5825a" stroke-width="2"/>
+  <text x="208" y="29" font-size="14" fill="#756d62">Network</text>
+  <text x="304" y="29" font-size="14" fill="#756d62">Sources</text>
+  <line x1="0" y1="44" x2="1000" y2="44" stroke="#000000" stroke-opacity="0.25" stroke-width="1.5"/>
+  <g font-size="15" xml:space="preserve">
+    <text x="28" y="96" fill="#756d62">&#8250; console.log(text)</text>
+    <text x="28" y="132" fill="#d8d2c6">  data: {"type": "token", "content": " fun</text>
+    <text x="28" y="180" fill="#e5825a">&#9888;  Uncaught (in promise) SyntaxError:</text>
+    <text x="56" y="210" fill="#e5825a">Unexpected end of JSON input</text>
+    <text x="56" y="252" fill="#756d62">at sendMessage (<tspan fill="#6fa8dc">page.tsx:46:38</tspan>)</text>
+    <text x="56" y="282" fill="#756d62">at async HTMLFormElement.&lt;anonymous&gt;</text>
+    <text x="28" y="344" fill="#756d62">// JSON.parse got half a parcel: the chunk ended</text>
+    <text x="28" y="372" fill="#756d62">// mid-envelope, before the closing brace arrived.</text>
+  </g>
+</svg>
