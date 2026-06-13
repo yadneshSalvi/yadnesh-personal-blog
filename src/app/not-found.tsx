@@ -10,7 +10,7 @@ export default function NotFound() {
         Lost in the weights.
       </h1>
       <p className="mt-5 text-muted">
-        This page doesn&apos;t exist — or it was pruned during training.
+        This page doesn&apos;t exist. Maybe it was pruned during training.
       </p>
       <Link
         href="/"

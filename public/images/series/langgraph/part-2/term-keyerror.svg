@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="960" height="420" fill="#1a1816"/>
+  <rect x="0" y="0" width="960" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="480" y="30" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal 1 · backend</text>
+  <g font-size="15.5" fill="#d8d2c6" xml:space="preserve">
+    <text x="40" y="94"><tspan fill="#756d62">INFO:</tspan>     127.0.0.1:56380 - "POST /chat HTTP/1.1" <tspan fill="#e5825a">500 Internal Server Error</tspan></text>
+    <text x="40" y="132" fill="#e5825a">ERROR:    Exception in ASGI application</text>
+    <text x="40" y="170">Traceback (most recent call last):</text>
+    <text x="59" y="208" fill="#756d62">[ 43 lines of uvicorn, Starlette, and FastAPI internals ]</text>
+    <text x="59" y="246">File "/Users/you/langgraph-chatbot/backend/app/main.py", line 13, in chat</text>
+    <text x="77" y="284">return {"reply": f"you said: {payload['message']}"}</text>
+    <text x="356" y="322" fill="#e5825a">~~~~~~~^^^^^^^^^^^</text>
+    <text x="40" y="360" fill="#e5825a">KeyError: 'message'</text>
+  </g>
+</svg>

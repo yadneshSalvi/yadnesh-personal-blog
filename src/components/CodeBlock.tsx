@@ -63,7 +63,12 @@ export function CodeBlock({
 
   return (
     <div className={clsx("group/box w-full text-[13px]", className)}>
-      <div className="flex items-center justify-between rounded-t-md border border-b-0 border-zinc-800 bg-zinc-900/80 px-3 py-1.5 text-zinc-300">
+      <div
+        className={clsx(
+          "flex items-center justify-between rounded-t-md border border-zinc-800 bg-zinc-900/80 px-3 py-1.5 text-zinc-300",
+          collapsed ? "rounded-b-md" : "border-b-0"
+        )}
+      >
         <div className="truncate font-medium">{headerLabel}</div>
         <div className="flex items-center gap-1.5">
           {collapsible && (
@@ -93,7 +98,7 @@ export function CodeBlock({
       <div
         className={clsx(
           "relative overflow-hidden rounded-b-md border border-zinc-800",
-          collapsed && "max-h-60"
+          collapsed && "hidden"
         )}
       >
         <Highlight theme={THEME} code={code.trimEnd()} language={prismLanguage}>
@@ -119,9 +124,6 @@ export function CodeBlock({
           )}
         </Highlight>
 
-        {collapsed && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#1e1e1e] to-transparent" />
-        )}
       </div>
     </div>
   );

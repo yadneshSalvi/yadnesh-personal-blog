@@ -4,6 +4,14 @@ import Tweet from "@/components/mdx/Tweet";
 import Callout from "@/components/mdx/Callout";
 import YouTube from "@/components/mdx/YouTube";
 import Mermaid from "@/components/mdx/Mermaid";
+import Figure from "@/components/mdx/Figure";
+import CodeTabs, { Tab } from "@/components/mdx/CodeTabs";
+import Quiz from "@/components/mdx/Quiz";
+import Recap from "@/components/mdx/Recap";
+import type { FigureProps } from "@/components/mdx/Figure";
+import type { TabProps } from "@/components/mdx/CodeTabs";
+import type { QuizProps } from "@/components/mdx/Quiz";
+import type { RecapProps } from "@/components/mdx/Recap";
 import type { ReactNode } from "react";
 
 type CodeChildProps = { className?: string; children?: ReactNode; mdxType?: string; originalType?: string };
@@ -39,6 +47,11 @@ const MDXComponents: Record<string, (props: unknown) => React.ReactNode> = {
   Callout: (props) => <Callout {...(props as Record<string, unknown>)} />,
   YouTube: (props) => <YouTube {...(props as { id: string })} />,
   Mermaid: (props) => <Mermaid {...(props as { chart: string })} />,
+  Figure: (props) => <Figure {...(props as FigureProps)} />,
+  CodeTabs: (props) => <CodeTabs {...(props as { children?: ReactNode })} />,
+  Tab: (props) => <Tab {...(props as TabProps)} />,
+  Quiz: (props) => <Quiz {...(props as QuizProps)} />,
+  Recap: (props) => <Recap {...(props as RecapProps)} />,
   pre: (props) => {
     const p = props as { children?: ReactNode };
     const candidate = firstChild(p.children);

@@ -24,11 +24,11 @@ const newsreader = Newsreader({
 
 export const metadata: Metadata = {
   title: {
-    default: "Yadnesh Salvi — Notes on AI Engineering",
-    template: "%s — Yadnesh Salvi",
+    default: "Yadnesh Salvi · Notes on AI Engineering",
+    template: "%s · Yadnesh Salvi",
   },
   description:
-    "Essays and field notes on AI engineering — agents, RAG, fine-tuning, and what actually survives production.",
+    "Essays and field notes on AI engineering: agents, RAG, fine-tuning, and what actually survives production.",
 };
 
 export default function RootLayout({

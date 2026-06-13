@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="810" viewBox="0 0 1120 810" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="810" fill="#ffffff"/>
+  <rect x="0" y="0" width="1120" height="64" fill="#f3f1ec"/>
+  <line x1="0" y1="64" x2="1120" y2="64" stroke="#e2ded4" stroke-width="1.5"/>
+  <circle cx="32" cy="32" r="8" fill="#d6d1c5"/><circle cx="60" cy="32" r="8" fill="#d6d1c5"/><circle cx="88" cy="32" r="8" fill="#d6d1c5"/>
+  <rect x="300" y="14" width="520" height="36" rx="18" fill="#ffffff" stroke="#e2ded4"/>
+  <text x="560" y="38" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#5b554c" text-anchor="middle">localhost:8000/docs</text>
+  <text x="48" y="126" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#3b4151">FastAPI</text>
+  <rect x="144" y="111.12" width="52" height="22" rx="11" fill="#7d8492"/>
+  <text x="170" y="127.12" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="middle">0.1.0</text>
+  <rect x="206" y="111.12" width="62" height="22" rx="11" fill="#89bf04"/>
+  <text x="237" y="127.12" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="middle">OAS 3.1</text>
+  <text x="48" y="154" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#4990e2">/openapi.json</text>
+  <rect x="48" y="172" width="1024" height="48" rx="6" fill="#ebf3fb" stroke="#61affe"/>
+  <rect x="64" y="179" width="76" height="33" rx="4" fill="#61affe"/>
+  <text x="102" y="201.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">GET</text>
+  <text x="164" y="203" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" font-weight="600" fill="#3b4151">/</text>
+  <text x="192" y="202" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#8b8b8b">Health Check</text>
+  <path d="M 1034 191 l 9 9 l 9 -9" stroke="#8b8b8b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <rect x="48" y="240" width="1024" height="540" rx="6" fill="#e8f6f0" stroke="#49cc90"/>
+  <rect x="64" y="252" width="84" height="34" rx="4" fill="#49cc90"/>
+  <text x="106" y="275" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">POST</text>
+  <text x="172" y="277" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" font-weight="600" fill="#3b4151">/chat</text>
+  <text x="252" y="276" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#8b8b8b">Chat</text>
+  <rect x="948" y="250" width="108" height="36" rx="4" fill="none" stroke="#f93e3e" stroke-width="1.5"/>
+  <text x="1002" y="274" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#f93e3e" text-anchor="middle">Cancel</text>
+
+  <text x="64" y="330" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#3b4151">Request body</text>
+  <text x="170" y="324" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#f93e3e">required</text>
+  <rect x="886" y="306" width="170" height="32" rx="4" fill="#ffffff" stroke="#d8dde3"/>
+  <text x="906" y="327" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#3b4151">application/json</text>
+  <path d="M 1026 318 l 9 9 l 9 -9" stroke="#8b8b8b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <text x="64" y="372" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#8b8b8b">Edit Value</text>
+  <text x="148" y="372" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#a1a1aa">Schema</text>
+  <rect x="64" y="388" width="992" height="102" rx="4" fill="#ffffff"/>
+<g font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#1f1c19" xml:space="preserve">
+<text x="84" y="418">{</text>
+<text x="84" y="444"><tspan dx="20">"message": "hello"</tspan></text>
+<text x="84" y="470">}</text>
+</g>
+  <rect x="64" y="510" width="496" height="46" rx="4" fill="#4990e2"/>
+  <text x="312" y="539" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">Execute</text>
+  <rect x="572" y="510" width="484" height="46" rx="4" fill="none" stroke="#8b8b8b" stroke-width="1.5"/>
+  <text x="814" y="539" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="600" fill="#3b4151" text-anchor="middle">Clear</text>
+
+  <text x="64" y="606" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#3b4151">Responses</text>
+  <text x="64" y="642" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#8b8b8b">Server response</text>
+  <text x="64" y="702" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#3b4151">200</text>
+  <text x="156" y="660" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#a1a1aa">Response body</text>
+  <rect x="156" y="668" width="900" height="52" rx="4" fill="#2a2724"/>
+<g font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#8fb573" xml:space="preserve">
+<text x="176" y="698">{ "reply": "you said: hello" }</text>
+</g>
+</svg>

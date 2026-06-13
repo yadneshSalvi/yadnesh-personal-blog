@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { getAllPostsMeta } from "@/lib/posts";
+import { getListedPostsMeta } from "@/lib/posts";
+import { getListedItems } from "@/lib/series";
 import Hero from "@/components/Hero";
 import PostList from "@/components/PostList";
 
 export default function Home() {
-  const posts = getAllPostsMeta();
+  const posts = getListedItems(getListedPostsMeta());
   return (
     <>
       <Hero />

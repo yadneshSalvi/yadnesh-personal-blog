@@ -1,7 +1,9 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import TOC from "@/components/TOC";
 import { getAllPostSlugs, getPostBySlug } from "@/lib/posts";
+import { getSeriesContextForPost } from "@/lib/series";
 
 export const dynamic = "force-static";
 
@@ -27,6 +29,7 @@ export default async function BlogPost({
   const post = await getPostBySlug(slug);
   if (!post) return notFound();
   const { meta, content } = post;
+  const seriesCtx = getSeriesContextForPost(meta);
   const updatedDiffers =
     formatDate(meta.updatedAt) !== formatDate(meta.createdAt);
 
@@ -36,6 +39,17 @@ export default async function BlogPost({
         <TOC contentSelector="#post-content" />
         <article className="w-full max-w-3xl lg:mx-auto">
           <header>
+            {seriesCtx ? (
+              <p className="mb-3">
+                <Link
+                  href={`/series/${seriesCtx.series.slug}`}
+                  className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint transition-colors hover:text-accent"
+                >
+                  Series · {seriesCtx.series.name} · Part {seriesCtx.part} of{" "}
+                  {seriesCtx.totalParts}
+                </Link>
+              </p>
+            ) : null}
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
               <time dateTime={meta.createdAt}>{formatDate(meta.createdAt)}</time>
               {updatedDiffers ? (
@@ -70,9 +84,25 @@ export default async function BlogPost({
                 alt=""
                 width={1280}
                 height={720}
-                className="h-auto w-full object-cover"
+                unoptimized={meta.image.endsWith(".svg")}
+                className={
+                  meta.imageDark
+                    ? "h-auto w-full object-cover dark:hidden"
+                    : "h-auto w-full object-cover"
+                }
                 priority
               />
+              {meta.imageDark ? (
+                <Image
+                  src={meta.imageDark}
+                  alt=""
+                  width={1280}
+                  height={720}
+                  unoptimized={meta.imageDark.endsWith(".svg")}
+                  className="hidden h-auto w-full object-cover dark:block"
+                  priority
+                />
+              ) : null}
             </div>
           ) : null}
 

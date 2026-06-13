@@ -1,0 +1,383 @@
+---
+title: "LangGraph from Scratch, Part 2: FastAPI Fundamentals"
+subtitle: "Request bodies, Pydantic validation, CORS, and the interactive docs page FastAPI has been writing for you since Part 1."
+image: "/images/series/langgraph/part-2/cover-light.svg"
+imageDark: "/images/series/langgraph/part-2/cover-dark.svg"
+createdAt: "2026-06-13T00:00:00.000Z"
+updatedAt: "2026-06-13T00:00:00.000Z"
+tags: ["langgraph", "fastapi", "pydantic", "tutorial"]
+series: "langgraph-fastapi-nextjs"
+seriesPart: 2
+---
+
+Your backend has been keeping a secret. Since the moment it first started in Part 1, FastAPI has been maintaining a second page you never wrote: a live, clickable control panel for your API. It sits at [http://localhost:8000/docs](http://localhost:8000/docs), and it has been waiting there this whole time.
+
+Today it earns its keep. You'll teach the backend to accept a chat message and answer back, crash it with a one-letter typo, then teach it to reject that same typo with an error so precise it names the field. By the end, this is your screen:
+
+<Figure
+  src="/images/series/langgraph/part-2/browser-docs-echo-light.svg"
+  srcDark="/images/series/langgraph/part-2/browser-docs-echo-dark.svg"
+  alt="The FastAPI docs page at localhost:8000/docs with the POST /chat endpoint expanded. A request body of message: hello has been sent with the Execute button, and the server response below shows code 200 with the body: reply, you said: hello."
+  caption="Today's destination: your backend accepting a chat message and replying, tested from a page you never had to build."
+  width={1120}
+  height={810}
+/>
+
+One honest note before we start: there is no LangGraph in this part, on purpose. Part 3 hands the conversation to a real language model, and every concept here (request shapes, validation, the docs page) is load-bearing for that. If you already know FastAPI and Pydantic, skim the headings, copy the final `main.py`, and meet me at the commit.
+
+Three versions matter today, all of them already on your machine since Part 1's big `pip install`:
+
+| Tool | Version used here |
+|---|---|
+| FastAPI | 0.136.3 |
+| Uvicorn | 0.49.0 |
+| Pydantic | 2.13.4 |
+
+Pydantic is the new name on the list, but not new in your `.venv`; it rode in with FastAPI. You'll meet it properly in a few minutes.
+
+## Wake the backend up
+
+New day, fresh terminal, and a reflex to practice. Open a terminal, `cd` into `langgraph-chatbot/backend`, and look at the prompt. No `(.venv)`? You know this one now:
+
+```bash
+source .venv/bin/activate
+uvicorn main:app --reload
+```
+
+(On Windows the first line is `.venv\Scripts\activate`, as always. And if Part 1's server is somehow still running in an old terminal, that window works as-is; don't start a second one, or the two will fight over port 8000.) The frontend stays asleep today; this whole part lives on the backend.
+
+With the server running, open the address from the intro: [http://localhost:8000/docs](http://localhost:8000/docs).
+
+## The page you never wrote
+
+<Figure
+  src="/images/series/langgraph/part-2/browser-docs-before-light.svg"
+  srcDark="/images/series/langgraph/part-2/browser-docs-before-dark.svg"
+  alt="The FastAPI docs page showing a header reading FastAPI 0.1.0 OAS 3.1, a link to /openapi.json, and a single blue GET / endpoint labeled Health Check."
+  caption="Your entire API as Part 1 left it: one endpoint. The 'Health Check' label is your function name, title-cased. Even the 0.1.0 is yours: your API's version number, defaulted."
+  width={1120}
+  height={440}
+/>
+
+This is Swagger UI, an industry-standard API explorer, and FastAPI built it by *reading your code*. Your eight-line `main.py` contains everything needed: the route (`/`), the method (`GET`), even the human label, which FastAPI made by title-casing your function name `health_check`. The `/openapi.json` link at the top is the machine-readable description it generated first; this page is that description, rendered.
+
+That's the FastAPI trade in one screen. You write plain typed Python, and the framework derives three things from it: documentation (this page), validation (the star of today), and serialization (your dicts becoming JSON in Part 1). Change the code and all three update; this page never goes stale.
+
+It can also *send real requests*, which makes it the best debugging tool you'll have all series. We'll push its buttons once there's something worth pushing.
+
+## One file becomes a folder
+
+A confession about where we're heading: by Part 6 the backend will be `main.py` plus `graph.py` plus `tools.py`. Three loose files rattling around next to `.venv` and `.env` gets confusing, so Python projects put application code in a package: a folder of related modules. We'll make that folder now, while moving one file is cheap.
+
+First, stop the server: click into its terminal and press `CTRL+C`.
+
+Now, in your editor's file tree, inside `backend/`: create a folder named `app`, create an empty file named `__init__.py` inside it, and drag `main.py` in as well. (Terminal equivalent on macOS/Linux: `mkdir app && touch app/__init__.py && mv main.py app/`.) The result:
+
+```text
+backend/
+├── .venv/
+├── .env
+└── app/
+    ├── __init__.py
+    └── main.py
+```
+
+<Callout type="info" title="What's __init__.py for?">
+It marks the folder as a Python package, which is what lets you write imports like `from app.main import app`. Empty is correct; the file's existence is the feature. In Part 3, when `graph.py` joins the package, this is what lets `main.py` import from it cleanly.
+</Callout>
+
+The file moved, so the old `uvicorn main:app` is now pointing at nothing. If muscle memory runs it anyway, the error is refreshingly direct:
+
+```text
+ERROR:    Error loading ASGI app. Could not import module "main".
+```
+
+There is no module named `main` at the top level anymore; it lives inside `app` now. So the new launch command, from `backend/` as always:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Same dotted logic as Part 1, one level deeper: "in the package `app`, in the module `main`, find the object `app`." Run it, check [http://localhost:8000](http://localhost:8000) still says `{"status":"ok"}`, and update your reflexes: this is the launch command for the rest of the series.
+
+Checkpoint. Right now you have: the same one-endpoint API, in a package with room to grow. Same behavior, better bones.
+
+## Teach it to listen
+
+`GET /` answers anyone who knocks, but it can't *receive* anything. A chat endpoint has to accept the user's message, and in HTTP that means a `POST` request carrying a body. Open `app/main.py` and add a second endpoint below the first:
+
+```python filename="backend/app/main.py"
+@app.post("/chat")
+async def chat(payload: dict):
+    return {"reply": f"you said: {payload['message']}"}
+```
+
+Two new things, one deferred mystery. `@app.post("/chat")` is the same decorator pattern as Part 1, for POST requests. `payload: dict` tells FastAPI "the request body is JSON; parse it into a dict for me." The mystery is `async`; it gets its own section soon, and changes nothing about today's behavior.
+
+Save the file and glance at the server terminal:
+
+```text
+WARNING:  WatchFiles detected changes in 'app/main.py'. Reloading...
+```
+
+That's `--reload` earning its keep, exactly as promised in Part 1. No restart, ever.
+
+Your browser can't easily send a POST (the address bar only speaks GET), but your terminal can. `curl` is the command-line tool for making HTTP requests, and it's how we'll poke every backend feature until the frontend exists. Open a second terminal (any terminal that isn't hosting the server; `curl` needs no `(.venv)`) and send your backend its first message:
+
+```bash
+curl -X POST http://localhost:8000/chat -H "Content-Type: application/json" -d '{"message": "hello"}'
+```
+
+```json
+{"reply":"you said: hello"}
+```
+
+It listens!
+
+<Callout type="info" title="Reading that curl command">
+`-X POST` sets the method, `-d` carries the body, and the `-H` header tells the server the body is JSON, so FastAPI knows to parse it as such rather than treat it as an opaque string. On Windows, quoting JSON in PowerShell is a known minefield: type `curl.exe` instead of `curl` and write the body as `'{\"message\": \"hello\"}'`, or skip the fight entirely and use the docs page's Execute button, two sections from now.
+</Callout>
+
+## Now break it on purpose
+
+In Part 4, a frontend will send that exact request from code, and code gets field names wrong constantly. So send the typo today, deliberately, while the stakes are zero. One letter: `message` becomes `mesage`.
+
+```bash
+curl -X POST http://localhost:8000/chat -H "Content-Type: application/json" -d '{"mesage": "hello"}'
+```
+
+```text
+Internal Server Error
+```
+
+Three words and no clues; that's what the *caller* gets. The real story landed in the server's terminal:
+
+<Figure
+  src="/images/series/langgraph/part-2/term-keyerror.svg"
+  alt="A dark terminal showing the uvicorn log: a POST /chat request returning 500 Internal Server Error, then a Python traceback ending at line 13 of app/main.py, on the line returning the f-string, with KeyError: 'message'."
+  caption="Anatomy of a 500. Read tracebacks bottom-up: the last line is the crime, the lines above it are the scene. The bracketed line stands in for 43 real lines of framework internals you get to ignore."
+  width={960}
+  height={420}
+/>
+
+Read it bottom-up, like every traceback: `KeyError: 'message'`. The line above shows the scene of the crime, your f-string reaching for `payload['message']` in a dict that only has `mesage`. Plain Python dict, missing key, crash.
+
+Sit with what happened, because it's a pattern you'll meet for years. The endpoint *trusted* its input. One typo'd field from one caller, and your code threw an uncaught exception; FastAPI converted the wreckage into a `500 Internal Server Error`, which is HTTP for "not your fault, dear caller, mine." Exactly backwards here: it *was* the caller's typo, and they're the one person the message tells nothing.
+
+This bug has a long career. Somewhere right now an API is returning 500s because a mobile app sends `userID` and the server expects `user_id`, and the developer staring at this same traceback has a pager going off. The fix was never "more careful callers." It's a stricter door.
+
+## The kitchen gets an order form
+
+FastAPI's door is **Pydantic**: a library that lets you declare the *shape* of your data as a Python class, then checks every incoming request against it before your code runs. You met type hints on `payload: dict`; Pydantic is what happens when the hint gets specific. Replace the whole of `app/main.py` with this:
+
+```python filename="backend/app/main.py"
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class ChatRequest(BaseModel):
+    message: str
+
+
+class ChatResponse(BaseModel):
+    reply: str
+
+
+@app.get("/")
+def health_check():
+    return {"status": "ok"}
+
+
+@app.post("/chat")
+async def chat(request: ChatRequest) -> ChatResponse:
+    return ChatResponse(reply=f"you said: {request.message}")
+```
+
+`ChatRequest` is an order form: one required box, `message`, which must hold a string. Swapping the parameter to `request: ChatRequest` is the entire enforcement step; FastAPI reads that type hint and builds the door check from it. The hint isn't decoration anymore. It's load-bearing.
+
+`ChatResponse` does the same for the way out: the return annotation declares what `/chat` promises to send back, documents it, and would strip any extra fields you accidentally included. In and out, both shapes are now contracts.
+
+The server has already reloaded. Send the same typo'd request again, and this time the response is worth pretty-printing (curl hands it to you on one line):
+
+```bash
+curl -X POST http://localhost:8000/chat -H "Content-Type: application/json" -d '{"mesage": "hello"}'
+```
+
+```json
+{
+  "detail": [
+    {
+      "type": "missing",
+      "loc": ["body", "message"],
+      "msg": "Field required",
+      "input": {"mesage": "hello"}
+    }
+  ]
+}
+```
+
+Same typo, different universe. The status code is `422 Unprocessable Entity`, which means "I understood the request; its contents don't match the contract." And look at what the caller receives now: which field (`message`), where it was missing from (the `body`), what the rule was (`Field required`), and an echo of what they actually sent, typo visible. Your function never ran. The kitchen rejected the order form at the window, and it circled the empty box.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, 1536x1024, quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 2-panel comic about strict input validation, panels side by side with a thin black divider. Panel 1: Yad as a cheerful waiter with a small apron and notepad, passing a handwritten paper order slip through a restaurant kitchen window; the slip clearly reads "MESAGE: 1 BURGER". Panel 2: at the same kitchen window, a strict robot chef wearing a tall chef hat hands the same slip back, now marked with a big red rubber stamp reading "422", and says in a speech bubble: "FIELD REQUIRED: MESSAGE". Yad stares at the slip, stunned, holding his pen. Clean readable hand-lettered speech bubbles, minimal text, large clear lettering. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/langgraph/part-2/comic-422-waiter.png"
+  alt='Comic in two panels: Yad, a bearded developer with headphones dressed as a waiter, cheerfully passes an order slip reading "MESAGE: 1 BURGER" through a kitchen window, calling "ORDER UP!". In panel two, a stern robot chef in a tall chef hat hands the slip back stamped with a big red 422, saying "FIELD REQUIRED: MESSAGE".'
+  caption="Pydantic, in apron form. The kitchen doesn't guess what you meant. It names the box you missed and hands the form back."
+  width={1536}
+  height={1024}
+/>
+
+## The docs got smarter while you weren't looking
+
+Refresh [http://localhost:8000/docs](http://localhost:8000/docs):
+
+<Figure
+  src="/images/series/langgraph/part-2/browser-docs-schemas-light.svg"
+  srcDark="/images/series/langgraph/part-2/browser-docs-schemas-dark.svg"
+  alt="The docs page for POST /chat after adding Pydantic models. The request body example now reads message: string, the responses list a 200 with example reply: string and a 422 Validation Error, and a Schemas section at the bottom lists ChatRequest and ChatResponse as objects."
+  caption="Types, paying rent. The request example, the response example, the documented 422, and the Schemas section were all derived from your two classes."
+  width={1120}
+  height={750}
+/>
+
+Before the models, this page described `/chat`'s request body as `{"additionalProp1": {}}`, the OpenAPI equivalent of a shrug: "sends... something." Now it knows the exact shape in, the exact shape out, and it documents the 422 you just earned, because every Pydantic-validated endpoint can produce one. Scroll down and your own classes, `ChatRequest` and `ChatResponse`, have a Schemas section to themselves.
+
+And now the buttons are worth pushing. Expand **POST /chat**, click **Try it out**, change the example body's `"string"` to real words, and hit **Execute**. The response appears right in the page; that's exactly how the screenshot at the top of this part was made. Two details worth noticing while you're in there: Swagger shows you the precise `curl` command it ran (compare it to yours), and for Windows readers this button is the JSON-quoting-free way to test everything from here on.
+
+## So what is async def?
+
+Time to close the loop from earlier. `async def` makes a function *pausable*: when it hits a slow operation that supports it (a database read, an LLM call over the network), it can step aside and let the server handle other requests while it waits, instead of blocking the whole process. That single idea is why Part 1 installed uvicorn, a server built around this kind of cooperative waiting.
+
+For today's echo there's nothing to wait for, so `async` changes nothing observable. The payoff is scheduled: in Part 3 this endpoint will spend whole seconds waiting on a language model, and in Part 5 it will stream a reply word by word, a trick built entirely out of this kind of pausing. Writing the endpoint async from day one means neither part needs a rewrite.
+
+<Callout type="info" title="ASGI vs WSGI, in one breath">
+Older Python web servers speak WSGI: one request per worker at a time, fine for quick responses. Uvicorn speaks ASGI, the async successor, where one worker juggles many in-flight requests as they pause and resume. FastAPI accepts plain `def` endpoints too and runs them safely on a side thread pool, so both work; we'll write endpoints with `async def` and keep slow, blocking work out of them.
+</Callout>
+
+## One locked door between you and Part 4
+
+Inventory before the last move. Right now you have: a `/chat` endpoint that accepts JSON and echoes it, a validation layer that rejects malformed requests with precise 422s, and living documentation for all of it. One invisible problem remains, and it's cheaper to fix now than to discover later.
+
+Browsers enforce a rule your terminal doesn't: JavaScript loaded from one website may not quietly call a different one. "Different" is strict; it's the scheme + domain + port trio, called an **origin**, so `http://localhost:3000` (your future frontend) and `http://localhost:8000` (this backend) count as two different websites. In Part 4, the moment your frontend calls `fetch("http://localhost:8000/chat")`, the browser will check whether the *backend* has explicitly welcomed that origin, and by default the answer is no: the request gets blocked mid-flight with a console error mentioning **CORS** (Cross-Origin Resource Sharing).
+
+The welcome mat is a piece of backend middleware. Two additions to `app/main.py`, an import and a block right under `app = FastAPI()`:
+
+```python filename="backend/app/main.py"
+from fastapi.middleware.cors import CORSMiddleware  # new, next to the other imports
+
+app = FastAPI()  # you already have this line
+
+app.add_middleware(  # new, directly below it
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+Read as a sentence: requests from the origin `http://localhost:3000` are welcome, any method, any headers. The wildcards are fine between your own two localhost servers; in Part 8, when this goes public, the origin list gets pinned to your real frontend URL.
+
+No frontend exists yet, but you can still prove the door is open, because the browser's permission check is itself an HTTP request: before a cross-origin POST, the browser first sends an `OPTIONS` request asking "may I?" You can impersonate it from your second terminal:
+
+```bash
+curl -i -X OPTIONS http://localhost:8000/chat -H "Origin: http://localhost:3000" -H "Access-Control-Request-Method: POST"
+```
+
+```text
+HTTP/1.1 200 OK
+access-control-allow-methods: DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT
+access-control-max-age: 600
+access-control-allow-origin: http://localhost:3000
+```
+
+(Trimmed of the usual `date`/`server` headers.) That last header is the yes. When Part 4's frontend knocks for real, the answer is already waiting.
+
+<Recap
+  part={2}
+  items={[
+    "A `POST /chat` endpoint that receives JSON over real HTTP and answers in kind, tested from the terminal and from the docs page.",
+    "A validation door: malformed requests now get stopped before your code runs and bounced with a 422 that names the missing field, instead of crashing the endpoint into a 500.",
+    "Self-updating interactive documentation, derived from your types, that you've now used as a testing tool.",
+    "A backend that already welcomes the Part 4 frontend's origin, so CORS will be a word you recognize instead of an error you meet at midnight.",
+    "A package layout (`app/`) with room for everything the next six parts will add to it.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "After you add the `ChatRequest` model, you send a body with a typo'd field (`mesage` instead of `message`). What does `/chat` return?",
+      options: [
+        "The same 500 crash as before, with a clearer message",
+        "A 422 that names the missing field, before your function runs",
+        "A 200 with an empty reply",
+        "A 404, because the route changed",
+      ],
+      answer: 1,
+      explain: "Pydantic validates the body against the model before your code runs. A missing field is bounced with a 422 pointing at `message`, instead of a `KeyError` crashing the endpoint into a 500.",
+    },
+    {
+      q: "FastAPI reads your typed Python and builds three things for free. Which is NOT one of them?",
+      options: [
+        "The interactive `/docs` page",
+        "Validation of incoming requests",
+        "A database to store your data",
+        "JSON serialization of your responses",
+      ],
+      answer: 2,
+      explain: "Types drive docs, validation, and serialization. Storage is never automatic; it is a deliberate choice you make later, and this series keeps state in memory until Part 7.",
+    },
+    {
+      q: "You are staring at a Python traceback. Where is the actual cause almost always found?",
+      options: [
+        "The very first line at the top",
+        "Somewhere in the middle, among the framework frames",
+        "The last line at the bottom",
+        "Tracebacks do not show the cause",
+      ],
+      answer: 2,
+      explain: "Read bottom-up. The last line is the exception itself (here, `KeyError: 'message'`); the lines just above it are your own code that triggered it. The middle is framework plumbing you can skim.",
+    },
+    {
+      q: "The frontend will call the backend from the browser in Part 4. Why add `CORSMiddleware` now, when your curl tests worked fine without it?",
+      options: [
+        "It makes the backend respond faster",
+        "Browsers block calls to a different origin unless the server opts in; curl does not enforce that",
+        "It encrypts the connection",
+        "Pydantic needs it to validate requests",
+      ],
+      answer: 1,
+      explain: "`:3000` and `:8000` are different origins (scheme plus domain plus port). The browser blocks the cross-origin call unless the backend welcomes `:3000`. curl skips that check, which is why your terminal tests never tripped it.",
+    },
+    {
+      q: "Today's `async def chat(...)` behaves exactly like a plain function. Why write it `async` at all?",
+      options: [
+        "It makes the echo reply faster",
+        "FastAPI refuses to run non-async endpoints",
+        "So it can pause on slow work later (the LLM call, then streaming) with no rewrite",
+        "It is required for Pydantic to work",
+      ],
+      answer: 2,
+      explain: "`async` lets a function step aside while it waits on I/O. There is nothing to wait for today, but Part 3 waits on a language model and Part 5 streams the reply word by word, so writing it async now avoids a rewrite.",
+    },
+  ]}
+/>
+
+The commit, from the project root, in any terminal that isn't hosting the server:
+
+```bash
+git add .
+git commit -m "part 2: /chat echoes, validates, and documents itself"
+```
+
+Right now the reply is your own words with a sticker on them. In Part 3, LangGraph wires `/chat` to a real language model, and for the first time the bot says something you didn't.
+
+{/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-2-fastapi-basics) in the intro once it exists. */}
+
+{/* TODO once the Concepts page (langgraph-concepts.mdx) ships: link "async def" and "CORS" mentions to /blog/langgraph-concepts#async-await and #cors instead of defining only inline. */}
+
+{/* ANECDOTE slot (optional upgrade, WRITING-STYLE §6): a real first-person story from Yadnesh about a production API crashing on malformed/typo'd input (the userID vs user_id genre), 3 beats, 5 sentences max. If provided, it replaces the "This bug has a long career" paragraph at the end of the break-it section. */}

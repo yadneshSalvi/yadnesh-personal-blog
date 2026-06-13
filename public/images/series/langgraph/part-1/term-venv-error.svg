@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="300" viewBox="0 0 960 300" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="960" height="300" fill="#1a1816"/>
+  <rect x="0" y="0" width="960" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="480" y="30" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal 2 · a fresh window</text>
+  <g font-size="16" fill="#d8d2c6" xml:space="preserve">
+    <text x="40" y="92"><tspan fill="#756d62">~/langgraph-chatbot/backend $</tspan> uvicorn main:app --reload</text>
+    <text x="40" y="130" fill="#e5825a">zsh: command not found: uvicorn</text>
+    <text x="40" y="178"><tspan fill="#756d62">~/langgraph-chatbot/backend $</tspan> source .venv/bin/activate</text>
+    <text x="40" y="216"><tspan fill="#8fb573">(.venv)</tspan> <tspan fill="#756d62">~/langgraph-chatbot/backend $</tspan> uvicorn main:app --reload</text>
+    <text x="40" y="254"><tspan fill="#756d62">INFO:</tspan>     Uvicorn running on <tspan fill="#e5825a">http://127.0.0.1:8000</tspan> (Press CTRL+C to quit)</text>
+  </g>
+</svg>

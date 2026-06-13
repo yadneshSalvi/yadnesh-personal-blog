@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { PostMeta } from "@/lib/posts";
+import type { PostListItem } from "@/lib/posts";
 
 export function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -10,7 +10,7 @@ export function formatDate(iso: string) {
   });
 }
 
-export default function PostList({ posts }: { posts: PostMeta[] }) {
+export default function PostList({ posts }: { posts: PostListItem[] }) {
   if (posts.length === 0) {
     return (
       <p className="border-b border-line py-12 text-center font-mono text-xs uppercase tracking-[0.2em] text-faint">
@@ -24,7 +24,7 @@ export default function PostList({ posts }: { posts: PostMeta[] }) {
       {posts.map((p, i) => (
         <li key={p.slug}>
           <Link
-            href={`/blog/${p.slug}`}
+            href={p.href ?? `/blog/${p.slug}`}
             className="group grid grid-cols-[2.25rem_1fr] gap-x-4 py-8 sm:grid-cols-[3.25rem_1fr_auto] sm:gap-x-6"
           >
             <span className="pt-2 font-mono text-xs tabular-nums text-faint">
@@ -40,11 +40,19 @@ export default function PostList({ posts }: { posts: PostMeta[] }) {
                 </p>
               ) : null}
               <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.15em] text-faint">
-                <time dateTime={p.createdAt}>{formatDate(p.createdAt)}</time>
-                {typeof p.readingTime === "number" ? (
-                  <> · {p.readingTime} min</>
-                ) : null}
-                {p.tags && p.tags.length > 0 ? <> · {p.tags.join(", ")}</> : null}
+                {p.metaLine ? (
+                  p.metaLine
+                ) : (
+                  <>
+                    <time dateTime={p.createdAt}>{formatDate(p.createdAt)}</time>
+                    {typeof p.readingTime === "number" ? (
+                      <> · {p.readingTime} min</>
+                    ) : null}
+                    {p.tags && p.tags.length > 0 ? (
+                      <> · {p.tags.join(", ")}</>
+                    ) : null}
+                  </>
+                )}
               </p>
             </div>
             <span

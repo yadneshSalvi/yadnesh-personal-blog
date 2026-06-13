@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="750" viewBox="0 0 1120 750" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="750" fill="#ffffff"/>
+  <rect x="0" y="0" width="1120" height="64" fill="#f3f1ec"/>
+  <line x1="0" y1="64" x2="1120" y2="64" stroke="#e2ded4" stroke-width="1.5"/>
+  <circle cx="32" cy="32" r="8" fill="#d6d1c5"/><circle cx="60" cy="32" r="8" fill="#d6d1c5"/><circle cx="88" cy="32" r="8" fill="#d6d1c5"/>
+  <rect x="300" y="14" width="520" height="36" rx="18" fill="#ffffff" stroke="#e2ded4"/>
+  <text x="560" y="38" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#5b554c" text-anchor="middle">localhost:8000/docs</text>
+  <rect x="48" y="104" width="84" height="36" rx="4" fill="#49cc90"/>
+  <text x="90" y="128" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">POST</text>
+  <text x="156" y="130" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="18" font-weight="600" fill="#3b4151">/chat</text>
+  <text x="240" y="129" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#8b8b8b">Chat</text>
+
+  <text x="64" y="182" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#3b4151">Request body</text>
+  <text x="172" y="176" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#f93e3e">required</text>
+  <text x="280" y="181" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#8b8b8b">Example Value</text>
+  <text x="388" y="181" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#a1a1aa">Schema</text>
+  <rect x="64" y="200" width="992" height="52" rx="4" fill="#2a2724"/>
+<g font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#8fb573" xml:space="preserve">
+<text x="84" y="230">{ "message": "string" }</text>
+</g>
+
+  <text x="64" y="306" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#3b4151">Responses</text>
+  <text x="64" y="344" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#3b4151">200</text>
+  <text x="156" y="332" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#3b4151">Successful Response</text>
+  <rect x="156" y="348" width="900" height="52" rx="4" fill="#2a2724"/>
+<g font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#8fb573" xml:space="preserve">
+<text x="176" y="378">{ "reply": "string" }</text>
+</g>
+  <text x="64" y="460" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#3b4151">422</text>
+  <text x="156" y="460" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#3b4151">Validation Error</text>
+
+  <line x1="48" y1="500" x2="1072" y2="500" stroke="#ebebeb" stroke-width="1.5"/>
+  <text x="48" y="552" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="23" font-weight="700" fill="#3b4151">Schemas</text>
+  <rect x="48" y="576" width="1024" height="48" rx="4" fill="#f6f6f6"/>
+  <text x="68" y="606" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#3b4151">ChatRequest</text>
+  <text x="200" y="605" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#8a63d2">object</text>
+  <rect x="48" y="636" width="1024" height="48" rx="4" fill="#f6f6f6"/>
+  <text x="68" y="666" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#3b4151">ChatResponse</text>
+  <text x="212" y="665" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#8a63d2">object</text>
+  <text x="68" y="716" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a1a1aa">HTTPValidationError, ValidationError</text>
+</svg>

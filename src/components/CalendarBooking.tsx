@@ -14,7 +14,7 @@ export default function CalendarBooking() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted">
-        Thirty minutes, no agenda required — pick a slot that suits you.
+        Thirty minutes, no agenda required. Pick a slot that suits you.
       </p>
 
       <div className="min-h-[700px] overflow-auto rounded-sm border border-line">

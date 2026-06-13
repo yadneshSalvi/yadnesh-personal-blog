@@ -29,7 +29,7 @@ export default function Hero() {
         </h1>
 
         <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted">
-          Five years shipping NLP, agents, and retrieval systems — trained at
+          Five years shipping NLP, agents, and retrieval systems; trained at
           IISc Bangalore and IIT Delhi. This is where I write down what
           actually works in AI engineering, and what quietly doesn&apos;t.
         </p>

@@ -1,0 +1,465 @@
+---
+title: "LangGraph from Scratch, Part 1: Installation & Setup"
+subtitle: "From an empty folder to two running servers: the foundation for a streaming AI chatbot with tools and memory."
+image: "/images/series/langgraph/part-1/cover-light.svg"
+imageDark: "/images/series/langgraph/part-1/cover-dark.svg"
+createdAt: "2026-06-12T00:00:00.000Z"
+updatedAt: "2026-06-12T00:00:00.000Z"
+tags: ["langgraph", "fastapi", "nextjs", "tutorial"]
+series: "langgraph-fastapi-nextjs"
+seriesPart: 1
+---
+
+Nobody quits a chatbot tutorial at the hard part. They quit twenty minutes in, when `pip` prints a wall of red and the guide shrugs, "this should work." Setup is where tutorials go to die, so this series starts there and takes it seriously.
+
+By the end of this page, two servers will be running on your machine: a Python backend and a Next.js frontend. You'll also hold an LLM API key with a hard spending cap, and a git repo wrapped around all of it. And when something refuses to run (it will), there's a section below where we break it on purpose and read the error together.
+
+## Where you're going
+
+This is Part 1 of **LangGraph from Scratch**, an eight-part series for developers who can write a basic Python function and a basic React component but have never touched FastAPI, Next.js, or LangGraph. Across the series you'll build this:
+
+<Figure
+  src="/images/series/langgraph/part-1/fig-finished-app-light.svg"
+  srcDark="/images/series/langgraph/part-1/fig-finished-app-dark.svg"
+  alt="A browser showing a finished chat app. The user asked for 23 times 17 plus the population of Tokyo; the bot ran a calculator tool and a web search tool, and is streaming its answer mid-sentence with a cursor still blinking."
+  caption="The destination: a chatbot that streams its answers word by word, does math with a real calculator, searches the web, and remembers you. Built from nothing, by you."
+  width={1120}
+  height={800}
+/>
+
+A streaming AI chatbot: the kind where words appear as the model thinks, where the bot can reach for a calculator instead of guessing at arithmetic, and where "what's my name?" actually gets answered. By Part 8 it's deployed on the public internet, on a URL you can text to a friend.
+
+Today's slice is deliberately humble: get everything installed and prove it runs. No AI yet. Foundations first, on purpose. A server you trust on day one is the difference between debugging your code later and debugging your laptop.
+
+## What you need before anything else
+
+Three things:
+
+- **A laptop.** macOS, Linux, or Windows all work. Where a command differs, I'll show each.
+- **A terminal you're not scared of.** You'll run commands and read their output. That's the whole skill.
+- **A willingness to see errors.** You'll hit at least one today, on schedule, in a section built for it.
+
+This series was written against pinned versions. If something behaves differently on your machine, check your versions against this table *before* assuming the tutorial is broken. Most "bugs" in tutorials are version drift wearing a disguise.
+
+| Tool | Version used in this series |
+|---|---|
+| Python | 3.12 recommended (everything here verified on 3.11) |
+| Node.js | 22.18.0 (any Node 22 LTS) |
+| Next.js | 16.2.9 |
+| FastAPI | 0.136.3 |
+| Uvicorn | 0.49.0 |
+| LangGraph | 1.2.4 |
+| LangChain | 1.3.9 |
+| langchain-openai / langchain-anthropic | 1.3.0 / 1.4.6 |
+
+Already have Python and Node installed? Verify the versions, then skim ahead to the "One folder, two halves" section.
+
+## Install Python
+
+The backend speaks Python. Check what you have first:
+
+```bash
+python3 --version
+```
+
+If that prints `3.11` or higher, you're done; move on. Otherwise:
+
+**macOS:** use [Homebrew](https://brew.sh), or the installer from [python.org](https://www.python.org/downloads/):
+
+```bash
+brew install python@3.12
+```
+
+**Windows:** grab the installer from [python.org](https://www.python.org/downloads/) and run it. One critical detail: on the first screen, tick **"Add python.exe to PATH"**. Miss that checkbox and Windows won't know the word `python`. It's the single most common Windows setup failure. (On Windows, type `python` wherever this series says `python3`.)
+
+**Linux:** on Ubuntu/Debian:
+
+```bash
+sudo apt install python3.12 python3.12-venv
+```
+
+Run the version check again and make sure it answers.
+
+## Install Node.js
+
+The frontend runs on Node. Same drill:
+
+```bash
+node --version
+```
+
+Anything starting with `v22` (or newer) is fine. Otherwise:
+
+**macOS:** `brew install node@22`, or the LTS installer from [nodejs.org](https://nodejs.org).
+
+**Windows:** the LTS installer from [nodejs.org](https://nodejs.org). Defaults are fine; no checkbox traps this time.
+
+**Linux:** install [nvm](https://github.com/nvm-sh/nvm), the Node version manager (one install script, on its README), then:
+
+```bash
+nvm install 22
+```
+
+Node ships with `npm`, the package manager; you get both in one install.
+
+## One folder, two halves
+
+Everything you build across all eight parts lives in one folder with two rooms in it. Open a terminal wherever you keep projects (your home folder or Desktop is fine) and run:
+
+```bash
+mkdir langgraph-chatbot
+cd langgraph-chatbot
+mkdir backend
+```
+
+`backend/` is for Python. The frontend folder doesn't exist yet. In a few minutes a tool will generate it for us, scaffolding and all. One repo, two halves, which is exactly how a small production project would look.
+
+## Your backend: a server in eight lines
+
+Step into the backend and create a **virtual environment**:
+
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+On Windows, the activate line is `.venv\Scripts\activate` instead.
+
+<Callout type="info" title="What's a virtual environment?">
+A private toolbox that belongs to this one project. Without it, every `pip install` lands in one global pile shared by every project on your machine, and two projects needing different versions of the same library will eventually fight. The `.venv` folder keeps this project's tools sealed off from everything else, including your operating system's own Python, which really doesn't appreciate visitors.
+</Callout>
+
+Every developer of a certain age has a haunted laptop: three Pythons from three different installers, a `pip` that answers to none of them, and one project from 2023 that only runs on Tuesdays. Nobody plans this. It accrues, one global install at a time, until reinstalling the OS starts to sound reasonable. The `.venv` habit is how you make sure this project never joins the haunting.
+
+Notice your prompt changed: it now starts with `(.venv)`. That marker means "pip and python now point inside this project." You want to see it every single time you work on the backend. Think of it as a seatbelt light.
+
+Now install everything the whole series needs, in one go:
+
+```bash
+pip install fastapi "uvicorn[standard]" langgraph langchain langchain-openai langchain-anthropic python-dotenv
+```
+
+Half of these won't be touched until Part 3, but installing them together means they're version-locked together, and you never have to interrupt a future part for a pip run. What you grabbed:
+
+- **fastapi**: the web framework. It turns Python functions into HTTP endpoints.
+- **uvicorn**: the server that actually runs FastAPI. FastAPI defines *what* to answer; uvicorn handles the networking of *answering*. (The term to google later: it's an "ASGI server.")
+- **langgraph** + **langchain**: the AI orchestration layer, waiting patiently for Part 3.
+- **langchain-openai** / **langchain-anthropic**: connectors for the two LLM providers this series supports. You'll pick one in Part 3; installing both costs nothing.
+- **python-dotenv**: reads your API key from a file instead of your source code.
+
+While that downloads, the traditional first-time question: *why a whole framework for one endpoint?* Because FastAPI gives you three things this series leans on hard: automatic JSON handling, automatic input validation, and an interactive docs page it writes for you. You'll meet all three in Part 2.
+
+Now the code. Create a new file named `main.py` inside `backend/`, right next to the `.venv` folder, in whatever editor you like (VS Code, Cursor, even Notepad). Paste in these eight lines and save:
+
+```python filename="backend/main.py"
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.get("/")
+def health_check():
+    return {"status": "ok"}
+```
+
+Eight lines. `app` is the application object, uvicorn's entry point. The `@app.get("/")` decorator tells FastAPI: "when a GET request arrives at `/`, call this function." And the function returns a plain Python dict, which FastAPI converts to JSON on the way out. No JSON serialization code, no response objects. That's the framework earning its keep already.
+
+One convention for the whole series: whenever a code block shows a file path in its header (like `backend/main.py` above), that's a file to create or edit and save. Blocks without a path are commands you type into the terminal.
+
+## The moment it runs
+
+Back in your terminal, still inside `backend/` and with `(.venv)` still in your prompt:
+
+```bash
+uvicorn main:app --reload
+```
+
+`main:app` means "in the file `main.py`, find the object named `app`."
+
+<Figure
+  src="/images/series/langgraph/part-1/term-uvicorn.svg"
+  alt="A dark terminal running uvicorn main:app --reload. Log lines show the reloader starting, the server process starting, and 'Uvicorn running on http://127.0.0.1:8000'."
+  caption="The four lines that matter: a watcher, a server process, and an address. CTRL+C stops it."
+  width={960}
+  height={380}
+/>
+
+<Callout type="info" title="What does --reload do?">
+It watches your files and restarts the server every time you save. You'll change `main.py` constantly across this series; `--reload` means you never have to manually stop and restart. It's a development-only flag; it comes off in Part 8 when we deploy.
+</Callout>
+
+Open [http://localhost:8000](http://localhost:8000) in your browser:
+
+<Figure
+  src="/images/series/langgraph/part-1/browser-status-ok-light.svg"
+  srcDark="/images/series/langgraph/part-1/browser-status-ok-dark.svg"
+  alt="A browser pointed at localhost:8000 showing the raw JSON response: status ok."
+  caption="Your function's return value, served over HTTP. The browser sent GET /, FastAPI called health_check(), and this is the dict, returned as JSON."
+  width={1120}
+  height={480}
+/>
+
+That's your code, on the network, answering requests!
+
+It looks like nothing, fifteen characters of JSON, but be clear about what happened: your machine is running a real web server, the same breed of process that runs production APIs, and it executed your Python because a browser asked it to. Every feature in this series gets bolted onto this exact loop.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, 1536x1024, quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). Single-panel comic. A living-room wall with framed pictures: a small family photo and a university diploma with a ribbon seal. Yad stands on a chair, proudly hanging a large ornate gold picture frame in the center of the wall. Inside the gold frame is a dark computer terminal window showing only the text: {"status": "ok"}. Yad has a proud single tear and says in a speech bubble: "MY FIRST API". Clean readable hand-lettered speech bubble, minimal text. No caption box, no watermark.
+   edit pass (gpt-image-2 /v1/images/edits, --ref = the v1 comic itself): keep everything identical, but replace the framed family photo on the left wall with a small framed portrait of a friendly green python snake wearing a tiny bow tie, posed formally like a dignified old family ancestor portrait. */}
+
+<Figure
+  src="/images/series/langgraph/part-1/comic-diploma.png"
+  alt='Comic: Yad, a bearded developer with headphones, stands on a chair hanging an ornate gold frame on his living-room wall, right between his university diploma and a formal ancestor-style portrait of a green python wearing a bow tie. Inside the gold frame: a terminal printing {"status": "ok"}. He sheds a single proud tear and says "MY FIRST API".'
+  caption="Frame it. You earned it. (Left: the family elder.)"
+  width={1400}
+  height={933}
+/>
+
+## Now break it on purpose
+
+Tomorrow you'll open a fresh terminal, type the uvicorn command, and get this. Let's get it today instead, while it's cheap:
+
+<Figure
+  src="/images/series/langgraph/part-1/term-venv-error.svg"
+  alt="A second terminal window. Running uvicorn fails with 'zsh: command not found: uvicorn'. After running 'source .venv/bin/activate', the same command starts the server normally."
+  caption="The most common error of the entire series, and its two-second fix. Note what's missing from the first prompt: no (.venv)."
+  width={960}
+  height={300}
+/>
+
+First, stop the server you have running: click into that terminal and press `CTRL+C`. Now open a second, completely fresh terminal window, `cd` into `langgraph-chatbot/backend`, and run `uvicorn main:app --reload`. It fails: `command not found: uvicorn`.
+
+Read it like a detective. The shell says it's never heard of uvicorn, yet you installed it five minutes ago. Where did it go? Into `.venv`, the private toolbox. A new terminal starts *outside* the toolbox, so `uvicorn` isn't on its path. The prompt was telling you all along: no `(.venv)` prefix, no toolbox.
+
+The fix is the activation command, every time, reflexively:
+
+```bash
+source .venv/bin/activate
+```
+
+Run `uvicorn main:app --reload` once more and the server starts like nothing ever happened; that's the bottom half of the screenshot above. Leave it running. This window is the backend's home from now on.
+
+You will hit this again: after a reboot, after lunch, in three weeks when you reopen this project. Now it's not a wall; it's an old acquaintance. New terminal, no `(.venv)`, activate. That reflex is genuinely the most valuable thing in this entire part.
+
+## Your frontend: scaffolded in one command
+
+The backend got built by hand because eight lines is a fair ask. A frontend involves a few dozen config files nobody writes by hand anymore, so the Next.js team ships a generator instead. The backend's terminal is busy hosting a server, so open one more terminal for the frontend (this one needs no `(.venv)`; that's a Python thing) and go to the **project root** (`langgraph-chatbot/`, not `backend/`):
+
+```bash
+npx create-next-app@latest frontend
+```
+
+It asks one question: *"Would you like to use the recommended Next.js defaults?"* Answer **Yes**. That gets you TypeScript, Tailwind CSS, ESLint, and the App Router: the current standard kit, and exactly what this series assumes. (It may also offer an `AGENTS.md` file with guidance for AI coding assistants; it's included by default and harmless either way.)
+
+<Callout type="info" title="What's the App Router?">
+Next.js has two routing systems. The older Pages Router maps files in `pages/` to URLs; the newer App Router maps folders in `app/` to URLs and is where all current Next.js development happens. Everything in this series assumes the App Router, and so does almost every Next.js doc you'll read from here on.
+</Callout>
+
+If npm mutters about `moderate severity vulnerabilities` afterward: noted, normal, and not worth chasing for a local learning project. Now run it:
+
+```bash
+cd frontend
+npm run dev
+```
+
+The banner says `Ready` in well under a second; that's Turbopack, the new bundler, showing off. Open [http://localhost:3000](http://localhost:3000):
+
+<Figure
+  src="/images/series/langgraph/part-1/browser-next-welcome-light.svg"
+  srcDark="/images/series/langgraph/part-1/browser-next-welcome-dark.svg"
+  alt="A browser pointed at localhost:3000 showing the Next.js welcome page: the Next.js wordmark, a 'Get started by editing app/page.tsx' hint, and Deploy / Docs buttons."
+  caption="The Next.js welcome page. In Part 4, everything you see here gets deleted and replaced with your chat UI."
+  width={1120}
+  height={640}
+/>
+
+Two servers now. Different ports, by the way, because a port can only have one tenant: the backend lives at `:8000`, the frontend at `:3000`, both on your machine only. Nothing here is visible to the internet.
+
+## Get a key to a language model
+
+In Part 3 the backend starts calling a real LLM, and LLM APIs cost money, so the responsible move is to set this up *now*, with a spending cap, while you're calm and not mid-tutorial. Pick **one** provider. The entire series shows every snippet for both, and your choice here sticks across all eight parts.
+
+<CodeTabs>
+
+<Tab label="OpenAI">
+
+1. Create an account at [platform.openai.com](https://platform.openai.com) (this is the developer platform; its billing is separate from ChatGPT).
+2. Add a payment method under **Settings → Billing**, and buy a small amount of credit. $5 is more than this series will use.
+3. Under **Settings → Limits**, set a **monthly budget** of $5. This is the hard cap that makes the rest of the series worry-free.
+4. Go to **API keys → Create new secret key**, name it `langgraph-tutorial`, and copy the key (it starts with `sk-`). You'll store it properly in the next section.
+
+</Tab>
+
+<Tab label="Anthropic">
+
+1. Create an account at [console.anthropic.com](https://console.anthropic.com).
+2. Add a payment method under **Settings → Billing**, and buy a small amount of credit. $5 is more than this series will use.
+3. While you're in Billing, set a low **auto-reload threshold**, or leave auto-reload off entirely, so $5 is genuinely the most you can spend.
+4. Go to **Settings → API keys → Create key**, name it `langgraph-tutorial`, and copy the key (it starts with `sk-ant-`). You'll store it properly in the next section.
+
+</Tab>
+
+</CodeTabs>
+
+For scale: the model this series uses costs a fraction of a cent per chat message. Your $5 of credit is a few thousand conversations. The cap isn't there because you'll spend it; it's there so you never have to think about it.
+
+<Callout type="warning" title="An API key is a password">
+Anyone holding this string can spend your credit. It never goes in your source code, never in a screenshot, never in git. If a key does leak, revoke it from the same dashboard and make a new one. Keys are disposable; budgets are not.
+</Callout>
+
+## Tell your code about the key
+
+Secrets live in `.env` files: plain text files that stay on your machine, get read at runtime, and never enter version control. Create a new file named `.env` inside `backend/` (the leading dot is part of the filename) with one line in it:
+
+<CodeTabs>
+
+<Tab label="OpenAI">
+
+```bash filename="backend/.env"
+OPENAI_API_KEY=sk-paste-your-actual-key-here
+```
+
+</Tab>
+
+<Tab label="Anthropic">
+
+```bash filename="backend/.env"
+ANTHROPIC_API_KEY=sk-ant-paste-your-actual-key-here
+```
+
+</Tab>
+
+</CodeTabs>
+
+No quotes, no spaces around the `=`. Nothing reads this file yet (that's Part 3's job), but it's now sitting exactly where the code will expect it.
+
+The frontend gets its own config file, with a different job: telling the browser code where the backend lives. Create a file named `.env.local` inside `frontend/`:
+
+```bash filename="frontend/.env.local"
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+```
+
+<Callout type="info" title="Why the NEXT_PUBLIC_ prefix?">
+Frontend code runs in your visitors' browsers, so any value it uses is, by definition, public. Next.js makes you declare that out loud: only variables prefixed with `NEXT_PUBLIC_` are shipped to the browser. A backend URL is fine to expose. An API key is not, which is exactly why the key lives in the backend's `.env` and nowhere near this file.
+</Callout>
+
+## Step back and look at what's running
+
+<Figure
+  src="/images/series/langgraph/part-1/fig-two-servers-light.svg"
+  srcDark="/images/series/langgraph/part-1/fig-two-servers-dark.svg"
+  alt="Diagram of one laptop running two boxes: a Next.js 16 frontend on localhost:3000 and a FastAPI backend on localhost:8000, with a dotted unconnected line between them labeled 'they don't talk to each other yet. That's Part 4'."
+  caption="Checkpoint. Two independent processes, two ports, one laptop. The dotted line is the entire rest of the series."
+  width={1280}
+  height={540}
+/>
+
+Inventory check. Right now you have: a FastAPI server on `:8000` that answers one question, a Next.js dev server on `:3000` showing a welcome page, and a key with a cap. The two servers are strangers to each other. Wiring them together is Part 4, and the wire is that dotted line.
+
+## Turn it into a git repo (your undo button)
+
+One more habit to install, and it's the one that lets you experiment fearlessly for seven more parts: every part of this series ends with a commit. A commit is a save point. From here on, no experiment can cost you more than the work since the last one.
+
+Two bits of housekeeping first, both run from the project root, in any terminal that isn't busy hosting a server. `create-next-app` made `frontend/` its own git repo; we want one repo for the whole project, so remove the nested one:
+
+```bash
+rm -rf frontend/.git
+```
+
+(On Windows PowerShell, that's `Remove-Item -Recurse -Force frontend\.git` instead.)
+
+Then create a file named `.gitignore` at the project root, telling git what it should never track:
+
+```text filename=".gitignore"
+.venv/
+__pycache__/
+.env
+.DS_Store
+```
+
+The `.env` line is the one that matters; it's what makes "secrets never enter version control" true in practice, not in theory. (The frontend has its own `.gitignore`, courtesy of the generator, already covering `node_modules/` and `.env.local`.)
+
+Now the ritual:
+
+```bash
+git init
+git add .
+git commit -m "part 1: two servers, zero features"
+```
+
+Before you commit, glance at the file list `git add` picked up (`git status` shows it). If you ever see `.env` in there, stop and fix the `.gitignore` first. Today the answer should be: scaffold files, `main.py`, and `.gitignore`. No secrets.
+
+<Recap
+  part={1}
+  items={[
+    "A Python backend serving real HTTP on `localhost:8000`, inside a sealed virtual environment, with every library the series needs already pinned and installed.",
+    "A TypeScript + Tailwind Next.js app on `localhost:3000`, scaffolded the way the Next.js team intends.",
+    "An LLM API key with a hard spending cap, stored where code can read it and git can't.",
+    "A git repo with a clean first commit: your undo button for everything that follows.",
+    "A diagnostic reflex: no `(.venv)` in the prompt means activate before anything else.",
+  ]}
+/>
+
+And one more thing that's harder to see: you now know your environment works. Whatever breaks from here on is code, and code is the fun kind of broken.
+
+<Quiz
+  questions={[
+    {
+      q: "You open a brand-new terminal, run `uvicorn main:app --reload`, and get `command not found: uvicorn`. What is the fix?",
+      options: [
+        "Reinstall uvicorn with pip",
+        "Run `source .venv/bin/activate` first",
+        "Restart your laptop",
+        "Reinstall Python from scratch",
+      ],
+      answer: 1,
+      explain: "A fresh terminal starts outside the `.venv` toolbox, so its tools are not on your path. The missing `(.venv)` in the prompt is the tell. Activate, and uvicorn is back.",
+    },
+    {
+      q: "What does the `--reload` flag do when you start uvicorn?",
+      options: [
+        "Refreshes the browser tab automatically",
+        "Restarts the server every time you save a file",
+        "Re-downloads your dependencies on each request",
+        "Clears Python's import cache",
+      ],
+      answer: 1,
+      explain: "It watches your files and restarts the server on save, so you never stop and start it by hand while developing. It comes off in Part 8 when you deploy.",
+    },
+    {
+      q: "Why does the frontend's API URL need the `NEXT_PUBLIC_` prefix in `.env.local`?",
+      options: [
+        "It encrypts the value before sending it",
+        "It is only a naming style, with no real effect",
+        "It tells Next.js the value is safe to ship to the browser",
+        "It makes the variable load faster",
+      ],
+      answer: 2,
+      explain: "Only `NEXT_PUBLIC_` variables reach browser code. A backend URL is fine to expose; an API key never gets this prefix, which is exactly why the key lives in the backend's `.env`.",
+    },
+    {
+      q: "Your backend runs on `:8000` and your frontend on `:3000`. Why two different ports?",
+      options: [
+        "One handles input, the other handles output",
+        "React reserves 3000 and Python reserves 8000",
+        "They need different ports in order to talk to each other",
+        "A port can only have one process listening on it",
+      ],
+      answer: 3,
+      explain: "Each port hosts exactly one process. They are two independent servers on your machine, strangers for now. Wiring them together is Part 4.",
+    },
+    {
+      q: "Which line in your `.gitignore` is the one keeping your API key out of version control?",
+      options: ["`.venv/`", "`__pycache__/`", "`.env`", "`.DS_Store`"],
+      answer: 2,
+      explain: "The `.env` line is what makes 'secrets never enter git' true in practice. Glance at `git status` before every commit; if you ever see `.env` staged, fix `.gitignore` first.",
+    },
+  ]}
+/>
+
+Right now your backend can say exactly one thing, to anyone, forever: `{"status": "ok"}`. In Part 2 you'll teach it to actually listen: request bodies, validation, and the interactive docs page FastAPI has been quietly building for you this whole time.
+
+{/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-1-setup) in the intro once it exists. */}
+
+{/* ANECDOTE slot (optional upgrade, WRITING-STYLE §6): a real first-person story from Yadnesh about an environment/setup disaster (a global pip install or Python version clash that ate an evening, for example), 3 beats, 5 sentences max. If provided, it replaces the "haunted laptop" paragraph after the virtual-environment callout. */}

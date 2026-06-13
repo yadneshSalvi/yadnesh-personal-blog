@@ -1,11 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { PostMeta } from "@/lib/posts";
+import type { PostListItem } from "@/lib/posts";
 import PostList from "./PostList";
 
 type BlogTableProps = {
-  posts: PostMeta[];
+  posts: PostListItem[];
 };
 
 export default function BlogTable({ posts }: BlogTableProps) {

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="380" viewBox="0 0 960 380" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="960" height="380" fill="#1a1816"/>
+  <rect x="0" y="0" width="960" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="480" y="30" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal 1 · backend</text>
+  <g font-size="16" fill="#d8d2c6" xml:space="preserve">
+    <text x="40" y="92"><tspan fill="#8fb573">(.venv)</tspan> <tspan fill="#756d62">~/langgraph-chatbot/backend $</tspan> uvicorn main:app --reload</text>
+    <text x="40" y="130"><tspan fill="#756d62">INFO:</tspan>     Will watch for changes in these directories: ['~/langgraph-chatbot/backend']</text>
+    <text x="40" y="162"><tspan fill="#756d62">INFO:</tspan>     Uvicorn running on <tspan fill="#e5825a">http://127.0.0.1:8000</tspan> (Press CTRL+C to quit)</text>
+    <text x="40" y="194"><tspan fill="#756d62">INFO:</tspan>     Started reloader process [41561] using WatchFiles</text>
+    <text x="40" y="226"><tspan fill="#756d62">INFO:</tspan>     Started server process [41577]</text>
+    <text x="40" y="258"><tspan fill="#756d62">INFO:</tspan>     Waiting for application startup.</text>
+    <text x="40" y="290"><tspan fill="#756d62">INFO:</tspan>     Application startup complete.</text>
+    <text x="40" y="338" fill="#756d62">█</text>
+  </g>
+</svg>

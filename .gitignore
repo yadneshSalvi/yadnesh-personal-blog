@@ -43,3 +43,8 @@ next-env.d.ts
 # agent
 .claude
 .agent
+
+# local authoring docs & helpers (not published)
+/WRITING-STYLE.md
+/scripts/generate-image.mjs
+/scripts/gen-part2-svgs.mjs

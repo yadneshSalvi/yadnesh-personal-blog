@@ -1,4 +1,5 @@
-import { getAllPostsMeta } from "@/lib/posts";
+import { getListedPostsMeta } from "@/lib/posts";
+import { getListedItems } from "@/lib/series";
 import BlogTable from "@/components/BlogTable";
 
 export const dynamic = "force-static";
@@ -8,7 +9,7 @@ export const metadata = {
 };
 
 export default function BlogIndex() {
-  const posts = getAllPostsMeta();
+  const posts = getListedItems(getListedPostsMeta());
   return (
     <main className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
       <header>
@@ -19,7 +20,7 @@ export default function BlogIndex() {
           Writing
         </h1>
         <p className="mt-5 max-w-xl leading-relaxed text-muted">
-          Essays and field notes on AI engineering — agents, retrieval,
+          Essays and field notes on AI engineering: agents, retrieval,
           fine-tuning, and the unglamorous plumbing in between.
         </p>
       </header>

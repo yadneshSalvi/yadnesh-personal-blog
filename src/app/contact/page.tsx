@@ -23,7 +23,7 @@ export default function ContactPage() {
           Get in touch.
         </h1>
         <p className="mt-5 max-w-xl leading-relaxed text-muted">
-          Questions, collaboration, or a second opinion on an AI system — my
+          Questions, collaboration, or a second opinion on an AI system? My
           inbox is open. Write a note below, or book a call directly.
         </p>
       </header>

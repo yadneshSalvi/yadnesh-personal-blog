@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="440" viewBox="0 0 1120 440" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="440" fill="#1a1816"/>
+  <rect x="0" y="0" width="1120" height="64" fill="#211e1a"/>
+  <line x1="0" y1="64" x2="1120" y2="64" stroke="#2b2723" stroke-width="1.5"/>
+  <circle cx="32" cy="32" r="8" fill="#3a3530"/><circle cx="60" cy="32" r="8" fill="#3a3530"/><circle cx="88" cy="32" r="8" fill="#3a3530"/>
+  <rect x="300" y="14" width="520" height="36" rx="18" fill="#1a1816" stroke="#3a3530"/>
+  <text x="560" y="38" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#a49c90" text-anchor="middle">localhost:8000/docs</text>
+  <text x="48" y="136" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#d8d2c6">FastAPI</text>
+  <rect x="168" y="117.4" width="52" height="22" rx="11" fill="#7d8492"/>
+  <text x="194" y="133.4" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="middle">0.1.0</text>
+  <rect x="230" y="117.4" width="62" height="22" rx="11" fill="#89bf04"/>
+  <text x="261" y="133.4" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="middle">OAS 3.1</text>
+  <text x="48" y="164" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#4990e2">/openapi.json</text>
+  <text x="48" y="248" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="23" font-weight="700" fill="#d8d2c6">default</text>
+  <path d="M 1044 238 l 9 9 l 9 -9" stroke="#756d62" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <line x1="48" y1="264" x2="1072" y2="264" stroke="#2b2723" stroke-width="1.5"/>
+  <rect x="48" y="288" width="1024" height="56" rx="6" fill="#1d2530" stroke="#61affe"/>
+  <rect x="64" y="298" width="84" height="36" rx="4" fill="#61affe"/>
+  <text x="106" y="322" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">GET</text>
+  <text x="170" y="323" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" font-weight="600" fill="#d8d2c6">/</text>
+  <text x="200" y="322" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#756d62">Health Check</text>
+  <path d="M 1034 311 l 9 9 l 9 -9" stroke="#756d62" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+</svg>

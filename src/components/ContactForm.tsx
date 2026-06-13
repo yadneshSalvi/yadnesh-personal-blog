@@ -169,11 +169,11 @@ export default function ContactForm() {
           </p>
         ) : submitState.status === "success" ? (
           <p className="font-mono text-[11px] text-accent">
-            status: success — {submitState.message}
+            status: success · {submitState.message}
           </p>
         ) : submitState.status === "error" ? (
           <p className="font-mono text-[11px] text-red-700 dark:text-red-400">
-            status: error — {submitState.message}
+            status: error · {submitState.message}
           </p>
         ) : (
           <p className="font-mono text-[11px] text-faint">

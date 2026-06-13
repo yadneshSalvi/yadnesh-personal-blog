@@ -114,7 +114,7 @@ ${escapeHtml(message)}</code></pre>
         <h2 style="margin:0 0 8px;">✅ Message received</h2>
         <p style="margin:0 0 8px; color:#475569;">Hey ${escapeHtml(name)}, thanks for reaching out! Your message is in the queue.</p>
         <pre style="background:#0b1220; color:#e2e8f0; padding:12px; border-radius:8px; white-space:pre-wrap;"><code>${escapeHtml(message)}</code></pre>
-        <p style="margin-top:12px; color:#64748b;">I'll reply as soon as possible. — Yadnesh</p>
+        <p style="margin-top:12px; color:#64748b;">I'll reply as soon as possible. Best, Yadnesh</p>
       </div>
     `;
 
