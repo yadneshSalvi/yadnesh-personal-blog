@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="620" viewBox="0 0 1120 620">
+  <rect width="1120" height="620" fill="#faf9f6"/>
+
+  <rect x="476" y="80" width="168" height="52" rx="26" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="560" y="111" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" letter-spacing="3" fill="#8f887a" text-anchor="middle">START</text>
+  <text x="670" y="111" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#8f887a">built in · the entrance</text>
+
+  <line x1="560" y1="132" x2="560" y2="241" stroke="#5b554c" stroke-width="2"/>
+  <path d="M 554 240 L 566 240 L 560 250 Z" fill="#5b554c"/>
+  <text x="586" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#8f887a">add_edge(START, 'llm')</text>
+
+  <rect x="400" y="250" width="320" height="120" rx="14" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <rect x="400" y="250" width="6" height="120" rx="3" fill="#b3441a"/>
+  <text x="432" y="288" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#8f887a">NODE</text>
+  <text x="432" y="322" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="30" font-weight="700" fill="#1f1c19">llm</text>
+  <text x="432" y="352" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#5b554c">calls the language model</text>
+  <text x="740" y="304" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#8f887a">the one node</text>
+  <text x="740" y="324" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#8f887a">you write</text>
+
+  <line x1="560" y1="370" x2="560" y2="479" stroke="#5b554c" stroke-width="2"/>
+  <path d="M 554 478 L 566 478 L 560 488 Z" fill="#5b554c"/>
+  <text x="586" y="433" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#8f887a">add_edge('llm', END)</text>
+
+  <rect x="476" y="488" width="168" height="52" rx="26" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="560" y="519" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" letter-spacing="3" fill="#8f887a" text-anchor="middle">END</text>
+  <text x="670" y="519" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#8f887a">built in · the exit</text>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="400" viewBox="0 0 960 400" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="960" height="400" fill="#1a1816"/>
+  <rect width="960" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="480" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal 1 · backend</text>
+  <g font-size="15" fill="#d8d2c6" xml:space="preserve">
+    <text x="32" y="92"><tspan fill="#756d62">WARNING:</tspan>  WatchFiles detected changes in 'app/graph.py'. Reloading...</text>
+    <text x="32" y="124">Process SpawnProcess-2:</text>
+    <text x="32" y="156">Traceback (most recent call last):</text>
+    <text x="51" y="188" fill="#756d62">[ 18 lines of uvicorn, importlib, and your app's imports ]</text>
+    <text x="51" y="220">File ".../backend/app/graph.py", line 13, in &lt;module&gt;</text>
+    <text x="69" y="252">llm = ChatOpenAI(model=MODEL)</text>
+    <text x="32" y="306" fill="#e5825a">openai.OpenAIError: Missing credentials. Please pass an `api_key`,</text>
+    <text x="32" y="336" fill="#e5825a">or set the `OPENAI_API_KEY` environment variable.</text>
+  </g>
+</svg>

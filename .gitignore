@@ -48,3 +48,4 @@ next-env.d.ts
 /WRITING-STYLE.md
 /scripts/generate-image.mjs
 /scripts/gen-part2-svgs.mjs
+/scripts/gen-part3-svgs.mjs

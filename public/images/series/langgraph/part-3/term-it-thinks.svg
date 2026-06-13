@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="324" viewBox="0 0 960 324" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="960" height="324" fill="#1a1816"/>
+  <rect width="960" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="480" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal 2 · curl</text>
+  <g font-size="15.5" fill="#d8d2c6" xml:space="preserve">
+    <text x="36" y="92"><tspan fill="#756d62">$</tspan> curl -sX POST localhost:8000/chat \</text>
+    <text x="36" y="120">    -H "Content-Type: application/json" \</text>
+    <text x="36" y="148">    -d '{"message": "explain recursion in one sentence"}'</text>
+    <text x="36" y="196">{"reply": <tspan fill="#8fb573">"Recursion is when a function solves a problem</tspan></text>
+    <text x="36" y="224"><tspan fill="#8fb573">          by calling itself on a smaller version of the</tspan></text>
+    <text x="36" y="252"><tspan fill="#8fb573">          same problem, until it reaches a case simple</tspan></text>
+    <text x="36" y="280"><tspan fill="#8fb573">          enough to answer directly."</tspan>}</text>
+  </g>
+</svg>

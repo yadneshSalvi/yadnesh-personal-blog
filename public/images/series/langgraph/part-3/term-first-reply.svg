@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="300" viewBox="0 0 960 300" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="960" height="300" fill="#1a1816"/>
+  <rect width="960" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="480" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal 2 · curl</text>
+  <g font-size="15.5" fill="#d8d2c6" xml:space="preserve">
+    <text x="36" y="96"><tspan fill="#756d62">$</tspan> curl -sX POST localhost:8000/chat \</text>
+    <text x="36" y="126">    -H "Content-Type: application/json" \</text>
+    <text x="36" y="156">    -d '{"message": "hello"}'</text>
+    <text x="36" y="212">{"reply": <tspan fill="#8fb573">"Hello! Nice to meet you. What</tspan></text>
+    <text x="36" y="242"><tspan fill="#8fb573">          would you like to talk about?"</tspan>}</text>
+  </g>
+</svg>

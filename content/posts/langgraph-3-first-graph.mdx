@@ -1,0 +1,392 @@
+---
+title: "LangGraph from Scratch, Part 3: Your First LangGraph"
+subtitle: "State, nodes, edges, and the moment your backend says something you didn't write. The core idea of the whole series, taken slow."
+image: "/images/series/langgraph/part-3/cover-light.svg"
+imageDark: "/images/series/langgraph/part-3/cover-dark.svg"
+createdAt: "2026-06-13T00:00:00.000Z"
+updatedAt: "2026-06-13T00:00:00.000Z"
+tags: ["langgraph", "langchain", "llm", "tutorial"]
+series: "langgraph-fastapi-nextjs"
+seriesPart: 3
+---
+
+Every reply your backend has sent so far, you wrote by hand. `{"status": "ok"}` in Part 1. `you said: hello` in Part 2. Your own words, echoed back with a sticker on them.
+
+Today that changes. By the end of this page you'll send your backend a message and get back an answer nobody typed in advance, composed on the spot by a language model. The thing that does it is a *graph*, and your first one has exactly one working part.
+
+<Figure
+  src="/images/series/langgraph/part-3/term-first-reply.svg"
+  alt="A dark terminal. A curl POST to localhost:8000/chat sends the message 'hello'. The JSON response reads: reply, 'Hello! Nice to meet you. What would you like to talk about?'"
+  caption="Today's destination. The same 'hello' you echoed back in Part 2, answered this time by a real model that wrote the sentence on the spot."
+  width={960}
+  height={300}
+/>
+
+There's a pile of new vocabulary between here and there: state, nodes, edges, reducers, message types. Here's a promise about all of it. Every one of those words names something small. By the last section they'll feel less like jargon and more like furniture. Take this part slowly; it's the hinge the other five swing on.
+
+Two libraries do the heavy lifting, both sitting in your `.venv` since Part 1's big install:
+
+| Tool | Version used here |
+|---|---|
+| LangChain | 1.3.9 |
+| LangGraph | 1.2.4 |
+
+You installed `langchain-openai` and `langchain-anthropic` back then too. You finally pick one of them in a few minutes, and that choice sticks for the rest of the series.
+
+## LangChain talks, LangGraph organizes
+
+The names blur together for everyone at first, so here's the one-line split before we touch either.
+
+**LangChain** is the library for talking to a language model. It gives you a single, consistent way to call OpenAI, Anthropic, and a dozen others: build a list of messages, call `.invoke()`, get a reply back. That's the piece you'll use today.
+
+**LangGraph** is the library for *structuring* what happens around those calls. Real AI apps are rarely one call. They're a call, then maybe a tool, then another call, then a decision about whether to stop. LangGraph lets you lay that out as a graph: boxes for the steps, arrows for what runs next.
+
+Today's graph is the smallest one that could possibly exist: a single box that makes one LangChain call. You don't need the structure yet. You're building the one-room version of a house you'll add wings to in Parts 5, 6, and 7, and starting in one room is how the finished house stays understandable.
+
+## Three nouns and you've got it
+
+LangGraph has a reputation for being heavy. Its docs open with phrases like "stateful multi-actor applications," and beginners bounce off the first paragraph. So here is the entire idea in three nouns, using a picture you already own: a factory assembly line.
+
+- **State** is the tray that rides down the line. Every station puts something on it and passes it along. Our tray holds one thing: the list of messages in the conversation.
+- **Nodes** are the stations. Each is a plain Python function that takes the tray, does its job, and sets something back down. Our one node calls the language model.
+- **Edges** are the conveyor belts between stations. They decide what runs next. Ours are about as simple as belts get: start, then the one station, then done.
+
+That's LangGraph. Everything else in the whole library is variations on those three nouns: more stations, smarter belts, bigger trays. The smallest graph that could work looks like this:
+
+<Figure
+  src="/images/series/langgraph/part-3/fig-graph-light.svg"
+  srcDark="/images/series/langgraph/part-3/fig-graph-dark.svg"
+  alt="A flow diagram on a paper background: a small circle labeled START, an arrow down to a single rounded box labeled llm, an arrow down to a small circle labeled END. Labels note that START and END are built in and the llm box is the one node you write."
+  caption="Your first graph. One station ('llm'), two belts. START and END are LangGraph's built-in bookends; you don't write them, you point at them."
+  width={1120}
+  height={620}
+/>
+
+Hold that picture. We'll build it from the bottom up: first the tray, then the station, then the belts. And at the end, LangGraph will draw this exact diagram back to you, generated from your own code.
+
+## The tray that rides the line
+
+A station needs to know what's on the tray before it can add to it, so the tray's shape is the first thing to define. Make a new file named `graph.py` in your package, right next to `main.py`:
+
+```python filename="backend/app/graph.py"
+from typing import Annotated, TypedDict
+from langchain_core.messages import AnyMessage
+from langgraph.graph.message import add_messages
+
+
+class State(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
+```
+
+Six lines, and two of them are genuinely new. We'll take them one at a time, because this tiny block is the part of LangGraph people find slipperiest.
+
+<Callout type="info" title="What's a TypedDict?">
+A normal Python dictionary where you've written down which keys it has and what type each value holds. `State` still behaves like a plain dict at runtime (`state["messages"]` works exactly as you'd expect); the annotation is there so your editor and LangGraph both know the tray carries a `messages` key holding a list. No new runtime behavior, just a labeled shape.
+</Callout>
+
+Now the strange-looking part: `Annotated[list[AnyMessage], add_messages]`. Read it as a value with a sticky note attached. The value's real type is `list[AnyMessage]`, a list of chat messages. The sticky note is `add_messages`, and it's a message *to LangGraph* about how to update this one field.
+
+Here's why that note earns its keep. Every time a node returns, LangGraph has to fold what came back into the tray. The obvious way is to overwrite: the new value replaces the old. For most fields that's fine. For a conversation it's a catastrophe, because the user's question would vanish the instant the model answered. `add_messages` says: don't overwrite this list, *append* to it. It's the station's rule for how to add to the tray.
+
+You can watch the rule work on its own. `add_messages` is just a function; hand it an existing list and a new one and see what it gives back:
+
+```python
+>>> from langchain_core.messages import HumanMessage, AIMessage
+>>> from langgraph.graph.message import add_messages
+>>> merged = add_messages([HumanMessage("hello")], [AIMessage("hi there")])
+>>> [(type(m).__name__, m.content) for m in merged]
+[('HumanMessage', 'hello'), ('AIMessage', 'hi there')]
+```
+
+Two messages, both kept. Plain assignment would have left you with one and thrown the question away. That single detail is the reason "what's my name?" will actually work back in Part 7.
+
+<Figure
+  src="/images/series/langgraph/part-3/fig-state-flow-light.svg"
+  srcDark="/images/series/langgraph/part-3/fig-state-flow-dark.svg"
+  alt="A diagram of a tray passing through the llm node. On the left, the tray entering holds one item: HumanMessage 'hello'. The node returns one new item: AIMessage 'hi there'. On the right, the tray leaving holds both: HumanMessage 'hello' and AIMessage 'hi there'. A label reads 'add_messages appends, it does not replace'."
+  caption="The reducer in one picture. The node returns only the new message; add_messages appends it, so the tray that leaves holds the whole conversation, not just the latest line."
+  width={1180}
+  height={560}
+/>
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, 1536x1024, quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). Single-panel comic. A vast, absurdly over-engineered factory hall that fills the whole frame: giant conveyor belts, enormous gears, tangled pipes, robotic arms, blinking control panels, steam. In the dead center of all this colossal machinery, a single small yellow sticky note rides on a conveyor belt, having moved maybe one inch, with a tiny dotted line and a small ruler showing how little it travelled. Yad stands proudly to one side wearing a yellow hard hat, presenting the giant contraption with both arms wide, beaming. Speech bubble from Yad: "STATE MANAGEMENT". Clean readable hand-lettered speech bubble, large clear lettering, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/langgraph/part-3/comic-conveyor.png"
+  alt='Comic: Yad, a bearded developer in a yellow hard hat, stands beaming beside a colossal factory hall packed with giant conveyor belts, gears, pipes, and robotic arms. In the center of all that machinery, a single small yellow sticky note has ridden a conveyor belt about one inch. Yad presents the whole contraption with both arms and declares "STATE MANAGEMENT".'
+  caption="The first time you meet LangGraph for a one-node graph, this is the exact ratio of machinery to payload. It stops feeling absurd around Part 6, when the belt finally has somewhere to go."
+  width={1536}
+  height={1024}
+/>
+
+## The one station that does the thinking
+
+The tray is defined. Now the station that does the work, and this is the moment you pick your provider. Whatever tab you choose here is what every snippet assumes for the rest of the series, so pick one and stay on it. Add this below what you already have in `graph.py`:
+
+<CodeTabs>
+
+<Tab label="OpenAI">
+
+```python filename="backend/app/graph.py"
+from langchain_openai import ChatOpenAI
+
+MODEL = "gpt-5.4-mini"
+llm = ChatOpenAI(model=MODEL)
+
+
+def call_model(state: State) -> State:
+    response = llm.invoke(state["messages"])
+    return {"messages": [response]}
+```
+
+</Tab>
+
+<Tab label="Anthropic">
+
+```python filename="backend/app/graph.py"
+from langchain_anthropic import ChatAnthropic
+
+MODEL = "claude-haiku-4-5"
+llm = ChatAnthropic(model=MODEL)
+
+
+def call_model(state: State) -> State:
+    response = llm.invoke(state["messages"])
+    return {"messages": [response]}
+```
+
+</Tab>
+
+</CodeTabs>
+
+The function is the part to read closely, and it's identical in both tabs. `call_model` takes the state (the tray), reaches for `state["messages"]` (the conversation so far), and hands that whole list to the model with `llm.invoke(...)`. The model reads the transcript and returns its reply as a single message. The function wraps that reply in a list and returns it under the `messages` key.
+
+Notice it returns `{"messages": [response]}`, only the new message, not the whole updated list. That's the `add_messages` rule paying off: you hand back what's new, and LangGraph appends it for you. The station sets one item on the tray; the conveyor handles the rest.
+
+`MODEL` sits at the top as a named constant, so the day a newer model ships you change one line instead of hunting through the file.
+
+<Callout type="info" title="HumanMessage, AIMessage, SystemMessage">
+LangChain models don't take a bare string; they take a list of typed messages, because a chat is a transcript with speakers. A `HumanMessage` is something the user said, an `AIMessage` is something the model said, and a `SystemMessage` is a standing instruction you set once ("You are a helpful assistant"). Today you send one `HumanMessage` and get one `AIMessage` back. `state["messages"]` is just that transcript, growing by one each turn.
+</Callout>
+
+## Wire the stations together
+
+Two pieces left: tell LangGraph the station exists, and lay the belts. Add this to the bottom of `graph.py`:
+
+```python filename="backend/app/graph.py"
+from langgraph.graph import StateGraph, START, END
+
+builder = StateGraph(State)
+builder.add_node("llm", call_model)
+builder.add_edge(START, "llm")
+builder.add_edge("llm", END)
+graph = builder.compile()
+```
+
+Line by line. `StateGraph(State)` opens an empty line that runs on trays shaped like your `State`. `add_node("llm", call_model)` installs your station and names it `llm`. The two `add_edge` calls lay the belts: from the built-in `START` to your node, then from your node to the built-in `END`. `compile()` freezes the blueprint into a `graph` object you can actually run.
+
+`START` and `END` are LangGraph's bookends. `START` is where every run enters; `END` is where it stops. You don't define them, you import them and point at them.
+
+Don't take my word for the shape, though. LangGraph can draw the graph it just built. Open a Python shell in `backend/` (with `(.venv)` active) and ask:
+
+```python
+>>> from app.graph import graph
+>>> print(graph.get_graph().draw_mermaid())
+```
+
+```text
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	llm(llm)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> llm;
+	llm --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
+```
+
+That's [Mermaid](https://mermaid.js.org), a text format for diagrams. The `config` and `classDef` lines are styling; the five in the middle are your graph. Drop that block into any Mermaid renderer and those lines become a picture:
+
+<Mermaid
+  config={{ htmlLabels: false, flowchart: { htmlLabels: false } }}
+  chart={`graph TD;
+    START([START])
+    llm(llm):::hero
+    END([END])
+    START --> llm;
+    llm --> END;
+    classDef hero stroke:#e5825a,stroke-width:3px;`}
+/>
+
+You didn't draw that. Your code did, and it matches the sketch from a few sections ago line for line.
+
+Checkpoint. Right now you have: a compiled graph with one node that calls a real language model. It has no idea HTTP exists yet. Let's introduce them.
+
+## Hand the conversation to the graph
+
+Open `app/main.py`. The `/chat` endpoint still echoes from Part 2; you're going to replace its body with a call to the graph. Two new imports up top, and a new function body:
+
+```python filename="backend/app/main.py"
+from langchain_core.messages import HumanMessage  # new, with the other imports
+from app.graph import graph                        # new
+
+
+@app.post("/chat")
+async def chat(request: ChatRequest) -> ChatResponse:
+    result = graph.invoke({"messages": [HumanMessage(content=request.message)]})
+    reply = result["messages"][-1].content
+    return ChatResponse(reply=reply)
+```
+
+Read the three lines of the body. You wrap the user's text in a `HumanMessage` and set it on a fresh tray (`{"messages": [...]}`). `graph.invoke(...)` runs that tray down the line: START, your `llm` node, END. When it comes back, the tray holds two messages, the human one you sent and the AI one the model added, so `result["messages"][-1]` is the reply and `.content` is its text. The `ChatRequest` and `ChatResponse` models from Part 2 didn't change. The contract at the door is the same; only the kitchen behind it got an upgrade.
+
+Save it, and watch the server terminal try to reload. (If your Part 2 server isn't running, start it from `backend/` with `(.venv)` active: `uvicorn app.main:app --reload`.) Instead of the usual calm, it falls over:
+
+<Figure
+  src="/images/series/langgraph/part-3/term-missing-key.svg"
+  alt="A dark terminal. Uvicorn tries to reload after the file change and crashes. A traceback ends at graph.py where llm = ChatOpenAI(model=MODEL) is constructed, with the final line: openai.OpenAIError: Missing credentials. Please pass an api_key, or set the OPENAI_API_KEY environment variable."
+  caption="The most common Part 3 error, met on purpose. Read it bottom-up: the model went looking for your API key and found nothing."
+  width={960}
+  height={400}
+/>
+
+Read it bottom-up, the habit from Part 2: `openai.OpenAIError: Missing credentials`. The model tried to build itself, went looking for your API key, and came up empty. But you *have* a key. It's been sitting in `backend/.env` since Part 1. The problem is that nobody told the code to read that file. A `.env` isn't magic; something has to load it.
+
+That something is `python-dotenv`, which you installed in Part 1 and haven't used until this exact moment. Add two lines at the very top of `graph.py`, above every other line, so the key lands in the environment before the model goes looking for it:
+
+```python filename="backend/app/graph.py"
+from dotenv import load_dotenv
+
+load_dotenv()  # reads backend/.env into the environment, before the model is built
+```
+
+Save again. This time the reload is quiet, which is the sound of everything working. The server is up, the graph is wired, and the key is finally loaded. One thing left: ask it something.
+
+<Callout type="info" title="Wait, am I being charged now?">
+Yes, and trivially. Every message from here on makes one real API call. With the small, fast model this series uses, a single chat costs a fraction of a cent; you'd send a thousand of them before spending a dollar, and the cap you set in Part 1 is the backstop regardless. Test as much as you like.
+</Callout>
+
+## The moment it thinks
+
+Same `curl` as Part 2, from any terminal that isn't hosting the server. Send the most basic message there is and see what comes back:
+
+```bash
+curl -X POST http://localhost:8000/chat -H "Content-Type: application/json" -d '{"message": "hello"}'
+```
+
+```json
+{"reply":"Hello! Nice to meet you. What would you like to talk about?"}
+```
+
+Put that next to Part 2's `you said: hello`. Same word in, an entirely different thing out. Nobody wrote that sentence; the model composed it when your request arrived. There's a specific small jolt the first time this lands, the one where you typed `hello` expecting your own echo and a stranger answered instead. Every developer who ships their first model-backed endpoint feels it.
+
+Now prove it isn't a fluke or a fancier echo. Ask it something only a real model could answer:
+
+```bash
+curl -X POST http://localhost:8000/chat -H "Content-Type: application/json" -d '{"message": "explain recursion in one sentence"}'
+```
+
+<Figure
+  src="/images/series/langgraph/part-3/term-it-thinks.svg"
+  alt="A dark terminal showing the curl POST with message 'explain recursion in one sentence', and the JSON reply: 'Recursion is when a function solves a problem by calling itself on a smaller version of the same problem, until it reaches a case simple enough to answer directly.'"
+  caption="No lookup table could fake this. You asked a real question and the model wrote a fresh answer, after a short pause while it thought."
+  width={960}
+  height={320}
+/>
+
+Does it stream the words in one at a time, the way a chat app does? Not yet. The whole reply lands at once, after a noticeable pause while the model thinks. That pause is exactly what Part 5 fixes, when words start arriving as they're generated. For now, sit with the pause. It means real work is happening on the other end of your one-node graph.
+
+Right now you have: a FastAPI backend whose `/chat` endpoint drops your message onto a tray, runs it through a one-node LangGraph, calls a real language model, and hands back the answer over HTTP. The graph is tiny on purpose. Every hard thing the series has left, streaming and tools and memory, is a change to *this* graph, not a rewrite around it.
+
+<Recap
+  part={3}
+  items={[
+    "A `graph.py` that defines a real LangGraph: a `State` holding the conversation, one node that calls a language model, and edges wiring `START` to it and on to `END`.",
+    "A `/chat` endpoint that no longer echoes. It runs your message through the graph and returns a genuine model reply over HTTP.",
+    "The `add_messages` reducer doing its job: your node returns only the new message and LangGraph appends it, so the conversation grows instead of getting overwritten.",
+    "Your API key finally in play, loaded from `.env` by `python-dotenv`, with each call costing a fraction of a cent under the Part 1 cap.",
+    "A mental model you can sketch: state is the tray, nodes are stations, edges are the belts. The entire rest of the series is just more of each.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "What's the cleanest one-line split between LangChain and LangGraph?",
+      options: [
+        "LangChain is for Python, LangGraph is for JavaScript",
+        "LangChain talks to a language model; LangGraph structures the steps around those calls",
+        "LangChain is the old version that LangGraph replaced",
+        "They are two names for the exact same library",
+      ],
+      answer: 1,
+      explain: "LangChain gives you one consistent way to call a model (`.invoke()` on a list of messages). LangGraph arranges calls, tools, and decisions as a graph of nodes. Today's graph made exactly one LangChain call.",
+    },
+    {
+      q: "Your node returns only the single new message each turn, yet the conversation keeps growing instead of overwriting. What makes that happen?",
+      options: [
+        "FastAPI quietly merges the lists for you",
+        "The model remembers previous calls on its own",
+        "`Annotated[..., add_messages]` tells LangGraph to append the return value instead of replacing the list",
+        "`TypedDict` automatically keeps a history of every value",
+      ],
+      answer: 2,
+      explain: "The `add_messages` reducer on the `messages` field is the rule for how to update it: append, don't overwrite. Return what's new and LangGraph folds it onto the tray. Without it, the user's message would vanish the moment the model replied.",
+    },
+    {
+      q: "You wire everything up, start the server, and get `OpenAIError: Missing credentials`. Your key has been in `backend/.env` since Part 1. What's actually missing?",
+      options: [
+        "The key expired and needs regenerating in the dashboard",
+        "Nothing reads `.env` automatically; you need `load_dotenv()` before the model is built",
+        "API keys only work once the app is deployed to production",
+        "The key has to live in `main.py`, not in a `.env` file",
+      ],
+      answer: 1,
+      explain: "A `.env` is just a text file; `python-dotenv`'s `load_dotenv()` is what reads it into the environment. Call it at the top of `graph.py`, before `ChatOpenAI(...)` goes looking for the key.",
+    },
+    {
+      q: "Inside the graph, what is the `messages` field of the state a list of?",
+      options: [
+        "Plain Python strings",
+        "Dictionaries that each have a `role` key",
+        "One combined string of the whole conversation",
+        "Typed chat messages, like `HumanMessage` and `AIMessage`",
+      ],
+      answer: 3,
+      explain: "LangChain models take a transcript of typed messages, not a bare string. You send a `HumanMessage`; the model returns an `AIMessage`; `add_messages` keeps both on the tray.",
+    },
+    {
+      q: "Today's graph has one node and runs start to finish with no branching. Why build a graph for that at all?",
+      options: [
+        "It's the small version of the structure Parts 5 to 7 expand; streaming, tools, and memory become changes to this graph, not rewrites",
+        "A graph is required before you can make any API call",
+        "Graphs run measurably faster than plain function calls",
+        "FastAPI only accepts graphs as endpoint handlers, never functions",
+      ],
+      answer: 0,
+      explain: "One node is overkill for a single call, on purpose. Starting from the smallest graph means the streaming, tool, and memory features later slot into a shape you already understand.",
+    },
+  ]}
+/>
+
+The commit, from the project root, in any terminal that isn't hosting the server:
+
+```bash
+git add .
+git commit -m "part 3: /chat answers with a real LLM through a one-node graph"
+```
+
+Your backend thinks now, but it thinks in private: the reply lands all at once, after a wait, with no screen to show it on. In Part 4 you'll build the actual chat UI in Next.js, type into a browser, and watch these answers arrive in a real interface.
+
+{/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-3-first-graph) in the intro once it exists. */}
+
+{/* TODO once the Concepts page (langgraph-concepts.mdx) ships: link "TypedDict", "Annotated / reducers", "HumanMessage / AIMessage", and "async def" to /blog/langgraph-concepts#typed-dict, #annotated-reducers, etc. instead of defining only inline. */}
+
+{/* ANECDOTE slot (optional upgrade, WRITING-STYLE §6): a real first-person story from Yadnesh about the first time an LLM call returned something genuinely surprising, OR an evening lost to a key that wasn't being loaded (the load_dotenv genre), 3 beats, 5 sentences max. If provided, it replaces the "specific small jolt" relatable-incident sentence in "The moment it thinks". */}
