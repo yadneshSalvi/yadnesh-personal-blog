@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="420" viewBox="0 0 1040 420" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="420" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">python &#183; backend</text>
+  <g font-size="14.5" fill="#d8d2c6" xml:space="preserve">
+    <text x="32" y="92"><tspan fill="#756d62">&gt;&gt;&gt;</tspan> config = {"configurable": {"thread_id": <tspan fill="#8fb573">"a1b2"</tspan>}}</text>
+    <text x="32" y="124"><tspan fill="#756d62">&gt;&gt;&gt;</tspan> snapshot = graph.get_state(config)</text>
+    <text x="32" y="156"><tspan fill="#756d62">&gt;&gt;&gt;</tspan> for m in snapshot.values["messages"]:</text>
+    <text x="32" y="184"><tspan fill="#756d62">...</tspan>     print(m.type, "&#183;", m.content)</text>
+    <text x="32" y="216" fill="#756d62"># the whole conversation, read straight back out of memory</text>
+    <text x="32" y="256"><tspan fill="#e5825a">human</tspan> &#183; My name is Alex.</text>
+    <text x="32" y="284"><tspan fill="#8fb573">ai</tspan> &#183; Nice to meet you, Alex.</text>
+    <text x="32" y="312"><tspan fill="#e5825a">human</tspan> &#183; What's my name?</text>
+    <text x="32" y="340"><tspan fill="#8fb573">ai</tspan> &#183; Your name is Alex.</text>
+    
+    <text x="32" y="380"><tspan fill="#756d62">&gt;&gt;&gt;</tspan></text>
+  </g>
+</svg>

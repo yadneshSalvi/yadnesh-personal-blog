@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="500" viewBox="0 0 1040 500" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="500" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; backend</text>
+  <g font-size="14.5" fill="#d8d2c6" xml:space="preserve">
+    <text x="32" y="92" fill="#756d62"># you added the checkpointer, then sent a message</text>
+    <text x="32" y="128" fill="#756d62">  File ".../app/main.py", line 28, in token_stream</text>
+    <text x="56" y="156" fill="#d8d2c6">async for event in graph.astream_events(inputs, version="v2"):</text>
+    <text x="32" y="184" fill="#756d62">  File ".../langgraph/pregel/__init__.py", in astream</text>
+    <text x="32" y="212" fill="#756d62">  File ".../langgraph/pregel/_checkpoint.py", in _checkpoint</text>
+    <text x="32" y="256" fill="#e5825a">ValueError: Checkpointer requires one or more of the</text>
+    <text x="32" y="284" fill="#e5825a">following 'configurable' keys: thread_id, checkpoint_ns,</text>
+    <text x="32" y="312" fill="#e5825a">checkpoint_id</text>
+    <text x="32" y="356" fill="#756d62"># the graph now demands to know WHICH conversation this is.</text>
+    <text x="32" y="384" fill="#756d62"># you gave it a memory but never told it the thread_id.</text>
+    <text x="32" y="440" fill="#d8d2c6"><tspan fill="#e5825a">INFO:</tspan>     500 Internal Server Error</text>
+  </g>
+</svg>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="586" viewBox="0 0 1180 586" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1180" height="586" fill="#f5f5f4"/>
+  <rect x="0" y="0" width="1180" height="64" fill="#f3f1ec"/>
+  <line x1="0" y1="64" x2="1180" y2="64" stroke="#e2ded4" stroke-width="1.5"/>
+  <circle cx="32" cy="32" r="8" fill="#d6d1c5"/><circle cx="60" cy="32" r="8" fill="#d6d1c5"/><circle cx="88" cy="32" r="8" fill="#d6d1c5"/>
+  <rect x="330" y="14" width="520" height="36" rx="18" fill="#ffffff" stroke="#e2ded4"/>
+  <text x="590" y="38" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#5b554c" text-anchor="middle">localhost:3000</text>
+  <rect x="62" y="98" width="1056" height="454" rx="16" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <rect x="62" y="98" width="256" height="454" rx="16" fill="#fbfaf8"/>
+  <rect x="317" y="98" width="1.5" height="454" fill="#eceae8"/>
+  <text x="86" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="1" fill="#78716c">CHATS</text>
+  <rect x="188" y="114" width="112" height="34" rx="9" fill="none" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="244" y="136" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#78716c" text-anchor="middle">+ New chat</text>
+  <rect x="74" y="182" width="232" height="44" rx="9" fill="#f1ece9"/>
+  <rect x="74" y="190" width="3" height="28" rx="1.5" fill="#b3441a"/>
+  <text x="90" y="210" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#b3441a" font-weight="600">My name is Alex...</text>
+  <text x="90" y="262" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#78716c" font-weight="400">Explain recursion</text>
+  <text x="90" y="314" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#78716c" font-weight="400">23 × 17 and Tokyo</text>
+  <text x="346" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#1c1917">Chatbot</text>
+  <line x1="318" y1="164" x2="1118" y2="164" stroke="#eceae8" stroke-width="1.5"/>
+  
+  <rect x="918" y="190" width="172" height="47" rx="16" fill="#1c1917"/>
+  <text x="936" y="219" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#fafaf9">My name is Alex.</text>
+  <rect x="346" y="253" width="232" height="47" rx="16" fill="#f5f5f4"/>
+  <text x="364" y="282" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1c1917">Nice to meet you, Alex.</text>
+  <rect x="926" y="316" width="164" height="47" rx="16" fill="#1c1917"/>
+  <text x="944" y="345" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#fafaf9">What's my name?</text>
+  <rect x="346" y="379" width="189" height="47" rx="16" fill="#f5f5f4"/>
+  <text x="364" y="408" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1c1917">Your name is Alex.</text>
+  <line x1="318" y1="464" x2="1118" y2="464" stroke="#eceae8" stroke-width="1.5"/>
+  <rect x="342" y="488" width="660" height="44" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="360" y="516" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#a8a29e">Ask me anything...</text>
+  <rect x="1018" y="488" width="76" height="44" rx="10" fill="#1c1917"/>
+  <text x="1056" y="516" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#fafaf9" text-anchor="middle">Send</text>
+</svg>

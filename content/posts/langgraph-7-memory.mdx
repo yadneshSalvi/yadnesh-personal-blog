@@ -1,0 +1,662 @@
+---
+title: "LangGraph from Scratch, Part 7: Conversation Memory"
+subtitle: "Your bot finally remembers what you told it. A checkpointer, one thread per conversation, a New chat button, and a sidebar of past chats, all without a database."
+image: "/images/series/langgraph/part-7/cover-light.svg"
+imageDark: "/images/series/langgraph/part-7/cover-dark.svg"
+createdAt: "2026-06-14T00:00:00.000Z"
+updatedAt: "2026-06-14T00:00:00.000Z"
+tags: ["langgraph", "fastapi", "memory", "tutorial"]
+series: "langgraph-fastapi-nextjs"
+seriesPart: 7
+---
+
+Tell your bot from Part 6 your name. It will say something friendly back. Now ask it what your name is. It has no idea. Not because it's broken, but because it never had a chance: every message you send starts a brand-new conversation with no past in it. Your bot is sharp, it has tools, and it forgets you the instant you hit Send.
+
+By the end of this page, that's fixed. Your bot holds a conversation across turns, a "New chat" button starts a clean one, and a sidebar lets you flip between past chats, all with no database and about thirty lines of code.
+
+<Figure
+  src="/images/series/langgraph/part-7/browser-memory-final-light.svg"
+  srcDark="/images/series/langgraph/part-7/browser-memory-final-dark.svg"
+  alt="The chat UI at localhost:3000 with a New chat button in the top right of the card. The conversation reads: user 'My name is Alex.', assistant 'Nice to meet you, Alex.', user 'What's my name?', assistant 'Your name is Alex.' The bot correctly recalls the name from earlier in the same conversation."
+  caption="Today's destination. You tell it your name, change the subject, ask again, and it remembers. Same graph, same stream; it stopped starting from zero every time."
+  width={1120}
+  height={462}
+/>
+
+This part is almost all about one idea with a friendly name: a *checkpointer*. It's the piece that lets the graph save where it was and pick back up. You'll add it in one line, hit a very loud error on purpose, fix it by teaching your app to label each conversation, and then build the UI on top. Let's cure the amnesia.
+
+## Your bot has the memory of a goldfish
+
+Watch the failure first, because naming it is half the fix. You say your name, the bot greets you, you ask it to recall the name, and it draws a complete blank.
+
+<Figure
+  src="/images/series/langgraph/part-7/browser-amnesia-light.svg"
+  srcDark="/images/series/langgraph/part-7/browser-amnesia-dark.svg"
+  alt="The chat UI at localhost:3000. The conversation reads: user 'My name is Alex.', assistant 'Nice to meet you, Alex.', user 'What's my name?', assistant 'I have no idea, you never told me.' The bot has forgotten the name it was told two messages earlier."
+  caption="The bug, met on purpose. The bot greeted Alex one message ago and now swears they've never met. Nothing is broken; nothing is being remembered."
+  width={1120}
+  height={462}
+/>
+
+Here's why. Every time the frontend calls `/chat`, the backend runs `graph.astream_events` with exactly one message in it: the one you just typed. The graph runs, the model answers, the request ends, and everything the graph held is thrown away. The next message starts a fresh run with no trace of the last one. The model isn't forgetting; there's nothing to forget *from*. Each turn is the bot's first day on the job.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, 1536x1024, quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 2-panel comic, panels side by side with a thin vertical black divider, about a chatbot that forgets you instantly because its memory lives only in RAM. The same small friendly white robot chatbot in both panels: rounded boxy body, simple smiling screen face, two little antennas. In BOTH panels, a small round glass goldfish bowl with one orange goldfish sits beside the robot; the bowl has a small rectangular paper label reading "PROD" stuck on its front. Panel 1: Yad sits leaning in warmly next to the robot, mid heart-to-heart, one hand on his chest, smiling; Yad's speech bubble: "AND THAT'S MY WHOLE STORY." The robot smiles back attentively. Panel 2: a moment later the same robot turns to Yad with a blank, polite, stranger's smile and waves hello; the robot's speech bubble: "NICE TO MEET YOU!" Yad slumps, arms drooping, eyes flat with exasperation, no speech bubble. The goldfish in the PROD bowl swims in an oblivious little circle. */}
+
+<Figure
+  src="/images/series/langgraph/part-7/comic-goldfish.png"
+  alt="Comic in two panels. Panel one: Yad, a bearded developer with headphones, leans in warmly next to a small white robot, hand on his chest, saying 'AND THAT'S MY WHOLE STORY.' A goldfish bowl labeled PROD sits beside the robot. Panel two: a moment later the same robot waves at Yad with a blank, polite smile and says 'NICE TO MEET YOU!', while Yad slumps in exasperation and the goldfish swims in an oblivious circle."
+  caption="In-memory state, taken literally. A goldfish has a famous nine-second memory; a bot whose only memory is one request is worse. The PROD label is the foreshadowing for Part 8."
+  width={1536}
+  height={1024}
+/>
+
+## Threads: one notebook per conversation
+
+To remember a conversation, two things have to be true. The history has to be *saved* somewhere between requests, and your app has to know *which* saved history belongs to this chat. The second one is the part people skip, and it's where the whole design hinges.
+
+Picture a drawer of notebooks, one per conversation. Each notebook has a label on its spine. When a message comes in carrying the label `a1b2`, the graph pulls that exact notebook, reads everything written in it so far, adds the new turn, and puts it back. A message labeled `9f3c` opens a different notebook entirely. The label is the only thing that decides which memory you get.
+
+<Figure
+  src="/images/series/langgraph/part-7/fig-threads-light.svg"
+  srcDark="/images/series/langgraph/part-7/fig-threads-dark.svg"
+  alt="A diagram titled 'Threads: the id is the label on the notebook'. On the left, a request box shows POST /chat with a JSON body containing a message and a thread_id of 'a1b2' highlighted in accent. An arrow labeled 'carries the id' points to a small box, THE GRAPH (llm plus tools, runs as before). From the graph, an arrow labeled 'opens a1b2, reads and writes' points into a panel labeled THE CHECKPOINTER, one notebook per conversation. Inside are three notebook cards: the active one tabbed 'a1b2' showing the Alex conversation, and two muted ones tabbed '9f3c' and 'c7d0' holding other conversations kept apart."
+  caption="The whole mental model. The thread_id rides in with the request, the checkpointer opens the matching notebook, and the rest of the graph never has to think about it."
+  width={1314}
+  height={660}
+/>
+
+<Callout type="info" title="Thread and thread_id, defined">
+A **thread** is one continuous conversation: all the back-and-forth that should remember itself. Its **thread_id** is a unique string that names it, like `a1b2` or a long random UUID. You make one up per conversation and send it with every message. Same id, same thread, same memory. A new id is a blank notebook. That's the entire concept; everything below is plumbing to make it real.
+</Callout>
+
+## Giving the graph a memory
+
+The thing that reads and writes those notebooks is a **checkpointer**. LangGraph ships one that keeps everything in your computer's memory, `InMemorySaver`, and wiring it in is genuinely one line of import and one line of use. Open `graph.py` and find the spot at the bottom where you compile the graph. Right now it reads `graph = builder.compile()`. Give it a checkpointer:
+
+```python filename="backend/app/graph.py"
+from langgraph.checkpoint.memory import InMemorySaver
+
+checkpointer = InMemorySaver()
+graph = builder.compile(checkpointer=checkpointer)
+```
+
+That's the whole backend change to *enable* memory. Everything above it, the state, the `llm` node, the `ToolNode`, the conditional edge, stays exactly as you left it in Part 6. `compile(checkpointer=...)` hands the graph a place to save its state after every step and to reload it before the next run.
+
+<Callout type="info" title="What a checkpointer actually is">
+A checkpointer is a tiny key-value store the graph reads and writes its own state to, keyed by `thread_id`. After each step of a run it writes a snapshot ("here's the full message list so far"); at the start of a run it reads the snapshot back so the graph continues instead of restarting. `InMemorySaver` keeps those snapshots in a plain Python dict in the running process. No database, no setup, no file. That simplicity has a sharp edge we'll meet at the end of the part.
+</Callout>
+
+## The graph now demands to know who it's talking to
+
+Save `graph.py`, restart the server, and send a message from the UI. Instead of a reply, the backend falls over. Read the error; it's about to tell you exactly what's missing.
+
+<Figure
+  src="/images/series/langgraph/part-7/term-thread-missing.svg"
+  alt="A dark backend terminal showing a traceback. The call that failed is 'async for event in graph.astream_events(inputs, version=v2)' in token_stream, with frames descending into langgraph's pregel and checkpoint modules. The exception reads 'ValueError: Checkpointer requires one or more of the following configurable keys: thread_id, checkpoint_ns, checkpoint_id'. Comments note that the graph now demands to know which conversation this is, and that you gave it a memory but never told it the thread_id. A final line shows INFO: 500 Internal Server Error."
+  caption="The deliberate break. The moment the graph has a memory, it refuses to run without knowing which conversation to use. This is LangGraph protecting you from silently mixing everyone's chats into one notebook."
+  width={1040}
+  height={500}
+/>
+
+`ValueError: Checkpointer requires one or more of the following 'configurable' keys: thread_id, checkpoint_ns, checkpoint_id`. You saw this family of error in Part 3 (missing API key) and Part 6 (missing Tavily key): the library checks a precondition up front and fails loudly instead of doing something quietly wrong. A graph with a checkpointer *must* be told which thread it's working on, every single call. You added the memory; now you have to hand it the notebook label. Right now you're passing none, so it stops you.
+
+## Telling it which conversation
+
+Two small changes wire the thread through. First, the request needs to carry a `thread_id`, so add it to your `ChatRequest` model in `main.py`:
+
+```python filename="backend/app/main.py"
+class ChatRequest(BaseModel):
+    message: str
+    thread_id: str
+```
+
+Second, `token_stream` has to pass that id into the graph as config. LangGraph reads the thread from a nested dict under the `configurable` key, and that dict goes in as the second argument to `astream_events`. Update the generator and the endpoint that calls it:
+
+```python filename="backend/app/main.py"
+async def token_stream(message: str, thread_id: str):
+    inputs = {"messages": [HumanMessage(content=message)]}
+    config = {"configurable": {"thread_id": thread_id}}
+    async for event in graph.astream_events(inputs, config, version="v2"):
+        ...  # the token / tool_start / tool_end branches from Part 6, unchanged
+    yield sse({"type": "done"})
+
+
+@app.post("/chat")
+async def chat(request: ChatRequest):
+    return StreamingResponse(
+        token_stream(request.message, request.thread_id),
+        media_type="text/event-stream",
+    )
+```
+
+The body of the event loop doesn't change at all; the three branches you wrote in Part 6 still handle tokens and tool calls exactly as before. The only new thing is `config`, slotted in as the second argument, carrying the one fact the checkpointer was asking for.
+
+Now look at what `inputs` still is: a single message, the one the user just typed. Not the whole history. That feels wrong the first time, so here's the picture that makes it click.
+
+<Figure
+  src="/images/series/langgraph/part-7/fig-checkpoint-cycle-light.svg"
+  srcDark="/images/series/langgraph/part-7/fig-checkpoint-cycle-dark.svg"
+  alt="A three-stage diagram titled 'Every turn: load, run, save'. Stage 1, LOAD: the checkpointer fills the tray with the saved history (you 'My name is Alex.', bot 'Nice to meet you, Alex.') plus your new line (you 'What's my name?' in accent). An arrow points to stage 2, RUN: the llm node reads the whole tray so it can answer in context. An arrow points to stage 3, SAVE: the reply is appended (bot 'Your name is Alex.' in green) and the notebook is written back, growing by two lines, ready for the next turn."
+  caption="Why you only send the newest message. The checkpointer loads the saved history onto the tray before the node runs, and saves the grown tray after. You supply one line; it supplies the rest."
+  width={1320}
+  height={560}
+/>
+
+Remember the `add_messages` reducer from Part 3, the rule that *appends* to the message list instead of replacing it? This is its payoff. The checkpointer loads the saved messages onto the tray, your one new message gets appended by that reducer, the model sees the full conversation, and its reply gets appended and saved. You send one message; the graph remembers the rest. That's the trade the checkpointer makes for you on every turn.
+
+## The frontend picks a name for the chat
+
+The backend is ready to remember, but the frontend isn't sending a `thread_id` yet. Open `frontend/app/page.tsx`. The plan: on first load, mint a random id and stash it in `localStorage` so it survives refreshes, then send it with every message.
+
+Add a piece of state for the current thread and an effect that sets it up once:
+
+```tsx filename="frontend/app/page.tsx"
+const [threadId, setThreadId] = useState("");
+
+useEffect(() => {
+  let id = localStorage.getItem("thread_id");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("thread_id", id);
+  }
+  setThreadId(id);
+}, []);
+```
+
+On the first visit there's nothing stored, so `crypto.randomUUID()` mints a fresh id like `a1b2c3d4-...` and saves it. On every visit after, the stored id comes straight back, so the same browser keeps talking to the same notebook. Now send it: add `thread_id` to the body of your `fetch`:
+
+```tsx filename="frontend/app/page.tsx"
+body: JSON.stringify({ message: text, thread_id: threadId }),
+```
+
+<Callout type="info" title="What localStorage is, and isn't">
+`localStorage` is a small box of string-to-string storage the browser keeps for your site, and it stays put across refreshes and restarts. Perfect for a thread id you don't want to lose on reload. The catch: it lives in *one* browser on *one* device. Open the site in a different browser or on your phone and you get a different, empty box, so a different conversation. It's a client-side convenience, not a real per-user account, and Part 8's closing notes point at what you'd reach for when you outgrow it.
+</Callout>
+
+Save both files, send your name, then ask for it back. The bot remembers. Same streaming, same tool bubbles, but now the conversation has a spine.
+
+<Figure
+  src="/images/series/langgraph/part-7/browser-memory-final-light.svg"
+  srcDark="/images/series/langgraph/part-7/browser-memory-final-dark.svg"
+  alt="The chat UI at localhost:3000 with a New chat button in the top right. The conversation reads: user 'My name is Alex.', assistant 'Nice to meet you, Alex.', user 'What's my name?', assistant 'Your name is Alex.' The bot recalls the name from earlier in the conversation."
+  caption="The payoff. The same shot from the top of the page, now real. The thread_id rode along on every request, the checkpointer kept the notebook, and the bot read its own history before answering."
+  width={1120}
+  height={462}
+/>
+
+## A button that starts fresh
+
+One thread is a great start, but you'll want to begin a clean conversation without the old one bleeding in. That's a "New chat" button, and it's three lines of logic: mint a new id, point `localStorage` at it, and clear the messages on screen.
+
+```tsx filename="frontend/app/page.tsx"
+function newChat() {
+  const id = crypto.randomUUID();
+  localStorage.setItem("thread_id", id);
+  setThreadId(id);
+  setMessages([]);
+}
+```
+
+The old conversation isn't deleted; its notebook still sits in the checkpointer under its old id. You've just opened a brand-new blank one and pointed the UI at it. Drop a button in your card header next to the title:
+
+```tsx filename="frontend/app/page.tsx"
+<div className="flex items-center justify-between border-b px-5 py-4">
+  <span className="font-semibold">Chatbot</span>
+  <Button variant="outline" size="sm" onClick={newChat}>
+    + New chat
+  </Button>
+</div>
+```
+
+Click it and the screen wipes clean. Tell the new chat a different name, ask it back: it knows the new name and has no memory of the old thread. Two separate notebooks, exactly as the diagram promised.
+
+Right now you have a bot that holds a real conversation, survives a page refresh, and can start over on demand. For most readers that's a perfect place to stop, and the part is complete. The rest is a stretch goal that's genuinely fun: a sidebar of every chat you've had, click to jump back in.
+
+## Stretch: a shelf of past conversations
+
+Here's the honest scope before you start, because this is the one section in the series that adds real surface area. To list past chats you need to remember their ids on the frontend; to *reopen* one you need to rebuild its messages, which means a new backend endpoint that reads a thread's history out of the checkpointer. None of it is hard, but it's more moving parts than a one-line button. If you'd rather ship what you have, skip to the recap; nothing below changes what you already built.
+
+### Reading a thread back out of memory
+
+The checkpointer already holds every conversation. You need a way to ask it for one. LangGraph exposes the saved state through `get_state`, and there's an async version, `aget_state`, that fits a `async def` endpoint cleanly. Add this to `main.py`:
+
+```python filename="backend/app/main.py"
+class StoredMessage(BaseModel):
+    role: str
+    content: str
+
+
+@app.get("/threads/{thread_id}/messages")
+async def thread_messages(thread_id: str) -> list[StoredMessage]:
+    config = {"configurable": {"thread_id": thread_id}}
+    snapshot = await graph.aget_state(config)
+    messages = snapshot.values.get("messages", [])
+    return [
+        StoredMessage(role="user" if m.type == "human" else "assistant", content=m.content)
+        for m in messages
+        if m.type in ("human", "ai") and m.content
+    ]
+```
+
+`aget_state` hands back a snapshot of the thread; `snapshot.values` is the saved state dict, and `.get("messages", [])` pulls the list out, falling back to empty for a thread that was never used. Each stored message carries a `.type`, one of `human`, `ai`, or `tool`, and we keep the human and assistant text, mapping it to the `{role, content}` shape the frontend already speaks. The `and m.content` filter drops the empty-bodied turns the model emits while it's calling a tool, so the rebuilt history reads like a clean conversation.
+
+<Callout type="info" title="Why we skip the tool messages on rebuild">
+A live conversation shows tool bubbles as they happen (Part 6). When we rebuild an old thread from storage, we replay only the human and assistant text, not the intermediate tool calls. It keeps this endpoint small and the restored chat readable. Replaying tool bubbles from history is doable, the data is right there in the `tool`-typed messages, but it's more shape-juggling than this stretch needs, so we draw the line here on purpose.
+</Callout>
+
+Prove it works before touching the UI. Open a Python shell in your backend and read a thread straight back:
+
+<Figure
+  src="/images/series/langgraph/part-7/term-get-state.svg"
+  alt="A dark python REPL in the backend. The commands build a config with thread_id 'a1b2', call snapshot = graph.get_state(config), and loop printing m.type and m.content for each message in snapshot.values['messages']. The output lists the full stored conversation: human 'My name is Alex.', ai 'Nice to meet you, Alex.', human 'What's my name?', ai 'Your name is Alex.' A comment notes this is the whole conversation read straight back out of memory."
+  caption="The conversation, read back out of the checkpointer. This is exactly what the new endpoint serves: the saved history of one thread, addressed by its id."
+  width={1040}
+  height={420}
+/>
+
+### Listing and switching threads in the UI
+
+Back in `page.tsx`. The frontend needs to remember which threads exist and let you click between them. Keep a small list of `{ id, title }` objects in state and in `localStorage`, alongside the active thread id:
+
+```tsx filename="frontend/app/page.tsx"
+type Thread = { id: string; title: string };
+const [threads, setThreads] = useState<Thread[]>([]);
+
+useEffect(() => {
+  setThreads(JSON.parse(localStorage.getItem("threads") ?? "[]"));
+}, []);
+```
+
+When a brand-new thread sends its first message, record it with that message as its title. Add this at the top of `sendMessage`, right where you append the user's message:
+
+```tsx filename="frontend/app/page.tsx"
+if (messages.length === 0) {
+  const entry = { id: threadId, title: text };
+  const updated = [entry, ...threads];
+  setThreads(updated);
+  localStorage.setItem("threads", JSON.stringify(updated));
+}
+```
+
+To reopen a thread, point at its id and pull its messages from the new endpoint. Two small functions handle it:
+
+```tsx filename="frontend/app/page.tsx"
+async function loadThread(id: string) {
+  const res = await fetch(`${API_BASE}/threads/${id}/messages`);
+  if (res.ok) setMessages(await res.json());
+}
+
+function switchThread(id: string) {
+  localStorage.setItem("thread_id", id);
+  setThreadId(id);
+  loadThread(id);
+}
+```
+
+`loadThread` asks the backend for a thread's history and drops it into `messages`; the `{role, content}` objects it returns already match your assistant and user bubbles, so they render with no extra work. `switchThread` makes that thread the active one so your next message continues it. Finally, render the list as a sidebar and let the whole layout sit side by side:
+
+```tsx filename="frontend/app/page.tsx"
+<aside className="w-56 shrink-0 border-r p-3">
+  <Button variant="outline" size="sm" className="w-full" onClick={newChat}>
+    + New chat
+  </Button>
+  <nav className="mt-3 space-y-1">
+    {threads.map((t) => (
+      <button
+        key={t.id}
+        onClick={() => switchThread(t.id)}
+        className={`block w-full truncate rounded-md px-3 py-2 text-left text-sm ${
+          t.id === threadId ? "bg-muted font-medium text-primary" : "text-muted-foreground"
+        }`}
+      >
+        {t.title}
+      </button>
+    ))}
+  </nav>
+</aside>
+```
+
+Each button is one saved thread; clicking it swaps the conversation under you. The active one gets the accent treatment so you always know which notebook you're writing in.
+
+<Figure
+  src="/images/series/langgraph/part-7/browser-sidebar-light.svg"
+  srcDark="/images/series/langgraph/part-7/browser-sidebar-dark.svg"
+  alt="The chat UI at localhost:3000 with a left sidebar labeled CHATS and a New chat button. The sidebar lists three past conversations: 'My name is Alex...' highlighted as active in accent, 'Explain recursion', and '23 × 17 and Tokyo'. The main panel shows the active Alex conversation with the bot correctly recalling the name."
+  caption="The finished thing. Every conversation is a notebook on the shelf; click one to open it. Each lives under its own thread_id in the same checkpointer the bot reads on every turn."
+  width={1180}
+  height={550}
+/>
+
+## The catch hiding in InMemorySaver
+
+You built real memory without a database, and that's the magic trick, but it's worth knowing exactly how the trick works. `InMemorySaver` keeps every thread in a plain dict inside the running Python process. It's fast, it's zero-setup, and it vanishes the instant that process stops. Restart the server and every conversation is gone, every notebook blank. This is the goldfish bowl labeled PROD from the comic: it works beautifully right up until something restarts.
+
+<Callout type="info" title="When you outgrow the goldfish bowl">
+The fix is to swap the saver for one that writes to durable storage. LangGraph ships `SqliteSaver` (a single local file) and `PostgresSaver` (a real database), and because they share the checkpointer interface, switching is mostly a one-line change to how you build `checkpointer`. We're staying with `InMemorySaver` through Part 8 to keep the deploy simple, and the closing section there points you at the durable options when you're ready. For now, knowing the limit is enough.
+</Callout>
+
+Here's the full `frontend/app/page.tsx` after this part, sidebar and all, in case a piece drifted while you wired it up:
+
+```tsx filename="frontend/app/page.tsx" collapsed
+"use client";
+
+import { useState, useRef, useEffect, type FormEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+
+type Message =
+  | { role: "user" | "assistant"; content: string }
+  | { role: "tool"; name: string; args: Record<string, unknown>; result: string | null };
+
+type Thread = { id: string; title: string };
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+function ToolCallBubble({ name, args, result }: {
+  name: string;
+  args: Record<string, unknown>;
+  result: string | null;
+}) {
+  const argText = Object.values(args).join(", ");
+  return (
+    <div className="text-left">
+      <span className="inline-flex flex-col gap-0.5 rounded-xl border border-dashed px-3 py-2 font-mono text-xs text-muted-foreground">
+        <span className="text-foreground">
+          <span className="font-semibold">{name}</span>({argText})
+        </span>
+        <span>{result === null ? "running…" : `→ ${result}`}</span>
+      </span>
+    </div>
+  );
+}
+
+export default function Chat() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [controller, setController] = useState<AbortController | null>(null);
+  const [threadId, setThreadId] = useState("");
+  const [threads, setThreads] = useState<Thread[]>([]);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let id = localStorage.getItem("thread_id");
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem("thread_id", id);
+    }
+    setThreadId(id);
+    setThreads(JSON.parse(localStorage.getItem("threads") ?? "[]"));
+  }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  function appendToken(token: string) {
+    setMessages((prev) => {
+      const last = prev[prev.length - 1];
+      if (last && last.role === "assistant") {
+        const next = [...prev];
+        next[next.length - 1] = { ...last, content: last.content + token };
+        return next;
+      }
+      return [...prev, { role: "assistant", content: token }];
+    });
+  }
+
+  function startTool(name: string, args: Record<string, unknown>) {
+    setMessages((prev) => [...prev, { role: "tool", name, args, result: null }]);
+  }
+
+  function endTool(result: string) {
+    setMessages((prev) => {
+      const next = [...prev];
+      for (let i = next.length - 1; i >= 0; i--) {
+        const m = next[i];
+        if (m.role === "tool" && m.result === null) {
+          next[i] = { ...m, result };
+          break;
+        }
+      }
+      return next;
+    });
+  }
+
+  function newChat() {
+    const id = crypto.randomUUID();
+    localStorage.setItem("thread_id", id);
+    setThreadId(id);
+    setMessages([]);
+    setError(null);
+  }
+
+  async function loadThread(id: string) {
+    const res = await fetch(`${API_BASE}/threads/${id}/messages`);
+    if (res.ok) setMessages(await res.json());
+  }
+
+  function switchThread(id: string) {
+    localStorage.setItem("thread_id", id);
+    setThreadId(id);
+    loadThread(id);
+  }
+
+  function stop() {
+    controller?.abort();
+  }
+
+  async function sendMessage(e: FormEvent) {
+    e.preventDefault();
+    const text = input.trim();
+    if (!text || loading) return;
+
+    if (messages.length === 0) {
+      const updated = [{ id: threadId, title: text }, ...threads];
+      setThreads(updated);
+      localStorage.setItem("threads", JSON.stringify(updated));
+    }
+
+    setMessages((prev) => [...prev, { role: "user", content: text }]);
+    setInput("");
+    setLoading(true);
+    setError(null);
+
+    const controller = new AbortController();
+    setController(controller);
+
+    try {
+      const res = await fetch(`${API_BASE}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text, thread_id: threadId }),
+        signal: controller.signal,
+      });
+      if (!res.ok || !res.body) throw new Error();
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split("\n\n");
+        buffer = parts.pop() ?? "";
+        for (const part of parts) {
+          if (!part.startsWith("data: ")) continue;
+          const envelope = JSON.parse(part.slice(6));
+          if (envelope.type === "token") appendToken(envelope.content);
+          else if (envelope.type === "tool_start") startTool(envelope.name, envelope.args);
+          else if (envelope.type === "tool_end") endTool(envelope.result);
+        }
+      }
+    } catch (err) {
+      if ((err as Error).name !== "AbortError") {
+        setError("Could not reach the backend. Is it running on :8000?");
+      }
+    } finally {
+      setLoading(false);
+      setController(null);
+    }
+  }
+
+  return (
+    <main className="mx-auto flex h-dvh max-w-4xl flex-col p-4">
+      <Card className="flex flex-1 overflow-hidden">
+        <aside className="w-56 shrink-0 border-r p-3">
+          <Button variant="outline" size="sm" className="w-full" onClick={newChat}>
+            + New chat
+          </Button>
+          <nav className="mt-3 space-y-1">
+            {threads.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => switchThread(t.id)}
+                className={`block w-full truncate rounded-md px-3 py-2 text-left text-sm ${
+                  t.id === threadId ? "bg-muted font-medium text-primary" : "text-muted-foreground"
+                }`}
+              >
+                {t.title}
+              </button>
+            ))}
+          </nav>
+        </aside>
+
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <div className="border-b px-5 py-4 font-semibold">Chatbot</div>
+          <div className="flex-1 space-y-4 overflow-y-auto p-5">
+            {messages.map((m, i) =>
+              m.role === "tool" ? (
+                <ToolCallBubble key={i} name={m.name} args={m.args} result={m.result} />
+              ) : (
+                <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
+                  <span className={`inline-block max-w-[75%] rounded-2xl px-4 py-2 ${
+                    m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+                  }`}>
+                    {m.content}
+                    {loading && m.role === "assistant" && i === messages.length - 1 && (
+                      <span className="ml-0.5 animate-pulse">▍</span>
+                    )}
+                  </span>
+                </div>
+              )
+            )}
+            <div ref={bottomRef} />
+          </div>
+          {error && (
+            <p className="mx-5 mb-2 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">
+              {error}
+            </p>
+          )}
+          <form onSubmit={sendMessage} className="flex gap-2 border-t p-4">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask me anything..."
+              disabled={loading}
+            />
+            {loading ? (
+              <Button type="button" variant="outline" onClick={stop}>
+                Stop
+              </Button>
+            ) : (
+              <Button type="submit">Send</Button>
+            )}
+          </form>
+        </div>
+      </Card>
+    </main>
+  );
+}
+```
+
+<Recap
+  part={7}
+  items={[
+    "A checkpointer wired into the graph with one line, `builder.compile(checkpointer=InMemorySaver())`, so the graph saves and reloads its own state.",
+    "Threads: every conversation is keyed by a `thread_id`, generated with `crypto.randomUUID()` and kept in `localStorage` so it survives refreshes.",
+    "The thread wired end to end: the frontend sends `thread_id`, the backend passes it as the graph's `config`, and the bot reads its own history before each reply.",
+    "A `New chat` button that mints a fresh thread, and a sidebar that lists past chats and reopens them via a `GET /threads/{id}/messages` endpoint reading from the checkpointer.",
+    "A clear-eyed view of the limit: `InMemorySaver` lives in RAM, so every conversation is wiped on restart, the problem Part 8 leaves you ready to solve.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "Why did the Part 6 bot forget your name between two messages?",
+      options: [
+        "The model is too small to hold a conversation",
+        "Each `/chat` request ran the graph fresh with only the message you just sent, and nothing carried the past between requests",
+        "The frontend deleted old messages to save memory",
+        "Tools overwrote the conversation history",
+      ],
+      answer: 1,
+      explain: "Without a checkpointer, every request built `inputs` from a single message, ran the graph, and threw the state away when the request ended. There was nothing being saved between calls, so each turn started from zero.",
+    },
+    {
+      q: "What is a `thread_id`?",
+      options: [
+        "The model's internal session token",
+        "A unique string that names one conversation, used as the key the checkpointer stores and looks up that conversation's history under",
+        "The id of the Python thread the server runs on",
+        "A counter that increments with every message",
+      ],
+      answer: 1,
+      explain: "A thread is one continuous conversation; its `thread_id` is a unique label for it. Same id means same saved notebook and same memory; a new id is a blank one. It's the key the checkpointer reads and writes against.",
+    },
+    {
+      q: "After adding the checkpointer, the server crashed with `ValueError: Checkpointer requires one or more of the following 'configurable' keys`. Why?",
+      options: [
+        "`InMemorySaver` was installed incorrectly",
+        "A graph with a checkpointer must be told which thread it's working on via config, and you hadn't passed a `thread_id` yet",
+        "The model ran out of context window",
+        "The frontend sent malformed JSON",
+      ],
+      answer: 1,
+      explain: "The instant the graph has a memory, it refuses to run without knowing which conversation to read and write. You enabled the checkpointer but were still calling the graph with no `config`, so LangGraph stopped you instead of silently mixing threads.",
+    },
+    {
+      q: "With memory on, why does the backend still send only the newest message to the graph, not the whole history?",
+      options: [
+        "To save on bandwidth",
+        "The checkpointer loads the saved history onto the tray before the node runs and saves the result after, and `add_messages` appends your new message to it",
+        "The model only accepts one message at a time",
+        "Old messages are stored on the frontend instead",
+      ],
+      answer: 1,
+      explain: "On each turn the checkpointer reloads the thread's saved messages, the `add_messages` reducer from Part 3 appends your one new message, and the grown list is saved again. You supply the new line; the graph supplies the rest.",
+    },
+    {
+      q: "The series uses `InMemorySaver`. What happens to every conversation when the server restarts?",
+      options: [
+        "Nothing; conversations are written to a database",
+        "Only the active thread is kept; the rest are cleared",
+        "Every thread is gone, because `InMemorySaver` keeps all state in the process's RAM and a restart wipes it",
+        "They're reloaded from `localStorage` on the frontend",
+      ],
+      answer: 2,
+      explain: "`InMemorySaver` stores threads in a plain dict inside the running process. It's perfect for development and zero-setup, but a restart erases everything. That's the goldfish bowl labeled PROD, and swapping in `SqliteSaver` or `PostgresSaver` is the durable fix Part 8 points to.",
+    },
+  ]}
+/>
+
+Commit it, from the project root, in a terminal that isn't hosting a server:
+
+```bash
+git add .
+git commit -m "part 7: give the bot conversation memory with a checkpointer and threads"
+```
+
+Your bot remembers you now, runs tools, and streams its answers, the whole thing humming on your laptop. There's one wall left: it only exists on your machine. In Part 8 you'll put it on the public internet, share the link, and watch it forget everyone the first time you redeploy, which turns out to be the perfect reason to care about everything this part taught you.
+
+{/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-7-memory) in the intro once it exists. */}
+
+{/* TODO once the Concepts page (langgraph-concepts.mdx) ships: link "checkpointer", "threads", and "localStorage" to /blog/langgraph-concepts#checkpointers, #threads (or #react-pattern neighborhood), and #local-storage instead of defining only inline. */}
+
+{/* ANECDOTE slot (optional upgrade, WRITING-STYLE §6): a true first-person story from Yadnesh about a deployed bot or service that lost its memory/state on a restart or redeploy, or the first time he realized in-memory state wouldn't survive production, 3 beats, 5 sentences max. If provided, it slots into "The catch hiding in InMemorySaver". */}

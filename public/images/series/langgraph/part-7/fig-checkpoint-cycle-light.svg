@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="560" viewBox="0 0 1320 560">
+  <rect width="1320" height="560" fill="#faf9f6"/>
+  <text x="64" y="86" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" letter-spacing="2.5" fill="#8f887a">EVERY TURN &#183; LOAD, RUN, SAVE</text>
+  <rect x="64" y="150" width="360" height="300" rx="14" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="90" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" letter-spacing="2" fill="#b3441a">1 &#183; LOAD</text>
+  <text x="90" y="232" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17.5" fill="#5b554c">the checkpointer fills the tray</text>
+  <rect x="90" y="252" width="205" height="38" rx="9" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.3"/>
+    <text x="104" y="277" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15.5" fill="#8f887a"><tspan font-weight="700">you</tspan> My name is Alex.</text>
+  <rect x="90" y="302" width="267" height="38" rx="9" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.3"/>
+    <text x="104" y="327" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15.5" fill="#8f887a"><tspan font-weight="700">bot</tspan> Nice to meet you, Alex.</text>
+  <rect x="90" y="352" width="196" height="38" rx="9" fill="#f6e7df" stroke="#dcb09a" stroke-width="1.3"/>
+    <text x="104" y="377" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15.5" fill="#b3441a"><tspan font-weight="700">you</tspan> What's my name?</text>
+  <text x="90" y="418" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#8f887a">saved history + <tspan fill="#b3441a">your new line</tspan></text>
+  <rect x="480" y="150" width="360" height="300" rx="14" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="506" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" letter-spacing="2" fill="#8f887a">2 &#183; RUN</text>
+  <text x="660" y="298" font-family="Georgia, 'Times New Roman', serif" font-size="27" fill="#1f1c19" text-anchor="middle">the llm node reads</text>
+  <text x="660" y="336" font-family="Georgia, 'Times New Roman', serif" font-size="27" fill="#1f1c19" text-anchor="middle">the whole tray</text>
+  <text x="660" y="382" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17.5" fill="#5b554c" text-anchor="middle">so it can answer in context</text>
+  <rect x="896" y="150" width="360" height="300" rx="14" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="922" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" letter-spacing="2" fill="#4f7a46">3 &#183; SAVE</text>
+  <text x="922" y="232" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17.5" fill="#5b554c">the reply is appended, written back</text>
+  <rect x="922" y="252" width="196" height="38" rx="9" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.3"/>
+    <text x="936" y="277" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15.5" fill="#8f887a"><tspan font-weight="700">you</tspan> What's my name?</text>
+  <rect x="922" y="302" width="223" height="38" rx="9" fill="#e9f0e4" stroke="#cdddc1" stroke-width="1.3"/>
+    <text x="936" y="327" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15.5" fill="#4f7a46"><tspan font-weight="700">bot</tspan> Your name is Alex.</text>
+  <text x="922" y="368" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#8f887a">the notebook grows by two lines</text>
+  <text x="922" y="400" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#8f887a">ready for the next turn</text>
+  <line x1="432" y1="300" x2="463" y2="300" stroke="#5b554c" stroke-width="2.5"/>
+  <path d="M 462 294 L 462 306 L 472 300 Z" fill="#5b554c"/>
+  <line x1="848" y1="300" x2="879" y2="300" stroke="#5b554c" stroke-width="2.5"/>
+  <path d="M 878 294 L 878 306 L 888 300 Z" fill="#5b554c"/>
+  <line x1="64" y1="504" x2="1256" y2="504" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="64" y="540" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#5b554c">This is why you send only the <tspan font-style="italic" fill="#b3441a">newest</tspan> message. The checkpointer supplies the rest and saves the result.</text>
+</svg>
