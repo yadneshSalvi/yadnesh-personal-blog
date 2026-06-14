@@ -51,3 +51,4 @@ next-env.d.ts
 /scripts/gen-part3-svgs.mjs
 /scripts/gen-part4-svgs.mjs
 /scripts/gen-part5-svgs.mjs
+/scripts/gen-part6-svgs.mjs

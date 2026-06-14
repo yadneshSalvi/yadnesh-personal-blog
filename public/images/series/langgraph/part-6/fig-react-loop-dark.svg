@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="600" viewBox="0 0 1240 600">
+  <rect width="1240" height="600" fill="#151311"/>
+  <text x="64" y="76" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" letter-spacing="2.5" fill="#756d62">THE LOOP &#183; REASON, ACT, OBSERVE, REPEAT</text>
+  <path d="M 860 220 C 860 138, 480 138, 480 220" fill="none" stroke="#86aa72" stroke-width="2.5"/>
+  <path d="M 474 208 L 486 208 L 480 220 Z" fill="#86aa72"/>
+  <text x="670" y="126" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#86aa72" text-anchor="middle">the result returns; the model decides again</text>
+  <text x="118" y="288" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#756d62">your</text>
+  <text x="118" y="308" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#756d62">question</text>
+  <line x1="194" y1="300" x2="233" y2="300" stroke="#a49c90" stroke-width="2"/>
+  <path d="M 232 294 L 232 306 L 242 300 Z" fill="#a49c90"/>
+  <rect x="250" y="220" width="300" height="160" rx="14" fill="#1d1a17" stroke="#e5825a" stroke-width="3"/>
+  <text x="400" y="262" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="1.5" fill="#e5825a" text-anchor="middle">REASON &#183; THE llm NODE</text>
+  <text x="400" y="306" font-family="Georgia, 'Times New Roman', serif" font-size="21" fill="#ebe7df" text-anchor="middle">"Do I need a tool</text>
+  <text x="400" y="334" font-family="Georgia, 'Times New Roman', serif" font-size="21" fill="#ebe7df" text-anchor="middle">to answer this?"</text>
+  <rect x="790" y="220" width="320" height="160" rx="14" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="950" y="262" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="1.5" fill="#756d62" text-anchor="middle">ACT &#183; THE tools NODE</text>
+  <text x="950" y="306" font-family="Georgia, 'Times New Roman', serif" font-size="21" fill="#ebe7df" text-anchor="middle">run the chosen tool,</text>
+  <text x="950" y="334" font-family="Georgia, 'Times New Roman', serif" font-size="21" fill="#ebe7df" text-anchor="middle">hand back the result</text>
+  <text x="670" y="286" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#e5825a" text-anchor="middle">routes to "tools"</text>
+  <line x1="558" y1="306" x2="773" y2="306" stroke="#e5825a" stroke-width="2.5"/>
+  <path d="M 772 300 L 772 312 L 782 306 Z" fill="#e5825a"/>
+  <line x1="400" y1="380" x2="400" y2="462" stroke="#a49c90" stroke-width="2"/>
+  <path d="M 394 461 L 406 461 L 400 472 Z" fill="#a49c90"/>
+  <text x="418" y="431" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#756d62" text-anchor="start">routes to "__end__"</text>
+  <rect x="235" y="472" width="330" height="50" rx="12" fill="#2a201a" stroke="#5e463a" stroke-width="1.5"/>
+  <text x="400" y="503" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#e5825a" text-anchor="middle">no tool needed &#8594; final answer streams</text>
+  <line x1="64" y1="536" x2="1176" y2="536" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="64" y="572" font-family="Georgia, 'Times New Roman', serif" font-size="18" fill="#a49c90">For "23 &#215; 17 plus the population of Tokyo," the loop runs twice: once for the calculator, once for search, then it finishes.</text>
+</svg>

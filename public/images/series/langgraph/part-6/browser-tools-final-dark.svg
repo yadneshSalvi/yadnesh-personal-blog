@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="631" viewBox="0 0 1120 631" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="631" fill="#0c0a09"/>
+
+  <!-- browser chrome -->
+  <rect x="0" y="0" width="1120" height="64" fill="#211e1a"/>
+  <line x1="0" y1="64" x2="1120" y2="64" stroke="#2b2723" stroke-width="1.5"/>
+  <circle cx="32" cy="32" r="8" fill="#3a3530"/><circle cx="60" cy="32" r="8" fill="#3a3530"/><circle cx="88" cy="32" r="8" fill="#3a3530"/>
+  <rect x="300" y="14" width="520" height="36" rx="18" fill="#1a1816" stroke="#3a3530"/>
+  <text x="560" y="38" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#a49c90" text-anchor="middle">localhost:3000</text>
+
+  <!-- chat card -->
+  <rect x="200" y="98" width="720" height="499" rx="16" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="228" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#fafaf9">Chatbot</text>
+  <line x1="200" y1="164" x2="920" y2="164" stroke="#242020" stroke-width="1.5"/>
+  
+  <rect x="473" y="190" width="419" height="47" rx="16" fill="#fafaf9"/>
+  <text x="491" y="219" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1c1917">What is 23 × 17, and the population of Tokyo?</text>
+  <rect x="228" y="253" width="200" height="66" rx="12" fill="#1a1715" stroke="#3a3530" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <rect x="229" y="263" width="3" height="46" rx="1.5" fill="#e5825a"/>
+  <text x="254" y="279" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#fafaf9"><tspan font-weight="700" fill="#e5825a">calculator</tspan>(23 * 17)</text>
+  <text x="254" y="301" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#86aa72">→ 391</text>
+  <rect x="228" y="335" width="322" height="66" rx="12" fill="#1a1715" stroke="#3a3530" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <rect x="229" y="345" width="3" height="46" rx="1.5" fill="#e5825a"/>
+  <text x="254" y="361" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#fafaf9"><tspan font-weight="700" fill="#e5825a">tavily_search</tspan>(population of Tokyo)</text>
+  <text x="254" y="383" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#86aa72">→ Tokyo: ~14 million (city proper)</text>
+  <rect x="228" y="417" width="351" height="70" rx="16" fill="#292524"/>
+  <text x="246" y="446" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#fafaf9">23 × 17 is 391, and Tokyo has about</text>
+  <text x="246" y="469" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#fafaf9">14 million people in the city proper.</text>
+
+  <!-- footer: input + send/stop -->
+  <line x1="200" y1="509" x2="920" y2="509" stroke="#242020" stroke-width="1.5"/>
+  <rect x="224" y="533" width="580" height="44" rx="10" fill="#0c0a09" stroke="#292524" stroke-width="1.5"/>
+  <text x="242" y="561" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#78716c">Ask me anything...</text>
+  <rect x="820" y="533" width="76" height="44" rx="10" fill="#fafaf9"/>
+  <text x="858" y="561" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917" text-anchor="middle">Send</text>
+</svg>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="540" viewBox="0 0 1180 540">
+  <rect width="1180" height="540" fill="#faf9f6"/>
+  <text x="64" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" letter-spacing="2.5" fill="#8f887a">WHAT "TOOL CALLING" ACTUALLY IS</text>
+  <rect x="64" y="150" width="300" height="230" rx="14" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <rect x="64" y="150" width="6" height="230" rx="3" fill="#b3441a"/>
+  <text x="94" y="190" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2" fill="#8f887a">THE MODEL</text>
+  <text x="94" y="236" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#1f1c19">"I can't multiply</text>
+  <text x="94" y="264" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#1f1c19">23 &#215; 17 in my head.</text>
+  <text x="94" y="292" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#1f1c19">I'll ask for help."</text>
+  <text x="94" y="340" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#5b554c">writes the request, does not run it</text>
+  <rect x="816" y="150" width="300" height="230" rx="14" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="846" y="190" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2" fill="#8f887a">YOUR APP</text>
+  <text x="846" y="234" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#5b554c">runs the real function</text>
+  <rect x="844" y="250" width="244" height="34" rx="8" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.2"/>
+  <text x="966" y="272" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#1f1c19" text-anchor="middle">calculator("23 * 17")</text>
+  <text x="846" y="316" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#5b554c">and gets a real number:</text>
+  <text x="846" y="346" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="20" font-weight="700" fill="#4f7a46">391</text>
+  <line x1="372" y1="206" x2="799" y2="206" stroke="#b3441a" stroke-width="2.5"/>
+  <path d="M 798 200 L 798 212 L 808 206 Z" fill="#b3441a"/>
+  <rect x="389" y="152" width="402" height="40" rx="10" fill="#f6e7df" stroke="#dcb09a" stroke-width="1.2"/>
+  <text x="590" y="178" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#b3441a" text-anchor="middle">tool call: calculator(expression="23 * 17")</text>
+  <line x1="808" y1="340" x2="381" y2="340" stroke="#4f7a46" stroke-width="2.5"/>
+  <path d="M 382 334 L 382 346 L 372 340 Z" fill="#4f7a46"/>
+  <rect x="516.5" y="354" width="147" height="38" rx="10" fill="#e9f0e4" stroke="#cdddc1" stroke-width="1.2"/>
+  <text x="590" y="379" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#4f7a46" text-anchor="middle">result: "391"</text>
+  <line x1="64" y1="452" x2="1116" y2="452" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="64" y="490" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#1f1c19">The model never runs your code. It writes down <tspan font-style="italic" fill="#b3441a">what</tspan> to run, your app runs it, and the answer rides back.</text>
+</svg>

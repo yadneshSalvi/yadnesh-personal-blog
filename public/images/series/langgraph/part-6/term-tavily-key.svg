@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="470" viewBox="0 0 1040 470" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="470" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; backend</text>
+  <g font-size="14.5" fill="#d8d2c6" xml:space="preserve">
+    <text x="32" y="92"><tspan fill="#756d62">(.venv) $</tspan> uvicorn app.main:app --reload</text>
+    <text x="32" y="124" fill="#756d62">  ...</text>
+    <text x="32" y="152" fill="#756d62">  File ".../langchain_tavily/tavily_search.py", line 342, in __init__</text>
+    <text x="32" y="180" fill="#756d62">  File ".../pydantic/main.py", line 263, in __init__</text>
+    <text x="32" y="220" fill="#e5825a">pydantic_core._pydantic_core.ValidationError: 1 validation error</text>
+    <text x="32" y="248" fill="#e5825a">for TavilySearchAPIWrapper</text>
+    <text x="56" y="282" fill="#d8d2c6">Value error, Did not find tavily_api_key, please add an</text>
+    <text x="56" y="310" fill="#d8d2c6">environment variable <tspan fill="#8fb573">TAVILY_API_KEY</tspan> which contains it,</text>
+    <text x="56" y="338" fill="#d8d2c6">or pass <tspan fill="#8fb573">tavily_api_key</tspan> as a named parameter.</text>
+    <text x="32" y="378" fill="#e5825a">ERROR:    Application startup failed. Exiting.</text>
+    <text x="32" y="424" fill="#756d62"># the server won't boot until Tavily can see its key</text>
+  </g>
+</svg>

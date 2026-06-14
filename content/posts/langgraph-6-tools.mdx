@@ -1,0 +1,520 @@
+---
+title: "LangGraph from Scratch, Part 6: Giving the Bot Tools"
+subtitle: "Your bot stops guessing. It calls a real calculator and a real web search, decides for itself when to reach for them, and streams the work back to the UI over the exact belt you built in Part 5."
+image: "/images/series/langgraph/part-6/cover-light.svg"
+imageDark: "/images/series/langgraph/part-6/cover-dark.svg"
+createdAt: "2026-06-14T00:00:00.000Z"
+updatedAt: "2026-06-14T00:00:00.000Z"
+tags: ["langgraph", "fastapi", "tools", "tutorial"]
+series: "langgraph-fastapi-nextjs"
+seriesPart: 6
+---
+
+Ask your bot from Part 5 what 23 times 17 is. It will answer with total confidence, and there's a real chance it's wrong. Ask it for today's headlines and it will invent some. The model isn't lying on purpose. It's a brilliant improviser that has never once done arithmetic or seen the internet. It pattern-matches words, and sometimes the pattern for "23 times 17" lands on the wrong number.
+
+By the end of this page, your bot stops guessing. It gets a calculator that's always right and a web search that actually looks things up, and, the part that makes it an *agent* instead of a chatbot, it decides on its own when to use them.
+
+<Figure
+  src="/images/series/langgraph/part-6/browser-tools-final-light.svg"
+  srcDark="/images/series/langgraph/part-6/browser-tools-final-dark.svg"
+  alt="The chat UI at localhost:3000. The user asked 'What is 23 × 17, and the population of Tokyo?'. Below it are two tool-call bubbles with dashed borders, distinct from the chat bubbles: the first reads 'calculator(23 * 17)' then '→ 391', the second reads 'tavily_search(population of Tokyo)' then '→ Tokyo: ~14 million (city proper)'. Under those, the assistant's final bubble reads '23 × 17 is 391, and Tokyo has about 14 million people in the city proper.'"
+  caption="Today's destination. One question, two tools the bot chose to call, and a final answer built from their results. The dashed bubbles are the bot showing its work."
+  width={1120}
+  height={462}
+/>
+
+This part has more moving pieces than the last, so here's the map: one new Python file for the tools, a few lines that let the model reach for them, a graph that can now loop, and two new envelope types riding the SSE belt from Part 5. You'll install one new package along the way. Let's give the bot some hands.
+
+## Why your bot is a confident liar
+
+The thing to understand before any code: a language model has no calculator inside it and no live connection to anything. It generates the most plausible next word. For "the capital of France" the most plausible continuation is "Paris," and it's right. For "23 times 17" the most plausible next token is *some* number, and the odds it's exactly 391 are not great.
+
+Tool calling fixes this by giving the model an escape hatch. When it hits something it can't do reliably, it stops guessing and asks your program to run a real function. The calculator computes 391 because it actually multiplies. Search returns real results because it actually queries the web. The model's job shrinks to the thing it's genuinely good at: deciding *which* tool to reach for and turning the result into a sentence.
+
+## What tool calling actually is
+
+Here's the part that trips everyone up, so let's be precise. The model never runs your code. It can't. It has no Python interpreter and no access to your server. What it produces is a *request*: a little structured note that says "please run the tool named `calculator` with the argument `23 * 17`." Your application reads that note, runs the real function, and hands the answer back to the model.
+
+<Figure
+  src="/images/series/langgraph/part-6/fig-tool-handoff-light.svg"
+  srcDark="/images/series/langgraph/part-6/fig-tool-handoff-dark.svg"
+  alt="A diagram titled 'What tool calling actually is'. On the left, a box labeled THE MODEL says 'I can't multiply 23 × 17 in my head. I'll ask for help,' noting it writes the request but does not run it. An accent arrow labeled 'tool call: calculator(expression 23 * 17)' points right to a box labeled YOUR APP, which runs the real function calculator(23 * 17) and gets a real number: 391. A green arrow underneath, labeled 'result: 391', points back from the app to the model."
+  caption="The handoff in one picture. The model writes down what it wants run; your app runs it; the answer rides back. The model and your code never trade places."
+  width={1180}
+  height={540}
+/>
+
+This is the whole idea, and it's why tool calling is safe to reason about: the model is a planner, your app is the only thing that ever executes. That division of labor is also why your *first* job is to write tools that are safe to hand a planner you don't fully control. Which brings us to the calculator.
+
+## A calculator that can't be turned against you
+
+Make a new file, `backend/app/tools.py`. The obvious way to build a calculator in Python is `eval("23 * 17")`, and you must never do that. `eval` runs *any* Python, and the string is coming from a model that a stranger on the internet is steering. `eval("__import__('os').system('rm -rf ~')")` is also a valid expression. Hand the model `eval` and you've handed your server to whoever talks to it.
+
+<Callout type="warning" title="Do not run that command">
+That line is printed here to make a point, not to be typed anywhere. `rm -rf ~` force-deletes your entire home directory, every file you own, with no confirmation prompt and no way to undo it, and `eval` would run it the instant the model wrote it. Never paste it into a terminal, a Python shell, or your code. It is the whole reason the calculator below refuses to touch `eval` at all.
+</Callout>
+
+So we parse the expression into a syntax tree and walk it ourselves, allowing only arithmetic and refusing everything else. Start with the imports and a whitelist of the operators we permit:
+
+```python filename="backend/app/tools.py"
+import ast
+import operator
+
+from langchain_core.tools import tool
+
+_OPERATORS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.Pow: operator.pow,
+    ast.USub: operator.neg,
+}
+```
+
+`ast.parse` turns `"23 * 17"` into a tree of nodes: a multiplication node with two number nodes under it. Our `_OPERATORS` dict maps the handful of node types we trust to the Python function that performs each one. Anything not in this dict, a function call, a name, an attribute lookup, has no entry at all, and that's the security boundary.
+
+Now the walker. It recurses through the tree, and the only nodes it knows how to handle are plain numbers and our whitelisted operators:
+
+```python filename="backend/app/tools.py"
+def _eval(node):
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPERATORS:
+        return _OPERATORS[type(node.op)](_eval(node.left), _eval(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPERATORS:
+        return _OPERATORS[type(node.op)](_eval(node.operand))
+    raise ValueError("unsupported expression")
+```
+
+Read the last line as the hero. If the tree contains anything that isn't a number, a binary operator, or a unary minus, none of the `if` branches match and `_eval` raises `ValueError`. `__import__('os').system(...)` is a function call, which is an `ast.Call` node, which has no branch, so it dies on `raise` instead of running. The whitelist is a closed door, not a list of locks to pick.
+
+Last, wrap it as a tool the model can actually see:
+
+```python filename="backend/app/tools.py"
+@tool
+def calculator(expression: str) -> str:
+    """Evaluate a basic math expression, e.g. '23 * 17 + 5'."""
+    tree = ast.parse(expression, mode="eval")
+    return str(_eval(tree.body))
+```
+
+<Callout type="info" title="What the @tool decorator does">
+`@tool` is the bridge between a plain Python function and something a model can request. It reads your function's name, its type hints, and, importantly, its docstring, and packages them into a description the model receives. The model uses that description to decide when the tool fits and what arguments to pass, so the docstring isn't a comment here, it's the instruction manual. Write it for the model: say what the tool does and give an example.
+</Callout>
+
+That docstring matters more than it looks. "Evaluate a basic math expression" is how the model knows this is the thing to reach for when it sees arithmetic. A vague docstring gets a tool the model never calls.
+
+## A tool that can see the internet
+
+The calculator you wrote by hand because it's a teaching moment. For web search you'd be reinventing a search API, so we use a prebuilt one: [Tavily](https://tavily.com), a search service shaped for LLMs. It has a free tier that's plenty for this. Sign up, grab an API key from the dashboard, and install the package:
+
+```bash
+pip install langchain-tavily
+```
+
+Then add the search tool to the bottom of `tools.py`. It's a single line, because Tavily's package already ships a ready-made tool:
+
+```python filename="backend/app/tools.py"
+from langchain_tavily import TavilySearch
+
+web_search = TavilySearch(max_results=3)
+```
+
+`TavilySearch` is already a tool, the same shape your `@tool`-decorated `calculator` produces, so the model can call it the same way. `max_results=3` keeps replies tight. Its built-in name, the one you'll see in the stream, is `tavily_search`.
+
+Now save the file and restart your server. If you skipped a step, you're about to meet a very specific error, and meeting it here on purpose is cheaper than meeting it confused at midnight.
+
+<Figure
+  src="/images/series/langgraph/part-6/term-tavily-key.svg"
+  alt="A dark backend terminal. The command '(.venv) $ uvicorn app.main:app --reload' is followed by a traceback through langchain_tavily/tavily_search.py and pydantic/main.py, ending in 'pydantic_core._pydantic_core.ValidationError: 1 validation error for TavilySearchAPIWrapper', then 'Value error, Did not find tavily_api_key, please add an environment variable TAVILY_API_KEY which contains it, or pass tavily_api_key as a named parameter.' Below that, 'ERROR: Application startup failed. Exiting.' and a comment: the server won't boot until Tavily can see its key."
+  caption="The deliberate break. TavilySearch checks for its key the instant it's constructed, which is the instant the module is imported, which is server startup. No key, no boot."
+  width={1040}
+  height={470}
+/>
+
+You saw this shape back in Part 3, when `ChatOpenAI` couldn't find its key. Same fix, new key. `TavilySearch` looks for `TAVILY_API_KEY` the moment it's built, and the server can't even start without it. Add the key to your `backend/.env`, next to the LLM key that's already there:
+
+```bash filename="backend/.env"
+OPENAI_API_KEY=sk-...
+TAVILY_API_KEY=tvly-...
+```
+
+One detail, because import order matters here. `tools.py` constructs `TavilySearch` at the top level, the moment it's imported, so it needs the `.env` loaded before that line runs. Add `load_dotenv()` to the top of `tools.py` so the file can find its own key no matter who imports it first:
+
+```python filename="backend/app/tools.py"
+from dotenv import load_dotenv
+
+load_dotenv()  # put this at the very top, above the Tavily import
+```
+
+Restart, and the server boots clean. You now have two tools sitting in a file. The model still has no idea they exist.
+
+## Teaching the model the tools exist
+
+Open `graph.py`. The model you built in Part 3 was created with `ChatOpenAI(...)` or `ChatAnthropic(...)`, whichever tab you picked. Right after that line, bind the tools to it:
+
+```python filename="backend/app/graph.py"
+from app.tools import calculator, web_search   # with your other imports
+
+tools = [calculator, web_search]
+llm = llm.bind_tools(tools)                     # right after you create llm
+```
+
+`bind_tools` returns a *new* model object that carries the tool descriptions in every request it makes. We reassign `llm` to that bound version, so `call_model` doesn't change by a single character; it still calls `llm.invoke(...)`, but now every call quietly includes "by the way, here are two tools you can ask for."
+
+<Callout type="info" title="What binding tools actually changes">
+Under the hood, `bind_tools` adds a `tools` field to the JSON your app sends the model's API on every request, listing each tool's name, description, and argument shape (all pulled from those `@tool` docstrings and type hints). The model reads that list and, instead of only being able to reply with text, gains a second option: reply with a structured tool-call request. Binding doesn't run anything or cost extra by itself. It just widens what the model is allowed to say back.
+</Callout>
+
+## A graph that can change its mind
+
+Here's the conceptual heart of the part. Until now your graph was a straight line: `START` to `llm` to `END`, every time. But a tool-using bot can't be a straight line, because the model might want to call a tool, see the result, and *then* decide it needs another one before it answers. The graph has to be able to loop.
+
+<Figure
+  src="/images/series/langgraph/part-6/fig-react-loop-light.svg"
+  srcDark="/images/series/langgraph/part-6/fig-react-loop-dark.svg"
+  alt="A diagram titled 'The loop · reason, act, observe, repeat'. A question enters a highlighted box, REASON · THE llm NODE, which asks 'Do I need a tool to answer this?'. An accent arrow labeled 'routes to tools' points right to a box, ACT · THE tools NODE, which runs the chosen tool and hands back the result. A curved arrow over the top, labeled 'the result returns; the model decides again', loops from the act box back to the reason box. A separate arrow drops down from the reason box, labeled 'routes to __end__', into a box reading 'no tool needed → final answer streams'."
+  caption="The ReAct loop. The model reasons about whether it needs a tool, acts by calling one, observes the result, and reasons again. It leaves the loop only when it has nothing left to look up."
+  width={1240}
+  height={600}
+/>
+
+That pattern, reason then act then observe then repeat, is called the ReAct loop, and LangGraph gives you every piece of it prebuilt. You need three changes to the graph: a node that runs tools, an edge that decides whether to use it, and an edge that loops back. Replace your old wiring block in `graph.py` with this:
+
+```python filename="backend/app/graph.py"
+from langgraph.prebuilt import ToolNode, tools_condition
+
+builder = StateGraph(State)
+builder.add_node("llm", call_model)
+builder.add_node("tools", ToolNode(tools))
+builder.add_edge(START, "llm")
+builder.add_conditional_edges("llm", tools_condition)
+builder.add_edge("tools", "llm")
+graph = builder.compile()
+```
+
+Three lines are new, and each one maps to a piece of the loop diagram. `add_node("tools", ToolNode(tools))` adds the **ACT** station: `ToolNode` is LangGraph's prebuilt runner that reads the model's tool-call request, executes the matching function, and puts the result back on the tray. You hand it the same `tools` list you bound to the model.
+
+`add_conditional_edges("llm", tools_condition)` is the fork. A normal edge always goes to the same place; a *conditional* edge runs a function to decide. `tools_condition` is a prebuilt checker: it looks at what the model just produced and returns `"tools"` if the model asked for a tool, or `"__end__"` if it just answered. You don't pass a routing table; `tools_condition` already returns the right node names. This line replaces your old `add_edge("llm", END)`, because ending is now just one of the two things that can happen.
+
+`add_edge("tools", "llm")` is the loop. After the tools node runs, the result goes *back* to the model, which gets to reason again. That single edge is what lets the bot chain "calculate this, then search for that, then answer."
+
+Don't take my word for the shape. Ask LangGraph to draw it, the same way you did in Part 3:
+
+```text
+graph TD;
+	__start__([__start__]):::first
+	llm(llm)
+	tools(tools)
+	__end__([__end__]):::last
+	__start__ --> llm;
+	llm -.-> __end__;
+	llm -.-> tools;
+	tools --> llm;
+```
+
+The dotted lines out of `llm` are the conditional edge: it goes to one or the other, decided at runtime. The solid line from `tools` back to `llm` is your loop. Here's that same graph rendered:
+
+<Mermaid
+  config={{ htmlLabels: false, flowchart: { htmlLabels: false } }}
+  chart={`graph TD;
+    START([START])
+    llm(llm):::hero
+    tools(tools)
+    END([END])
+    START --> llm;
+    llm -. tools_condition .-> tools;
+    llm -. tools_condition .-> END;
+    tools --> llm;
+    classDef hero stroke:#e5825a,stroke-width:3px;`}
+/>
+
+<Callout type="info" title="Could this loop forever?">
+In theory the model could keep asking for tools and never finish. In practice it stops on its own once it has what it needs, and LangGraph also caps the number of steps with a `recursion_limit` (25 by default), raising a clear error instead of spinning forever. For this bot you won't hit it. When you build agents that chew on harder problems, that limit is the seatbelt that keeps a confused model from running up your bill.
+</Callout>
+
+## New events on the same belt
+
+The graph runs tools now, but the frontend can't see any of it yet. Time to collect on the design decision from Part 5. Remember the envelope: every SSE message is `data: {"type": ..., ...}`, and you swore that when tools arrived, the frontend parser wouldn't change, it would just learn new `type` values. Today's the day that pays off.
+
+`graph.astream_events` already reports tool activity. Alongside the `on_chat_model_stream` events you handled in Part 5, the same firehose now emits `on_tool_start` when a tool begins and `on_tool_end` when it returns. Forward them as two new envelope types. Open `main.py` and grow your `token_stream`:
+
+```python filename="backend/app/main.py"
+async def token_stream(message: str):
+    inputs = {"messages": [HumanMessage(content=message)]}
+    async for event in graph.astream_events(inputs, version="v2"):
+        kind = event["event"]
+        if kind == "on_chat_model_stream":
+            token = event["data"]["chunk"].content
+            if token:
+                yield sse({"type": "token", "content": token})
+        elif kind == "on_tool_start":
+            yield sse({
+                "type": "tool_start",
+                "name": event["name"],
+                "args": event["data"]["input"],
+            })
+        elif kind == "on_tool_end":
+            result = event["data"]["output"].content
+            yield sse({
+                "type": "tool_end",
+                "name": event["name"],
+                "result": result,
+            })
+    yield sse({"type": "done"})
+```
+
+The `on_chat_model_stream` branch is untouched from Part 5; the final answer still streams token by token (the empty chunks the model emits while writing a tool call are dropped by the `if token` guard you already have). The two new branches each read three fields. `event["name"]` is the tool's own name, like `calculator`. `event["data"]["input"]` is the arguments the model chose, like `{"expression": "23 * 17"}`. And the result has one gotcha worth a callout.
+
+<Callout type="info" title="The tool result is a message, not a string">
+`event["data"]["output"]` on `on_tool_end` is not the plain result text. It's a `ToolMessage` object, the typed wrapper LangGraph puts around every tool result so it can flow back into the conversation. The string you actually want lives on `.content`. Reach for `event["data"]["output"].content` and you get `"391"`; call `str(...)` on the whole object by mistake and you get a noisy `ToolMessage(content='391', name=...)` repr in your UI. One attribute, and the first thing people miss.
+</Callout>
+
+Save and curl it, with the `-N` flag from Part 5 so nothing buffers:
+
+```bash
+curl -N -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "what is 23 * 17?"}'
+```
+
+<Figure
+  src="/images/series/langgraph/part-6/term-tool-stream.svg"
+  alt="A dark backend terminal running curl -N against localhost:8000/chat with the message 'what is 23 * 17?'. The streamed output shows new envelope types: a tool_start line naming calculator with args expression 23 * 17, then a tool_end line giving calculator the result 391, then a tool_start and tool_end pair for tavily_search, then several token envelopes spelling out '23 × 17 is 391,', and finally a done envelope. A comment notes it's the same belt as Part 5 with two new labels riding it."
+  caption="The same wire from Part 5, carrying two new labels. tool_start and tool_end interleave with the token envelopes; the blank-line framing and the done envelope are exactly as you left them."
+  width={1040}
+  height={620}
+/>
+
+There they are: `tool_start` and `tool_end` on the wire, in between the tokens, framed by the same blank line, closed by the same `done`. The backend is finished. The frontend just needs to learn what to do when those two new types arrive.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, 1536x1024, quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 2-panel comic, panels side by side with a thin vertical black divider. Panel 1: Yad stands on the left, hand on chin, asking a friendly small white robot chatbot (rounded boxy body, simple smiling screen face, two little antennas). Yad's speech bubble: "WHAT'S 2 + 2?". The little robot looks blank with a single sweat drop. Panel 2: the same little robot now triumphantly holds up a big chunky pocket calculator showing "4" on its display, beaming, arms raised high; the robot's speech bubble: "I HAVE TOOLS NOW!". Yad on the right side gives a small amused thumbs up. Clean readable hand-lettered speech bubbles, large clear lettering, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/langgraph/part-6/comic-calculator.png"
+  alt="Comic in two panels. Panel one: Yad, a bearded developer with headphones, asks a small friendly robot 'WHAT'S 2 + 2?', and the robot looks blank with a nervous sweat drop. Panel two: the robot proudly holds up a big pocket calculator showing 4 and announces 'I HAVE TOOLS NOW!', while Yad gives an amused thumbs up."
+  caption="Tool calling, taken literally. The bot can't do 2 + 2 in its head either, but now it knows to reach for the calculator instead of guessing. Knowing which tool to grab is the whole skill."
+  width={1536}
+  height={1024}
+/>
+
+## Showing the work in the UI
+
+Back in `frontend/app/page.tsx`. Your messages have been `{ role, content }` since Part 4. A tool call doesn't fit that shape; it has a name, arguments, and a result, not a body of text. So widen the `Message` type into a union:
+
+```tsx filename="frontend/app/page.tsx"
+type Message =
+  | { role: "user" | "assistant"; content: string }
+  | { role: "tool"; name: string; args: Record<string, unknown>; result: string | null };
+```
+
+A tool message starts with `result: null`, the "running" state, and gets filled in when its `tool_end` arrives. Add two small helpers next to `appendToken`, one to start a tool and one to finish it:
+
+```tsx filename="frontend/app/page.tsx"
+function startTool(name: string, args: Record<string, unknown>) {
+  setMessages((prev) => [...prev, { role: "tool", name, args, result: null }]);
+}
+
+function endTool(result: string) {
+  setMessages((prev) => {
+    const next = [...prev];
+    for (let i = next.length - 1; i >= 0; i--) {
+      const m = next[i];
+      if (m.role === "tool" && m.result === null) {
+        next[i] = { ...m, result };
+        break;
+      }
+    }
+    return next;
+  });
+}
+```
+
+`startTool` pushes a new tool bubble in its running state. `endTool` walks backward to the most recent unfinished tool and fills in its result, the same immutable-update pattern you've used since Part 4: new array, new object, fresh references so React repaints.
+
+There's one more change, and it's a consequence of the loop. In Part 5, when the user sent a message, you added an empty assistant bubble immediately, ready to fill with tokens. But now the bot might call a tool *before* it says anything, and you don't want an empty grey bubble sitting above the tool call. So stop pre-creating it. On send, add only the user's message:
+
+```tsx filename="frontend/app/page.tsx"
+setMessages((prev) => [...prev, { role: "user", content: text }]);
+```
+
+And let `appendToken` create the assistant bubble on demand, the first time a token actually arrives:
+
+```tsx filename="frontend/app/page.tsx"
+function appendToken(token: string) {
+  setMessages((prev) => {
+    const last = prev[prev.length - 1];
+    if (last && last.role === "assistant") {
+      const next = [...prev];
+      next[next.length - 1] = { ...last, content: last.content + token };
+      return next;
+    }
+    return [...prev, { role: "assistant", content: token }];
+  });
+}
+```
+
+If the last message is already an assistant bubble, grow it. If it isn't, because the last thing on screen is a tool result, or the conversation just started, open a fresh one. This is what lets the bot talk, run a tool, and talk again, each turn landing in its own bubble in the right order.
+
+Now the moment Part 5 was built for. Find your reader loop, the one that splits on the blank line and parses each envelope. The parser doesn't change. You add two branches to the part that reacts to `type`, and nothing else moves:
+
+```tsx filename="frontend/app/page.tsx"
+for (const part of parts) {
+  if (!part.startsWith("data: ")) continue;
+  const envelope = JSON.parse(part.slice(6));
+  if (envelope.type === "token") appendToken(envelope.content);
+  else if (envelope.type === "tool_start") startTool(envelope.name, envelope.args);
+  else if (envelope.type === "tool_end") endTool(envelope.result);
+}
+```
+
+That's it. That's the entire reward for designing an envelope in Part 5 instead of streaming bare tokens. Two new lines, no rewrite, no new parser. The buffer, the `\n\n` split, the kept tail: all of it works untouched, because you taught it to read a shape, not a token.
+
+Last, a component to render a tool bubble so it reads as the bot working, not as a chat message. Add a small `ToolCallBubble` above your `Chat` component:
+
+```tsx filename="frontend/app/page.tsx"
+function ToolCallBubble({ name, args, result }: {
+  name: string;
+  args: Record<string, unknown>;
+  result: string | null;
+}) {
+  const argText = Object.values(args).join(", ");
+  return (
+    <div className="text-left">
+      <span className="inline-flex flex-col gap-0.5 rounded-xl border border-dashed px-3 py-2 font-mono text-xs text-muted-foreground">
+        <span className="text-foreground">
+          <span className="font-semibold">{name}</span>({argText})
+        </span>
+        <span>{result === null ? "running…" : `→ ${result}`}</span>
+      </span>
+    </div>
+  );
+}
+```
+
+The dashed border and monospace font are deliberate: they make a tool call look like a machine doing work, clearly not the same thing as a person or the bot talking. Then, in your `messages.map`, send tool messages to it and everything else to the bubble you already have:
+
+```tsx filename="frontend/app/page.tsx"
+{messages.map((m, i) =>
+  m.role === "tool" ? (
+    <ToolCallBubble key={i} name={m.name} args={m.args} result={m.result} />
+  ) : (
+    <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
+      {/* the same <span> bubble (with the streaming caret) from Part 5, unchanged */}
+    </div>
+  )
+)}
+```
+
+Save and send "What is 23 times 17?". A dashed `calculator(23 * 17)` bubble pops in reading "running…", flips to "→ 391" a beat later, and then the answer streams in below it.
+
+<Figure
+  src="/images/series/langgraph/part-6/browser-tool-running-light.svg"
+  srcDark="/images/series/langgraph/part-6/browser-tool-running-dark.svg"
+  alt="The chat UI at localhost:3000. The user asked 'What is 23 × 17?'. Below it is a single dashed-border tool bubble reading 'calculator(23 * 17)' with a second line 'running...' in accent and a small pulsing dot, captured mid-execution before the result arrives."
+  caption="The tool mid-run. The bubble appears the instant tool_start lands and shows 'running…' until tool_end fills in the result. The bot is visibly thinking with its hands."
+  width={1120}
+  height={398}
+/>
+
+## Watch it reach for both
+
+Now the question this whole part was building toward. Ask it something that needs the calculator *and* the web in one breath:
+
+> What is 23 times 17, and what's the population of Tokyo?
+
+Watch the loop run. The model reasons, decides it needs the calculator, and a `calculator(23 * 17)` bubble appears and resolves to 391. The result goes back to the model, which reasons again, decides it also needs the web, and a `tavily_search` bubble appears and resolves with Tokyo's population. That goes back too, and only now, with both facts in hand, does the model write its final answer, streaming in word by word under the two tool bubbles. You can see the dessert shot at the top of this page; that's your bot, running the loop twice and showing every step.
+
+<Callout type="info" title="Tools aren't free, and they can run in parallel">
+Each trip through the loop is another call to the model's API, so a two-tool answer costs roughly three model calls instead of one. Still pennies for this bot, but worth knowing before you give an agent twenty tools and a hard question. One nice freebie: when the model asks for several independent tools at once, LangGraph's `ToolNode` runs them in parallel for you, so two searches don't take twice as long. You didn't have to write a line of that.
+</Callout>
+
+Right now you have: a bot that holds two real tools, decides on its own when to use them, runs them in a loop that can chain one into the next, and narrates every tool call and result to the UI over the same stream you built last time. It stopped being a chatbot. It's an agent.
+
+<Recap
+  part={6}
+  items={[
+    "A safe `calculator` tool built on an `ast` walker with an operator whitelist, so the model can do exact math without ever running `eval` on untrusted input.",
+    "A real `web_search` tool from Tavily, wired in with one line and its own API key in `.env`.",
+    "Tools bound to the model with `llm.bind_tools(...)`, so it can ask for them, and a graph that loops through a prebuilt `ToolNode` via `tools_condition`.",
+    "The ReAct loop running end to end: the bot reasons, acts, observes the result, and reasons again until it can answer.",
+    "Two new envelope types, `tool_start` and `tool_end`, streamed over the Part 5 belt and rendered as live tool bubbles, with the frontend parser unchanged.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "When the model 'calls a tool,' what does it actually do?",
+      options: [
+        "It runs your Python function directly inside the model",
+        "It emits a structured request naming the tool and its arguments, and your app runs the real function",
+        "It rewrites your backend code to add the tool",
+        "It downloads the tool from the internet and executes it",
+      ],
+      answer: 1,
+      explain: "The model never executes anything. It produces a tool-call request (a tool name plus arguments), your application runs the matching function, and the result is handed back to the model. The model plans; your app is the only thing that runs code.",
+    },
+    {
+      q: "Why does the calculator walk an `ast` tree instead of calling Python's `eval()` on the expression?",
+      options: [
+        "`eval` is slower than walking a tree",
+        "`eval` can't do multiplication",
+        "The expression comes from a model a stranger can steer, and `eval` would run any Python it's handed, including destructive code",
+        "`ast` gives more decimal places",
+      ],
+      answer: 2,
+      explain: "`eval` executes arbitrary Python, and the expression is ultimately attacker-influenced through the model. The AST walker only permits a whitelist of arithmetic nodes and raises on everything else, so a malicious expression like `__import__('os').system(...)` is rejected instead of run.",
+    },
+    {
+      q: "What does `builder.add_conditional_edges('llm', tools_condition)` do?",
+      options: [
+        "Always sends the graph from the llm node to the tools node",
+        "Runs `tools_condition` to route to the tools node if the model asked for a tool, or to the end if it just answered",
+        "Adds every tool to the graph as its own node",
+        "Limits how many tools the model can call",
+      ],
+      answer: 1,
+      explain: "A conditional edge runs a function to pick the next node. `tools_condition` inspects the model's latest message and returns 'tools' when there's a tool call to run, or '__end__' when the model answered directly. It replaces the old fixed `add_edge('llm', END)`.",
+    },
+    {
+      q: "Adding tool events to the UI needed only two new lines in the frontend's reader. Why so little?",
+      options: [
+        "React re-renders tools automatically",
+        "Tavily ships its own React component",
+        "Part 5's envelope format means new event kinds are just new `type` values; the buffer and parser stay the same",
+        "The backend converts tool events into tokens",
+      ],
+      answer: 2,
+      explain: "Because Part 5 wrapped every message in a `{type, ...}` envelope, the reader already parses one shape and branches on `type`. Tool events are just two more `type` values, so the blank-line buffering and JSON parsing carry over unchanged.",
+    },
+    {
+      q: "On an `on_tool_end` event, `event['data']['output']` is a `ToolMessage`. How do you get the result string for the envelope?",
+      options: [
+        "`str(event['data']['output'])`",
+        "`event['data']['output'].content`",
+        "`event['data']['result']`",
+        "`event['name']`",
+      ],
+      answer: 1,
+      explain: "The output is a typed `ToolMessage`, and the result text lives on its `.content` attribute. Calling `str()` on the whole object gives its noisy repr instead, and `event['name']` is the tool's name, not its result.",
+    },
+  ]}
+/>
+
+Commit it, from the project root, in a terminal that isn't hosting a server:
+
+```bash
+git add .
+git commit -m "part 6: give the bot a calculator and web search via tools"
+```
+
+Your bot is sharp now, but it has the memory of a goldfish. Tell it your name, then ask what your name is, and it will have no idea, because every message you send starts a brand-new conversation with no past. In Part 7 you'll give it a memory, so it can hold a thread across turns and you can finally have a real conversation.
+
+{/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-6-tools) in the intro once it exists. */}
+
+{/* TODO once the Concepts page (langgraph-concepts.mdx) ships: link "tool calling" and "the ReAct loop" to /blog/langgraph-concepts#tool-calling and #react-pattern instead of defining only inline. */}
+
+{/* ANECDOTE slot (optional upgrade, WRITING-STYLE §6): a true first-person story from Yadnesh about a model confidently getting arithmetic or a fact wrong before tools, or the first time an agent chained two tools on its own, 3 beats, 5 sentences max. If provided, it slots into "Why your bot is a confident liar". */}
