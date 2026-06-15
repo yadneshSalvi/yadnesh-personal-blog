@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="594" viewBox="0 0 760 594" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="760" height="594" fill="#f5f5f4"/>
+  <rect x="166" y="42" width="428" height="510" rx="54" fill="#d8d3c8" stroke="#c7c1b4" stroke-width="1.5"/>
+  <rect x="174" y="50" width="412" height="494" rx="46" fill="#ffffff"/>
+  <rect x="334" y="62" width="92" height="22" rx="11" fill="#d8d3c8"/>
+  <text x="204" y="80" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#1c1917">9:41</text>
+  <circle cx="530" cy="75" r="3" fill="#78716c"/>
+  <circle cx="542" cy="75" r="3" fill="#78716c"/>
+  <rect x="550" y="70" width="18" height="10" rx="2.5" fill="none" stroke="#78716c" stroke-width="1.3"/>
+  <rect x="552" y="72" width="11" height="6" rx="1" fill="#78716c"/>
+  <rect x="192" y="108" width="376" height="34" rx="17" fill="#fbfaf8" stroke="#e7e5e4" stroke-width="1.3"/>
+  <rect x="208" y="118" width="11" height="9" rx="2" fill="none" stroke="#78716c" stroke-width="1.3"/>
+  <path d="M 210.5 118 v -3 a 3 3 0 0 1 6 0 v 3" fill="none" stroke="#78716c" stroke-width="1.3"/>
+  <text x="386" y="130" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#78716c" text-anchor="middle">your-app.vercel.app</text>
+  <text x="200" y="184" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#1c1917">Chatbot</text>
+  <line x1="188" y1="204" x2="572" y2="204" stroke="#eceae8" stroke-width="1.3"/>
+  
+  <rect x="382" y="222" width="172" height="47" rx="16" fill="#1c1917"/>
+  <text x="400" y="251" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#fafaf9">My name is Alex.</text>
+  <rect x="206" y="283" width="232" height="47" rx="16" fill="#f5f5f4"/>
+  <text x="224" y="312" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1c1917">Nice to meet you, Alex.</text>
+  <rect x="390" y="344" width="164" height="47" rx="16" fill="#1c1917"/>
+  <text x="408" y="373" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#fafaf9">What's my name?</text>
+  <rect x="206" y="405" width="189" height="47" rx="16" fill="#f5f5f4"/>
+  <text x="224" y="434" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1c1917">Your name is Alex.</text>
+  <line x1="188" y1="470" x2="572" y2="470" stroke="#eceae8" stroke-width="1.3"/>
+  <rect x="192" y="488" width="300" height="40" rx="20" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.3"/>
+  <text x="210" y="513" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a8a29e">Message...</text>
+  <rect x="500" y="488" width="68" height="40" rx="20" fill="#1c1917"/>
+  <text x="534" y="513" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#fafaf9" text-anchor="middle">Send</text>
+</svg>

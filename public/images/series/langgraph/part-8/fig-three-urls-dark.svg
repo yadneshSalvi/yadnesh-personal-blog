@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="600" viewBox="0 0 1320 600">
+  <rect width="1320" height="600" fill="#151311"/>
+  <text x="88" y="56" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" letter-spacing="2.5" fill="#756d62">THE HANDSHAKE &#183; EACH ONE NEEDS THE OTHER'S URL</text>
+  <rect x="88" y="168" width="470" height="196" rx="14" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="116" y="210" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2" fill="#756d62">FLY.IO &#183; THE BACKEND</text>
+  <text x="116" y="246" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15.5" fill="#a49c90">deploy it first, and it hands you a URL:</text>
+  <rect x="116" y="278" width="414" height="42" rx="9" fill="#2a201a" stroke="#5e463a" stroke-width="1.3"/>
+  <text x="132" y="305" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#e5825a">https://your-app.fly.dev</text>
+  <rect x="762" y="168" width="470" height="196" rx="14" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="790" y="210" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2" fill="#756d62">VERCEL &#183; THE FRONTEND</text>
+  <text x="790" y="246" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15.5" fill="#a49c90">deploy it next, and it hands you a URL:</text>
+  <rect x="790" y="278" width="414" height="42" rx="9" fill="#2a201a" stroke="#5e463a" stroke-width="1.3"/>
+  <text x="806" y="305" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#e5825a">https://your-app.vercel.app</text>
+  <path d="M 323 168 L 323 96 L 985 96" fill="none" stroke="#e5825a" stroke-width="2.4"/>
+  <path d="M 984 90 L 984 102 L 994 96 Z" fill="#e5825a"/>
+  <text x="660" y="82" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" fill="#e5825a" text-anchor="middle"><tspan font-weight="700">&#9312;</tspan> the Fly URL becomes the frontend's <tspan font-weight="700">NEXT_PUBLIC_API_BASE_URL</tspan></text>
+  <path d="M 997 364 L 997 450 L 335 450" fill="none" stroke="#86aa72" stroke-width="2.4"/>
+  <path d="M 336 444 L 336 456 L 326 450 Z" fill="#86aa72"/>
+  <text x="660" y="476" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" fill="#86aa72" text-anchor="middle"><tspan font-weight="700">&#9314;</tspan> the Vercel URL becomes the backend's <tspan font-weight="700">FRONTEND_ORIGIN</tspan> (CORS), then redeploy</text>
+  <line x1="88" y1="542" x2="1232" y2="542" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="88" y="578" font-family="Georgia, 'Times New Roman', serif" font-size="19" fill="#a49c90">It looks circular, so you break it in order: ship the backend, point the frontend at it, then point the backend <tspan font-style="italic" fill="#e5825a">back</tspan>.</text>
+</svg>

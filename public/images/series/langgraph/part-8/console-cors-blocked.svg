@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="470" viewBox="0 0 1040 470" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="470" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">DevTools &#183; Console</text>
+  <g font-size="14.5" fill="#d8d2c6" xml:space="preserve">
+    <text x="32" y="94" fill="#e5825a">&#10005;  POST https://langgraph-chatbot.fly.dev/chat net::ERR_FAILED</text>
+    <text x="32" y="138" fill="#d8d2c6">Access to fetch at 'https://langgraph-chatbot.fly.dev/chat'</text>
+    <text x="32" y="166" fill="#d8d2c6">from origin '<tspan fill="#e5825a">https://your-app.vercel.app</tspan>' has been</text>
+    <text x="32" y="194" fill="#d8d2c6">blocked by CORS policy: No 'Access-Control-Allow-Origin'</text>
+    <text x="32" y="222" fill="#d8d2c6">header is present on the requested resource.</text>
+    <text x="32" y="286" fill="#756d62"># the backend is up. it just doesn't trust the new origin yet.</text>
+    <text x="32" y="318" fill="#756d62"># you saw this family of error in Part 2, the first time the</text>
+    <text x="32" y="346" fill="#756d62"># browser on :3000 tried to reach the server on :8000.</text>
+    <text x="32" y="404" fill="#756d62"># fix: tell the backend its frontend's URL, then redeploy.</text>
+  </g>
+</svg>
