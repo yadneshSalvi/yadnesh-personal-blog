@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import TOC from "@/components/TOC";
+import ZoomableImage from "@/components/ZoomableImage";
 import { getAllPostSlugs, getPostBySlug } from "@/lib/posts";
 import { getSeriesContextForPost } from "@/lib/series";
 
@@ -78,32 +78,17 @@ export default async function BlogPost({
           </header>
 
           {meta.image ? (
-            <div className="mt-10 overflow-hidden rounded-sm border border-line">
-              <Image
-                src={meta.image}
-                alt=""
-                width={1280}
-                height={720}
-                unoptimized={meta.image.endsWith(".svg")}
-                className={
-                  meta.imageDark
-                    ? "h-auto w-full object-cover dark:hidden"
-                    : "h-auto w-full object-cover"
-                }
-                priority
-              />
-              {meta.imageDark ? (
-                <Image
-                  src={meta.imageDark}
-                  alt=""
-                  width={1280}
-                  height={720}
-                  unoptimized={meta.imageDark.endsWith(".svg")}
-                  className="hidden h-auto w-full object-cover dark:block"
-                  priority
-                />
-              ) : null}
-            </div>
+            <ZoomableImage
+              src={meta.image}
+              srcDark={meta.imageDark}
+              alt=""
+              width={1280}
+              height={720}
+              priority
+              frameClassName="mt-10 overflow-hidden rounded-sm border border-line"
+              imageClassName="h-auto w-full object-cover"
+              zoomLabel={`Enlarge cover image for ${meta.title}`}
+            />
           ) : null}
 
           <div
