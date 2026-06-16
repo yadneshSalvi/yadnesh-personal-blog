@@ -16,6 +16,8 @@ export type SeriesMeta = {
   tagline?: string;
   image?: string;
   imageDark?: string;
+  /** Descriptive alt text for the series cover. Falls back to a generated string. */
+  imageAlt?: string;
   /** Total parts the series will have when complete */
   plannedParts?: number;
   createdAt: string;
@@ -49,6 +51,7 @@ function parseSeriesMeta(slug: string, data: Record<string, unknown>): SeriesMet
     tagline: data.tagline ? String(data.tagline) : undefined,
     image: data.image ? String(data.image) : undefined,
     imageDark: data.imageDark ? String(data.imageDark) : undefined,
+    imageAlt: data.imageAlt ? String(data.imageAlt) : undefined,
     plannedParts: data.plannedParts ? Number(data.plannedParts) : undefined,
     createdAt: String(data.createdAt || new Date().toISOString()),
     updatedAt: String(data.updatedAt || data.createdAt || new Date().toISOString()),
@@ -72,11 +75,22 @@ export function getAllSeriesMeta(): SeriesMeta[] {
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 }
 
-/** Published parts of a series, sorted by seriesPart */
+/** Published parts of a series, sorted by seriesPart (excludes kind:reference) */
 export function getSeriesParts(slug: string): PostMeta[] {
   return getAllPostsMeta()
-    .filter((post) => post.series === slug)
+    .filter((post) => post.series === slug && post.kind !== "reference")
     .sort((a, b) => (a.seriesPart ?? 0) - (b.seriesPart ?? 0));
+}
+
+/**
+ * Reference/glossary pages (kind:reference) attached to a series. These are
+ * excluded from listings and the numbered parts list, so surface them on the
+ * series page to keep them from becoming orphan pages. (None exist today.)
+ */
+export function getSeriesReferences(slug: string): PostMeta[] {
+  return getAllPostsMeta().filter(
+    (post) => post.series === slug && post.kind === "reference"
+  );
 }
 
 export async function getSeriesBySlug(slug: string): Promise<Series | null> {

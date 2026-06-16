@@ -1,11 +1,15 @@
+import type { Metadata } from "next";
 import { getListedPostsMeta } from "@/lib/posts";
 import { getListedItems } from "@/lib/series";
 import BlogTable from "@/components/BlogTable";
 
 export const dynamic = "force-static";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Writing",
+  description:
+    "Essays and field notes on AI engineering: agents, retrieval, fine-tuning, and the unglamorous plumbing in between.",
+  alternates: { canonical: "/blog" },
 };
 
 export default function BlogIndex() {

@@ -39,6 +39,12 @@ export default function Footer() {
                   {item.label}
                 </Link>
               ))}
+              <a
+                href="/feed.xml"
+                className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted transition-colors hover:text-ink"
+              >
+                RSS
+              </a>
             </nav>
             <nav className="flex flex-col gap-2.5">
               {SOCIALS.map((item) => (

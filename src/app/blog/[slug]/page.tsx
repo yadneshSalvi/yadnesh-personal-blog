@@ -1,14 +1,57 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import TOC from "@/components/TOC";
 import ZoomableImage from "@/components/ZoomableImage";
-import { getAllPostSlugs, getPostBySlug } from "@/lib/posts";
+import JsonLd from "@/components/JsonLd";
+import { getAllPostSlugs, getPostBySlug, getPostMetaBySlug } from "@/lib/posts";
 import { getSeriesContextForPost } from "@/lib/series";
+import { SITE_DESCRIPTION, SITE_URL, AUTHOR, absoluteUrl, ogImageFor } from "@/lib/seo";
 
 export const dynamic = "force-static";
 
 export async function generateStaticParams() {
   return getAllPostSlugs().map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const meta = getPostMetaBySlug(slug);
+  if (!meta) return {};
+
+  // Description precedence: explicit description → subtitle → site default.
+  const description = meta.description ?? meta.subtitle ?? SITE_DESCRIPTION;
+  const url = `/blog/${slug}`;
+
+  // Note: og:image / twitter:image are supplied by the file-based
+  // `opengraph-image.tsx` (a per-post generated card). We intentionally do NOT
+  // set openGraph.images / twitter.images here — config-based images override
+  // the file convention in Next, which would suppress the generated card.
+  return {
+    title: meta.title, // root template appends " · Yadnesh Salvi"
+    description,
+    keywords: meta.tags,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      title: meta.title,
+      description,
+      url,
+      publishedTime: meta.createdAt,
+      modifiedTime: meta.updatedAt,
+      authors: [`${SITE_URL}/about`],
+      tags: meta.tags,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: meta.title,
+      description,
+    },
+  };
 }
 
 function formatDate(iso: string) {
@@ -33,8 +76,46 @@ export default async function BlogPost({
   const updatedDiffers =
     formatDate(meta.updatedAt) !== formatDate(meta.createdAt);
 
+  const postUrl = absoluteUrl(`/blog/${slug}`);
+  const blogPostingSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${postUrl}#article`,
+    headline: meta.title,
+    description: meta.description ?? meta.subtitle ?? undefined,
+    image: absoluteUrl(ogImageFor(meta.image)),
+    datePublished: meta.createdAt,
+    dateModified: meta.updatedAt,
+    author: { "@id": `${SITE_URL}/#person` },
+    publisher: { "@id": `${SITE_URL}/#person` },
+    mainEntityOfPage: { "@type": "WebPage", "@id": postUrl },
+    keywords: meta.tags?.join(", "),
+    url: postUrl,
+    ...(meta.readingTime ? { timeRequired: `PT${meta.readingTime}M` } : {}),
+  };
+
+  const breadcrumbItems = [
+    { name: "Home", url: SITE_URL },
+    ...(seriesCtx
+      ? [{ name: seriesCtx.series.name, url: absoluteUrl(`/series/${seriesCtx.series.slug}`) }]
+      : [{ name: "Writing", url: absoluteUrl("/blog") }]),
+    { name: meta.title, url: postUrl },
+  ];
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbItems.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+
   return (
     <main className="mx-auto max-w-6xl px-6 py-16">
+      <JsonLd data={blogPostingSchema} />
+      <JsonLd data={breadcrumbSchema} />
       <div className="grid grid-cols-1 lg:grid-cols-[auto_minmax(0,1fr)]">
         <TOC
           key={slug}
@@ -85,7 +166,7 @@ export default async function BlogPost({
             <ZoomableImage
               src={meta.image}
               srcDark={meta.imageDark}
-              alt=""
+              alt={meta.imageAlt ?? `Cover illustration for “${meta.title}”`}
               width={1280}
               height={720}
               priority

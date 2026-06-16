@@ -19,8 +19,12 @@ export type PostMeta = {
   slug: string;
   title: string;
   subtitle?: string;
+  /** Explicit meta description (tuned SERP snippet). Falls back to subtitle. */
+  description?: string;
   image?: string;
   imageDark?: string;
+  /** Descriptive alt text for the cover image. Falls back to a generated string. */
+  imageAlt?: string;
   createdAt: string;
   updatedAt: string;
   tags?: string[];
@@ -65,8 +69,10 @@ export function getAllPostsMeta(): PostMeta[] {
       const { data, content } = matter(source);
       const title = String(data.title || slug);
       const subtitle = data.subtitle ? String(data.subtitle) : undefined;
+      const description = data.description ? String(data.description) : undefined;
       const image = data.image ? String(data.image) : undefined;
       const imageDark = data.imageDark ? String(data.imageDark) : undefined;
+      const imageAlt = data.imageAlt ? String(data.imageAlt) : undefined;
       const createdAt = String(data.createdAt || new Date().toISOString());
       const updatedAt = String(data.updatedAt || createdAt);
       const tags = Array.isArray(data.tags)
@@ -78,7 +84,7 @@ export function getAllPostsMeta(): PostMeta[] {
       const series = data.series ? String(data.series) : undefined;
       const seriesPart = data.seriesPart ? Number(data.seriesPart) : undefined;
       const kind = data.kind ? String(data.kind) : undefined;
-      const meta: PostMeta = { slug, title, subtitle, image, imageDark, createdAt, updatedAt, tags, readingTime, series, seriesPart, kind };
+      const meta: PostMeta = { slug, title, subtitle, description, image, imageDark, imageAlt, createdAt, updatedAt, tags, readingTime, series, seriesPart, kind };
       return meta;
     })
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
@@ -107,8 +113,10 @@ export async function getPostBySlug(slug: string): Promise<{
   const { content, frontmatter } = await compileMDX<{
     title: string;
     subtitle?: string;
+    description?: string;
     image?: string;
     imageDark?: string;
+    imageAlt?: string;
     createdAt: string;
     updatedAt?: string;
     tags?: string[];
@@ -145,8 +153,10 @@ export async function getPostBySlug(slug: string): Promise<{
     slug,
     title: String(frontmatter.title || slug),
     subtitle: frontmatter.subtitle ? String(frontmatter.subtitle) : undefined,
+    description: frontmatter.description ? String(frontmatter.description) : undefined,
     image: frontmatter.image ? String(frontmatter.image) : undefined,
     imageDark: frontmatter.imageDark ? String(frontmatter.imageDark) : undefined,
+    imageAlt: frontmatter.imageAlt ? String(frontmatter.imageAlt) : undefined,
     createdAt: String(frontmatter.createdAt || new Date().toISOString()),
     updatedAt: String(frontmatter.updatedAt || frontmatter.createdAt || new Date().toISOString()),
     tags: Array.isArray(frontmatter.tags)
@@ -159,6 +169,35 @@ export async function getPostBySlug(slug: string): Promise<{
   };
 
   return { content, meta, headings: extractHeadings(rawContent) };
+}
+
+/**
+ * Frontmatter-only reader for a single post. Does NOT compile MDX — use this in
+ * generateMetadata so the page render isn't forced to compile the post twice.
+ */
+export function getPostMetaBySlug(slug: string): PostMeta | null {
+  ensurePostsDir();
+  const mdxPath = path.join(POSTS_DIR, `${slug}.mdx`);
+  if (!fs.existsSync(mdxPath)) return null;
+  const { data, content } = matter(fs.readFileSync(mdxPath, "utf8"));
+  const title = String(data.title || slug);
+  const subtitle = data.subtitle ? String(data.subtitle) : undefined;
+  const description = data.description ? String(data.description) : undefined;
+  const image = data.image ? String(data.image) : undefined;
+  const imageDark = data.imageDark ? String(data.imageDark) : undefined;
+  const imageAlt = data.imageAlt ? String(data.imageAlt) : undefined;
+  const createdAt = String(data.createdAt || new Date().toISOString());
+  const updatedAt = String(data.updatedAt || createdAt);
+  const tags = Array.isArray(data.tags)
+    ? data.tags.map((t: unknown) => String(t)).filter(Boolean)
+    : undefined;
+  const readingTime = data.readingTime
+    ? Number(data.readingTime)
+    : calculateReadingTime(content);
+  const series = data.series ? String(data.series) : undefined;
+  const seriesPart = data.seriesPart ? Number(data.seriesPart) : undefined;
+  const kind = data.kind ? String(data.kind) : undefined;
+  return { slug, title, subtitle, description, image, imageDark, imageAlt, createdAt, updatedAt, tags, readingTime, series, seriesPart, kind };
 }
 
 function ensurePostsDir() {

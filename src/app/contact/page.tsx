@@ -1,10 +1,13 @@
+import type { Metadata } from "next";
 import ContactForm from "@/components/ContactForm";
 import CalendarBooking from "@/components/CalendarBooking";
 
 export const dynamic = "force-static";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Contact",
+  description: "Get in touch with Yadnesh Salvi — booking, email, and social links.",
+  alternates: { canonical: "/contact" },
 };
 
 const SOCIALS = [

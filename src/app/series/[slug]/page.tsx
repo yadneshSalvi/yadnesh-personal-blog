@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAllSeriesSlugs, getSeriesBySlug } from "@/lib/series";
+import { getAllSeriesSlugs, getSeriesBySlug, getSeriesReferences } from "@/lib/series";
 import { formatDate } from "@/components/PostList";
+import JsonLd from "@/components/JsonLd";
+import { SITE_URL, absoluteUrl, ogImageFor } from "@/lib/seo";
 
 export const dynamic = "force-static";
 
@@ -18,7 +20,24 @@ export async function generateMetadata({
   const { slug } = await params;
   const series = await getSeriesBySlug(slug);
   if (!series) return {};
-  return { title: series.meta.name, description: series.meta.tagline };
+  const { meta } = series;
+  const description = meta.tagline;
+  const url = `/series/${slug}`;
+  const ogImage = ogImageFor(meta.image);
+
+  return {
+    title: meta.name,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      title: meta.name,
+      description,
+      url,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: meta.name }],
+    },
+    twitter: { card: "summary_large_image", title: meta.name, description, images: [ogImage] },
+  };
 }
 
 function AccentName({ name, accentWord }: { name: string; accentWord?: string }) {
@@ -86,9 +105,26 @@ export default async function SeriesPage({
   const published = parts.length;
   const planned = meta.plannedParts ?? published;
   const totalMinutes = parts.reduce((sum, p) => sum + (p.readingTime ?? 0), 0);
+  const references = getSeriesReferences(slug);
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { name: "Home", url: SITE_URL },
+      { name: "Writing", url: absoluteUrl("/blog") },
+      { name: meta.name, url: absoluteUrl(`/series/${slug}`) },
+    ].map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
+      <JsonLd data={breadcrumbSchema} />
       <header>
         <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-faint">
           Series · {published} of {planned} parts · {totalMinutes} min so far
@@ -108,7 +144,7 @@ export default async function SeriesPage({
           <ThemedImage
             src={meta.image}
             srcDark={meta.imageDark}
-            alt=""
+            alt={meta.imageAlt ?? `Cover illustration for the ${meta.name} series`}
             width={1280}
             height={720}
             priority
@@ -145,7 +181,7 @@ export default async function SeriesPage({
                     <ThemedImage
                       src={part.image}
                       srcDark={part.imageDark}
-                      alt=""
+                      alt={part.imageAlt ?? `Cover illustration for “${shortPartTitle(part.title)}”`}
                       width={1280}
                       height={720}
                     />
@@ -190,6 +226,33 @@ export default async function SeriesPage({
           </p>
         ) : null}
       </section>
+
+      {references.length > 0 ? (
+        <section className="mt-16">
+          <h2 className="border-b border-line pb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-faint">
+            Reference
+          </h2>
+          <ul className="divide-y divide-line border-b border-line">
+            {references.map((ref) => (
+              <li key={ref.slug}>
+                <Link
+                  href={`/blog/${ref.slug}`}
+                  className="group flex flex-col gap-1 py-6"
+                >
+                  <h3 className="font-serif text-xl leading-snug tracking-tight text-ink transition-colors group-hover:text-accent">
+                    {ref.title}
+                  </h3>
+                  {ref.subtitle ? (
+                    <p className="max-w-xl text-sm leading-relaxed text-muted">
+                      {ref.subtitle}
+                    </p>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </main>
   );
 }
