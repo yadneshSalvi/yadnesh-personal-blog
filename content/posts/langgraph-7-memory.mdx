@@ -10,7 +10,7 @@ series: "langgraph-fastapi-nextjs"
 seriesPart: 7
 ---
 
-Tell your bot from Part 6 your name. It will say something friendly back. Now ask it what your name is. It has no idea. Not because it's broken, but because it never had a chance: every message you send starts a brand-new conversation with no past in it. Your bot is sharp, it has tools, and it forgets you the instant you hit Send.
+Tell your bot from [Part 6](/blog/langgraph-6-tools#watch-it-reach-for-both) your name. It will say something friendly back. Now ask it what your name is. It has no idea. Not because it's broken, but because it never had a chance: every message you send starts a brand-new conversation with no past in it. Your bot is sharp, it has tools, and it forgets you the instant you hit Send.
 
 By the end of this page, that's fixed. Your bot holds a conversation across turns, a "New chat" button starts a clean one, and a sidebar lets you flip between past chats, all with no database and about thirty lines of code.
 
@@ -23,7 +23,7 @@ By the end of this page, that's fixed. Your bot holds a conversation across turn
   height={462}
 />
 
-This part is almost all about one idea with a friendly name: a *checkpointer*. It's the piece that lets the graph save where it was and pick back up. You'll add it in one line, hit a very loud error on purpose, fix it by teaching your app to label each conversation, and then build the UI on top. Let's cure the amnesia.
+This part is almost all about one idea with a friendly name: a [*checkpointer*](https://docs.langchain.com/oss/python/langgraph/persistence). It's the piece that lets the graph save where it was and pick back up. You'll add it in one line, hit a very loud error on purpose, fix it by teaching your app to label each conversation, and then build the UI on top. Let's cure the amnesia.
 
 ## Your bot has the memory of a goldfish
 
@@ -46,7 +46,7 @@ Flat cartoon comic, bold black outlines, flat colors, warm off-white paper backg
 <Figure
   src="/images/series/langgraph/part-7/comic-goldfish.png"
   alt="Comic in two panels. Panel one: Yad, a bearded developer with headphones, leans in warmly next to a small white robot, hand on his chest, saying 'AND THAT'S MY WHOLE STORY.' A goldfish bowl labeled PROD sits beside the robot. Panel two: a moment later the same robot waves at Yad with a blank, polite smile and says 'NICE TO MEET YOU!', while Yad slumps in exasperation and the goldfish swims in an oblivious circle."
-  caption="In-memory state, taken literally. A goldfish has a famous nine-second memory; a bot whose only memory is one request is worse. The PROD label is the foreshadowing for Part 8."
+  caption="In-memory state, taken literally. A goldfish has a famous nine-second memory; a bot whose only memory is one request is worse. The PROD label is the foreshadowing for [Part 8](/blog/langgraph-8-deploy#watch-it-forget-you)."
   width={1536}
   height={1024}
 />
@@ -72,7 +72,7 @@ A **thread** is one continuous conversation: all the back-and-forth that should 
 
 ## Giving the graph a memory
 
-The thing that reads and writes those notebooks is a **checkpointer**. LangGraph ships one that keeps everything in your computer's memory, `InMemorySaver`, and wiring it in is genuinely one line of import and one line of use. Open `graph.py` and find the spot at the bottom where you compile the graph. Right now it reads `graph = builder.compile()`. Give it a checkpointer:
+The thing that reads and writes those notebooks is a **checkpointer**. LangGraph ships one that keeps everything in your computer's memory, [`InMemorySaver`](https://reference.langchain.com/python/langgraph/checkpoints), and wiring it in is genuinely one line of import and one line of use. Open `graph.py` and find the spot at the bottom where you compile the graph. Right now it reads `graph = builder.compile()`. Give it a checkpointer:
 
 ```python filename="backend/app/graph.py"
 from langgraph.checkpoint.memory import InMemorySaver
@@ -81,7 +81,7 @@ checkpointer = InMemorySaver()
 graph = builder.compile(checkpointer=checkpointer)
 ```
 
-That's the whole backend change to *enable* memory. Everything above it, the state, the `llm` node, the `ToolNode`, the conditional edge, stays exactly as you left it in Part 6. `compile(checkpointer=...)` hands the graph a place to save its state after every step and to reload it before the next run.
+That's the whole backend change to *enable* memory. Everything above it, the state, the `llm` node, the `ToolNode`, the conditional edge, stays exactly as you left it in [Part 6](/blog/langgraph-6-tools#a-graph-that-can-change-its-mind). `compile(checkpointer=...)` hands the graph a place to save its state after every step and to reload it before the next run.
 
 <Callout type="info" title="What a checkpointer actually is">
 A checkpointer is a tiny key-value store the graph reads and writes its own state to, keyed by `thread_id`. After each step of a run it writes a snapshot ("here's the full message list so far"); at the start of a run it reads the snapshot back so the graph continues instead of restarting. `InMemorySaver` keeps those snapshots in a plain Python dict in the running process. No database, no setup, no file. That simplicity has a sharp edge we'll meet at the end of the part.
@@ -99,7 +99,7 @@ Save `graph.py`, restart the server, and send a message from the UI. Instead of 
   height={500}
 />
 
-`ValueError: Checkpointer requires one or more of the following 'configurable' keys: thread_id, checkpoint_ns, checkpoint_id`. You saw this family of error in Part 3 (missing API key) and Part 6 (missing Tavily key): the library checks a precondition up front and fails loudly instead of doing something quietly wrong. A graph with a checkpointer *must* be told which thread it's working on, every single call. You added the memory; now you have to hand it the notebook label. Right now you're passing none, so it stops you.
+`ValueError: Checkpointer requires one or more of the following 'configurable' keys: thread_id, checkpoint_ns, checkpoint_id`. You saw this family of error in [Part 3](/blog/langgraph-3-first-graph#hand-the-conversation-to-the-graph) (missing API key) and [Part 6](/blog/langgraph-6-tools#a-tool-that-can-see-the-internet) (missing Tavily key): the library checks a precondition up front and fails loudly instead of doing something quietly wrong. A graph with a checkpointer *must* be told which thread it's working on, every single call. You added the memory; now you have to hand it the notebook label. Right now you're passing none, so it stops you.
 
 ## Telling it which conversation
 
@@ -130,7 +130,7 @@ async def chat(request: ChatRequest):
     )
 ```
 
-The body of the event loop doesn't change at all; the three branches you wrote in Part 6 still handle tokens and tool calls exactly as before. The only new thing is `config`, slotted in as the second argument, carrying the one fact the checkpointer was asking for.
+The body of the event loop doesn't change at all; the three branches you wrote in [Part 6](/blog/langgraph-6-tools#new-events-on-the-same-belt) still handle tokens and tool calls exactly as before. The only new thing is `config`, slotted in as the second argument, carrying the one fact the checkpointer was asking for.
 
 Now look at what `inputs` still is: a single message, the one the user just typed. Not the whole history. That feels wrong the first time, so here's the picture that makes it click.
 
@@ -143,7 +143,7 @@ Now look at what `inputs` still is: a single message, the one the user just type
   height={560}
 />
 
-Remember the `add_messages` reducer from Part 3, the rule that *appends* to the message list instead of replacing it? This is its payoff. The checkpointer loads the saved messages onto the tray, your one new message gets appended by that reducer, the model sees the full conversation, and its reply gets appended and saved. You send one message; the graph remembers the rest. That's the trade the checkpointer makes for you on every turn.
+Remember the [`add_messages` reducer from Part 3](/blog/langgraph-3-first-graph#the-tray-that-rides-the-line), the rule that *appends* to the message list instead of replacing it? This is its payoff. The checkpointer loads the saved messages onto the tray, your one new message gets appended by that reducer, the model sees the full conversation, and its reply gets appended and saved. You send one message; the graph remembers the rest. That's the trade the checkpointer makes for you on every turn.
 
 ## The frontend picks a name for the chat
 
@@ -164,14 +164,14 @@ useEffect(() => {
 }, []);
 ```
 
-On the first visit there's nothing stored, so `crypto.randomUUID()` mints a fresh id like `a1b2c3d4-...` and saves it. On every visit after, the stored id comes straight back, so the same browser keeps talking to the same notebook. Now send it: add `thread_id` to the body of your `fetch`:
+On the first visit there's nothing stored, so [`crypto.randomUUID()`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/randomUUID) mints a fresh id like `a1b2c3d4-...` and saves it. On every visit after, the stored id comes straight back, so the same browser keeps talking to the same notebook. Now send it: add `thread_id` to the body of your `fetch`:
 
 ```tsx filename="frontend/app/page.tsx"
 body: JSON.stringify({ message: text, thread_id: threadId }),
 ```
 
 <Callout type="info" title="What localStorage is, and isn't">
-`localStorage` is a small box of string-to-string storage the browser keeps for your site, and it stays put across refreshes and restarts. Perfect for a thread id you don't want to lose on reload. The catch: it lives in *one* browser on *one* device. Open the site in a different browser or on your phone and you get a different, empty box, so a different conversation. It's a client-side convenience, not a real per-user account, and Part 8's closing notes point at what you'd reach for when you outgrow it.
+[`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) is a small box of string-to-string storage the browser keeps for your site, and it stays put across refreshes and restarts. Perfect for a thread id you don't want to lose on reload. The catch: it lives in *one* browser on *one* device. Open the site in a different browser or on your phone and you get a different, empty box, so a different conversation. It's a client-side convenience, not a real per-user account, and [Part 8's closing notes](/blog/langgraph-8-deploy#where-to-go-from-here) point at what you'd reach for when you outgrow it.
 </Callout>
 
 Save both files, send your name, then ask for it back. The bot remembers. Same streaming, same tool bubbles, but now the conversation has a spine.
@@ -242,7 +242,7 @@ async def thread_messages(thread_id: str) -> list[StoredMessage]:
 `aget_state` hands back a snapshot of the thread; `snapshot.values` is the saved state dict, and `.get("messages", [])` pulls the list out, falling back to empty for a thread that was never used. Each stored message carries a `.type`, one of `human`, `ai`, or `tool`, and we keep the human and assistant text, mapping it to the `{role, content}` shape the frontend already speaks. The `and m.content` filter drops the empty-bodied turns the model emits while it's calling a tool, so the rebuilt history reads like a clean conversation.
 
 <Callout type="info" title="Why we skip the tool messages on rebuild">
-A live conversation shows tool bubbles as they happen (Part 6). When we rebuild an old thread from storage, we replay only the human and assistant text, not the intermediate tool calls. It keeps this endpoint small and the restored chat readable. Replaying tool bubbles from history is doable, the data is right there in the `tool`-typed messages, but it's more shape-juggling than this stretch needs, so we draw the line here on purpose.
+A live conversation shows tool bubbles as they happen ([Part 6](/blog/langgraph-6-tools#showing-the-work-in-the-ui)). When we rebuild an old thread from storage, we replay only the human and assistant text, not the intermediate tool calls. It keeps this endpoint small and the restored chat readable. Replaying tool bubbles from history is doable, the data is right there in the `tool`-typed messages, but it's more shape-juggling than this stretch needs, so we draw the line here on purpose.
 </Callout>
 
 Prove it works before touching the UI. Open a Python shell in your backend and read a thread straight back:
@@ -333,7 +333,7 @@ Each button is one saved thread; clicking it swaps the conversation under you. T
 You built real memory without a database, and that's the magic trick, but it's worth knowing exactly how the trick works. `InMemorySaver` keeps every thread in a plain dict inside the running Python process. It's fast, it's zero-setup, and it vanishes the instant that process stops. Restart the server and every conversation is gone, every notebook blank. This is the goldfish bowl labeled PROD from the comic: it works beautifully right up until something restarts.
 
 <Callout type="info" title="When you outgrow the goldfish bowl">
-The fix is to swap the saver for one that writes to durable storage. LangGraph ships `SqliteSaver` (a single local file) and `PostgresSaver` (a real database), and because they share the checkpointer interface, switching is mostly a one-line change to how you build `checkpointer`. We're staying with `InMemorySaver` through Part 8 to keep the deploy simple, and the closing section there points you at the durable options when you're ready. For now, knowing the limit is enough.
+The fix is to swap the saver for one that writes to durable storage. LangGraph ships `SqliteSaver` (a single local file) and `PostgresSaver` (a real database), and because they share the checkpointer interface, switching is mostly a one-line change to how you build `checkpointer`. We're staying with `InMemorySaver` through [Part 8](/blog/langgraph-8-deploy#where-to-go-from-here) to keep the deploy simple, and the closing section there points you at the durable options when you're ready. For now, knowing the limit is enough.
 </Callout>
 
 Here's the full `frontend/app/page.tsx` after this part, sidebar and all, in case a piece drifted while you wired it up:
@@ -582,14 +582,14 @@ export default function Chat() {
     "Threads: every conversation is keyed by a `thread_id`, generated with `crypto.randomUUID()` and kept in `localStorage` so it survives refreshes.",
     "The thread wired end to end: the frontend sends `thread_id`, the backend passes it as the graph's `config`, and the bot reads its own history before each reply.",
     "A `New chat` button that mints a fresh thread, and a sidebar that lists past chats and reopens them via a `GET /threads/{id}/messages` endpoint reading from the checkpointer.",
-    "A clear-eyed view of the limit: `InMemorySaver` lives in RAM, so every conversation is wiped on restart, the problem Part 8 leaves you ready to solve.",
+    "A clear-eyed view of the limit: `InMemorySaver` lives in RAM, so every conversation is wiped on restart, the problem [Part 8](/blog/langgraph-8-deploy#watch-it-forget-you) leaves you ready to solve.",
   ]}
 />
 
 <Quiz
   questions={[
     {
-      q: "Why did the Part 6 bot forget your name between two messages?",
+      q: "Why did the [Part 6 bot](/blog/langgraph-6-tools#watch-it-reach-for-both) forget your name between two messages?",
       options: [
         "The model is too small to hold a conversation",
         "Each `/chat` request ran the graph fresh with only the message you just sent, and nothing carried the past between requests",
@@ -630,7 +630,7 @@ export default function Chat() {
         "Old messages are stored on the frontend instead",
       ],
       answer: 1,
-      explain: "On each turn the checkpointer reloads the thread's saved messages, the `add_messages` reducer from Part 3 appends your one new message, and the grown list is saved again. You supply the new line; the graph supplies the rest.",
+      explain: "On each turn the checkpointer reloads the thread's saved messages, the `add_messages` reducer [from Part 3](/blog/langgraph-3-first-graph#the-tray-that-rides-the-line) appends your one new message, and the grown list is saved again. You supply the new line; the graph supplies the rest.",
     },
     {
       q: "The series uses `InMemorySaver`. What happens to every conversation when the server restarts?",
@@ -641,7 +641,7 @@ export default function Chat() {
         "They're reloaded from `localStorage` on the frontend",
       ],
       answer: 2,
-      explain: "`InMemorySaver` stores threads in a plain dict inside the running process. It's perfect for development and zero-setup, but a restart erases everything. That's the goldfish bowl labeled PROD, and swapping in `SqliteSaver` or `PostgresSaver` is the durable fix Part 8 points to.",
+      explain: "`InMemorySaver` stores threads in a plain dict inside the running process. It's perfect for development and zero-setup, but a restart erases everything. That's the goldfish bowl labeled PROD, and swapping in `SqliteSaver` or `PostgresSaver` is the durable fix [Part 8](/blog/langgraph-8-deploy#where-to-go-from-here) points to.",
     },
   ]}
 />
@@ -653,7 +653,7 @@ git add .
 git commit -m "part 7: give the bot conversation memory with a checkpointer and threads"
 ```
 
-Your bot remembers you now, runs tools, and streams its answers, the whole thing humming on your laptop. There's one wall left: it only exists on your machine. In Part 8 you'll put it on the public internet, share the link, and watch it forget everyone the first time you redeploy, which turns out to be the perfect reason to care about everything this part taught you.
+Your bot remembers you now, runs tools, and streams its answers, the whole thing humming on your laptop. There's one wall left: it only exists on your machine. In [Part 8](/blog/langgraph-8-deploy#it-answers-from-anywhere-now) you'll put it on the public internet, share the link, and [watch it forget everyone the first time you redeploy](/blog/langgraph-8-deploy#watch-it-forget-you), which turns out to be the perfect reason to care about everything this part taught you.
 
 {/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-7-memory) in the intro once it exists. */}
 

@@ -28,7 +28,7 @@ export default async function BlogPost({
   const { slug } = await params;
   const post = await getPostBySlug(slug);
   if (!post) return notFound();
-  const { meta, content } = post;
+  const { meta, content, headings } = post;
   const seriesCtx = getSeriesContextForPost(meta);
   const updatedDiffers =
     formatDate(meta.updatedAt) !== formatDate(meta.createdAt);
@@ -36,7 +36,11 @@ export default async function BlogPost({
   return (
     <main className="mx-auto max-w-6xl px-6 py-16">
       <div className="grid grid-cols-1 lg:grid-cols-[auto_minmax(0,1fr)]">
-        <TOC contentSelector="#post-content" />
+        <TOC
+          key={slug}
+          contentSelector="#post-content"
+          initialHeadings={headings}
+        />
         <article className="w-full max-w-3xl lg:mx-auto">
           <header>
             {seriesCtx ? (

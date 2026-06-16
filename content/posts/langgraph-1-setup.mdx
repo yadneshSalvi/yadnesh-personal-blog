@@ -16,7 +16,7 @@ By the end of this page, two servers will be running on your machine: a Python b
 
 ## Where you're going
 
-This is Part 1 of **LangGraph from Scratch**, an eight-part series for developers who can write a basic Python function and a basic React component but have never touched FastAPI, Next.js, or LangGraph. Across the series you'll build this:
+This is Part 1 of **LangGraph from Scratch**, an eight-part series for developers who can write a basic Python function and a basic React component but have never touched [FastAPI](https://fastapi.tiangolo.com/), [Next.js](https://nextjs.org/docs), or [LangGraph](https://docs.langchain.com/oss/python/langgraph/overview). Across the series you'll build this:
 
 <Figure
   src="/images/series/langgraph/part-1/fig-finished-app-light.svg"
@@ -27,7 +27,7 @@ This is Part 1 of **LangGraph from Scratch**, an eight-part series for developer
   height={800}
 />
 
-A streaming AI chatbot: the kind where words appear as the model thinks, where the bot can reach for a calculator instead of guessing at arithmetic, and where "what's my name?" actually gets answered. By Part 8 it's deployed on the public internet, on a URL you can text to a friend.
+A streaming AI chatbot: the kind where words appear as the model thinks, where the bot can reach for a calculator instead of guessing at arithmetic, and where "what's my name?" actually gets answered. By [Part 8](/blog/langgraph-8-deploy#it-answers-from-anywhere-now) it's deployed on the public internet, on a URL you can text to a friend.
 
 Today's slice is deliberately humble: get everything installed and prove it runs. No AI yet. Foundations first, on purpose. A server you trust on day one is the difference between debugging your code later and debugging your laptop.
 
@@ -140,15 +140,15 @@ Now install everything the whole series needs, in one go:
 pip install fastapi "uvicorn[standard]" langgraph langchain langchain-openai langchain-anthropic python-dotenv
 ```
 
-Half of these won't be touched until Part 3, but installing them together means they're version-locked together, and you never have to interrupt a future part for a pip run. What you grabbed:
+Half of these won't be touched until [Part 3](/blog/langgraph-3-first-graph#langchain-talks-langgraph-organizes), but installing them together means they're version-locked together, and you never have to interrupt a future part for a pip run. What you grabbed:
 
 - **fastapi**: the web framework. It turns Python functions into HTTP endpoints.
-- **uvicorn**: the server that actually runs FastAPI. FastAPI defines *what* to answer; uvicorn handles the networking of *answering*. (The term to google later: it's an "ASGI server.")
-- **langgraph** + **langchain**: the AI orchestration layer, waiting patiently for Part 3.
-- **langchain-openai** / **langchain-anthropic**: connectors for the two LLM providers this series supports. You'll pick one in Part 3; installing both costs nothing.
+- [**uvicorn**](https://uvicorn.dev/): the server that actually runs FastAPI. FastAPI defines *what* to answer; uvicorn handles the networking of *answering*. (The term to google later: it's an "ASGI server.")
+- [**langgraph**](https://docs.langchain.com/oss/python/langgraph/overview) + [**langchain**](https://docs.langchain.com/oss/python/langchain/overview): the AI orchestration layer, waiting patiently for [Part 3](/blog/langgraph-3-first-graph#langchain-talks-langgraph-organizes).
+- **langchain-openai** / **langchain-anthropic**: connectors for the two LLM providers this series supports. You'll pick one in [Part 3](/blog/langgraph-3-first-graph#the-one-station-that-does-the-thinking); installing both costs nothing.
 - **python-dotenv**: reads your API key from a file instead of your source code.
 
-While that downloads, the traditional first-time question: *why a whole framework for one endpoint?* Because FastAPI gives you three things this series leans on hard: automatic JSON handling, automatic input validation, and an interactive docs page it writes for you. You'll meet all three in Part 2.
+While that downloads, the traditional first-time question: *why a whole framework for one endpoint?* Because FastAPI gives you three things this series leans on hard: automatic JSON handling, automatic input validation, and an interactive docs page it writes for you. You'll meet all three in [Part 2](/blog/langgraph-2-fastapi-basics#the-page-you-never-wrote).
 
 Now the code. Create a new file named `main.py` inside `backend/`, right next to the `.venv` folder, in whatever editor you like (VS Code, Cursor, even Notepad). Paste in these eight lines and save:
 
@@ -186,7 +186,7 @@ uvicorn main:app --reload
 />
 
 <Callout type="info" title="What does --reload do?">
-It watches your files and restarts the server every time you save. You'll change `main.py` constantly across this series; `--reload` means you never have to manually stop and restart. It's a development-only flag; it comes off in Part 8 when we deploy.
+It watches your files and restarts the server every time you save. You'll change `main.py` constantly across this series; `--reload` means you never have to manually stop and restart. It's a development-only flag; it comes off in [Part 8](/blog/langgraph-8-deploy#getting-the-backend-ready-to-ship) when we deploy.
 </Callout>
 
 Open [http://localhost:8000](http://localhost:8000) in your browser:
@@ -244,13 +244,13 @@ You will hit this again: after a reboot, after lunch, in three weeks when you re
 
 ## Your frontend: scaffolded in one command
 
-The backend got built by hand because eight lines is a fair ask. A frontend involves a few dozen config files nobody writes by hand anymore, so the Next.js team ships a generator instead. The backend's terminal is busy hosting a server, so open one more terminal for the frontend (this one needs no `(.venv)`; that's a Python thing) and go to the **project root** (`langgraph-chatbot/`, not `backend/`):
+The backend got built by hand because eight lines is a fair ask. A frontend involves a few dozen config files nobody writes by hand anymore, so the Next.js team ships a [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app) generator instead. The backend's terminal is busy hosting a server, so open one more terminal for the frontend (this one needs no `(.venv)`; that's a Python thing) and go to the **project root** (`langgraph-chatbot/`, not `backend/`):
 
 ```bash
 npx create-next-app@latest frontend
 ```
 
-It asks one question: *"Would you like to use the recommended Next.js defaults?"* Answer **Yes**. That gets you TypeScript, Tailwind CSS, ESLint, and the App Router: the current standard kit, and exactly what this series assumes. (It may also offer an `AGENTS.md` file with guidance for AI coding assistants; it's included by default and harmless either way.)
+It asks one question: *"Would you like to use the recommended Next.js defaults?"* Answer **Yes**. That gets you TypeScript, Tailwind CSS, ESLint, and the [App Router](https://nextjs.org/docs/app): the current standard kit, and exactly what this series assumes. (It may also offer an `AGENTS.md` file with guidance for AI coding assistants; it's included by default and harmless either way.)
 
 <Callout type="info" title="What's the App Router?">
 Next.js has two routing systems. The older Pages Router maps files in `pages/` to URLs; the newer App Router maps folders in `app/` to URLs and is where all current Next.js development happens. Everything in this series assumes the App Router, and so does almost every Next.js doc you'll read from here on.
@@ -269,7 +269,7 @@ The banner says `Ready` in well under a second; that's Turbopack, the new bundle
   src="/images/series/langgraph/part-1/browser-next-welcome-light.svg"
   srcDark="/images/series/langgraph/part-1/browser-next-welcome-dark.svg"
   alt="A browser pointed at localhost:3000 showing the Next.js welcome page: the Next.js wordmark, a 'Get started by editing app/page.tsx' hint, and Deploy / Docs buttons."
-  caption="The Next.js welcome page. In Part 4, everything you see here gets deleted and replaced with your chat UI."
+  caption="The Next.js welcome page. In [Part 4](/blog/langgraph-4-nextjs-frontend#a-tour-of-the-room-youre-about-to-redecorate), everything you see here gets deleted and replaced with your chat UI."
   width={1120}
   height={640}
 />
@@ -278,7 +278,7 @@ Two servers now. Different ports, by the way, because a port can only have one t
 
 ## Get a key to a language model
 
-In Part 3 the backend starts calling a real LLM, and LLM APIs cost money, so the responsible move is to set this up *now*, with a spending cap, while you're calm and not mid-tutorial. Pick **one** provider. The entire series shows every snippet for both, and your choice here sticks across all eight parts.
+In [Part 3](/blog/langgraph-3-first-graph#the-one-station-that-does-the-thinking) the backend starts calling a real LLM, and LLM APIs cost money, so the responsible move is to set this up *now*, with a spending cap, while you're calm and not mid-tutorial. Pick **one** provider. The entire series shows every snippet for both, and your choice here sticks across all eight parts.
 
 <CodeTabs>
 
@@ -332,7 +332,7 @@ ANTHROPIC_API_KEY=sk-ant-paste-your-actual-key-here
 
 </CodeTabs>
 
-No quotes, no spaces around the `=`. Nothing reads this file yet (that's Part 3's job), but it's now sitting exactly where the code will expect it.
+No quotes, no spaces around the `=`. Nothing reads this file yet (that's [Part 3](/blog/langgraph-3-first-graph#hand-the-conversation-to-the-graph)'s job), but it's now sitting exactly where the code will expect it.
 
 The frontend gets its own config file, with a different job: telling the browser code where the backend lives. Create a file named `.env.local` inside `frontend/`:
 
@@ -355,7 +355,7 @@ Frontend code runs in your visitors' browsers, so any value it uses is, by defin
   height={540}
 />
 
-Inventory check. Right now you have: a FastAPI server on `:8000` that answers one question, a Next.js dev server on `:3000` showing a welcome page, and a key with a cap. The two servers are strangers to each other. Wiring them together is Part 4, and the wire is that dotted line.
+Inventory check. Right now you have: a FastAPI server on `:8000` that answers one question, a Next.js dev server on `:3000` showing a welcome page, and a key with a cap. The two servers are strangers to each other. Wiring them together is [Part 4](/blog/langgraph-4-nextjs-frontend#wire-it-to-the-brain), and the wire is that dotted line.
 
 ## Turn it into a git repo (your undo button)
 
@@ -425,7 +425,7 @@ And one more thing that's harder to see: you now know your environment works. Wh
         "Clears Python's import cache",
       ],
       answer: 1,
-      explain: "It watches your files and restarts the server on save, so you never stop and start it by hand while developing. It comes off in Part 8 when you deploy.",
+      explain: "It watches your files and restarts the server on save, so you never stop and start it by hand while developing. It comes off in [Part 8](/blog/langgraph-8-deploy#getting-the-backend-ready-to-ship) when you deploy.",
     },
     {
       q: "Why does the frontend's API URL need the `NEXT_PUBLIC_` prefix in `.env.local`?",
@@ -447,7 +447,7 @@ And one more thing that's harder to see: you now know your environment works. Wh
         "A port can only have one process listening on it",
       ],
       answer: 3,
-      explain: "Each port hosts exactly one process. They are two independent servers on your machine, strangers for now. Wiring them together is Part 4.",
+      explain: "Each port hosts exactly one process. They are two independent servers on your machine, strangers for now. Wiring them together is [Part 4](/blog/langgraph-4-nextjs-frontend#wire-it-to-the-brain).",
     },
     {
       q: "Which line in your `.gitignore` is the one keeping your API key out of version control?",
@@ -458,7 +458,7 @@ And one more thing that's harder to see: you now know your environment works. Wh
   ]}
 />
 
-Right now your backend can say exactly one thing, to anyone, forever: `{"status": "ok"}`. In Part 2 you'll teach it to actually listen: request bodies, validation, and the interactive docs page FastAPI has been quietly building for you this whole time.
+Right now your backend can say exactly one thing, to anyone, forever: `{"status": "ok"}`. In [Part 2](/blog/langgraph-2-fastapi-basics#teach-it-to-listen) you'll teach it to actually listen: request bodies, validation, and the interactive docs page FastAPI has been quietly building for you this whole time.
 
 {/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-1-setup) in the intro once it exists. */}
 

@@ -10,7 +10,7 @@ series: "langgraph-fastapi-nextjs"
 seriesPart: 6
 ---
 
-Ask your bot from Part 5 what 23 times 17 is. It will answer with total confidence, and there's a real chance it's wrong. Ask it for today's headlines and it will invent some. The model isn't lying on purpose. It's a brilliant improviser that has never once done arithmetic or seen the internet. It pattern-matches words, and sometimes the pattern for "23 times 17" lands on the wrong number.
+Ask your bot from [Part 5](/blog/langgraph-5-streaming#give-it-a-cursor-and-a-self-scroll) what 23 times 17 is. It will answer with total confidence, and there's a real chance it's wrong. Ask it for today's headlines and it will invent some. The model isn't lying on purpose. It's a brilliant improviser that has never once done arithmetic or seen the internet. It pattern-matches words, and sometimes the pattern for "23 times 17" lands on the wrong number.
 
 By the end of this page, your bot stops guessing. It gets a calculator that's always right and a web search that actually looks things up, and, the part that makes it an *agent* instead of a chatbot, it decides on its own when to use them.
 
@@ -23,7 +23,7 @@ By the end of this page, your bot stops guessing. It gets a calculator that's al
   height={462}
 />
 
-This part has more moving pieces than the last, so here's the map: one new Python file for the tools, a few lines that let the model reach for them, a graph that can now loop, and two new envelope types riding the SSE belt from Part 5. You'll install one new package along the way. Let's give the bot some hands.
+This part has more moving pieces than the last, so here's the map: one new Python file for the tools, a few lines that let the model reach for them, a graph that can now loop, and two new envelope types riding the [SSE belt from Part 5](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word). You'll install one new package along the way. Let's give the bot some hands.
 
 ## Why your bot is a confident liar
 
@@ -100,14 +100,14 @@ def calculator(expression: str) -> str:
 ```
 
 <Callout type="info" title="What the @tool decorator does">
-`@tool` is the bridge between a plain Python function and something a model can request. It reads your function's name, its type hints, and, importantly, its docstring, and packages them into a description the model receives. The model uses that description to decide when the tool fits and what arguments to pass, so the docstring isn't a comment here, it's the instruction manual. Write it for the model: say what the tool does and give an example.
+[`@tool`](https://docs.langchain.com/oss/python/langchain/tools) is the bridge between a plain Python function and something a model can request. It reads your function's name, its type hints, and, importantly, its docstring, and packages them into a description the model receives. The model uses that description to decide when the tool fits and what arguments to pass, so the docstring isn't a comment here, it's the instruction manual. Write it for the model: say what the tool does and give an example.
 </Callout>
 
 That docstring matters more than it looks. "Evaluate a basic math expression" is how the model knows this is the thing to reach for when it sees arithmetic. A vague docstring gets a tool the model never calls.
 
 ## A tool that can see the internet
 
-The calculator you wrote by hand because it's a teaching moment. For web search you'd be reinventing a search API, so we use a prebuilt one: [Tavily](https://tavily.com), a search service shaped for LLMs. It has a free tier that's plenty for this. Sign up, grab an API key from the dashboard, and install the package:
+The calculator you wrote by hand because it's a teaching moment. For web search you'd be reinventing a search API, so we use a prebuilt one: [Tavily](https://tavily.com), a search service shaped for LLMs. It has a free tier that's plenty for this. Sign up, grab an API key from the dashboard, and install the [LangChain Tavily integration](https://docs.langchain.com/oss/python/integrations/providers/tavily):
 
 ```bash
 pip install langchain-tavily
@@ -121,7 +121,7 @@ from langchain_tavily import TavilySearch
 web_search = TavilySearch(max_results=3)
 ```
 
-`TavilySearch` is already a tool, the same shape your `@tool`-decorated `calculator` produces, so the model can call it the same way. `max_results=3` keeps replies tight. Its built-in name, the one you'll see in the stream, is `tavily_search`.
+[`TavilySearch`](https://reference.langchain.com/python/langchain-tavily/tavily_search/TavilySearch) is already a tool, the same shape your `@tool`-decorated `calculator` produces, so the model can call it the same way. `max_results=3` keeps replies tight. Its built-in name, the one you'll see in the stream, is `tavily_search`.
 
 Now save the file and restart your server. If you skipped a step, you're about to meet a very specific error, and meeting it here on purpose is cheaper than meeting it confused at midnight.
 
@@ -133,7 +133,7 @@ Now save the file and restart your server. If you skipped a step, you're about t
   height={470}
 />
 
-You saw this shape back in Part 3, when `ChatOpenAI` couldn't find its key. Same fix, new key. `TavilySearch` looks for `TAVILY_API_KEY` the moment it's built, and the server can't even start without it. Add the key to your `backend/.env`, next to the LLM key that's already there:
+You saw this shape back in [Part 3](/blog/langgraph-3-first-graph#hand-the-conversation-to-the-graph), when `ChatOpenAI` couldn't find its key. Same fix, new key. `TavilySearch` looks for `TAVILY_API_KEY` the moment it's built, and the server can't even start without it. Add the key to your `backend/.env`, next to the LLM key that's already there:
 
 ```bash filename="backend/.env"
 OPENAI_API_KEY=sk-...
@@ -152,7 +152,7 @@ Restart, and the server boots clean. You now have two tools sitting in a file. T
 
 ## Teaching the model the tools exist
 
-Open `graph.py`. The model you built in Part 3 was created with `ChatOpenAI(...)` or `ChatAnthropic(...)`, whichever tab you picked. Right after that line, bind the tools to it:
+Open `graph.py`. The model you built in [Part 3](/blog/langgraph-3-first-graph#the-one-station-that-does-the-thinking) was created with `ChatOpenAI(...)` or `ChatAnthropic(...)`, whichever tab you picked. Right after that line, bind the tools to it:
 
 ```python filename="backend/app/graph.py"
 from app.tools import calculator, web_search   # with your other imports
@@ -161,7 +161,7 @@ tools = [calculator, web_search]
 llm = llm.bind_tools(tools)                     # right after you create llm
 ```
 
-`bind_tools` returns a *new* model object that carries the tool descriptions in every request it makes. We reassign `llm` to that bound version, so `call_model` doesn't change by a single character; it still calls `llm.invoke(...)`, but now every call quietly includes "by the way, here are two tools you can ask for."
+[`bind_tools`](https://reference.langchain.com/python/langchain-core/language_models/chat_models/BaseChatModel/bind_tools) returns a *new* model object that carries the tool descriptions in every request it makes. We reassign `llm` to that bound version, so `call_model` doesn't change by a single character; it still calls `llm.invoke(...)`, but now every call quietly includes "by the way, here are two tools you can ask for."
 
 <Callout type="info" title="What binding tools actually changes">
 Under the hood, `bind_tools` adds a `tools` field to the JSON your app sends the model's API on every request, listing each tool's name, description, and argument shape (all pulled from those `@tool` docstrings and type hints). The model reads that list and, instead of only being able to reply with text, gains a second option: reply with a structured tool-call request. Binding doesn't run anything or cost extra by itself. It just widens what the model is allowed to say back.
@@ -194,13 +194,13 @@ builder.add_edge("tools", "llm")
 graph = builder.compile()
 ```
 
-Three lines are new, and each one maps to a piece of the loop diagram. `add_node("tools", ToolNode(tools))` adds the **ACT** station: `ToolNode` is LangGraph's prebuilt runner that reads the model's tool-call request, executes the matching function, and puts the result back on the tray. You hand it the same `tools` list you bound to the model.
+Three lines are new, and each one maps to a piece of the loop diagram. `add_node("tools", ToolNode(tools))` adds the **ACT** station: [`ToolNode`](https://reference.langchain.com/python/langgraph.prebuilt/tool_node/ToolNode) is LangGraph's prebuilt runner that reads the model's tool-call request, executes the matching function, and puts the result back on the tray. You hand it the same `tools` list you bound to the model.
 
-`add_conditional_edges("llm", tools_condition)` is the fork. A normal edge always goes to the same place; a *conditional* edge runs a function to decide. `tools_condition` is a prebuilt checker: it looks at what the model just produced and returns `"tools"` if the model asked for a tool, or `"__end__"` if it just answered. You don't pass a routing table; `tools_condition` already returns the right node names. This line replaces your old `add_edge("llm", END)`, because ending is now just one of the two things that can happen.
+`add_conditional_edges("llm", tools_condition)` is the fork. A normal edge always goes to the same place; a *conditional* edge runs a function to decide. [`tools_condition`](https://reference.langchain.com/python/langgraph.prebuilt/tool_node/tools_condition) is a prebuilt checker: it looks at what the model just produced and returns `"tools"` if the model asked for a tool, or `"__end__"` if it just answered. You don't pass a routing table; `tools_condition` already returns the right node names. This line replaces your old `add_edge("llm", END)`, because ending is now just one of the two things that can happen.
 
 `add_edge("tools", "llm")` is the loop. After the tools node runs, the result goes *back* to the model, which gets to reason again. That single edge is what lets the bot chain "calculate this, then search for that, then answer."
 
-Don't take my word for the shape. Ask LangGraph to draw it, the same way you did in Part 3:
+Don't take my word for the shape. Ask LangGraph to draw it, the same way you did in [Part 3](/blog/langgraph-3-first-graph#wire-the-stations-together):
 
 ```text
 graph TD;
@@ -236,9 +236,9 @@ In theory the model could keep asking for tools and never finish. In practice it
 
 ## New events on the same belt
 
-The graph runs tools now, but the frontend can't see any of it yet. Time to collect on the design decision from Part 5. Remember the envelope: every SSE message is `data: {"type": ..., ...}`, and you swore that when tools arrived, the frontend parser wouldn't change, it would just learn new `type` values. Today's the day that pays off.
+The graph runs tools now, but the frontend can't see any of it yet. Time to collect on the [design decision from Part 5](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word). Remember the envelope: every SSE message is `data: {"type": ..., ...}`, and you swore that when tools arrived, the frontend parser wouldn't change, it would just learn new `type` values. Today's the day that pays off.
 
-`graph.astream_events` already reports tool activity. Alongside the `on_chat_model_stream` events you handled in Part 5, the same firehose now emits `on_tool_start` when a tool begins and `on_tool_end` when it returns. Forward them as two new envelope types. Open `main.py` and grow your `token_stream`:
+`graph.astream_events` already reports tool activity. Alongside the `on_chat_model_stream` events you handled in [Part 5](/blog/langgraph-5-streaming#teach-the-backend-to-hand-over-each-word), the same firehose now emits `on_tool_start` when a tool begins and `on_tool_end` when it returns. Forward them as two new envelope types. Open `main.py` and grow your `token_stream`:
 
 ```python filename="backend/app/main.py"
 async def token_stream(message: str):
@@ -265,13 +265,13 @@ async def token_stream(message: str):
     yield sse({"type": "done"})
 ```
 
-The `on_chat_model_stream` branch is untouched from Part 5; the final answer still streams token by token (the empty chunks the model emits while writing a tool call are dropped by the `if token` guard you already have). The two new branches each read three fields. `event["name"]` is the tool's own name, like `calculator`. `event["data"]["input"]` is the arguments the model chose, like `{"expression": "23 * 17"}`. And the result has one gotcha worth a callout.
+The `on_chat_model_stream` branch is untouched from [Part 5](/blog/langgraph-5-streaming#teach-the-backend-to-hand-over-each-word); the final answer still streams token by token (the empty chunks the model emits while writing a tool call are dropped by the `if token` guard you already have). The two new branches each read three fields. `event["name"]` is the tool's own name, like `calculator`. `event["data"]["input"]` is the arguments the model chose, like `{"expression": "23 * 17"}`. And the result has one gotcha worth a callout.
 
 <Callout type="info" title="The tool result is a message, not a string">
 `event["data"]["output"]` on `on_tool_end` is not the plain result text. It's a `ToolMessage` object, the typed wrapper LangGraph puts around every tool result so it can flow back into the conversation. The string you actually want lives on `.content`. Reach for `event["data"]["output"].content` and you get `"391"`; call `str(...)` on the whole object by mistake and you get a noisy `ToolMessage(content='391', name=...)` repr in your UI. One attribute, and the first thing people miss.
 </Callout>
 
-Save and curl it, with the `-N` flag from Part 5 so nothing buffers:
+Save and curl it, with the [`-N` flag from Part 5](/blog/langgraph-5-streaming#teach-the-backend-to-hand-over-each-word) so nothing buffers:
 
 ```bash
 curl -N -X POST http://localhost:8000/chat \
@@ -282,7 +282,7 @@ curl -N -X POST http://localhost:8000/chat \
 <Figure
   src="/images/series/langgraph/part-6/term-tool-stream.svg"
   alt="A dark backend terminal running curl -N against localhost:8000/chat with the message 'what is 23 * 17?'. The streamed output shows new envelope types: a tool_start line naming calculator with args expression 23 * 17, then a tool_end line giving calculator the result 391, then a tool_start and tool_end pair for tavily_search, then several token envelopes spelling out '23 × 17 is 391,', and finally a done envelope. A comment notes it's the same belt as Part 5 with two new labels riding it."
-  caption="The same wire from Part 5, carrying two new labels. tool_start and tool_end interleave with the token envelopes; the blank-line framing and the done envelope are exactly as you left them."
+  caption="The same wire from [Part 5](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word), carrying two new labels. tool_start and tool_end interleave with the token envelopes; the blank-line framing and the done envelope are exactly as you left them."
   width={1040}
   height={620}
 />
@@ -302,7 +302,7 @@ Flat cartoon comic, bold black outlines, flat colors, warm off-white paper backg
 
 ## Showing the work in the UI
 
-Back in `frontend/app/page.tsx`. Your messages have been `{ role, content }` since Part 4. A tool call doesn't fit that shape; it has a name, arguments, and a result, not a body of text. So widen the `Message` type into a union:
+Back in `frontend/app/page.tsx`. Your messages have been `{ role, content }` since [Part 4](/blog/langgraph-4-nextjs-frontend#teach-the-page-what-a-message-is). A tool call doesn't fit that shape; it has a name, arguments, and a result, not a body of text. So widen the `Message` type into a union:
 
 ```tsx filename="frontend/app/page.tsx"
 type Message =
@@ -332,9 +332,9 @@ function endTool(result: string) {
 }
 ```
 
-`startTool` pushes a new tool bubble in its running state. `endTool` walks backward to the most recent unfinished tool and fills in its result, the same immutable-update pattern you've used since Part 4: new array, new object, fresh references so React repaints.
+`startTool` pushes a new tool bubble in its running state. `endTool` walks backward to the most recent unfinished tool and fills in its result, the same immutable-update pattern you've used since [Part 4](/blog/langgraph-4-nextjs-frontend#a-box-to-type-in): new array, new object, fresh references so React repaints.
 
-There's one more change, and it's a consequence of the loop. In Part 5, when the user sent a message, you added an empty assistant bubble immediately, ready to fill with tokens. But now the bot might call a tool *before* it says anything, and you don't want an empty grey bubble sitting above the tool call. So stop pre-creating it. On send, add only the user's message:
+There's one more change, and it's a consequence of the loop. In [Part 5](/blog/langgraph-5-streaming#teach-the-browser-to-read-a-firehose), when the user sent a message, you added an empty assistant bubble immediately, ready to fill with tokens. But now the bot might call a tool *before* it says anything, and you don't want an empty grey bubble sitting above the tool call. So stop pre-creating it. On send, add only the user's message:
 
 ```tsx filename="frontend/app/page.tsx"
 setMessages((prev) => [...prev, { role: "user", content: text }]);
@@ -358,7 +358,7 @@ function appendToken(token: string) {
 
 If the last message is already an assistant bubble, grow it. If it isn't, because the last thing on screen is a tool result, or the conversation just started, open a fresh one. This is what lets the bot talk, run a tool, and talk again, each turn landing in its own bubble in the right order.
 
-Now the moment Part 5 was built for. Find your reader loop, the one that splits on the blank line and parses each envelope. The parser doesn't change. You add two branches to the part that reacts to `type`, and nothing else moves:
+Now the moment [Part 5](/blog/langgraph-5-streaming#teach-the-browser-to-read-a-firehose) was built for. Find your reader loop, the one that splits on the blank line and parses each envelope. The parser doesn't change. You add two branches to the part that reacts to `type`, and nothing else moves:
 
 ```tsx filename="frontend/app/page.tsx"
 for (const part of parts) {
@@ -370,7 +370,7 @@ for (const part of parts) {
 }
 ```
 
-That's it. That's the entire reward for designing an envelope in Part 5 instead of streaming bare tokens. Two new lines, no rewrite, no new parser. The buffer, the `\n\n` split, the kept tail: all of it works untouched, because you taught it to read a shape, not a token.
+That's it. That's the entire reward for [designing an envelope in Part 5](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word) instead of streaming bare tokens. Two new lines, no rewrite, no new parser. The buffer, the `\n\n` split, the kept tail: all of it works untouched, because you taught it to read a shape, not a token.
 
 Last, a component to render a tool bubble so it reads as the bot working, not as a chat message. Add a small `ToolCallBubble` above your `Chat` component:
 
@@ -440,7 +440,7 @@ Right now you have: a bot that holds two real tools, decides on its own when to 
     "A real `web_search` tool from Tavily, wired in with one line and its own API key in `.env`.",
     "Tools bound to the model with `llm.bind_tools(...)`, so it can ask for them, and a graph that loops through a prebuilt `ToolNode` via `tools_condition`.",
     "The ReAct loop running end to end: the bot reasons, acts, observes the result, and reasons again until it can answer.",
-    "Two new envelope types, `tool_start` and `tool_end`, streamed over the Part 5 belt and rendered as live tool bubbles, with the frontend parser unchanged.",
+    "Two new envelope types, `tool_start` and `tool_end`, streamed over the [Part 5 belt](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word) and rendered as live tool bubbles, with the frontend parser unchanged.",
   ]}
 />
 
@@ -488,7 +488,7 @@ Right now you have: a bot that holds two real tools, decides on its own when to 
         "The backend converts tool events into tokens",
       ],
       answer: 2,
-      explain: "Because Part 5 wrapped every message in a `{type, ...}` envelope, the reader already parses one shape and branches on `type`. Tool events are just two more `type` values, so the blank-line buffering and JSON parsing carry over unchanged.",
+      explain: "Because [Part 5](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word) wrapped every message in a `{type, ...}` envelope, the reader already parses one shape and branches on `type`. Tool events are just two more `type` values, so the blank-line buffering and JSON parsing carry over unchanged.",
     },
     {
       q: "On an `on_tool_end` event, `event['data']['output']` is a `ToolMessage`. How do you get the result string for the envelope?",
@@ -511,7 +511,7 @@ git add .
 git commit -m "part 6: give the bot a calculator and web search via tools"
 ```
 
-Your bot is sharp now, but it has the memory of a goldfish. Tell it your name, then ask what your name is, and it will have no idea, because every message you send starts a brand-new conversation with no past. In Part 7 you'll give it a memory, so it can hold a thread across turns and you can finally have a real conversation.
+Your bot is sharp now, but it has the memory of a goldfish. Tell it your name, then ask what your name is, and it will have no idea, because every message you send starts a brand-new conversation with no past. In [Part 7](/blog/langgraph-7-memory#your-bot-has-the-memory-of-a-goldfish) you'll give it a memory, so it can hold a thread across turns and you can finally have a real conversation.
 
 {/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-6-tools) in the intro once it exists. */}
 

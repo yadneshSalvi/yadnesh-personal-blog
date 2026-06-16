@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import clsx from "clsx";
+import Slugger from "github-slugger";
+import { plainInlineText, renderInlineText } from "./InlineText";
 
 /**
  * End-of-part knowledge check. Editorial "ink & paper" styling: hairline rows,
@@ -37,20 +39,16 @@ export type QuizProps = {
 };
 
 const LETTERS = ["A", "B", "C", "D", "E", "F"];
+const inlineCodeClass = "rounded bg-surface px-1 py-0.5 font-mono text-[0.85em] text-ink";
+const inlineLinkClass =
+  "underline underline-offset-2 decoration-accent/35 transition-colors hover:text-ink";
 
-function withInlineCode(text: string): React.ReactNode {
-  return text.split("`").map((part, i) =>
-    i % 2 === 1 ? (
-      <code
-        key={i}
-        className="rounded bg-surface px-1 py-0.5 font-mono text-[0.85em] text-ink"
-      >
-        {part}
-      </code>
-    ) : (
-      <React.Fragment key={i}>{part}</React.Fragment>
-    )
-  );
+function withInlineText(text: string, { allowLinks = true }: { allowLinks?: boolean } = {}): React.ReactNode {
+  return renderInlineText(text, {
+    codeClassName: inlineCodeClass,
+    linkClassName: inlineLinkClass,
+    allowLinks,
+  });
 }
 
 const Mark = ({ kind }: { kind: "check" | "cross" }) => (
@@ -64,6 +62,7 @@ const Mark = ({ kind }: { kind: "check" | "cross" }) => (
 );
 
 export default function Quiz({ questions, title = "Test yourself" }: QuizProps) {
+  const headingId = new Slugger().slug(title);
   const [selected, setSelected] = React.useState<(number | null)[]>(() =>
     questions.map(() => null)
   );
@@ -108,7 +107,10 @@ export default function Quiz({ questions, title = "Test yourself" }: QuizProps) 
   return (
     <section className="not-prose my-12">
       <header className="flex items-baseline justify-between gap-4 border-b border-line pb-3">
-        <h2 className="m-0 scroll-mt-24 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-faint">
+        <h2
+          id={headingId}
+          className="m-0 scroll-mt-24 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-faint"
+        >
           {title}
         </h2>
         <div
@@ -131,6 +133,7 @@ export default function Quiz({ questions, title = "Test yourself" }: QuizProps) 
         const isDone = submitted[qi];
         const pick = selected[qi];
         const gotIt = isDone && pick === q.answer;
+        const questionLabel = plainInlineText(q.q);
 
         return (
           <div key={qi} className="border-b border-line py-7">
@@ -140,12 +143,12 @@ export default function Quiz({ questions, title = "Test yourself" }: QuizProps) 
               </span>
               <div className="min-w-0 flex-1">
                 <p className="m-0 font-serif text-lg leading-snug text-ink">
-                  {withInlineCode(q.q)}
+                  {withInlineText(q.q)}
                 </p>
 
                 <ul
                   role="radiogroup"
-                  aria-label={q.q}
+                  aria-label={questionLabel}
                   className="mt-4 space-y-px"
                 >
                   {q.options.map((opt, oi) => {
@@ -197,7 +200,7 @@ export default function Quiz({ questions, title = "Test yourself" }: QuizProps) 
                               LETTERS[oi]
                             )}
                           </span>
-                          <span className="min-w-0">{withInlineCode(opt)}</span>
+                          <span className="min-w-0">{withInlineText(opt, { allowLinks: false })}</span>
                         </button>
                       </li>
                     );
@@ -237,7 +240,7 @@ export default function Quiz({ questions, title = "Test yourself" }: QuizProps) 
                     </p>
                     {q.explain ? (
                       <p className="m-0 mt-1.5 text-sm leading-relaxed text-muted">
-                        {withInlineCode(q.explain)}
+                        {withInlineText(q.explain)}
                       </p>
                     ) : null}
                   </div>

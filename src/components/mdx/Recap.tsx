@@ -1,5 +1,6 @@
-import * as React from "react";
 import clsx from "clsx";
+import Slugger from "github-slugger";
+import { renderInlineText } from "./InlineText";
 
 /**
  * The "What you built" recap at the close of each tutorial part.
@@ -19,19 +20,6 @@ export type RecapProps = {
   items: string[];
 };
 
-/** Render a plain string with `backtick` spans turned into <code>. */
-function withInlineCode(text: string, codeClassName: string): React.ReactNode {
-  return text.split("`").map((part, i) =>
-    i % 2 === 1 ? (
-      <code key={i} className={codeClassName}>
-        {part}
-      </code>
-    ) : (
-      <React.Fragment key={i}>{part}</React.Fragment>
-    )
-  );
-}
-
 const Check = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden className={className}>
     <path d="M9 16.17 5.53 12.7l-1.41 1.41L9 19 20.88 7.12l-1.41-1.41z" />
@@ -39,8 +27,11 @@ const Check = ({ className }: { className?: string }) => (
 );
 
 export default function Recap({ part, title = "What you built", items }: RecapProps) {
+  const headingId = new Slugger().slug(title);
   const codeClass =
     "rounded bg-green-100 px-1 py-0.5 font-mono text-[0.85em] text-green-900 dark:bg-green-900/40 dark:text-green-100";
+  const linkClass =
+    "underline underline-offset-2 decoration-green-700/35 transition-colors hover:text-green-700 dark:decoration-green-300/35 dark:hover:text-green-200";
 
   return (
     <section
@@ -50,7 +41,10 @@ export default function Recap({ part, title = "What you built", items }: RecapPr
       )}
     >
       <div className="flex items-center justify-between gap-4 px-6 pt-5">
-        <h2 className="m-0 flex items-center gap-2 scroll-mt-24 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-green-700 dark:text-green-300">
+        <h2
+          id={headingId}
+          className="m-0 flex items-center gap-2 scroll-mt-24 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-green-700 dark:text-green-300"
+        >
           <Check className="text-green-600 dark:text-green-400" />
           {title}
         </h2>
@@ -68,7 +62,7 @@ export default function Recap({ part, title = "What you built", items }: RecapPr
               <Check />
             </span>
             <span className="text-[15px] leading-relaxed text-green-900/90 dark:text-green-50/90">
-              {withInlineCode(item, codeClass)}
+              {renderInlineText(item, { codeClassName: codeClass, linkClassName: linkClass })}
             </span>
           </li>
         ))}

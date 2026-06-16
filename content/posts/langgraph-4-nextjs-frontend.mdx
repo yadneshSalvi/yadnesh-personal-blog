@@ -12,18 +12,18 @@ seriesPart: 4
 
 You've been talking to your backend through `curl` for three parts now. It works, but `curl` is a screwdriver, not a chatbot. Nobody you know is going to open a terminal to say hello to your bot.
 
-By the end of this page that changes completely. You'll have a real chat window in your browser: type a message, hit Send, watch the answer slide in as a bubble. The Part 3 backend doesn't change by a single line. Today is about building it a face.
+By the end of this page that changes completely. You'll have a real chat window in your browser: type a message, hit Send, watch the answer slide in as a bubble. The [Part 3 backend](/blog/langgraph-3-first-graph#hand-the-conversation-to-the-graph) doesn't change by a single line. Today is about building it a face.
 
 <Figure
   src="/images/series/langgraph/part-4/browser-chat-final-light.svg"
   srcDark="/images/series/langgraph/part-4/browser-chat-final-dark.svg"
   alt="A browser at localhost:3000 showing a finished chat app titled Chatbot. An assistant bubble greets the user, the user asked to explain recursion in one sentence, and the assistant replied with a one-sentence definition. An input box at the bottom reads 'Ask me anything...' with a Send button."
-  caption="Today's destination. The same backend from Part 3, now answering you in a real chat UI instead of a terminal. By the end of this page, you built this."
+  caption="Today's destination. The same backend from [Part 3](/blog/langgraph-3-first-graph#hand-the-conversation-to-the-graph), now answering you in a real chat UI instead of a terminal. By the end of this page, you built this."
   width={1120}
   height={639}
 />
 
-Everything new today lives mostly in one file, `frontend/app/page.tsx`, about seventy lines of TypeScript by the time you're done. Three tools do the heavy lifting, all of them already in your `frontend/` folder since Part 1's `create-next-app`:
+Everything new today lives mostly in one file, `frontend/app/page.tsx`, about seventy lines of TypeScript by the time you're done. Three tools do the heavy lifting, all of them already in your `frontend/` folder since [Part 1's `create-next-app`](/blog/langgraph-1-setup#your-frontend-scaffolded-in-one-command):
 
 | Tool | Version used here |
 |---|---|
@@ -35,9 +35,9 @@ One more thing joins them today, [shadcn/ui](https://ui.shadcn.com), and it has 
 
 ## Two servers, still strangers
 
-Cast your mind back to the last picture in Part 1: two boxes on one laptop, a frontend on `:3000`, a backend on `:8000`, and a dotted line between them labeled "they don't talk to each other yet. That's Part 4."
+Cast your mind back to the [last picture in Part 1](/blog/langgraph-1-setup#step-back-and-look-at-whats-running): two boxes on one laptop, a frontend on `:3000`, a backend on `:8000`, and a dotted line between them labeled "they don't talk to each other yet. That's Part 4."
 
-This is Part 4. Today you draw that line. The backend already knows how to answer (Part 3) and it already welcomes the frontend's origin (Part 2's CORS middleware, set up for exactly this moment). The only missing piece is a browser that knows how to ask. That's the whole job.
+This is Part 4. Today you draw that line. The backend already knows how to answer ([Part 3](/blog/langgraph-3-first-graph#hand-the-conversation-to-the-graph)) and it already welcomes the frontend's origin ([Part 2's CORS middleware](/blog/langgraph-2-fastapi-basics#one-locked-door-between-you-and-part-4), set up for exactly this moment). The only missing piece is a browser that knows how to ask. That's the whole job.
 
 You'll want both servers running for the second half of this part. Start the frontend now, in its own terminal, from the `frontend/` folder:
 
@@ -60,7 +60,7 @@ frontend/
     └── globals.css    global styles and the Tailwind import
 ```
 
-`layout.tsx` is the outer shell: it renders the `<html>` and `<body>` tags once and wraps every page inside them. You'll leave it alone. `globals.css` holds your global styles and the one line that pulls in Tailwind; shadcn will add a block of color variables here in a minute, and then you'll leave it alone too. `page.tsx` is the page served at `/`, the welcome screen you saw in Part 1, and it's the one file you're about to gut.
+`layout.tsx` is the outer shell: it renders the `<html>` and `<body>` tags once and wraps every page inside them. You'll leave it alone. `globals.css` holds your global styles and the one line that pulls in Tailwind; shadcn will add a block of color variables here in a minute, and then you'll leave it alone too. `page.tsx` is the page served at `/`, the welcome screen you saw in [Part 1](/blog/langgraph-1-setup#your-frontend-scaffolded-in-one-command), and it's the one file you're about to gut.
 
 Open `app/page.tsx`, delete everything in it, and save. The browser tab goes blank. That's correct; an empty file is a clean canvas. Now let's fill it.
 
@@ -88,7 +88,7 @@ Start the dev server again (`npm run dev`) and let's write some React.
 
 ## Teach the page what a message is
 
-A chat is a list of messages, and each message has two facts: who said it, and what they said. Before you can store a conversation, you have to describe its shape, the same instinct as Part 2's Pydantic models, just in TypeScript this time. Type this into your empty `app/page.tsx`:
+A chat is a list of messages, and each message has two facts: who said it, and what they said. Before you can store a conversation, you have to describe its shape, the same instinct as [Part 2's Pydantic models](/blog/langgraph-2-fastapi-basics#the-kitchen-gets-an-order-form), just in TypeScript this time. Type this into your empty `app/page.tsx`:
 
 ```tsx filename="frontend/app/page.tsx"
 import { useState } from "react";
@@ -109,7 +109,7 @@ export default function Chat() {
 `interface Message` is the order form for one chat line: a `role` that's either `"user"` or `"assistant"`, and a `content` string. Then `useState` gives the component two pieces of memory: `messages`, the conversation so far (starting empty), and `input`, whatever the user is currently typing. Each call hands back the current value and a function to change it.
 
 <Callout type="info" title="What's useState?">
-React's way of giving a component memory. `useState(initialValue)` hands back a pair: the current value and a setter to change it, which is why you write it as `const [input, setInput] = useState("")`. Call the setter and React re-renders the component with the new value, so what's on screen always matches the state. Without it, a component would forget everything the moment it re-draws. You'll use one for every moving piece of this UI: the message list, the input box, and soon a loading flag.
+React's way of giving a component memory. [`useState(initialValue)`](https://react.dev/reference/react/useState) hands back a pair: the current value and a setter to change it, which is why you write it as `const [input, setInput] = useState("")`. Call the setter and React re-renders the component with the new value, so what's on screen always matches the state. Without it, a component would forget everything the moment it re-draws. You'll use one for every moving piece of this UI: the message list, the input box, and soon a loading flag.
 </Callout>
 
 Save the file, and the dev server falls over instead of reloading clean:
@@ -122,7 +122,7 @@ Save the file, and the dev server falls over instead of reloading clean:
   height={440}
 />
 
-Read it like Part 2 taught you, except this one is friendly enough to read top-down: `useState` only works in a Client Component. Here's the idea behind that sentence. Next.js renders most components on the *server*, ahead of time, where there's no browser, no clicks, and no state that changes. A component that holds state and responds to typing has to run in the *browser* instead. Next.js won't guess which kind you meant; you have to say so, with one line at the very top of the file:
+Read it like [Part 2 taught you](/blog/langgraph-2-fastapi-basics#now-break-it-on-purpose), except this one is friendly enough to read top-down: `useState` only works in a Client Component. Here's the idea behind that sentence. Next.js renders most components on the *server*, ahead of time, where there's no browser, no clicks, and no state that changes. A component that holds state and responds to typing has to run in the *browser* instead. Next.js won't guess which kind you meant; you have to say so, with one line at the very top of the file:
 
 ```tsx filename="frontend/app/page.tsx"
 "use client";
@@ -133,7 +133,7 @@ import { useState } from "react";
 Save again, and the reload is quiet. That one string is a boundary marker: everything in a file tagged `"use client"` ships to the browser and may use state, effects, and event handlers.
 
 <Callout type="info" title="When do I need 'use client'?">
-The rule of thumb: add it the moment a component needs to *react* to something in the browser. State (`useState`), lifecycle (`useEffect`), and event handlers (`onClick`, `onSubmit`) all require it. A component that just renders static markup doesn't. Forget it and you get the exact error above, which is why we met it on purpose: now it's a familiar face, not a wall.
+The rule of thumb: add it the moment a component needs to *react* to something in the browser. State (`useState`), lifecycle (`useEffect`), and event handlers (`onClick`, `onSubmit`) all require it. A component that just renders static markup doesn't. Forget it and you get the exact error above, which is why we met [`"use client"`](https://nextjs.org/docs/app/api-reference/directives/use-client) on purpose: now it's a familiar face, not a wall.
 </Callout>
 
 ## Dress the window
@@ -273,7 +273,7 @@ async function sendMessage(e: FormEvent) {
 }
 ```
 
-Look past the new `loading` and `error` lines for a second (they get their own section next) and read the middle. That `fetch` is the entire round trip. It's the exact same `POST /chat` you've been sending with `curl` since Part 2, with the same `Content-Type` header and the same `{"message": ...}` body, except a browser sends it now. `await` pauses until the reply comes back, `res.json()` parses it, and `data.reply` is the string your backend returned. You append it as an `assistant` message, and the map you wrote earlier paints it as a bubble.
+Look past the new `loading` and `error` lines for a second (they get their own section next) and read the middle. That [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) is the entire round trip. It's the exact same `POST /chat` you've been sending with `curl` since [Part 2](/blog/langgraph-2-fastapi-basics#teach-it-to-listen), with the same `Content-Type` header and the same `{"message": ...}` body, except a browser sends it now. `await` pauses until the reply comes back, `res.json()` parses it, and `data.reply` is the string your backend returned. You append it as an `assistant` message, and the map you wrote earlier paints it as a bubble.
 
 Two small things hold this together. First, `API_BASE`. Add it near the top of the file, just under the imports:
 
@@ -281,7 +281,7 @@ Two small things hold this together. First, `API_BASE`. Add it near the top of t
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 ```
 
-That reads the backend URL you saved in `frontend/.env.local` back in Part 1. You also need the two new state variables the handler uses; widen your state block:
+That reads the backend URL you saved in `frontend/.env.local` back in [Part 1](/blog/langgraph-1-setup#tell-your-code-about-the-key). You also need the two new state variables the handler uses; widen your state block:
 
 ```tsx filename="frontend/app/page.tsx"
 const [loading, setLoading] = useState(false);
@@ -289,7 +289,7 @@ const [error, setError] = useState<string | null>(null);
 ```
 
 <Callout type="info" title="Why not just hardcode http://localhost:8000?">
-Because the URL changes. On your laptop the backend is `localhost:8000`; in Part 8, deployed, it's a public address. Reading it from `NEXT_PUBLIC_API_BASE_URL` means you change one line in one env file instead of hunting through your code. The `NEXT_PUBLIC_` prefix, from Part 1, is what makes the value visible to browser code in the first place. A backend URL is safe to expose; your API key, which has no such prefix, is not.
+Because the URL changes. On your laptop the backend is `localhost:8000`; in [Part 8](/blog/langgraph-8-deploy#putting-the-frontend-on-vercel), deployed, it's a public address. Reading it from [`NEXT_PUBLIC_API_BASE_URL`](https://nextjs.org/docs/app/guides/environment-variables#bundling-environment-variables-for-the-browser) means you change one line in one env file instead of hunting through your code. The `NEXT_PUBLIC_` prefix, from [Part 1](/blog/langgraph-1-setup#tell-your-code-about-the-key), is what makes the value visible to browser code in the first place. A backend URL is safe to expose; your API key, which has no such prefix, is not.
 </Callout>
 
 This is the moment the backend has to be awake. In a second terminal, start it the usual way (from `backend/`, with `(.venv)` active):
@@ -304,7 +304,7 @@ Now go back to the browser, type a real question, and hit Send. After a short pa
   src="/images/series/langgraph/part-4/fig-roundtrip-light.svg"
   srcDark="/images/series/langgraph/part-4/fig-roundtrip-dark.svg"
   alt="A diagram of the request round trip. On the left, a browser box at localhost:3000 holds a chat input and the React state 'messages, input'. An accent arrow labeled 'fetch( /chat )' with '{ message }' points right to a server box at localhost:8000 running POST /chat and graph.invoke. A return arrow labeled '200 OK' and '{ reply }' points back left. A caption reads that your click sends the words out and the reply rides back to become a bubble."
-  caption="The whole trip. Same path as your Part 2 curl, except a browser makes it and React paints the answer. The backend is the Part 3 one-node graph, untouched."
+  caption="The whole trip. Same path as your [Part 2 curl](/blog/langgraph-2-fastapi-basics#teach-it-to-listen), except a browser makes it and React paints the answer. The backend is the [Part 3 one-node graph](/blog/langgraph-3-first-graph#hand-the-conversation-to-the-graph), untouched."
   width={1180}
   height={560}
 />
@@ -353,7 +353,7 @@ Now prove the safety net works by breaking it on purpose. Click into the backend
 
 With nothing listening on `:8000`, `fetch` throws, your `catch` block runs, and the reader sees a plain explanation instead of a dead screen. Start the backend again (`uvicorn app.main:app --reload`) and the chat works exactly as before. A real app spends a surprising amount of its code on these "what if it fails" paths; you just wrote your first one.
 
-Right now you have: a chat UI in the browser that takes a message, posts it to your FastAPI backend, runs it through the Part 3 graph, and shows the model's reply in a bubble, with a thinking indicator while it waits and an honest error when it can't connect. That dotted line from Part 1 is now a solid wire.
+Right now you have: a chat UI in the browser that takes a message, posts it to your FastAPI backend, runs it through the [Part 3 graph](/blog/langgraph-3-first-graph#hand-the-conversation-to-the-graph), and shows the model's reply in a bubble, with a thinking indicator while it waits and an honest error when it can't connect. That [dotted line from Part 1](/blog/langgraph-1-setup#step-back-and-look-at-whats-running) is now a solid wire.
 
 Here's the whole file, in case a piece drifted out of place while you built it up:
 
@@ -447,7 +447,7 @@ export default function Chat() {
   items={[
     "A real chat UI in the browser: a scrolling message list, a text input, and a Send button, built from React state and shadcn/ui components.",
     "The `use client` boundary in your bones: you know state and event handlers need it, and you've met the exact error you get when you forget.",
-    "A `fetch` call wiring the frontend to the backend, posting to `/chat` and appending the JSON reply as a new bubble. The Part 1 dotted line is finally a solid wire.",
+    "A `fetch` call wiring the frontend to the backend, posting to `/chat` and appending the JSON reply as a new bubble. The [Part 1 dotted line](/blog/langgraph-1-setup#step-back-and-look-at-whats-running) is finally a solid wire.",
     "Loading and error states: a thinking indicator and a disabled input while you wait, and an honest banner when the backend is asleep.",
     "The whole round trip in your head: your words leave as JSON, the graph thinks, the reply rides back, and React paints it on screen.",
   ]}
@@ -475,7 +475,7 @@ export default function Chat() {
         "It hides the URL from the browser for security",
       ],
       answer: 1,
-      explain: "Deployed in Part 8, the backend lives at a public address, not localhost. Reading it from an env file means a one-line change. The `NEXT_PUBLIC_` prefix is also what makes the value readable by browser code at all.",
+      explain: "Deployed in [Part 8](/blog/langgraph-8-deploy#putting-the-frontend-on-vercel), the backend lives at a public address, not localhost. Reading it from an env file means a one-line change. The `NEXT_PUBLIC_` prefix is also what makes the value readable by browser code at all.",
     },
     {
       q: "Your frontend calls the backend from the browser and it works, no CORS error in the console. Why, given curl never needed CORS?",
@@ -486,7 +486,7 @@ export default function Chat() {
         "shadcn/ui handles CORS for you",
       ],
       answer: 2,
-      explain: "Browsers block cross-origin calls unless the server opts in; `:3000` and `:8000` are different origins. You added that opt-in back in Part 2, on purpose, for exactly this request. curl never enforced the check, which is why your terminal tests didn't need it.",
+      explain: "Browsers block cross-origin calls unless the server opts in; `:3000` and `:8000` are different origins. You added that opt-in back in [Part 2](/blog/langgraph-2-fastapi-basics#one-locked-door-between-you-and-part-4), on purpose, for exactly this request. curl never enforced the check, which is why your terminal tests didn't need it.",
     },
     {
       q: "Inside `sendMessage`, why is the new list written as `setMessages((prev) => [...prev, newMessage])` rather than `messages.push(newMessage)`?",
@@ -520,7 +520,7 @@ git add .
 git commit -m "part 4: a real chat UI wired to the backend over fetch"
 ```
 
-There's still a pause in the middle of every conversation, the few seconds where the UI just says "Thinking..." and waits for the whole reply to land at once. Real chat apps don't make you wait like that; the words appear as the model writes them. In Part 5 you'll replace that pause with text streaming in one token at a time.
+There's still a pause in the middle of every conversation, the few seconds where the UI just says "Thinking..." and waits for the whole reply to land at once. Real chat apps don't make you wait like that; the words appear as the model writes them. In [Part 5](/blog/langgraph-5-streaming#why-three-seconds-feels-like-forever) you'll replace that pause with text streaming in one token at a time.
 
 {/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-4-nextjs-frontend) in the intro once it exists. */}
 

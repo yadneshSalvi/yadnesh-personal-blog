@@ -1,4 +1,5 @@
 import ZoomableImage from "@/components/ZoomableImage";
+import { renderInlineText } from "./InlineText";
 
 export type FigureProps = {
   src: string;
@@ -20,6 +21,11 @@ export default function Figure({
   height = 720,
   priority,
 }: FigureProps) {
+  const codeClass =
+    "rounded bg-surface px-1 py-0.5 font-mono text-[0.85em] text-ink";
+  const linkClass =
+    "underline underline-offset-2 decoration-current transition-colors hover:text-muted";
+
   return (
     <figure className="not-prose my-10">
       <ZoomableImage
@@ -34,7 +40,7 @@ export default function Figure({
       />
       {caption ? (
         <figcaption className="mt-3 font-mono text-xs leading-relaxed text-faint">
-          {caption}
+          {renderInlineText(caption, { codeClassName: codeClass, linkClassName: linkClass })}
         </figcaption>
       ) : null}
     </figure>

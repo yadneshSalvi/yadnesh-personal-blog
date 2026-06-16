@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { compileMDX } from "next-mdx-remote/rsc";
+import Slugger from "github-slugger";
 import remarkGfm from "remark-gfm";
 import MDXComponents from "@/components/mdx/MDXComponents";
 
@@ -27,6 +28,12 @@ export type PostMeta = {
   series?: string;
   seriesPart?: number;
   kind?: string;
+};
+
+export type PostHeading = {
+  id: string;
+  text: string;
+  level: number;
 };
 
 /**
@@ -87,11 +94,16 @@ export function getListedPostsMeta(): PostMeta[] {
   return getAllPostsMeta().filter((m) => !m.series && m.kind !== "reference");
 }
 
-export async function getPostBySlug(slug: string): Promise<{ content: React.ReactNode; meta: PostMeta } | null> {
+export async function getPostBySlug(slug: string): Promise<{
+  content: React.ReactNode;
+  meta: PostMeta;
+  headings: PostHeading[];
+} | null> {
   ensurePostsDir();
   const mdxPath = path.join(POSTS_DIR, `${slug}.mdx`);
   if (!fs.existsSync(mdxPath)) return null;
   const source = fs.readFileSync(mdxPath, "utf8");
+  const { content: rawContent } = matter(source);
   const { content, frontmatter } = await compileMDX<{
     title: string;
     subtitle?: string;
@@ -116,16 +128,18 @@ export async function getPostBySlug(slug: string): Promise<{ content: React.Reac
       // as defense-in-depth.
       blockJS: false,
       // GFM enables pipe tables, strikethrough, task lists, and autolinks.
-      mdxOptions: { remarkPlugins: [remarkGfm] },
+      mdxOptions: {
+        remarkPlugins: [remarkGfm],
+        rehypePlugins: [rehypeSlugHeadings],
+      },
     },
     components: MDXComponents,
   });
 
   // Calculate reading time from content if not manually specified
-  const contentForReadingTime = source.split('---').slice(2).join('---'); // Remove frontmatter
   const readingTime = frontmatter.readingTime 
     ? Number(frontmatter.readingTime) 
-    : calculateReadingTime(contentForReadingTime);
+    : calculateReadingTime(rawContent);
 
   const meta: PostMeta = {
     slug,
@@ -144,7 +158,7 @@ export async function getPostBySlug(slug: string): Promise<{ content: React.Reac
     kind: frontmatter.kind ? String(frontmatter.kind) : undefined,
   };
 
-  return { content, meta };
+  return { content, meta, headings: extractHeadings(rawContent) };
 }
 
 function ensurePostsDir() {
@@ -153,4 +167,119 @@ function ensurePostsDir() {
   }
 }
 
+function extractHeadings(content: string): PostHeading[] {
+  const slugger = new Slugger();
+  const headings: PostHeading[] = [];
+  const lines = content.split(/\r?\n/);
+  let inFence = false;
 
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (/^\s*(```|~~~)/.test(line)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
+
+    const componentHeading = extractComponentHeading(lines, i);
+    if (componentHeading) {
+      headings.push({
+        id: slugger.slug(componentHeading.text),
+        text: componentHeading.text,
+        level: componentHeading.level,
+      });
+      i = componentHeading.endIndex;
+      continue;
+    }
+
+    const match = /^(#{1,6})\s+(.+?)\s*#*\s*$/.exec(line);
+    if (!match) continue;
+
+    const level = match[1].length;
+    const text = markdownHeadingText(match[2]);
+    if (!text) continue;
+
+    headings.push({
+      id: slugger.slug(text),
+      text,
+      level,
+    });
+  }
+
+  return headings;
+}
+
+function extractComponentHeading(
+  lines: string[],
+  startIndex: number
+): { text: string; level: number; endIndex: number } | null {
+  const line = lines[startIndex].trim();
+  const match = /^<(Recap|Quiz)\b/.exec(line);
+  if (!match) return null;
+
+  let endIndex = startIndex;
+  const blockLines = [lines[startIndex]];
+  while (endIndex < lines.length - 1 && !lines[endIndex].includes("/>")) {
+    endIndex += 1;
+    blockLines.push(lines[endIndex]);
+  }
+
+  const block = blockLines.join("\n");
+  const titleMatch = /title\s*=\s*(?:"([^"]+)"|'([^']+)')/.exec(block);
+  const defaultTitle = match[1] === "Recap" ? "What you built" : "Test yourself";
+
+  return {
+    text: titleMatch?.[1] || titleMatch?.[2] || defaultTitle,
+    level: 2,
+    endIndex,
+  };
+}
+
+function markdownHeadingText(markdown: string): string {
+  return markdown
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/<[^>]+>/g, "")
+    .replace(/[*_~]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+type HastNode = {
+  type?: string;
+  tagName?: string;
+  value?: string;
+  properties?: Record<string, unknown>;
+  children?: HastNode[];
+};
+
+function rehypeSlugHeadings() {
+  return (tree: HastNode) => {
+    const slugger = new Slugger();
+
+    const visit = (node: HastNode) => {
+      if (node.type === "element" && /^h[1-6]$/.test(node.tagName || "")) {
+        const text = hastText(node);
+        if (text) {
+          node.properties = {
+            ...node.properties,
+            id: node.properties?.id ?? slugger.slug(text),
+          };
+        }
+      }
+
+      for (const child of node.children || []) visit(child);
+    };
+
+    visit(tree);
+  };
+}
+
+function hastText(node: HastNode): string {
+  if (node.type === "text") return normalizeText(node.value || "");
+  return normalizeText((node.children || []).map(hastText).join(" "));
+}
+
+function normalizeText(text: string): string {
+  return text.replace(/\s+/g, " ").trim();
+}

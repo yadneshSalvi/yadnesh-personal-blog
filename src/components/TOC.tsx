@@ -1,69 +1,151 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Slugger from "github-slugger";
 import clsx from "clsx";
 
 type Heading = { id: string; text: string; level: number };
 
-function collectHeadings(container: HTMLElement): Heading[] {
+type TOCProps = {
+  contentSelector?: string;
+  initialHeadings?: Heading[];
+};
+
+const EMPTY_HEADINGS: Heading[] = [];
+
+function collectHeadings(
+  container: HTMLElement,
+  fallbackHeadings: Heading[]
+): Heading[] {
   const headings = Array.from(
     container.querySelectorAll<HTMLElement>("h1, h2, h3, h4, h5, h6")
   ).filter((h) => h.textContent && h.textContent.trim().length > 0);
 
   const slugger = new Slugger();
   const results: Heading[] = [];
-  for (const el of headings) {
+  for (const [index, el] of headings.entries()) {
     const level = Number(el.tagName[1]);
-    const text = el.textContent!.trim();
-    // Ensure element has an id
-    const id = el.id || slugger.slug(text);
+    const text = normalizeHeadingText(el.textContent!);
+    const fallback = fallbackHeadings[index];
+    const fallbackMatches =
+      fallback && fallback.level === level && fallback.text === text;
+    const generatedId = fallbackMatches ? fallback.id : slugger.slug(text);
+    if (fallbackMatches) slugger.slug(text);
+    // Ensure element IDs match the server-derived TOC whenever possible.
+    const id = el.id || generatedId;
     el.id = id;
     results.push({ id, text, level });
   }
   return results;
 }
 
-export default function TOC({ contentSelector = "#post-content" }: { contentSelector?: string }) {
-  const [headings, setHeadings] = useState<Heading[]>([]);
+function normalizeHeadingText(text: string): string {
+  return text.replace(/\s+/g, " ").trim();
+}
+
+export default function TOC({
+  contentSelector = "#post-content",
+  initialHeadings = EMPTY_HEADINGS,
+}: TOCProps) {
+  const pathname = usePathname();
+  const [headings, setHeadings] = useState<Heading[]>(() => initialHeadings);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
-    const el = document.querySelector(contentSelector) as HTMLElement | null;
-    if (!el) return;
-    const collected = collectHeadings(el);
-    setHeadings(collected);
+    let animationFrame = 0;
+    let disposed = false;
+    let observer: MutationObserver | null = null;
+    let cleanupScrollListeners = () => {};
+    const timeouts: number[] = [];
 
-    // The active section is the last heading scrolled past the reading line
-    // (just below the sticky header), so highlighting tracks long sections too.
-    let ticking = false;
-    const updateActive = () => {
-      ticking = false;
-      let current: string | null = null;
-      for (const h of collected) {
-        const node = document.getElementById(h.id);
-        if (!node) continue;
-        if (node.getBoundingClientRect().top <= 104) current = h.id;
-        else break;
+    const scrollToHash = () => {
+      const hash = window.location.hash.slice(1);
+      if (!hash) return;
+      let targetId = hash;
+      try {
+        targetId = decodeURIComponent(hash);
+      } catch {
+        targetId = hash;
       }
-      setActiveId(current ?? collected[0]?.id ?? null);
-    };
-    const onScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(updateActive);
-      }
+      const target = document.getElementById(targetId);
+      target?.scrollIntoView();
     };
 
-    updateActive();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    const rebuild = () => {
+      if (disposed) return;
+      cleanupScrollListeners();
+      const el = document.querySelector(contentSelector) as HTMLElement | null;
+      if (!el) {
+        setHeadings(initialHeadings);
+        setActiveId(initialHeadings[0]?.id ?? null);
+        return;
+      }
+
+      const collected = collectHeadings(el, initialHeadings);
+      const nextHeadings = collected.length > 0 ? collected : initialHeadings;
+      setHeadings(nextHeadings);
+
+      // The active section is the last heading scrolled past the reading line
+      // (just below the sticky header), so highlighting tracks long sections too.
+      let ticking = false;
+      const updateActive = () => {
+        ticking = false;
+        let current: string | null = null;
+        for (const h of nextHeadings) {
+          const node = document.getElementById(h.id);
+          if (!node) continue;
+          if (node.getBoundingClientRect().top <= 104) current = h.id;
+          else break;
+        }
+        setActiveId(current ?? nextHeadings[0]?.id ?? null);
+      };
+      const onScroll = () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(updateActive);
+        }
+      };
+
+      updateActive();
+      animationFrame = requestAnimationFrame(scrollToHash);
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll);
+      window.addEventListener("hashchange", scrollToHash);
+      cleanupScrollListeners = () => {
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("resize", onScroll);
+        window.removeEventListener("hashchange", scrollToHash);
+      };
+    };
+
+    const scheduleRebuild = () => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(() => {
+        rebuild();
+        timeouts.push(window.setTimeout(rebuild, 50));
+        timeouts.push(window.setTimeout(rebuild, 250));
+      });
+    };
+
+    scheduleRebuild();
+    observer = new MutationObserver(scheduleRebuild);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    window.addEventListener("pageshow", scheduleRebuild);
+    window.addEventListener("popstate", scheduleRebuild);
+
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      disposed = true;
+      cancelAnimationFrame(animationFrame);
+      for (const timeout of timeouts) window.clearTimeout(timeout);
+      observer?.disconnect();
+      cleanupScrollListeners();
+      window.removeEventListener("pageshow", scheduleRebuild);
+      window.removeEventListener("popstate", scheduleRebuild);
     };
-  }, [contentSelector]);
+  }, [contentSelector, initialHeadings, pathname]);
 
   if (headings.length === 0) return null;
 
