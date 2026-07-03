@@ -1,0 +1,590 @@
+---
+title: "Claude Agent SDK in Production, Part 4: Workspaces and Artifacts"
+subtitle: "Every conversation gets its own desk, you upload your own files, and the analyst starts handing back deliverables: charts and reports in a panel built for them."
+image: "/images/series/agent-sdk/part-4/cover-light.svg"
+imageDark: "/images/series/agent-sdk/part-4/cover-dark.svg"
+createdAt: "2026-07-06T00:00:00.000Z"
+updatedAt: "2026-07-06T00:00:00.000Z"
+tags: ["claude-agent-sdk", "fastapi", "nextjs", "tutorial"]
+series: "claude-agent-sdk-fastapi-nextjs"
+seriesPart: 4
+---
+
+Here's the moment this act has been building toward. You drop a CSV onto the page, type one sentence, and 24 seconds later there's a chart and a written report sitting in a panel on the right, made by an agent, from your data, on your machine. That's the screenshot below, from a real run, and by the end of this part it's yours. One catch: the same feature that makes this possible, accepting files and paths from strangers, is also how web servers get burgled. So today has two jobs: build the analyst's desk, and put a lock on it. The burglary attempt is one line long, and we'll run it ourselves.
+
+<Figure
+  src="/images/series/agent-sdk/part-4/browser-hero-light.svg"
+  srcDark="/images/series/agent-sdk/part-4/browser-hero-dark.svg"
+  alt="The Beanline Analyst with a new artifacts panel on the right. In the chat, the user asked: chart monthly revenue by store and write up what you see. Four completed Bash badges show the agent exploring data and running matplotlib, then a bold line reads: Done. Created monthly_revenue_by_store.png and report.md. The panel lists both files and previews the actual line chart, six colored revenue lines over six months. The receipt reads $0.0418 and 24s, and file chips for the uploaded CSVs sit above the input."
+  caption="The end of this part, from a real run: $0.0418, 24 seconds, one chart and one report. The panel on the right is new; every pixel of chat on the left is Part 3, untouched."
+  width={1120}
+  height={816}
+/>
+
+Look at what did *not* change: the chat column is Part 3's, byte for byte in spirit and nearly in fact. Today's work is one new concept on the backend (the workspace), one new event type on the wire (`artifact_update`), and one new column of UI (the panel). The Part 2 vocabulary absorbs its first extension exactly the way it promised it would. Collecting that bet is half the fun of this part.
+
+## One desk per conversation
+
+Since Part 1 the agent has worked out of a single hardcoded `workspace/` folder. Fine for one developer in one terminal; absurd for a product. If two people used your Part 3 app at once, they'd be reading each other's files and overwriting each other's charts, because your analyst has one desk and everybody shares it.
+
+The fix is the reference app's pattern, unchanged: **one folder per conversation**, created on demand, and the agent's `cwd` points at the folder of whoever's asking.
+
+```python filename="backend/app/workspaces.py" repo="part-04-workspaces-artifacts/backend/app/workspaces.py" lines="15-30"
+WORKSPACES_ROOT = Path("workspaces")
+
+
+def create_workspace() -> str:
+    """Mint a new desk. The id is the server's choice, never the client's."""
+    workspace_id = uuid.uuid4().hex
+    (WORKSPACES_ROOT / workspace_id).mkdir(parents=True)
+    return workspace_id
+
+
+def workspace_path(workspace_id: str) -> Path:
+    """Resolve an id to its folder, refusing anything that isn't one of ours."""
+    path = WORKSPACES_ROOT / workspace_id
+    if not (len(workspace_id) == 32 and workspace_id.isalnum() and path.is_dir()):
+        raise HTTPException(status_code=404, detail="Unknown workspace.")
+    return path
+```
+
+Two lines of policy hide in there, and both are security decisions. The id is minted **server-side** (`uuid4().hex`, 32 hex characters); the client never gets to name a folder on your disk. And `workspace_path` refuses anything that isn't exactly the shape of an id we'd mint: right length, alphanumeric only, already exists. A `workspace_id` of `../../etc` dies here with a 404 before it ever touches the filesystem.
+
+Notice what this does to [Part 1's sandbox story](/blog/agent-sdk-1-first-agent#the-permission-wall). The scary trade of `bypassPermissions` was always "the agent can do anything, but we point it at a sandbox folder". That story just got stronger: now each *conversation* is sandboxed from every other conversation too. Still running with scissors until Parts 7 and 8, but the room is padded.
+
+## The upload endpoints, and a one-line burglary
+
+A desk is useless until you can put your own papers on it. Two endpoints: one mints a desk, one puts a file on it.
+
+```python filename="backend/app/main.py" repo="part-04-workspaces-artifacts/backend/app/main.py" lines="65-78"
+@app.post("/workspaces")
+async def new_workspace() -> dict:
+    return {"workspace_id": create_workspace()}
+
+
+@app.post("/workspaces/{workspace_id}/files")
+async def upload_file(workspace_id: str, file: UploadFile) -> dict:
+    workspace = workspace_path(workspace_id)
+    name = safe_filename(file.filename or "")
+    data = await file.read()
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="File too large; the cap is 5 MB.")
+    (workspace / name).write_bytes(data)
+    return {"filename": name, "size": len(data)}
+```
+
+<Callout type="info" title="Multipart, in one paragraph">
+Browsers send files as `multipart/form-data`: the body is split into parts, each with its own headers, and one part carries your file's bytes plus its original filename. FastAPI's `UploadFile` unpacks all of that for you; `file.filename` is whatever name the *client's machine* gave the file. Keep that sentence in mind for the next thirty seconds. (New to FastAPI? [LangGraph Part 2](/blog/langgraph-2-fastapi-basics) builds endpoints from zero.)
+</Callout>
+
+That endpoint calls `safe_filename`, and here's why it must. The filename arrives from the client, and a filename is *almost* a path. Watch what an attacker sends, one line, no special tools:
+
+```bash
+curl -X POST http://localhost:8000/workspaces/$WS/files \
+  -F 'file=@evil.py;filename=../../app/main.py'
+```
+
+Read that filename slowly: `../../app/main.py`. If the server writes to `workspace / name` without checking, the `..` segments walk up out of the workspace and the upload **overwrites the server's own source code**. With `--reload` on, uvicorn would then cheerfully restart into whatever the attacker wrote. Total cost of the attack: one HTTP request.
+
+{/* [ANECDOTE slot (WRITING-STYLE §6): a true first-person story from Yadnesh about user-supplied input (a filename, a path, an id) doing something scary in a real system, 3 beats, 5 sentences. Lands here, right after the attack is shown. */}
+
+The defense is as short as the attack:
+
+```python filename="backend/app/workspaces.py" repo="part-04-workspaces-artifacts/backend/app/workspaces.py" lines="33-42"
+def safe_filename(raw: str) -> str:
+    """Refuse anything that isn't a plain filename.
+
+    The attack this blocks is one line long: an upload named
+    "../../app/main.py" would land outside the workspace and overwrite
+    this very server. Never trust a client-supplied path.
+    """
+    if not raw or "/" in raw or "\\" in raw or raw in {".", ".."} or raw.startswith("."):
+        raise HTTPException(status_code=400, detail=f"Rejected filename: {raw!r}")
+    return raw
+```
+
+No path separators of either persuasion, no dot-files, no `.` or `..`, nothing empty. Anything suspicious gets a 400 with the rejected name quoted back. I ran the attack against the finished backend and the log reads like a bouncer's clipboard: the burglary attempt got `400 Bad Request`, a 6 MB file got `413 Content Too Large`, and a made-up workspace id got `404 Not Found`. Nothing landed outside a workspace.
+
+<Callout type="warning" title="The rule underneath the function">
+Never build a filesystem path from anything a client sent you. Not filenames, not ids, not "just this once". Sanitize to a known-safe shape (this endpoint), or resolve and verify containment (the download endpoint, below). Every web framework's security page says this; agents raise the stakes, because your server now also *executes code* next to those files.
+</Callout>
+
+Two conveniences round out the file API. A sample-data endpoint copies the Beanline CSVs into a workspace, so the "Load sample data" button can set up a demo in one click. And a download endpoint serves workspace files back out, because the panel will need to *show* the chart the agent made:
+
+```python filename="backend/app/main.py" repo="part-04-workspaces-artifacts/backend/app/main.py" lines="81-99"
+@app.post("/workspaces/{workspace_id}/sample-data")
+async def load_sample_data(workspace_id: str) -> dict:
+    workspace = workspace_path(workspace_id)
+    names = sorted(p.name for p in SAMPLE_DATA.glob("*.csv"))
+    for name in names:
+        shutil.copyfile(SAMPLE_DATA / name, workspace / name)
+    return {"filenames": names}
+
+
+@app.get("/workspaces/{workspace_id}/files/{file_path:path}")
+async def serve_file(workspace_id: str, file_path: str) -> FileResponse:
+    workspace = workspace_path(workspace_id)
+    target = (workspace / file_path).resolve()
+    # The traversal guard again, GET-shaped: whatever the URL says, the
+    # resolved file must still live inside this conversation's workspace.
+    if not (target.is_relative_to(workspace.resolve()) and target.is_file()):
+        raise HTTPException(status_code=404, detail="No such file.")
+    media_type, _ = mimetypes.guess_type(target.name)
+    return FileResponse(target, media_type=media_type or "application/octet-stream")
+```
+
+Same burglary, opposite direction: a GET for `files/../../app/main.py` would *read* your source instead of overwriting it. This endpoint takes the other defensive posture, because the agent may legitimately write into subfolders: resolve the full path, then demand the result still lives inside the workspace (`is_relative_to`). I tested that too; the traversal GET gets a 404. And `mimetypes.guess_type` means a `.png` arrives as `image/png` so the browser renders it instead of downloading it.
+
+## Wiring the chat request
+
+The chat endpoint now takes an optional `workspace_id`, builds the agent's options *per request* with `cwd` pointed at that conversation's desk, and echoes the id back on `session_start`:
+
+```python filename="backend/app/main.py" repo="part-04-workspaces-artifacts/backend/app/main.py" lines="102-115"
+@app.post("/chat")
+async def chat(request: ChatRequest) -> StreamingResponse:
+    workspace_id = request.workspace_id or create_workspace()
+    workspace = workspace_path(workspace_id)
+    stream = query(prompt=request.message, options=build_options(workspace))
+    events = with_artifacts(translate(stream), workspace)
+
+    async def frames():
+        async for event in events:
+            if event["type"] == "session_start":
+                event = {**event, "workspace_id": workspace_id}
+            yield sse(event)
+
+    return StreamingResponse(frames(), media_type="text/event-stream")
+```
+
+Three details, in order of subtlety. First: no `workspace_id` in the request? The server mints one, so a visitor who types a question before uploading anything still gets a desk. The echo on `session_start` is how the client learns the id it never chose; it sends it back on every later message. (File that pattern away: `session_start` also carries a `session_id` we've been dutifully forwarding since Part 2 and using for nothing. Part 5 is where that bill comes due.)
+
+Second: `build_options(workspace)` is new. Since Part 2 the options were a module-level constant; they can't be anymore, because `cwd` now changes per request. The constant became a function, and it picked up one more line while we were in there, which is the next section.
+
+Third: that `with_artifacts(...)` wrapper is the star of this part's second half. Ignore it for now; it will earn its own diagram.
+
+Right now you have: a backend where every conversation gets an isolated folder, uploads that can't escape it, downloads that can't either, and a chat endpoint that works out of the right desk. The agent hasn't changed at all. Time to change the agent.
+
+## Tell the agent it's an analyst
+
+So far the agent behaves like what it is: Claude Code with a small toolbox. Ask it a question and you get a chatty, helpful, sometimes emoji-decorated essay. Nothing wrong with that in a terminal. But we're building a *product* whose promise is charts and written reports, and prompting users to add "please also save a PNG and write report.md" to every question is not a product. The product's personality belongs in the **system prompt**.
+
+```python filename="backend/app/main.py" repo="part-04-workspaces-artifacts/backend/app/main.py" lines="26-48"
+# The house rules, appended to the claude_code preset: keep Claude Code's
+# battle-tested tool instructions, add only what makes this product OURS.
+ANALYST_PROMPT = """You are the Beanline data analyst. House rules for every answer:
+
+- When a chart would help, create it with matplotlib and save it as a PNG file
+  in the working directory (plt.savefig(..., dpi=150), never plt.show()).
+- Write your findings to report.md: a one-line headline, the key numbers as a
+  markdown table, then a short interpretation. Create or overwrite it each turn.
+- Keep the chat reply brief: the main numbers and the files you produced.
+  Prefer tables over prose for numbers."""
+
+
+def build_options(workspace: Path) -> ClaudeAgentOptions:
+    """Part 1's options, now built per request: the cwd is the conversation's
+    own desk, and the system prompt gives the agent its job description."""
+    return ClaudeAgentOptions(
+        cwd=str(workspace),
+        tools=["Read", "Glob", "Grep", "Bash", "Write"],
+        permission_mode="bypassPermissions",
+        model=MODEL,
+        include_partial_messages=True,
+        system_prompt={"type": "preset", "preset": "claude_code", "append": ANALYST_PROMPT},
+    )
+```
+
+The shape of that `system_prompt` value matters more than the words in it. It's not a string; it's the **preset-plus-append** form: start from the `claude_code` preset (the prompt that makes Claude Code good at multi-step tool work: when to search, when to re-read, how to recover from a failed command) and append our house rules on top. Replace the whole prompt with your own string and you throw away thousands of hours of prompt-hardening, then spend a month rediscovering fragments of it. Production apps append. The [concepts page has the fuller argument](/blog/agent-sdk-concepts#system-prompt-presets).
+
+<Callout type="info" title="Write prompts like acceptance criteria">
+Every line of `ANALYST_PROMPT` is specific and checkable: *save as PNG with savefig, never plt.show()* (a `show()` call would block a headless server forever); *report.md with headline, table, interpretation* (a file the panel can render); *tables over prose*. You can look at any answer and grade each rule pass or fail. "Be a helpful data analyst" grades nothing. Vibes make bad house rules.
+</Callout>
+
+Does it work? I ran the same question, "How did each store do in the second quarter?", against the same data with and without the append, and measured both. Without: a friendly 1,884-character essay (with a trophy emoji), zero files on the desk, $0.0763, 38 seconds. With: a 529-character reply, `q2_store_performance.png`, and a `report.md` whose structure tracks the house rules clause by clause: headline, table, interpretation. $0.0711, 26 seconds. Cheaper, faster, and it produced deliverables instead of paragraphs.
+
+<Figure
+  src="/images/series/agent-sdk/part-4/fig-before-after-light.svg"
+  srcDark="/images/series/agent-sdk/part-4/fig-before-after-dark.svg"
+  alt="Two cards compare the same Q2 question. Left, without the append: the reply begins, I'd be happy to help you analyze store performance in the second quarter, followed by a long wall of prose represented as gray bars, with measured stats of $0.0763, 38 seconds, 1,884 characters of chat, and zero files. Right, with ANALYST_PROMPT appended: a brief reply naming the key numbers, two artifact chips for q2_store_performance.png and report.md, and stats of $0.0711, 26.1 seconds, 529 characters, two deliverables. An arrow labeled system_prompt equals preset plus append points from left to right."
+  caption="Both runs measured on 2026-07-03, same data, same model. The append turned prose into deliverables and was somehow also cheaper."
+  width={1240}
+  height={560}
+/>
+
+Here's the after-run in the actual product, report open in the panel. Same question a user would type, nothing staged:
+
+<Figure
+  src="/images/series/agent-sdk/part-4/browser-report-light.svg"
+  srcDark="/images/series/agent-sdk/part-4/browser-report-dark.svg"
+  alt="The Beanline Analyst answering the second-quarter question. The chat shows green badges for ls, two file reads, a pandas analysis, and writing report.md, then a brief answer: Downtown Portland led with $159k, followed by Airport Portland at $125k. The artifacts panel lists q2_store_performance.png and report.md, with report.md selected and rendered as formatted markdown: a headline about Downtown dominating Q2, a table of six stores with revenue and units, and an interpretation paragraph."
+  caption="The house rules, obeyed: headline, table, interpretation, rendered straight from the report.md the agent wrote. Receipt: $0.0711, 26 seconds."
+  width={1120}
+  height={848}
+/>
+
+## Detecting what the agent made
+
+The panel needs to know a chart exists the moment the agent makes it. Tempting shortcut: the agent usually *says* what it made ("Created monthly_revenue_by_store.png"), so parse the prose. Don't. The model's narration is marketing copy about its work, not a syscall log: it abbreviates, it renames, it sometimes claims files it never wrote, and the phrasing changes run to run. The reference app settled this long ago with a pattern that fits in 25 lines: **diff the filesystem**.
+
+```python filename="backend/app/workspaces.py" repo="part-04-workspaces-artifacts/backend/app/workspaces.py" lines="55-61"
+def snapshot(workspace: Path) -> dict[str, tuple[int, int]]:
+    """Every file on the desk right now: path -> (mtime_ns, size)."""
+    return {
+        str(p.relative_to(workspace)): (p.stat().st_mtime_ns, p.stat().st_size)
+        for p in workspace.rglob("*")
+        if p.is_file() and not p.name.startswith(".")
+    }
+```
+
+A snapshot is a dict of every file's modification time and size. Take one when the turn starts, take another after every tool result, and anything that appeared or changed in between is, by definition and not by claim, something the agent did:
+
+```python filename="backend/app/workspaces.py" repo="part-04-workspaces-artifacts/backend/app/workspaces.py" lines="74-94"
+    seen = snapshot(workspace)
+
+    def changed() -> list[dict]:
+        nonlocal seen
+        current = snapshot(workspace)
+        updates = [
+            {"type": "artifact_update", "path": path, "kind": artifact_kind(path), "size": stamp[1]}
+            for path, stamp in sorted(current.items())
+            if seen.get(path) != stamp
+        ]
+        seen = current
+        return updates
+
+    async for event in events:
+        if event["type"] == "complete":
+            for update in changed():
+                yield update
+        yield event
+        if event["type"] == "tool_result":
+            for update in changed():
+                yield update
+```
+
+`with_artifacts` wraps the translator's event stream and passes everything through untouched; it only *adds*. After each `tool_result` it looks at the desk again and emits an `artifact_update` parcel per new or changed file, and it looks once more right before the receipt so nothing born in the final seconds slips through. Because the starting snapshot already contains the user's uploads, your CSVs never get announced as the agent's work. The diff has no imagination: it cannot hallucinate a filename, and it cannot forget one.
+
+<Figure
+  src="/images/series/agent-sdk/part-4/fig-artifact-diff-light.svg"
+  srcDark="/images/series/agent-sdk/part-4/fig-artifact-diff-dark.svg"
+  alt="Three-stage diagram of artifact detection. Stage one, snapshot the desk: the workspace folder listed as three CSV files with modification times and sizes, captioned that uploads are already on the desk so they never count as the agent's work. Stage two, tool result, look again: the same listing now shows monthly_revenue_by_store.png and report.md highlighted as NEW while the CSVs are unchanged, captioned that nobody asked the model what it made. Stage three, new parcels, same belt: two artifact_update JSON events carrying path, kind, and size, captioned that Part 3's client ignores these and keeps working while today's client opens a panel. A serif line below reads: the model narrates its work, the disk testifies to it, ship the testimony."
+  caption="with_artifacts() in one picture. Snapshot, act, diff, announce. The mtime+size pair is the cheapest honest witness there is."
+  width={1240}
+  height={540}
+/>
+
+Now collect the payoff this series has been promising since [Part 2 designed the envelope](/blog/agent-sdk-2-fastapi-streaming#designing-the-envelope). `artifact_update` is a brand-new event type, and the Part 3 client, the one you built last week with no idea this event would ever exist, **handles it perfectly by ignoring it**: `applyEvent` falls through, nothing renders, nothing breaks. The vocabulary grows; the parser shrugs. Every event type through Part 13 will board the belt exactly this way.
+
+One small refactor made this composable, worth ten seconds of your attention: in Part 2, `translate()` yielded pre-framed SSE strings. Now that the server has its *own* consumer of events (`with_artifacts` inspects each one's `type`), the translator yields plain dicts and the `sse()` framing happens at the very edge, in the endpoint. Generators that produce data compose; generators that produce serialized strings don't. You can see the two-line `sse()` helper via the GitHub icon on any `events.py` fence in [the repo](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/blob/main/part-04-workspaces-artifacts/backend/app/events.py).
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 4-panel comic strip, panels in a single row separated by thin vertical black dividers, about handing messy data to an AI analyst and getting a polished report back. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny necktie. Panel 1: Yad holds out a battered cardboard shoebox overflowing with crumpled paper receipts, some falling out; speech bubble from Yad: "IT'S ALL IN THERE. SOMEWHERE." Panel 2: the laptop-analyst solemnly accepts the shoebox with both arms, cradling it with great dignity like a precious briefcase, eyes closed, chest out. Panel 3: the laptop-analyst at a tiny desk, receipts smoothed flat and sorted into neat labeled stacks, a desk lamp on, working intently with a tiny calculator. Panel 4: the laptop-analyst slides a thick bound report with a chart on its cover across the desk toward an amazed Yad; speech bubble from the analyst: "PAGE 12. WITH CHARTS." Clean readable hand-lettered speech bubbles, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-4/comic-shoebox.png"
+  alt="Comic in four panels. Panel one: Yad, a bearded developer with headphones, hands over a battered shoebox overflowing with crumpled receipts, saying: it's all in there, somewhere. Panel two: the laptop analyst cradles the shoebox with solemn dignity, like a precious briefcase. Panel three: the analyst works at a desk lamp with the receipts smoothed flat and sorted into neat labeled stacks. Panel four: the analyst slides a thick bound report across the desk to an amazed Yad, saying: page 12, with charts."
+  caption="The whole part in four panels: your mess in, its deliverables out, and the desk in between belongs to the analyst."
+  width={1536}
+  height={1024}
+/>
+
+## The upload UI
+
+The frontend's half of the workspace API is one small file: four fetches that throw the server's own words on failure, which is exactly the shape a toast wants.
+
+```ts filename="frontend/lib/api.ts" repo="part-04-workspaces-artifacts/frontend/lib/api.ts" lines="12-30"
+export async function createWorkspace(): Promise<string> {
+  const res = await fetch(`${API_BASE}/workspaces`, { method: "POST" });
+  if (!res.ok) await fail(res, "Could not create a workspace.");
+  return (await res.json()).workspace_id;
+}
+
+export async function uploadFile(
+  workspaceId: string,
+  file: File,
+): Promise<{ filename: string; size: number }> {
+  const body = new FormData();
+  body.append("file", file);
+  const res = await fetch(`${API_BASE}/workspaces/${workspaceId}/files`, {
+    method: "POST",
+    body,
+  });
+  if (!res.ok) await fail(res, `Upload of ${file.name} failed.`);
+  return res.json();
+}
+```
+
+(Notice there's no `Content-Type` header on the upload: hand `fetch` a `FormData` and it writes the multipart header itself, boundary included. Setting it by hand is the classic way to break uploads.) The drop zone is a `<label>` wrapping a hidden file input, which buys click-to-browse with zero JavaScript, plus three drag handlers:
+
+```tsx filename="frontend/components/UploadZone.tsx" repo="part-04-workspaces-artifacts/frontend/components/UploadZone.tsx" lines="13-30"
+    <label
+      onDragOver={(e) => {
+        e.preventDefault();
+        setOver(true);
+      }}
+      onDragLeave={() => setOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setOver(false);
+        onFiles([...e.dataTransfer.files]);
+      }}
+      className={`block w-full max-w-sm cursor-pointer rounded-xl border-2 border-dashed px-6 py-5 text-center text-sm transition-colors ${
+        over
+          ? "border-accent bg-accent/5 text-accent"
+          : "border-stone-300 text-stone-500 hover:border-accent hover:text-accent dark:border-stone-700 dark:text-stone-400"
+      }`}
+    >
+      Drop your CSVs here, or click to browse
+```
+
+The page owns the workspace, and it creates one **lazily**: the first upload, sample-data click, or message is what mints a desk, so a visitor who bounces off your landing page never costs you a folder. Uploads then funnel through one `addFiles` function whose only interesting part is its manners when things go wrong:
+
+```tsx filename="frontend/app/page.tsx" repo="part-04-workspaces-artifacts/frontend/app/page.tsx" lines="119-132"
+    if (added.length > 0) {
+      setFiles((all) => [...new Set([...all, ...added])]);
+    }
+    setToast(
+      failure
+        ? { message: failure }
+        : {
+            message:
+              added.length === 1
+                ? `${added[0]} is on the analyst's desk.`
+                : `${added.length} files are on the analyst's desk.`,
+            tone: "success",
+          },
+    );
+```
+
+Drop three files where one is 6 MB and you get the two good ones as chips *plus* a toast quoting the server's 413 verbatim: "File too large; the cap is 5 MB." Partial success keeps its successes. And yes, `tone: "success"` is new: Part 3's toast only knew how to complain, so it grew a second tone with a green check, because an upload deserves a receipt, not silence. The toast finally has a day job beyond disasters.
+
+Uploaded files show as small mono chips above the input, the empty state gains the drop zone plus a "load the Beanline sample data" link, and the three sample questions now appear only *after* files exist, because an analyst with an empty desk has nothing to be asked about. Sequencing the empty state this way quietly teaches every new user the app's one rule: data first, then questions.
+
+<Figure
+  src="/images/series/agent-sdk/part-4/browser-desk-light.svg"
+  srcDark="/images/series/agent-sdk/part-4/browser-desk-dark.svg"
+  alt="The Beanline Analyst empty state after loading sample data. A dashed drop zone reads: drop your CSVs here, or click to browse, with an accent link below reading: or load the Beanline sample data. Three sample question chips are now visible, file chips for products.csv, sales.csv, and stores.csv sit above the input next to a plus button, and a green success toast in the corner reads: sample data loaded, products.csv, sales.csv, stores.csv."
+  caption="The desk, set. One click on the sample-data link produced the chips, the toast, and the questions; the toast text is the server's filenames list, not a hardcoded string."
+  width={1120}
+  height={700}
+/>
+
+## The artifacts panel
+
+The wire and the state layer first, because they're four lines each. The event union gets its new member, and an `Artifact` is what the panel tracks per file:
+
+```ts filename="frontend/lib/types.ts" repo="part-04-workspaces-artifacts/frontend/lib/types.ts" lines="21-33"
+  | { type: "error"; message: string }
+  | { type: "artifact_update"; path: string; kind: ArtifactKind; size: number };
+
+export type ArtifactKind = "image" | "markdown" | "file";
+
+// One deliverable on the desk, as the panel tracks it. updatedAt is client
+// time, kept so an overwritten report.md re-fetches instead of caching.
+export type Artifact = {
+  path: string;
+  kind: ArtifactKind;
+  size: number;
+  updatedAt: number;
+};
+```
+
+The send loop grows two branches, and pay attention to where they sit: **before** the `applyEvent` fallthrough, because these events are about the page, not the transcript. `session_start` collects the workspace echo; `artifact_update` upserts into the artifact list and selects the newcomer, so the panel always shows the newest deliverable the moment it lands:
+
+```tsx filename="frontend/app/page.tsx" repo="part-04-workspaces-artifacts/frontend/app/page.tsx" lines="200-206"
+        } else if (event.type === "session_start") {
+          // Collect the echo: on a first message with no workspace, the
+          // server minted a desk and this is how we learn its id.
+          if (event.workspace_id) setWorkspaceId(event.workspace_id);
+        } else if (event.type === "artifact_update") {
+          recordArtifact(event);
+        } else {
+```
+
+`applyEvent` itself, the function Part 3 called the client's whole contract, **does not change**. Blocks are the transcript's business; artifacts are the page's. Keeping that boundary is what let the Part 3 client survive today's server unmodified.
+
+The panel renders when the first artifact exists: a file list up top (kind icon, mono filename, size, active row highlighted) and a preview underneath. The preview component is a switch on `kind`:
+
+```tsx filename="frontend/components/ArtifactsPanel.tsx" repo="part-04-workspaces-artifacts/frontend/components/ArtifactsPanel.tsx" lines="47-70"
+  if (artifact.kind === "image") {
+    return (
+      <a href={url} target="_blank" rel="noreferrer" title="Open full size">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={url}
+          alt={artifact.path}
+          className="w-full cursor-zoom-in rounded-lg border border-stone-200 bg-white dark:border-stone-700"
+        />
+      </a>
+    );
+  }
+  if (text === null) {
+    return <p className="text-[13px] text-stone-400 dark:text-stone-500">Loading&#8230;</p>;
+  }
+  if (artifact.kind === "markdown") {
+    return <Markdown text={text} />;
+  }
+  return (
+    <pre className="max-h-96 overflow-auto rounded-lg bg-stone-100 p-3 font-mono text-[12px] leading-relaxed break-all whitespace-pre-wrap text-stone-600 dark:bg-stone-800/80 dark:text-stone-300">
+      {text.length > 4000 ? text.slice(0, 4000) + "\n…" : text}
+    </pre>
+  );
+}
+```
+
+Images point an `<img>` straight at the workspace URL from the download endpoint (click to open full size in a new tab). Markdown gets fetched as text and rendered through the same `Markdown` component the chat uses, so the agent's report looks native. Everything else lands in a clamped `<pre>`, capped at 4,000 characters, in the spirit of Part 2's `clip()`: preview in the panel, full file one click away. The URL carries `?t=<updatedAt>` as a cache-buster; `report.md` keeps its name across rewrites, and without the stamp the browser would happily show you last turn's report forever.
+
+## Try it end to end
+
+Boot both halves (backend from `backend/`, frontend from `frontend/`):
+
+```bash
+# terminal 1
+uv run uvicorn app.main:app --reload
+# terminal 2
+npm run dev
+```
+
+Open `localhost:3000`, click "load the Beanline sample data", then the first chip: **"Chart monthly revenue by store and write up what you see."** Badges bloom like in Part 3, and then the new thing happens: fifteen seconds in, the panel slides into existence with `monthly_revenue_by_store.png` already previewing, because the diff caught the file the instant the `savefig` tool call resolved. A few seconds later `report.md` joins it and the preview flips to the report. The receipt on my run: $0.0418, 24 seconds, and the hero screenshot at the top of this page is that exact moment. Click the PNG row, then the report row. You're paging through deliverables while the chat column stays a clean narrative of how they got made.
+
+## Break it on purpose: the library that wasn't there
+
+Time to confess the first thing that happened when *I* ran that chip, because it's the best lesson in this part. The house rules say "create it with matplotlib". When I wrote them, the backend's virtualenv contained FastAPI, uvicorn, the SDK, and **no matplotlib and no pandas**. Nobody told the agent that. Watch it find out:
+
+<Figure
+  src="/images/series/agent-sdk/part-4/browser-breakit-light.svg"
+  srcDark="/images/series/agent-sdk/part-4/browser-breakit-dark.svg"
+  alt="The Beanline Analyst mid-run on the chart question, with no artifacts panel yet. After three green badges for exploring the data, a failed Bash badge is expanded showing the error: exit code 1, traceback, ModuleNotFoundError, no module named pandas. Below it the agent says: let me install pandas and matplotlib. Two more failed badges follow: pip install fails with command not found, and python3 dash m pip fails with no module named pip. A fourth badge is still running: python3 dash m venv slash tmp slash analysis, with the working timer at 41 seconds."
+  caption="Three failures, three different lessons about the same environment, and the agent is still not done trying. All verbatim from the captured stream."
+  width={1120}
+  height={928}
+/>
+
+Read the badges in order, because the agent is performing a diagnosis you'd charge money for. `import pandas` fails: *the library isn't installed*. `pip install pandas` fails: *command not found*, there's no global pip on this machine. `python3 -m pip` fails: *No module named pip*, and the path in that error is the tell, `.venv/bin/python3`. **The agent's `python3` is the backend's virtualenv**, the very interpreter running uvicorn, and uv-managed venvs don't even ship pip. So the agent, uninstructed, built itself a fresh virtualenv in `/tmp/analysis`, installed pandas and matplotlib into it with the venv's own pip, and produced the chart and the report anyway. Total: $0.1063, 52.9 seconds, correct numbers.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels in a single row separated by thin vertical black dividers, about an AI agent whose Python environment is missing a library, so it builds its own. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny necktie. Panel 1: the laptop-analyst stands at an open toolbox labeled "BACKEND" holding up an empty hook where a tool should hang; a small tag on the empty hook reads "PANDAS"; the analyst looks shocked; Yad sips coffee in the background. Panel 2: outside, the laptop-analyst in a tiny hard hat hammers together a small wooden shed labeled "/tmp/analysis", sawdust and planks flying; Yad watches mid-sip, eyes wide. Panel 3: the laptop-analyst, back at its desk, proudly presents a finished bar chart; through a window behind it the little shed is visible; speech bubble from Yad: "DID YOU BUILD A WORKSHOP?"; speech bubble from the analyst: "YOU DIDN'T PROVIDE ONE." Clean readable hand-lettered speech bubbles, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-4/comic-workshop.png"
+  alt="Comic in three panels. Panel one: the laptop analyst stares in shock at an open toolbox labeled BACKEND where an empty hook carries a tag reading PANDAS, while Yad sips coffee in the background. Panel two: the analyst, in a tiny hard hat, hammers together a small wooden shed labeled slash tmp slash analysis while Yad watches mid-sip, eyes wide. Panel three: back at its desk, the analyst presents a finished bar chart with the shed visible through the window behind it. Yad asks: did you build a workshop? The analyst replies: you didn't provide one."
+  caption="Traceback-driven self-correction, the flattering cut. The unflattering cut: your product's success now depends on which workaround the model improvises."
+  width={1536}
+  height={1024}
+/>
+
+Admire it, then refuse to depend on it. A run that detours through building a virtualenv costs double and takes double, and a different run might pick a worse workaround (or give up and answer from vibes, which Part 1's permission wall taught you is worse than failing). The agent recovering is the safety net, not the plan. The plan is boring: put the tools in the toolbox.
+
+```bash
+cd backend
+uv add matplotlib pandas
+```
+
+That's the whole fix, and it's why `matplotlib==3.11.0` and `pandas==3.0.3` sit in [this part's `pyproject.toml`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/blob/main/part-04-workspaces-artifacts/backend/pyproject.toml) from here to the end of the series. Every run after it: pandas imports, chart on the first try, half the cost.
+
+<Callout type="warning" title="The agent's Python is the backend's Python">
+Let that error message sink in: the agent tried to install packages into *the interpreter serving your API*. It failed only because uv venvs don't bundle pip. On a machine where it succeeded, an agent could mutate your server's dependencies mid-request, and "install whatever the model wants" is not a dependency policy. The honest containment story, running agent code in an OS-level sandbox with its own filesystem and network rules, is [Part 12](/blog/agent-sdk-12-mcp-sandboxing)'s whole job. Until then: the toolbox is curated by you, deliberately.
+</Callout>
+
+## The cost ritual
+
+All real runs from building this part, reader-equivalent environment, `claude-haiku-4-5`:
+
+| Run | Result | Cost |
+|---|---|---|
+| Q2 question, no system prompt | right numbers, 1,884 chars of prose, 0 files | $0.0763 · 38.0s |
+| Q2 question, ANALYST_PROMPT | right numbers, PNG + report.md | $0.0711 · 26.1s |
+| Chart request, matplotlib missing | 3 failures, self-built venv, then both artifacts | $0.1063 · 52.9s |
+| Chart request, matplotlib installed | both artifacts, first try | $0.0418 · 24s |
+| Demo recording (below) | both artifacts, growth numbers verified | $0.0410 · 26s |
+
+Two lessons in one table. The system prompt *saved* money by ending the essay habit; and the missing library cost 2.5x the fixed version, because every failed attempt drags the whole conversation back through the model. Environment gaps are a cost problem wearing an error costume.
+
+<DemoVideo
+  src="/videos/agent-sdk/part-4-demo.mp4"
+  poster="/videos/agent-sdk/part-4-poster.jpg"
+  caption='A real run, recorded: a CSV dropped onto the desk (toast receipt), sample data loaded, the chart question typed in, badges resolving, and the artifacts panel lighting up with the chart and report, both opened. The analysis on camera is correct: Riverside really did grow 70.6% January to June.'
+  label="Screen recording of Part 4: uploading files to a workspace, asking for a chart, and the artifacts panel showing the generated PNG and markdown report"
+/>
+
+<Recap
+  part={4}
+  items={[
+    "Workspace-per-conversation: server-minted ids, cwd built per request, and the Part 1 sandbox story upgraded to per-conversation isolation.",
+    "A hardened file pipeline: multipart uploads with a size cap, safe_filename killing the ../ attack in one line, and a traversal-guarded download endpoint with mime guessing.",
+    "A system prompt with a real job: the claude_code preset plus appended house rules, with the before/after measured (1,884 chars of prose vs two deliverables, and the deliverables were cheaper).",
+    "artifact_update events from a filesystem diff: snapshot, act, diff, announce; the model is never asked to self-report its files, and Part 3's client ignored the new event exactly as designed.",
+    "An artifacts panel with image, markdown, and text previews, plus an upload UI where the toast finally has a day job: receipts for successes, server-quoted messages for failures.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "A client uploads a file whose multipart filename is ../../app/main.py. What happens in this part's backend?",
+      options: [
+        "The file lands in the workspace under a cleaned-up name",
+        "safe_filename rejects it with a 400 because it contains a path separator; nothing touches the disk",
+        "FastAPI strips the dots automatically before the handler runs",
+        "It works, which is why uploads should be disabled in production",
+      ],
+      answer: 1,
+      explain: "A filename is almost a path, and the client controls it. safe_filename refuses separators, dot-files, and dot segments outright, so the write to workspace / name can never escape the workspace. FastAPI does no such cleaning for you.",
+    },
+    {
+      q: "Why does the server diff the filesystem to produce artifact_update events instead of parsing the agent's own 'I created X' messages?",
+      options: [
+        "Parsing text is slower than calling stat() on files",
+        "The model's narration can abbreviate, rename, or claim files that don't exist, while the disk records exactly what changed; and the starting snapshot keeps user uploads from counting as agent work",
+        "The SDK doesn't expose the agent's text to the server",
+        "Filesystem diffs also capture files created by other users",
+      ],
+      answer: 1,
+      explain: "Narration is a description, not a record. The mtime+size diff can't hallucinate a filename and can't forget one, and because the first snapshot is taken before the turn starts, your uploaded CSVs are already 'seen' and never get announced.",
+    },
+    {
+      q: "What does system_prompt={'type': 'preset', 'preset': 'claude_code', 'append': ...} keep that a plain string system prompt would throw away?",
+      options: [
+        "The model's memory of earlier conversations",
+        "Nothing; it's shorthand for the same thing",
+        "The battle-tested instructions that make Claude Code good at multi-step tool work: searching before editing, re-reading files, recovering from failed commands",
+        "The list of tools the agent may use",
+      ],
+      answer: 2,
+      explain: "The preset is the hardened prompt the whole engine was tuned against. Appending adds your product's house rules on top; replacing means re-earning all of that tool-use behavior yourself. Tools are configured separately via tools=, not the prompt.",
+    },
+    {
+      q: "with_artifacts diffs the workspace after every tool_result AND once more before the complete event. Why both?",
+      options: [
+        "The per-tool-result diff makes artifacts appear live while the turn runs; the final diff catches anything written after the last tool result so nothing is missed",
+        "The double check guards against race conditions in the filesystem",
+        "Two diffs are needed to compute mtime deltas accurately",
+        "The final diff re-sends all artifacts so the client can recover from dropped events",
+      ],
+      answer: 0,
+      explain: "One diff at the end would work but the panel would only light up after the receipt, which wastes the whole live-streaming UX. Diffing per tool result is what makes the chart appear the moment savefig resolves; the last look before the receipt is the completeness guarantee.",
+    },
+    {
+      q: "The agent hit ModuleNotFoundError for pandas, and its pip install attempts failed inside .venv/bin/python3. What's the production-grade fix?",
+      options: [
+        "Tell the agent in the system prompt to always create its own virtualenv",
+        "Have users pip install pandas globally on their machines",
+        "Run the backend outside a virtualenv so pip is available",
+        "Add matplotlib and pandas to the backend's own dependencies: the agent's Python is the backend's Python, so the backend's env is the agent's toolbox",
+      ],
+      answer: 3,
+      explain: "The agent executes in the server's interpreter, so the server's pyproject.toml is what stocks its toolbox. The self-built /tmp venv was a great recovery and a terrible plan: 2.5x the cost, and dependent on the model improvising the same workaround next run.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 4: workspaces, uploads, and the artifacts panel"
+```
+
+Your analyst now works your files and hands back deliverables, and it does it with total amnesia: ask "now chart *that store's* weekly numbers" as a follow-up and it has no idea which store, which chart, or that you've ever spoken. Every `query()` is still a stranger. The `session_id` we've been forwarding since Part 2 finally gets its job in [Part 5](/blog/agent-sdk-5-sessions): memory, a conversations sidebar, and the analyst that remembers.
+
+The complete, tested code for this part lives in [`part-04-workspaces-artifacts`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/tree/main/part-04-workspaces-artifacts) in the [companion repo](https://github.com/yadneshSalvi/claude-agent-sdk-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="700" viewBox="0 0 1120 700" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="700" fill="#fafaf9"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#f3f1ec"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#e2ded4" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#d6d1c5"/><circle cx="56" cy="28" r="7" fill="#d6d1c5"/><circle cx="82" cy="28" r="7" fill="#d6d1c5"/>
+  <rect x="320" y="13" width="480" height="30" rx="15" fill="#ffffff" stroke="#e2ded4"/>
+  <text x="560" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#5b554c" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#e7e5e4" stroke-width="1"/>
+  <circle cx="28" cy="79" r="5" fill="#b3441a"/>
+  <text x="42" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Beanline Analyst</text>
+  <circle cx="560" cy="174" r="6" fill="#b3441a"/>
+  <text x="560" y="214" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#1c1917" text-anchor="middle">Ask the analyst</text>
+  <text x="560" y="242" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a8a29e" text-anchor="middle">Give it your CSVs, ask questions in plain English, and collect</text>
+  <text x="560" y="262" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a8a29e" text-anchor="middle">the charts and reports it writes back.</text>
+  <rect x="368" y="296" width="384" height="66" rx="12" fill="none" stroke="#d6d3d1" stroke-width="2" stroke-dasharray="7 6"/>
+  <text x="560" y="335" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a8a29e" text-anchor="middle">Drop your CSVs here, or click to browse</text>
+  <text x="560" y="392" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#b3441a" text-anchor="middle" text-decoration="underline">or load the Beanline sample data</text>
+  
+  <rect x="336.5" y="428" width="447" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="560" y="452" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#57534e" text-anchor="middle">Chart monthly revenue by store and write up what you see.</text>
+  <rect x="380" y="478" width="360" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="560" y="502" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#57534e" text-anchor="middle">Which store had the highest revenue in March?</text>
+  <rect x="383.5" y="528" width="353" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="560" y="552" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#57534e" text-anchor="middle">How did each store do in the second quarter?</text>
+  <line x1="0" y1="598" x2="1120" y2="598" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="200" y="610" width="99" height="21" rx="6" fill="#f5f5f4" stroke="#e7e5e4"/>
+  <text x="209" y="624.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c">products.csv</text>
+  <rect x="306" y="610" width="79" height="21" rx="6" fill="#f5f5f4" stroke="#e7e5e4"/>
+  <text x="315" y="624.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c">sales.csv</text>
+  <rect x="392" y="610" width="85" height="21" rx="6" fill="#f5f5f4" stroke="#e7e5e4"/>
+  <text x="401" y="624.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c">stores.csv</text>
+  <rect x="200" y="642" width="46" height="42" rx="12" fill="none" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="223" y="669" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#a8a29e" text-anchor="middle">+</text>
+  <rect x="256" y="642" width="580" height="42" rx="12" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="272" y="668" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#a8a29e">Ask about your data&#8230;</text>
+  <rect x="846" y="642" width="74" height="42" rx="12" fill="#b3441a" opacity="0.45"/>
+  <text x="883" y="668" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  <rect x="716" y="588" width="380" height="70" rx="10" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.5" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.12))"/>
+  <circle cx="746" cy="611" r="8" fill="#15803d"/>
+  <path d="M 742 611 l 3 3.5 l 5.5 -6.5" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+  <text x="760" y="614" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">Sample data loaded: products.csv,</text>
+  <text x="760" y="634" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">sales.csv, stores.csv.</text>
+  <text x="1076" y="615" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#a8a29e">&#x2715;</text>
+</svg>

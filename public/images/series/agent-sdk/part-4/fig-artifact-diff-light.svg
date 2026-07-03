@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="540" viewBox="0 0 1240 540">
+  <rect width="1240" height="540" fill="#faf9f6"/>
+  <text x="56" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#8f887a">DETECTING DELIVERABLES &#183; with_artifacts() IN ~25 LINES</text>
+  <text x="56" y="98" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" letter-spacing="2.5" fill="#8f887a">1 &#183; SNAPSHOT THE DESK</text>
+  <text x="56" y="120" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c">workspaces/8455aae6&#8230;/  &#8594;  {path: (mtime, size)}</text>
+  <rect x="56" y="136" width="310" height="40" rx="8" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="68" y="154" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="400" fill="#1f1c19">products.csv</text>
+  <text x="68" y="169" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a">mtime 16:52:01 · 390 B</text>
+  <rect x="56" y="186" width="310" height="40" rx="8" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="68" y="204" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="400" fill="#1f1c19">sales.csv</text>
+  <text x="68" y="219" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a">mtime 16:52:01 · 324,560 B</text>
+  <rect x="56" y="236" width="310" height="40" rx="8" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="68" y="254" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="400" fill="#1f1c19">stores.csv</text>
+  <text x="68" y="269" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a">mtime 16:52:01 · 228 B</text>
+  <text x="56" y="308" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#5b554c">Taken when the turn starts. Uploads are</text>
+  <text x="56" y="328" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#5b554c">already on the desk, so they never count</text>
+  <text x="56" y="348" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#5b554c">as the agent's work.</text>
+  <line x1="372" y1="248" x2="443" y2="248" stroke="#5b554c" stroke-width="2.5"/>
+  <path d="M 442 241 L 442 255 L 454 248 Z" fill="#5b554c"/>
+  <text x="466" y="98" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" letter-spacing="2.5" fill="#b3441a">2 &#183; TOOL RESULT &#8594; LOOK AGAIN</text>
+  <text x="466" y="120" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c">Bash ran plt.savefig(); Write made report.md</text>
+  <rect x="466" y="136" width="310" height="40" rx="8" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="478" y="154" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="400" fill="#1f1c19">products.csv</text>
+  <text x="478" y="169" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a">unchanged</text>
+  <rect x="466" y="186" width="310" height="40" rx="8" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="478" y="204" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="400" fill="#1f1c19">sales.csv  ·  stores.csv</text>
+  <text x="478" y="219" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a">unchanged</text>
+  <rect x="466" y="236" width="310" height="40" rx="8" fill="#f6e7df" stroke="#dcb09a" stroke-width="1.5"/>
+  <text x="478" y="254" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#b3441a">monthly_revenue_by_store.png</text>
+  <text x="478" y="269" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a">NEW · 127,090 B</text>
+  <rect x="466" y="286" width="310" height="40" rx="8" fill="#f6e7df" stroke="#dcb09a" stroke-width="1.5"/>
+  <text x="478" y="304" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#b3441a">report.md</text>
+  <text x="478" y="319" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a">NEW · 1,193 B</text>
+  <text x="466" y="358" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#5b554c">Anything new or changed since the last</text>
+  <text x="466" y="384" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#5b554c">look is an artifact. Nobody asked the</text>
+  <text x="466" y="404" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#5b554c">model what it made.</text>
+  <line x1="782" y1="248" x2="853" y2="248" stroke="#5b554c" stroke-width="2.5"/>
+  <path d="M 852 241 L 852 255 L 864 248 Z" fill="#5b554c"/>
+  <text x="876" y="98" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" letter-spacing="2.5" fill="#8f887a">3 &#183; NEW PARCELS, SAME BELT</text>
+  <rect x="876" y="124" width="310" height="70" rx="8" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="888" y="146" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#b3441a">{"type": "artifact_update",</text>
+  <text x="888" y="164" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c"> "path": "monthly_revenue_by_store.png",</text>
+  <text x="888" y="182" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c"> "kind": "image", "size": 127090}</text>
+  <rect x="876" y="204" width="310" height="70" rx="8" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="888" y="226" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#b3441a">{"type": "artifact_update",</text>
+  <text x="888" y="244" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c"> "path": "report.md",</text>
+  <text x="888" y="262" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c"> "kind": "markdown", "size": 1193}</text>
+  <text x="876" y="308" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#5b554c">The Part 2 envelope, one more label type.</text>
+  <text x="876" y="328" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#5b554c">Part 3's client ignores these and keeps</text>
+  <text x="876" y="348" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#5b554c">working. Today's client opens a panel.</text>
+  <text x="56" y="500" font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#1f1c19">The model narrates its work. <tspan font-style="italic" fill="#b3441a">The disk testifies to it.</tspan> Ship the testimony.</text>
+</svg>

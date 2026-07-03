@@ -9,6 +9,7 @@ Every folder below is the **complete, runnable project as it exists at the end o
 | 1 | [`part-01-first-agent`](part-01-first-agent) | A terminal agent that reads your CSVs and runs its own analysis | [Setup and Your First Agent](https://yadneshsalvi.com/blog/agent-sdk-1-first-agent) |
 | 2 | [`part-02-fastapi-streaming`](part-02-fastapi-streaming) | The agent behind HTTP, streaming six event types over SSE | [The FastAPI Bridge and the Event Vocabulary](https://yadneshsalvi.com/blog/agent-sdk-2-fastapi-streaming) |
 | 3 | [`part-03-agent-ui`](part-03-agent-ui) | A chat UI with live tool badges, markdown answers, and a Stop button | [The Agent UI](https://yadneshsalvi.com/blog/agent-sdk-3-agent-ui) |
+| 4 | [`part-04-workspaces-artifacts`](part-04-workspaces-artifacts) | Per-conversation workspaces, file uploads, and an artifacts panel for charts and reports | [Workspaces and Artifacts](https://yadneshsalvi.com/blog/agent-sdk-4-workspaces-artifacts) |
 
 *(The series is in progress — 14 parts across three acts. Folders appear here as parts publish.)*
 
