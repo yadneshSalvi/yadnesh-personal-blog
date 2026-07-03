@@ -2,6 +2,8 @@
 
 📖 Read along: [LangGraph from Scratch, Part 5](https://yadneshsalvi.com/blog/langgraph-5-streaming)
 
+🎬 See it run: **[demo.mp4](demo.mp4)** — a short screen recording of exactly what this part delivers.
+
 What changed since Part 4:
 
 - Backend: `/chat` returns a `StreamingResponse` that yields one SSE envelope per token, read off `graph.astream_events(...)` — the graph itself is untouched

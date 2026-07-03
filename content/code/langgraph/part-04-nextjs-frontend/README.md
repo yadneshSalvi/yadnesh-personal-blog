@@ -2,6 +2,8 @@
 
 📖 Read along: [LangGraph from Scratch, Part 4](https://yadneshsalvi.com/blog/langgraph-4-nextjs-frontend)
 
+🎬 See it run: **[demo.mp4](demo.mp4)** — a short screen recording of exactly what this part delivers.
+
 What changed since Part 3 (the backend didn't change by a single line):
 
 - `frontend/app/page.tsx` — the whole chat UI: message bubbles, a controlled input, one `fetch` to `POST /chat`, a "Thinking..." indicator, and an honest error banner

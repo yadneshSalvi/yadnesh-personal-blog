@@ -2,6 +2,8 @@
 
 📖 Read along: [LangGraph from Scratch, Part 8](https://yadneshsalvi.com/blog/langgraph-8-deploy)
 
+🎬 See it run: **[demo.mp4](demo.mp4)** — a short screen recording of exactly what this part delivers.
+
 What changed since Part 7:
 
 - `backend/requirements.txt` — the pinned dependency list the server installs from

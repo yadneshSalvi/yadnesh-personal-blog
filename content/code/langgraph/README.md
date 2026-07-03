@@ -2,7 +2,7 @@
 
 Companion code for the 8-part series **[LangGraph from Scratch](https://yadneshsalvi.com/series/langgraph-fastapi-nextjs)**: building a streaming AI chatbot with tools and memory, from an empty folder to a public URL, using FastAPI, LangGraph, and Next.js.
 
-Every folder below is the **complete, runnable project as it exists at the end of that part**. You can `cd` into any part and run it without assembling anything from earlier parts. All code was tested end to end against real APIs before publishing.
+Every folder below is the **complete, runnable project as it exists at the end of that part**. You can `cd` into any part and run it without assembling anything from earlier parts. All code was tested end to end against real APIs before publishing. Each part folder also contains a short `demo.mp4` screen recording showing exactly what that part looks like when it runs.
 
 | Part | Folder | What you build | Read along |
 |---|---|---|---|

@@ -2,6 +2,8 @@
 
 📖 Read along: [LangGraph from Scratch, Part 2](https://yadneshsalvi.com/blog/langgraph-2-fastapi-basics)
 
+🎬 See it run: **[demo.mp4](demo.mp4)** — a short screen recording of exactly what this part delivers.
+
 What changed since Part 1:
 
 - `main.py` moved into a package: `backend/app/main.py` (launch command is now `uvicorn app.main:app --reload`)

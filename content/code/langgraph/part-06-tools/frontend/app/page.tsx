@@ -19,11 +19,11 @@ function ToolCallBubble({ name, args, result }: {
   const argText = Object.values(args).join(", ");
   return (
     <div className="text-left">
-      <span className="inline-flex flex-col gap-0.5 rounded-xl border border-dashed px-3 py-2 font-mono text-xs text-muted-foreground">
+      <span className="inline-flex max-w-[75%] flex-col gap-0.5 rounded-xl border border-dashed px-3 py-2 font-mono text-xs text-muted-foreground">
         <span className="text-foreground">
           <span className="font-semibold">{name}</span>({argText})
         </span>
-        <span>{result === null ? "running…" : `→ ${result}`}</span>
+        <span className="line-clamp-3 break-all">{result === null ? "running…" : `→ ${result}`}</span>
       </span>
     </div>
   );

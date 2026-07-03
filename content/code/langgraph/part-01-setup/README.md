@@ -2,6 +2,8 @@
 
 📖 Read along: [LangGraph from Scratch, Part 1](https://yadneshsalvi.com/blog/langgraph-1-setup)
 
+🎬 See it run: **[demo.mp4](demo.mp4)** — a short screen recording of exactly what this part delivers.
+
 This part is mostly about getting your machine ready, so there is very little code — that's the point. By the end you have two running servers and zero features:
 
 - `backend/main.py` — an 8-line FastAPI server answering `{"status": "ok"}` on `GET /`

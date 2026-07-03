@@ -2,6 +2,8 @@
 
 📖 Read along: [LangGraph from Scratch, Part 3](https://yadneshsalvi.com/blog/langgraph-3-first-graph)
 
+🎬 See it run: **[demo.mp4](demo.mp4)** — a short screen recording of exactly what this part delivers.
+
 What changed since Part 2:
 
 - `backend/app/graph.py` — a real LangGraph: a `State` holding the conversation, one `llm` node that calls the model, edges from `START` to it and on to `END`

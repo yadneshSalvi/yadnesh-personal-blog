@@ -84,6 +84,14 @@ npx shadcn@latest add button input card
 Three new files under `components/ui/`: `button.tsx`, `input.tsx`, and `card.tsx`. They're plain React components, yours to read and change. You import them like anything else: `import { Button } from "@/components/ui/button"`. The `@/` is a shortcut for your project root, set up by `create-next-app`, so you never write `../../../` to find a file.
 </Callout>
 
+<Callout type="warning" title="One quirk to fix before moving on: your fonts just went serif">
+`shadcn init` rewrites `globals.css` and expects your font variable to be called `--font-sans`, but `create-next-app` named it `--font-geist-sans`. The result is a self-referential `--font-sans: var(--font-sans)` that resolves to nothing, and the whole app quietly falls back to the browser's default serif font — everything suddenly looks like Times New Roman. Point the variable at the font you actually have, in the `@theme inline` block of `globals.css`:
+
+```css filename="frontend/app/globals.css" repo="part-04-nextjs-frontend/frontend/app/globals.css" lines="10" nocollapse
+  --font-sans: var(--font-geist-sans);
+```
+</Callout>
+
 Start the dev server again (`npm run dev`) and let's write some React.
 
 ## Teach the page what a message is

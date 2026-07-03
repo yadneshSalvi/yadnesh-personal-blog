@@ -2,6 +2,8 @@
 
 📖 Read along: [LangGraph from Scratch, Part 6](https://yadneshsalvi.com/blog/langgraph-6-tools)
 
+🎬 See it run: **[demo.mp4](demo.mp4)** — a short screen recording of exactly what this part delivers.
+
 What changed since Part 5:
 
 - `backend/app/tools.py` — a safe `calculator` (an `ast` walker with an operator whitelist; never `eval`) and Tavily `web_search`
