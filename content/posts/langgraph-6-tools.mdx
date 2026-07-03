@@ -437,6 +437,13 @@ Each trip through the loop is another call to the model's API, so a two-tool ans
 
 Right now you have: a bot that holds two real tools, decides on its own when to use them, runs them in a loop that can chain one into the next, and narrates every tool call and result to the UI over the same stream you built last time. It stopped being a chatbot. It's an agent.
 
+<DemoVideo
+  src="/videos/langgraph/part-6-demo.mp4"
+  poster="/videos/langgraph/part-6-poster.jpg"
+  caption="The bot deciding on its own to call `calculator(23 * 17 + 5)`, then reaching for web search on a question it can't know."
+  label="Screen recording of Part 6: the assistant calling the calculator tool, then the Tavily search tool, each shown as a dashed tool bubble"
+/>
+
 <Recap
   part={6}
   items={[

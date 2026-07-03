@@ -507,7 +507,7 @@ export default function Chat() {
 
   return (
     <main className="mx-auto flex h-dvh max-w-4xl flex-col p-4">
-      <Card className="flex flex-1 overflow-hidden">
+      <Card className="flex flex-1 flex-row overflow-hidden">
         <aside className="w-56 shrink-0 border-r p-3">
           <Button variant="outline" size="sm" className="w-full" onClick={newChat}>
             + New chat
@@ -574,6 +574,13 @@ export default function Chat() {
   );
 }
 ```
+
+<DemoVideo
+  src="/videos/langgraph/part-7-demo.mp4"
+  poster="/videos/langgraph/part-7-poster.jpg"
+  caption="The same thread remembers Alex, a brand-new chat starts blank, and clicking the old thread restores the whole conversation."
+  label="Screen recording of Part 7: memory across turns in one thread, isolation in a new thread, and switching threads from the sidebar"
+/>
 
 <Recap
   part={7}

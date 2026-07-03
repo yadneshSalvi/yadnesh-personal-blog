@@ -305,6 +305,13 @@ Does it stream the words in one at a time, the way a chat app does? Not yet. The
 
 Right now you have: a FastAPI backend whose `/chat` endpoint drops your message onto a tray, runs it through a one-node LangGraph, calls a real language model, and hands back the answer over HTTP. The graph is tiny on purpose. Every hard thing the series has left, streaming and tools and memory, is a change to *this* graph, not a rewrite around it.
 
+<DemoVideo
+  src="/videos/langgraph/part-3-demo.mp4"
+  poster="/videos/langgraph/part-3-poster.jpg"
+  caption="The one-node graph answering a real question through `/docs`. That reply is a live `gpt-5.4-mini` call, not a mock."
+  label="Screen recording of Part 3: asking the LangGraph-powered /chat endpoint what LangGraph is and receiving a model-written answer"
+/>
+
 <Recap
   part={3}
   items={[

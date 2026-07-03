@@ -6,6 +6,8 @@ import Callout from "@/components/mdx/Callout";
 import YouTube from "@/components/mdx/YouTube";
 import Mermaid from "@/components/mdx/Mermaid";
 import Figure from "@/components/mdx/Figure";
+import DemoVideo from "@/components/mdx/DemoVideo";
+import type { DemoVideoProps } from "@/components/mdx/DemoVideo";
 import CodeTabs, { Tab } from "@/components/mdx/CodeTabs";
 import Quiz from "@/components/mdx/Quiz";
 import Recap from "@/components/mdx/Recap";
@@ -49,6 +51,7 @@ const MDXComponents: Record<string, (props: unknown) => React.ReactNode> = {
   YouTube: (props) => <YouTube {...(props as { id: string })} />,
   Mermaid: (props) => <Mermaid {...(props as { chart: string })} />,
   Figure: (props) => <Figure {...(props as FigureProps)} />,
+  DemoVideo: (props) => <DemoVideo {...(props as DemoVideoProps)} />,
   CodeTabs: (props) => <CodeTabs {...(props as { children?: ReactNode })} />,
   Tab: (props) => <Tab {...(props as TabProps)} />,
   Quiz: (props) => <Quiz {...(props as QuizProps)} />,

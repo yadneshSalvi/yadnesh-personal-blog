@@ -166,7 +166,7 @@ export default function Chat() {
 
   return (
     <main className="mx-auto flex h-dvh max-w-4xl flex-col p-4">
-      <Card className="flex flex-1 overflow-hidden">
+      <Card className="flex flex-1 flex-row overflow-hidden">
         <aside className="w-56 shrink-0 border-r p-3">
           <Button variant="outline" size="sm" className="w-full" onClick={newChat}>
             + New chat

@@ -302,6 +302,13 @@ You have a real, deployed, full-stack AI app. That's rarer than it sounds, and e
 - **Hand it more tools.** You wrote two in [Part 6](/blog/langgraph-6-tools#what-tool-calling-actually-is); the same `@tool` pattern, or an MCP server, or a vector search over your own documents, all plug into the exact graph you already have.
 - **Try a different brain.** Swap the model in `graph.py` for the other commercial provider, or run one locally with Ollama. The `MODEL` constant means it's a one-line experiment.
 
+<DemoVideo
+  src="/videos/langgraph/part-8-demo.mp4"
+  poster="/videos/langgraph/part-8-poster.jpg"
+  caption="The exact same chat, now served by the Docker image with CORS configured at runtime through `FRONTEND_ORIGIN`."
+  label="Screen recording of Part 8: the chat working end to end against the dockerized backend"
+/>
+
 <Recap
   part={8}
   items={[
