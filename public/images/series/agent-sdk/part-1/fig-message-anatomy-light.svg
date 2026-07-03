@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="980" viewBox="0 0 1240 980">
-  <rect width="1240" height="980" fill="#faf9f6"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="1190" viewBox="0 0 1240 1190">
+  <rect width="1240" height="1190" fill="#faf9f6"/>
   <text x="60" y="40" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#8f887a">WHAT query() YIELDS &#183; ONE REAL RUN, FOUR KINDS OF MESSAGE</text>
   <rect x="60" y="60" width="760" height="232" rx="14" fill="#ffffff" stroke="#dcb09a" stroke-width="1.5"/>
   <text x="86" y="98" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="19" font-weight="700" fill="#1f1c19">SystemMessage</text>
