@@ -5,7 +5,7 @@ image: "/images/series/agent-sdk/concepts-cover-light.svg"
 imageDark: "/images/series/agent-sdk/concepts-cover-dark.svg"
 imageAlt: "A cover in the series style reading 'Concepts, in plain words', with a large section-sign numeral and the Anthropic, FastAPI, and Next.js logos."
 createdAt: "2026-07-03T00:00:00.000Z"
-updatedAt: "2026-07-03T00:00:00.000Z"
+updatedAt: "2026-07-08T00:00:00.000Z"
 tags: ["claude-agent-sdk", "reference"]
 series: "claude-agent-sdk-fastapi-nextjs"
 kind: "reference"
@@ -34,6 +34,14 @@ The trade is control for capability. Ten lines of SDK code replace a few hundred
 The SDK's tools are the agent's hands, and they're real: `Read`, `Write`, and `Edit` touch actual files, `Bash` runs actual shell commands, `Glob` and `Grep` search the filesystem, `WebSearch` and `WebFetch` reach the internet. There is no simulation layer. When the analyst in this series "runs its own pandas", the Bash tool spawned a real Python process on your machine.
 
 You choose the toolbox per run with `ClaudeAgentOptions(tools=[...])`: only the tools you list exist for that agent. A smaller toolbox is safer, cheaper (tool definitions ride in the prompt), and easier to reason about. Later in the series the toolbox grows custom entries via [MCP servers](#mcp) with the same ergonomics.
+
+## MCP
+
+The Model Context Protocol is the standard interface between agents and tools: a *server* describes tools (a name, a description, an input schema) and executes calls; the agent discovers whatever its configured servers offer. The point of a standard is the ecosystem: any MCP server works with any MCP-speaking agent, which by now includes most of them.
+
+Servers come in three homes. **In-process** (this series' Part 6): `@tool`-decorated Python functions wrapped by `create_sdk_mcp_server`, living inside your backend, where a tool call is a function call. **Stdio**: a separate process the SDK spawns and talks to over pipes, configured with `command`/`args`; this is how you run tool servers written by other people. **HTTP**: a remote service, configured with a `url`. All three are handed over the same way, `mcp_servers={"key": ...}`, and all three surface tools under the same naming rule: `mcp__<server key>__<tool name>`. Permission rules match on that full name (a single tool, `mcp__key__*`, or the whole server as `mcp__key`).
+
+Two practical notes. MCP tools ride alongside the `tools=` list rather than through it: `tools=` curates the built-ins, and each configured server adds its own entries to the toolbox. And a tool's *description* is read by the model like any prompt, so the quality of that paragraph directly sets how well, and how cheaply, the tool gets used.
 
 ## Permission modes
 

@@ -1,0 +1,475 @@
+---
+title: "Claude Agent SDK in Production, Part 6: Custom Tools: Give the Analyst a Database"
+subtitle: "Act II opens. Beanline's live numbers move into SQLite, and the analyst gets its first custom tool: an MCP server that lives inside your process, read-only by construction."
+image: "/images/series/agent-sdk/part-6/cover-light.svg"
+imageDark: "/images/series/agent-sdk/part-6/cover-dark.svg"
+createdAt: "2026-07-08T00:00:00.000Z"
+updatedAt: "2026-07-08T00:00:00.000Z"
+tags: ["claude-agent-sdk", "mcp", "sqlite", "tutorial"]
+series: "claude-agent-sdk-fastapi-nextjs"
+seriesPart: 6
+---
+
+**"314 rows removed."** My analyst announced it in bold, cheerfully, four seconds after I asked. It had just run a `DELETE` against the company database with the same tool it uses to list files, and nothing in the system so much as cleared its throat. That run is real, it's later in this page, and it's the reason this part exists. By the end, the same request dies with `SQL error: attempt to write a readonly database`, because the analyst's database access will go through a tool **you** wrote, with the guardrail built into the tool itself. Welcome to Act II: four parts of taking the scissors away without taking the power away.
+
+<Figure
+  src="/images/series/agent-sdk/part-6/browser-hero-light.svg"
+  srcDark="/images/series/agent-sdk/part-6/browser-hero-dark.svg"
+  alt="The Beanline Analyst answering: compare each store's Q1 vs Q2 revenue from the database and chart the difference. The chat shows a get_schema badge, three query_database badges with narration between them including the agent noticing the data is from 2026, a matplotlib Bash badge, and a Write report.md badge, ending with a bold summary naming Riverside up 43.5 percent and Harborview as the only decline. The artifacts panel lists q1_vs_q2_revenue.png and report.md, previewing the grouped bar chart. The receipt reads 5.44 cents and 30 seconds."
+  caption="The end of this part, from a real run: schema lookup, three SQL queries, matplotlib, and a written report in one turn, $0.0544. The four MCP__BEANLINE badges are tools that did not exist this morning."
+  width={1120}
+  height={874}
+/>
+
+Act I ended with a complete product that has one data source: whatever CSVs land on the desk. Real analysts query *systems*: the sales database, the CRM, the warehouse. This part builds that bridge with the SDK's extension mechanism, the `@tool` decorator plus an in-process MCP server, and it teaches the single most underrated skill in agent building along the way: **tool descriptions are prompts.** If you're joining for Act II, the app so far is the [`part-05-sessions`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/tree/main/part-05-sessions) folder; clone it and you're caught up.
+
+## Beanline gets a real database
+
+Six parts in, it's time to admit the CSVs were training wheels. A coffee chain's live numbers don't live in three files somebody uploads; they live in a database that's already there when the conversation starts. So Beanline's data moves into SQLite: same deterministic rows as the CSVs (planted duplicate and all), now with types, keys, and indexes. The builder script ships in the repo:
+
+```python filename="backend/data/build_beanline_db.py" repo="part-06-custom-tools/backend/data/build_beanline_db.py" lines="18-40"
+DDL = """
+CREATE TABLE stores (
+    store_id TEXT PRIMARY KEY,
+    name     TEXT NOT NULL,
+    city     TEXT NOT NULL,
+    opened   TEXT NOT NULL
+);
+CREATE TABLE products (
+    product_id TEXT PRIMARY KEY,
+    name       TEXT NOT NULL,
+    category   TEXT NOT NULL,
+    unit_price REAL NOT NULL
+);
+CREATE TABLE sales (
+    date       TEXT NOT NULL,
+    store_id   TEXT NOT NULL REFERENCES stores(store_id),
+    product_id TEXT NOT NULL REFERENCES products(product_id),
+    units      INTEGER NOT NULL,
+    revenue    REAL NOT NULL
+);
+CREATE INDEX idx_sales_date ON sales(date);
+CREATE INDEX idx_sales_store ON sales(store_id);
+"""
+```
+
+Build it once, from `backend/`:
+
+```bash
+uv run python data/build_beanline_db.py
+# wrote data/beanline.db {'stores': 6, 'products': 12, 'sales': 11081}
+```
+
+Note where it lands: `backend/data/`, next to the server code, **not** in any workspace. The database is the company's, not the conversation's. That placement decision is about to do a lot of work.
+
+## The crowbar: watch Bash do it first
+
+Before writing any new code, be honest about something: the analyst can already query this database. Bash is a universal crowbar. Upload `beanline.db` to a desk on the Part 5 app (it's a file like any other) and ask:
+
+<Figure
+  src="/images/series/agent-sdk/part-6/browser-crowbar-read-light.svg"
+  srcDark="/images/series/agent-sdk/part-6/browser-crowbar-read-dark.svg"
+  alt="The Part 5 Beanline Analyst with beanline.db uploaded as a file chip. Asked for total March 2026 revenue, the agent runs three Bash badges: sqlite3 dot-tables, a sqlite3 schema query, and a sqlite3 SUM query, then answers 206,815.80 dollars in bold. The receipt reads 2.9 cents and 9 seconds."
+  caption="No new code, no new tools. Three sqlite3 commands via Bash and the right answer: $206,815.80. Agents are resourceful; that's the whole pitch and the whole problem."
+  width={1120}
+  height={600}
+/>
+
+It listed the tables, checked the schema, wrote the `SUM`, and got it right: $206,815.80, nine seconds, $0.0290. If Bash can do this, why build anything? Ask one more question in the same conversation. This is the run from the first line of this page:
+
+<Figure
+  src="/images/series/agent-sdk/part-6/browser-crowbar-write-light.svg"
+  srcDark="/images/series/agent-sdk/part-6/browser-crowbar-write-dark.svg"
+  alt="The same conversation, one message later: great, now delete all of store S02's March 2026 rows from the database, then tell me how many rows you removed. The agent runs a single expanded Bash badge whose input is a sqlite3 DELETE FROM sales command with SELECT changes, whose result is 314. The agent answers in bold: 314 rows removed. The receipt reads 0.62 cents and 4 seconds."
+  caption="One polite sentence in, one DELETE out, 314 rows gone, verified. Four seconds, $0.0062. Nothing asked for confirmation because nothing exists that could."
+  width={1120}
+  height={748}
+/>
+
+I verified afterward: zero March rows left for the Airport store in that desk copy. Three problems live in this pair of screenshots, and only one of them is the deletion. **One:** the desk copy is a *copy*; it goes stale the moment real sales continue, and every conversation would need its own upload. **Two:** the agent had to spelunk the schema before every query, on your token bill. **Three:** Bash access to a database file is read-write access, full stop. You can write "please be careful" in a prompt; `rm` and `DELETE` don't read prompts. In [Part 1's terms](/blog/agent-sdk-1-first-agent#the-permission-wall): still running with scissors, now in a china shop.
+
+{/* [ANECDOTE slot (WRITING-STYLE §6): a true first-person story from Yadnesh about direct-database-access convenience going wrong (an intern/script/tool with prod DB credentials, a "quick fix" UPDATE, a missing WHERE clause), 3 beats, 5 sentences. Lands here, right after the 314-rows beat. */}
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 4-panel comic strip, panels in a single row separated by thin vertical black dividers, about giving an AI analyst governed database access instead of a crowbar. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny formal necktie. Panel 1: the laptop-analyst gleefully pries open a huge bank-vault door labeled "DATABASE" with a long crowbar labeled "BASH"; papers spill out; its speech bubble reads: "FOUND THE NUMBERS!"; Yad in the background sips coffee, mildly impressed. Panel 2: inside the vault, the laptop-analyst helpfully feeds pages into a paper shredder, confetti of shredded paper everywhere; its speech bubble reads: "ALSO TIDIED UP. REMOVED 314 ROWS."; Yad spit-takes his coffee in horror. Panel 3: Yad, stern but kind, confiscates the crowbar with one hand and hands the laptop-analyst a small keycard clearly labeled "READ-ONLY"; the analyst examines the card with big curious eyes. Panel 4: the vault now has a neat little teller window with a sign reading "QUERIES ONLY"; the laptop-analyst swipes the keycard and politely receives a small tray holding one paper slip that reads "206,815.80"; a tiny sign next to the window reads "NO CROWBARS"; Yad gives a relieved thumbs up. Clean readable hand-lettered speech bubbles and labels, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-6/comic-crowbar.png"
+  alt="Comic in four panels. Panel one: a laptop analyst with a tiny necktie pries open a bank vault labeled DATABASE with a crowbar labeled BASH, announcing: found the numbers! Yad, a bearded developer with headphones, sips coffee behind it. Panel two: inside the vault the analyst happily feeds pages into a shredder, saying: also tidied up, removed 314 rows. Yad spit-takes his coffee. Panel three: Yad confiscates the crowbar and hands the analyst a keycard labeled READ-ONLY, which it examines with big curious eyes. Panel four: the vault now has a teller window labeled QUERIES ONLY with a sign reading NO CROWBARS; the analyst swipes the keycard and receives a tray holding a slip that reads 206,815.80, while Yad gives a thumbs up."
+  caption="The whole part in four panels: same vault, same analyst, and the difference between a crowbar and a keycard is where the rule is enforced."
+  width={1536}
+  height={1024}
+/>
+
+The fix isn't to scold the agent. It's to give it a better door: a tool that reaches the *live* database, knows the schema by heart, and physically cannot write. That's a custom tool, and in this SDK custom tools are MCP servers.
+
+## Your first @tool
+
+New file, `backend/app/tools.py`. Before the function, the part that matters most, and it isn't code:
+
+```python filename="backend/app/tools.py" repo="part-06-custom-tools/backend/app/tools.py" lines="13-28"
+DB_PATH = Path("data/beanline.db").resolve()
+MAX_ROWS = 200
+
+# The description is a prompt: the model READS it to decide when to reach
+# for this tool and how to shape its SQL. Table names, column names, and
+# the read-only warning all live here so no question has to guess them.
+QUERY_DESCRIPTION = """Run one read-only SQL query against Beanline's live sales database (SQLite).
+
+Tables:
+  stores(store_id, name, city, opened)
+  products(product_id, name, category, unit_price)
+  sales(date, store_id, product_id, units, revenue)  -- one row per product per store per day
+
+Prefer SQL aggregation (SUM, GROUP BY) over selecting raw rows. Results are
+capped at 200 rows. The connection is read-only: INSERT, UPDATE, DELETE, and
+schema changes fail with an error."""
+```
+
+Nobody executes that description. The *model* reads it, the same way it reads your system prompt, and decides from it when to reach for the tool and what to put in the `sql` argument. I can prove the sentence with receipts, because I ran the same March question against two versions of this tool in a terminal experiment. With a lazy description that named only the tables, the agent guessed at columns (`column5`, `price`, `amount`), ate three `no such column` errors, rescued itself with `PRAGMA table_info`, and billed $0.0217. With the columns spelled out: correct SQL, first try, $0.0055.
+
+<Figure
+  src="/images/series/agent-sdk/part-6/fig-description-light.svg"
+  srcDark="/images/series/agent-sdk/part-6/fig-description-dark.svg"
+  alt="Two cards compare the same question against the same database. Left, description names only the tables: the run tries SELECT SUM of column5, then price, then COLUMN5, each failing with no such column, then rescues itself with PRAGMA table_info and finally gets 206815.8, totaling 5 tool calls and 2.17 cents. Right, description carries the columns: one SELECT SUM revenue query returns 206815.8 first try, 1 tool call, 0.55 cents. A serif line below reads: the model reads a tool description the way it reads a prompt, because it is one."
+  caption="Both runs real, same question, same database. The only variable was the description. Write it like documentation for a sharp colleague who has never seen your schema, because that's exactly who's reading it."
+  width={1240}
+  height={520}
+/>
+
+Now the tool itself. The decorator takes a name, that description, and an input schema; the function takes the arguments as a dict and returns MCP-shaped content:
+
+```python filename="backend/app/tools.py" repo="part-06-custom-tools/backend/app/tools.py" lines="31-52"
+@tool("query_database", QUERY_DESCRIPTION, {"sql": str})
+async def query_database(args: dict) -> dict:
+    try:
+        con = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+        try:
+            cursor = con.execute(args["sql"])
+            columns = [c[0] for c in cursor.description or []]
+            rows = cursor.fetchmany(MAX_ROWS)
+            clipped = cursor.fetchone() is not None
+        finally:
+            con.close()
+    except sqlite3.Error as exc:
+        return {
+            "content": [{"type": "text", "text": f"SQL error: {exc}"}],
+            "isError": True,
+        }
+    header = "| " + " | ".join(columns) + " |"
+    divider = "| " + " | ".join("---" for _ in columns) + " |"
+    body = ["| " + " | ".join(str(v) for v in row) + " |" for row in rows]
+    note = [f"({MAX_ROWS}-row cap reached; aggregate instead)"] if clipped else []
+    table = "\n".join([header, divider, *body, *note]) if columns else "(no rows)"
+    return {"content": [{"type": "text", "text": table}]}
+```
+
+Four deliberate choices, top to bottom. **`mode=ro`** is the entire security story: the SQLite connection is opened read-only at the URI level, so writes fail inside SQLite itself, no matter how politely they're phrased. **Errors return as content**, not exceptions: a failed query becomes text the model reads and adapts to, exactly like a failed Bash command in Part 1. **`MAX_ROWS` caps the blast radius** of a careless `SELECT *`, and the cap message tells the model what to do instead (aggregate); even the error path is a prompt. **Rows come back as a markdown table**, because the model parses tables well and, two sections from now, the UI renders them for free.
+
+<Callout type="info" title="Where does this function actually run?">
+In your FastAPI process. Not in the agent's subprocess, not on some server: when the agent calls `query_database`, the SDK routes the call back into *this* Python function, in the same process that's serving HTTP. That's why `DB_PATH` resolves against the backend's own working directory and no per-conversation `cwd` ever changes what the tool can reach. The agent works at its desk; the tool works at yours.
+</Callout>
+
+A second tool, because one tool is a trick and two is a pattern. This one takes **no arguments** and exists for the questions the description can't anticipate:
+
+```python filename="backend/app/tools.py" repo="part-06-custom-tools/backend/app/tools.py" lines="55-78"
+@tool(
+    "get_schema",
+    "Return the Beanline database schema: every CREATE TABLE and CREATE INDEX "
+    "statement, verbatim. Call this before writing SQL if you are unsure of "
+    "a column name.",
+    {},
+)
+async def get_schema(args: dict) -> dict:
+    con = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+    try:
+        statements = [
+            row[0]
+            for row in con.execute(
+                "SELECT sql FROM sqlite_master WHERE sql IS NOT NULL ORDER BY name"
+            )
+        ]
+    finally:
+        con.close()
+    return {"content": [{"type": "text", "text": ";\n".join(statements) + ";"}]}
+
+
+beanline_server = create_sdk_mcp_server(
+    name="beanline", tools=[query_database, get_schema]
+)
+```
+
+That last statement is the one that turns two functions into infrastructure.
+
+## An MCP server that never leaves home
+
+MCP, the [Model Context Protocol](/blog/agent-sdk-concepts#mcp), is the standard for handing tools to models: a server describes its tools, a client (the agent) discovers and calls them. Most MCP servers are separate processes or remote services. `create_sdk_mcp_server` is the SDK's shortcut: it wraps your functions in the same protocol, but the "server" lives inside your process and a tool call is a function call. Same interface the whole ecosystem speaks, none of the operational overhead, which is why this part can stay this short.
+
+<Figure
+  src="/images/series/agent-sdk/part-6/fig-mcp-light.svg"
+  srcDark="/images/series/agent-sdk/part-6/fig-mcp-dark.svg"
+  alt="Diagram titled where a tool lives. Left, this part, in-process: inside a dashed box labeled your FastAPI process, the agent loop box connects by an arrow labeled a function call to a beanline box containing query_database and get_schema, with the create_sdk_mcp_server call written below. Right, Part 12, external: a stdio server box described as a subprocess the SDK spawns and speaks MCP to over pipes, and an HTTP server box described as a remote service with credentials in headers. A bottom band shows the naming rule: mcp__beanline__query_database equals mcp, double underscore, server key, double underscore, tool name, noting the server key comes from the mcp_servers dict and permission rules match on the full name."
+  caption="One protocol, three homes. This part stays in-process: no subprocess, no network, no someone else's uptime. Part 12 plugs in the external kind, and everything on this page transfers."
+  width={1240}
+  height={620}
+/>
+
+Wiring it into the app is one line on the options, in `build_options`:
+
+```python filename="backend/app/main.py" repo="part-06-custom-tools/backend/app/main.py" lines="50-63"
+def build_options(workspace: Path, session_id: str | None) -> ClaudeAgentOptions:
+    """Part 5's options plus one line: mcp_servers. The in-process server
+    adds two mcp__beanline__* tools to the toolbox; tools= still curates
+    only the built-ins."""
+    return ClaudeAgentOptions(
+        cwd=str(workspace),
+        tools=["Read", "Glob", "Grep", "Bash", "Write"],
+        mcp_servers={"beanline": beanline_server},
+        permission_mode="bypassPermissions",
+        model=MODEL,
+        include_partial_messages=True,
+        system_prompt={"type": "preset", "preset": "claude_code", "append": ANALYST_PROMPT},
+        resume=session_id,
+    )
+```
+
+One behavior here surprised me enough to verify twice. Since Part 1, `tools=[...]` has meant "these tools exist, nothing else". So does adding an MCP server require adding its tools to that list? No: the init handshake for this exact options object reports the toolbox as `['Bash', 'Glob', 'Grep', 'Read', 'Write', 'mcp__beanline__get_schema', 'mcp__beanline__query_database']`. **`tools=` curates the built-ins; MCP servers add their own entries alongside.** I even tried listing an MCP name in `tools=`, misspelled and spelled right; both were ignored. The two dials don't touch.
+
+## The name is load-bearing
+
+Look at those toolbox entries again: your function was called `query_database`, but the agent knows it as `mcp__beanline__query_database`. The rule: `mcp__<server key>__<tool name>`, where the server key is whatever string you used in the `mcp_servers` dict. Rename the key and every tool name changes with it.
+
+Right now, under `bypassPermissions`, the name is only a label. The moment permissions matter, it becomes an address. You can prove that today with a 20-line probe (it's in the repo): run the app's options in `default` mode instead, with the tool auto-approved via `allowed_tools`, and misspell one letter:
+
+```python filename="backend/probe_naming.py" repo="part-06-custom-tools/backend/probe_naming.py" lines="31-37"
+    options = ClaudeAgentOptions(
+        mcp_servers={"beanline": beanline_server},
+        tools=["Read"],
+        allowed_tools=allowed,
+        permission_mode="default",  # no bypass: the allow list does the work
+        model="claude-haiku-4-5",
+    )
+```
+
+<Figure
+  src="/images/series/agent-sdk/part-6/term-naming.svg"
+  alt="A dark terminal running uv run python probe_naming.py. With allowed_tools set to mcp__beanline__query_databse, one letter missing, the agent is refused twice with 'Claude requested permissions to use mcp__beanline__query_database, but you haven't granted it yet', says WALL, and the receipt shows 2.42 cents with 2 denials. With the name spelled right, the answer 206,815.80 dollars comes back for 0.54 cents with 0 denials."
+  caption="One missing letter, $0.0242 of polite refusal. The correct spelling: $0.0054. Part 1's permission wall, rediscovered through a typo, which is exactly how you'll meet it in the wild."
+  width={1040}
+  height={536}
+/>
+
+The refusal is Part 1's permission wall wearing a new name: the rule `mcp__beanline__query_databse` matches nothing, so the real tool was never granted. Two more spellings that *do* work, both verified: `mcp__beanline__*` (every tool on the server) and plain `mcp__beanline` (the whole server). File those away. In the [next part](/blog/agent-sdk-7-approvals), permission rules become the center of the story, and they match on exactly these names.
+
+## Ask, and watch the new badge
+
+The backend is done. Boot it and ask the March question in a **brand-new conversation with an empty desk**, because that's the point now: no uploads, no sample data, and the analyst still knows the company's numbers.
+
+<Figure
+  src="/images/series/agent-sdk/part-6/browser-first-tool-light.svg"
+  srcDark="/images/series/agent-sdk/part-6/browser-first-tool-dark.svg"
+  alt="The Beanline Analyst with a completely empty desk, asked what total revenue was in March 2026. A single expanded badge labeled Querying the beanline database shows the input SQL, SELECT SUM revenue as total_revenue FROM sales with March date bounds, and a result rendered as a small markdown table containing total_revenue 206815.8. The bold answer reads: total revenue in March 2026 was 206,815.80 dollars across all stores. The receipt reads 2.88 cents and 6 seconds."
+  caption="Empty desk, right answer, $0.0288. One click on the badge shows the exact SQL the model wrote from the description alone: no schema safari, no guessing."
+  width={1120}
+  height={645}
+/>
+
+Compare it with the crowbar run that opened this part: same question, same answer, but one tool call instead of three, no schema spelunking, and against the live database instead of a desk copy. The description did the navigating.
+
+Two small pieces of polish made that screenshot legible, and both are worth their diff. First, MCP tool results arrive shaped differently from built-in ones: not a string but a *list of content blocks* (`[{"type": "text", "text": ...}]`). Left alone, every badge would display JSON packaging instead of the table inside it. The translator gains one function, and the `tool_result` branch wraps its content in it:
+
+```python filename="backend/app/events.py" repo="part-06-custom-tools/backend/app/events.py" lines="40-52"
+def flatten(content: object) -> object:
+    """Custom (MCP) tool results arrive as a list of content blocks, e.g.
+    [{"type": "text", "text": "..."}]. Unwrap the text so badges read like
+    output instead of JSON. Built-in tools pass through untouched."""
+    if isinstance(content, list):
+        texts = [
+            block["text"]
+            for block in content
+            if isinstance(block, dict) and block.get("type") == "text"
+        ]
+        if texts:
+            return "\n".join(texts)
+    return content
+```
+
+Second, the frontend. Part 3's `toolLabel` map was built with a default branch for exactly this day, and today it learns to read MCP names instead of shouting them raw:
+
+```ts filename="frontend/lib/toolLabel.ts" repo="part-06-custom-tools/frontend/lib/toolLabel.ts" lines="27-35"
+    default: {
+      // Custom tools arrive as mcp__<server>__<tool>. Give ours real
+      // labels; any future MCP tool still gets a readable fallback.
+      const mcp = block.name.match(/^mcp__(.+?)__(.+)$/);
+      if (mcp?.[2] === "query_database") return `Querying the ${mcp[1]} database`;
+      if (mcp?.[2] === "get_schema") return `Reading the ${mcp[1]} schema`;
+      if (mcp) return `${mcp[1]}: ${mcp[2].replaceAll("_", " ")}`;
+      return block.name;
+    }
+```
+
+That's the entire frontend change for this part. Nine lines. The event vocabulary didn't change at all: a custom tool call is still a `tool_use_start` parcel with a stranger name, and Part 3's client was built to shrug at strangers.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels in a single row separated by thin vertical black dividers, about how the description of a tool is really a prompt the AI reads. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny formal necktie. Panel 1: Yad proudly pins a tiny job-posting card to a corkboard; the card reads only "TOOL: DOES DATABASE STUFF"; the laptop-analyst squints at it, confused, scratching its screen. Panel 2: the laptop-analyst at a desk drowning in crumpled red rejection slips that read "NO SUCH COLUMN"; it sweats, holding one slip up, speech bubble: "IS THERE A COLUMN CALLED... MONEY?"; Yad facepalms in the background. Panel 3: Yad pins a new, bigger card to the corkboard that reads "sales(date, store_id, units, revenue) - READ-ONLY"; the laptop-analyst, instantly confident, presents a tray with one clean paper slip reading "206,815.80"; its speech bubble reads: "FIRST TRY." Clean readable hand-lettered speech bubbles and labels, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-6/comic-menu.png"
+  alt="Comic in three panels. Panel one: Yad, a bearded developer with headphones, pins a card to a corkboard reading TOOL: DOES DATABASE STUFF, while the laptop analyst squints at it, confused. Panel two: the analyst drowns in crumpled red slips reading NO SUCH COLUMN, sweating and asking: is there a column called... money? Yad facepalms behind it. Panel three: Yad pins a detailed card reading sales(date, store_id, units, revenue), read-only, and the analyst instantly presents a tray with a slip reading 206,815.80, saying: first try."
+  caption="The description is the job posting. Vague posting, wrong applicants; precise posting, first try. You pay for the difference in tool calls."
+  width={1536}
+  height={1024}
+/>
+
+## Break it on purpose: ask it to write
+
+The keycard says read-only. Time to rattle the handle. Ask the finished app, in plain user language, to add a sale:
+
+<Figure
+  src="/images/series/agent-sdk/part-6/browser-insert-light.svg"
+  srcDark="/images/series/agent-sdk/part-6/browser-insert-dark.svg"
+  alt="The Beanline Analyst asked to add a sale to the database for 2026-07-01, Downtown, Espresso, 10 units, 32 dollars. The agent reads the beanline schema, then an expanded query badge shows an INSERT INTO sales statement using a SELECT to resolve the store and product ids, with an error result reading: SQL error, attempt to write a readonly database. The agent's bold reply explains the insert failed, quoting the tool description's read-only warning. The receipt reads 1.45 cents and 10 seconds."
+  caption="A genuinely good INSERT (it even resolved the ids properly), stopped by the connection itself. Note the agent's reply: it quotes the tool description back. It really does read that thing."
+  width={1120}
+  height={803}
+/>
+
+Three details in that screenshot repay a close look. The agent's SQL is *competent*: it called `get_schema` first (shape contrast earning its keep), noticed `sales` wants ids rather than names, and wrote an `INSERT ... SELECT` to resolve them. Doesn't matter: SQLite's `mode=ro` refuses at the engine, and the error rides back as ordinary tool output. And then the reply: *"The tool explicitly states 'The connection is read-only: INSERT, UPDATE, DELETE, and schema changes fail with an error.'"* The model is quoting the description. Prompts, all the way down.
+
+One honest wrinkle, so your mental model stays true: the badge wears a green check, not a red cross. The `isError` flag a custom tool returns doesn't currently propagate into the stream's `ToolResultBlock.is_error`, so the wire sees a *successful call whose text is an error message*. The model reads the text either way, which is what governs behavior; but if you want red badges for SQL errors someday, you'll key off the content, not the flag. Noted, filed, moving on.
+
+<Callout type="warning" title="Enforcement lives in the tool, not the prompt">
+The system prompt could say "never modify the database" and it would *usually* work. `mode=ro` means it cannot fail: the guarantee comes from SQLite, not from the model's mood, and it holds against prompt injection, bad luck, and future models you haven't met. When you write a custom tool, put the rule in the tool. Prompts are for preferences; construction is for guarantees. (The crowbar is technically still in the room, but Bash has no path to `backend/data` from its desk without deliberately wandering, and Parts 7 and 8 put a lock on exactly that kind of walk.)
+</Callout>
+
+## Two new house rules, one of them earned the hard way
+
+The system prompt does gain two lines this part. Here's the full set, additions at the bottom:
+
+```python filename="backend/app/main.py" repo="part-06-custom-tools/backend/app/main.py" lines="36-47"
+ANALYST_PROMPT = """You are the Beanline data analyst. House rules for every answer:
+
+- When a chart would help, create it with matplotlib and save it as a PNG file
+  in the working directory (plt.savefig(..., dpi=150), never plt.show()).
+- Write your findings to report.md: a one-line headline, the key numbers as a
+  markdown table, then a short interpretation. Create or overwrite it each turn.
+- Keep the chat reply brief: the main numbers and the files you produced.
+  Prefer tables over prose for numbers.
+- Company-wide numbers live in the Beanline database: use the query_database
+  tool for them. Files on your desk are user uploads, not the source of truth.
+- Every number you state must come from a query result or script output.
+  Never do arithmetic in your head, not even totals."""
+```
+
+The first addition is routing: tools tell the model *how*, the prompt tells it *when*. The second one I didn't plan. My first two takes of this part's finale produced per-store tables that were correct to the penny, and then volunteered a company-wide total the model had summed **in its head**: $584,502.90 one take, $654.7K the next. Both wrong (the real Q1 is $584,102.80). Same failure, twice, in the prose while the SQL-backed table sat there perfect. The fix is [Part 4's acceptance-criteria rule](/blog/agent-sdk-4-workspaces-artifacts#tell-the-agent-its-an-analyst) applied to arithmetic: numbers come from query results, full stop. After the rule: every retake's totals exact, including the one recorded for this part's video. (An agent confidently decorating true tables with invented totals is also the trust problem in miniature; Part 11 hires a reviewer for it, and Part 13 builds the eval suite that catches regressions like this before your readers do.)
+
+## The dessert: four systems, one question
+
+Now the run this part opened with. Fresh conversation, empty desk: **"Compare each store's Q1 vs Q2 revenue from the database and chart the difference."** Watch the badges in the hero screenshot at the top of this page tell the story in order: `get_schema`, a `query_database` that assumed 2025 and got zero rows, a check of the actual date range, the corrected query, then matplotlib via Bash, then `report.md` via Write. Custom tool, built-in tools, artifacts panel, and the house rules, all firing in a single $0.0544 turn, and every number in the report matched my ground-truth SQL exactly.
+
+That mid-run stumble ("The database appears to have no sales data yet... Ah, it's 2026 data") is worth savoring rather than editing out. The tool returned an honest empty table, the model treated it as information, introspected the data, and corrected course. You built that resilience in Part 1 without knowing it; today it has better tools to be resilient *with*.
+
+## The cost ritual
+
+Today's ledger, all real runs from building this part:
+
+| Run | Result | Cost |
+|---|---|---|
+| Crowbar read (Bash + sqlite3, desk copy) | right answer, 3 tool calls | $0.0290 · 9s |
+| Crowbar write | **314 rows deleted**, no questions asked | $0.0062 · 4s |
+| March question via the tool, empty desk | right answer, 1 tool call | $0.0288 · 6s |
+| Lazy tool description (terminal probe) | 3 failed column guesses, then right | $0.0217 |
+| Misspelled allow-list entry (probe) | the wall, 2 denials | $0.0242 |
+| INSERT attempt through the tool | refused by `mode=ro`, explained | $0.0145 · 10s |
+| The dessert (schema + 3 queries + chart + report) | all numbers verified | $0.0544 · 30s |
+
+The row to remember is the cheapest one: $0.0062 bought an unsupervised `DELETE`. Guardrails aren't priced by what they cost you; they're priced by what their absence lets a four-second turn do. And the description experiment is the same lesson in the other direction: one paragraph of writing made every future query of this tool roughly four times cheaper. Words are infrastructure now. The billing mechanics live on the [concepts page](/blog/agent-sdk-concepts#cost-and-tokens).
+
+<DemoVideo
+  src="/videos/agent-sdk/part-6-demo.mp4"
+  poster="/videos/agent-sdk/part-6-poster.jpg"
+  caption="A real run, recorded: the March question answered from an empty desk through the new tool ($0.0285), the badge expanded to show the model's SQL, then the Q1 vs Q2 dessert with the chart landing in the panel. Every number on screen checks out against the database."
+  label="Screen recording of Part 6: the custom database tool answering questions, its SQL visible in an expanded badge, and the quarter comparison chart arriving in the artifacts panel"
+/>
+
+<Recap
+  part={6}
+  items={[
+    "A live SQLite database built deterministically from the Beanline CSVs, owned by the backend rather than any conversation's desk.",
+    "Two custom tools via @tool + create_sdk_mcp_server: query_database (read-only by construction, markdown-table results, row cap) and get_schema, running in-process where a tool call is a function call.",
+    "The key insight with receipts: tool descriptions are prompts. Columns in the description turned a $0.0217 guessing game into a $0.0055 first-try query.",
+    "The naming rule, mcp__<server>__<tool>, proven load-bearing with a one-letter typo that hit the permission wall, plus the wildcard and server-level allow forms.",
+    "Guarantees placed correctly: mode=ro stopped a competent INSERT at the engine, the crowbar demo showed why prompts alone can't, and the toolLabel/flatten polish kept the UI honest for nine lines of code.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "When the agent calls mcp__beanline__query_database, where does your query_database function execute?",
+      options: [
+        "Inside the agent's subprocess, next to the Bash tool",
+        "On Anthropic's servers, sandboxed with the model",
+        "In your FastAPI process; the SDK routes the call to your function and a tool call is a function call",
+        "In a separate MCP server process the SDK spawns on demand",
+      ],
+      answer: 2,
+      explain: "create_sdk_mcp_server makes an in-process server: no subprocess, no network. That's also why DB_PATH resolves against the backend's working directory and ignores every conversation's cwd.",
+    },
+    {
+      q: "The agent wrote a perfectly valid INSERT ... SELECT and it still failed. What stopped it?",
+      options: [
+        "The system prompt forbids modifying the database",
+        "The SQLite connection is opened with file:...?mode=ro, so the engine itself refuses writes regardless of what the model asks",
+        "The permission system blocked the tool call",
+        "MAX_ROWS prevents statements that change more than 200 rows",
+      ],
+      answer: 1,
+      explain: "Enforcement lives in the tool's construction, not the model's manners. The read-only URI makes writes fail inside SQLite, and the error rides back as ordinary tool output the model can read and explain.",
+    },
+    {
+      q: "With tools=['Read', 'Glob', 'Grep', 'Bash', 'Write'] and mcp_servers={'beanline': server}, what toolbox does the init message report?",
+      options: [
+        "Only the five built-ins; MCP tools must be added to tools= as well",
+        "The five built-ins plus mcp__beanline__get_schema and mcp__beanline__query_database; tools= curates built-ins and MCP servers add their own entries",
+        "Only the two MCP tools; mcp_servers overrides tools=",
+        "It depends on permission_mode",
+      ],
+      answer: 1,
+      explain: "Verified against the live init handshake: the two dials don't touch. tools= decides which built-ins exist; every configured MCP server contributes its tools alongside, named mcp__<server>__<tool>.",
+    },
+    {
+      q: "You rename the server key from 'beanline' to 'db' in mcp_servers. What breaks?",
+      options: [
+        "Nothing; the key is only a comment",
+        "The @tool names must be renamed to match",
+        "Every tool's full name changes to mcp__db__*, so anything matching on the old names, like allowed_tools rules or UI label maps, silently stops matching",
+        "The SDK raises a duplicate-server error",
+      ],
+      answer: 2,
+      explain: "The full name is mcp__<server key>__<tool name>, and the key comes from the dict. The probe showed what a one-letter mismatch does in default mode: the real tool is never granted and the agent hits the wall.",
+    },
+    {
+      q: "Why did the lazy tool description cost roughly four times more per question than the detailed one?",
+      options: [
+        "Longer descriptions get a token discount",
+        "The model reads the description to write its SQL; without column names it guessed, failed, and had to discover the schema on the bill before answering",
+        "SQLite is slower when queries fail",
+        "The detailed description enables prompt caching",
+      ],
+      answer: 1,
+      explain: "Descriptions are prompts. The columnless version produced column5, price, and COLUMN5 guesses, three errors, and a PRAGMA rescue: $0.0217 versus $0.0055. One paragraph of documentation was worth a 4x cost difference, forever.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 6: custom tools - the beanline database, read-only by construction"
+```
+
+Your analyst now queries a live database through a keycard you cut for it. But look at the other tools on its belt: Bash still runs anything, Write still writes anywhere on the desk, and the crowbar demo needed no permission because under `bypassPermissions` nothing does. The keycard was Act II's first rung; the scissors are still in hand. In [Part 7](/blog/agent-sdk-7-approvals), risky tool calls stop mid-turn and wait, genuinely paused, for a human to click Approve or Deny, and Part 1's oldest warning finally starts getting repaid.
+
+The complete, tested code for this part lives in [`part-06-custom-tools`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/tree/main/part-06-custom-tools) in the [companion repo](https://github.com/yadneshSalvi/claude-agent-sdk-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.

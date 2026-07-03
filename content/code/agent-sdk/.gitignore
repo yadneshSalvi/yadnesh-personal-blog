@@ -15,5 +15,8 @@ next-env.d.ts
 # Agent workspaces (per-conversation scratch dirs, Part 4+)
 workspaces/
 
+# Built artifacts (rebuild with data/build_beanline_db.py, Part 6+)
+beanline.db
+
 # OS
 .DS_Store

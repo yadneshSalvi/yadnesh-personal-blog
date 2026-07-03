@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="536" viewBox="0 0 1040 536" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="536" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; probe_naming.py &#183; the name is load-bearing</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62">$</tspan> uv run python probe_naming.py</text>
+    <text x="32" y="116" xml:space="preserve"></text>
+    <text x="32" y="144" xml:space="preserve">--- allowed_tools=['mcp__beanline__query_<tspan fill="#d97676">databse</tspan>']  (one letter missing) ---</text>
+    <text x="32" y="172" xml:space="preserve">  !! Claude requested permissions to use mcp__beanline__query_database,</text>
+    <text x="32" y="200" xml:space="preserve">     but you haven't granted it yet.</text>
+    <text x="32" y="228" xml:space="preserve">Let me try again:</text>
+    <text x="32" y="256" xml:space="preserve">  !! Claude requested permissions to use mcp__beanline__query_database,</text>
+    <text x="32" y="284" xml:space="preserve">     but you haven't granted it yet.</text>
+    <text x="32" y="312" xml:space="preserve"><tspan fill="#d97676">WALL</tspan></text>
+    <text x="32" y="340" xml:space="preserve">The query_database tool has been refused twice. I cannot proceed further.</text>
+    <text x="32" y="368" xml:space="preserve">[$0.0242, 2 denials]</text>
+    <text x="32" y="396" xml:space="preserve"></text>
+    <text x="32" y="424" xml:space="preserve">--- allowed_tools=['mcp__beanline__query_<tspan fill="#8fb573">database</tspan>']  (spelled right) ---</text>
+    <text x="32" y="452" xml:space="preserve">The total revenue in March 2026 across all stores is <tspan fill="#8fb573">**$206,815.80**</tspan>.</text>
+    <text x="32" y="480" xml:space="preserve">[$0.0054, 0 denials]</text>
+  </g>
+</svg>

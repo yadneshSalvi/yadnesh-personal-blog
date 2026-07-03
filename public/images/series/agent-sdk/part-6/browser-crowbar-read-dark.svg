@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="600" viewBox="0 0 1120 600" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="600" fill="#0c0a09"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#211e1a"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#2b2723" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#3a3530"/><circle cx="56" cy="28" r="7" fill="#3a3530"/><circle cx="82" cy="28" r="7" fill="#3a3530"/>
+  <rect x="320" y="13" width="480" height="30" rx="15" fill="#1a1816" stroke="#3a3530"/>
+  <text x="560" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#a49c90" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#292524" stroke-width="1"/>
+  <circle cx="28" cy="79" r="5" fill="#e5825a"/>
+  <text x="42" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">Beanline Analyst</text>
+  <text x="1096" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#78716c" text-anchor="end">session cost $0.0290</text>
+  <line x1="220" y1="102" x2="220" y2="600" stroke="#292524" stroke-width="1"/>
+  <rect x="14" y="116" width="192" height="36" rx="9" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="110" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">+ New analysis</text>
+  <rect x="10" y="166" width="200" height="44" rx="9" fill="#292524"/>
+  <text x="20" y="185" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e7e5e4">beanline.db in your working dire…</text>
+  <text x="20" y="201" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c">1s ago</text>
+  
+  <rect x="398" y="130" width="582" height="62" rx="18" fill="#f5f5f4"/>
+  <text x="415" y="155" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#1c1917">beanline.db in your working directory is a SQLite database with our live</text>
+  <text x="415" y="177" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#1c1917">sales data. What was total revenue in March 2026, all stores combined?</text>
+  <rect x="340" y="210" width="560" height="38" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="355" y="234" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#4ade80">&#x2713;</text>
+  <text x="376" y="234" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Running: sqlite3 …/beanline.db ".tables"</text>
+  <text x="862" y="233" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="end">BASH</text>
+  <path d="M 874 226 l 5 6 l 5 -6" fill="none" stroke="#78716c" stroke-width="1.8"/>
+  
+  <text x="340" y="277" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#e7e5e4">Let me check the sales table schema and query for March 2026</text>
+  <text x="340" y="301" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#e7e5e4">revenue.</text>
+  <rect x="340" y="320" width="560" height="38" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="355" y="344" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#4ade80">&#x2713;</text>
+  <text x="376" y="344" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Running: sqlite3 …/beanline.db "SELECT sql FROM sqlite_master…"</text>
+  <text x="862" y="343" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="end">BASH</text>
+  <path d="M 874 336 l 5 6 l 5 -6" fill="none" stroke="#78716c" stroke-width="1.8"/>
+  <rect x="340" y="368" width="560" height="38" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="355" y="392" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#4ade80">&#x2713;</text>
+  <text x="376" y="392" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Running: sqlite3 …/beanline.db "SELECT SUM(revenue) FROM sal…"</text>
+  <text x="862" y="391" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="end">BASH</text>
+  <path d="M 874 384 l 5 6 l 5 -6" fill="none" stroke="#78716c" stroke-width="1.8"/>
+  
+  <text x="340" y="439" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">$206,815.80</text>
+  <text x="340" y="470" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#78716c">$0.0290 · 9s</text>
+  <line x1="220" y1="498" x2="1120" y2="498" stroke="#292524" stroke-width="1"/>
+  <rect x="340" y="510" width="92" height="21" rx="6" fill="#1c1917" stroke="#292524"/>
+  <text x="349" y="524.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a8a29e">beanline.db</text>
+  <rect x="340" y="542" width="46" height="42" rx="12" fill="none" stroke="#292524" stroke-width="1.5"/>
+  <text x="363" y="569" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#78716c" text-anchor="middle">+</text>
+  <rect x="396" y="542" width="500" height="42" rx="12" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="412" y="568" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#78716c">Ask about your data&#8230;</text>
+  <rect x="906" y="542" width="74" height="42" rx="12" fill="#e5825a" opacity="0.45"/>
+  <text x="943" y="568" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  
+</svg>

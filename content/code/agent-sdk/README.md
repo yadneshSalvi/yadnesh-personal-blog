@@ -11,6 +11,7 @@ Every folder below is the **complete, runnable project as it exists at the end o
 | 3 | [`part-03-agent-ui`](part-03-agent-ui) | A chat UI with live tool badges, markdown answers, and a Stop button | [The Agent UI](https://yadneshsalvi.com/blog/agent-sdk-3-agent-ui) |
 | 4 | [`part-04-workspaces-artifacts`](part-04-workspaces-artifacts) | Per-conversation workspaces, file uploads, and an artifacts panel for charts and reports | [Workspaces and Artifacts](https://yadneshsalvi.com/blog/agent-sdk-4-workspaces-artifacts) |
 | 5 | [`part-05-sessions`](part-05-sessions) | Session memory, a conversations sidebar, rename, and forkable analyses | [Sessions: The Analyst Remembers](https://yadneshsalvi.com/blog/agent-sdk-5-sessions) |
+| 6 | [`part-06-custom-tools`](part-06-custom-tools) | A real SQLite database behind custom `@tool`s, served by an in-process MCP server, read-only by construction | [Custom Tools: Give the Analyst a Database](https://yadneshsalvi.com/blog/agent-sdk-6-custom-tools) |
 
 *(The series is in progress — 14 parts across three acts. Folders appear here as parts publish.)*
 
@@ -24,6 +25,8 @@ python3 generate_beanline.py
 ```
 
 Each part folder ships with the generated CSVs already in place; you never need to run the generator unless you want to.
+
+From Part 6 on, the same rows also live in a SQLite database. Build it with `python3 data/build_beanline_db.py` (or, inside a part, `uv run python data/build_beanline_db.py` from `backend/`); the file itself is gitignored because the builder is the source of truth.
 
 ## Running a part
 

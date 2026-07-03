@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="803" viewBox="0 0 1120 803" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="803" fill="#0c0a09"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#211e1a"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#2b2723" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#3a3530"/><circle cx="56" cy="28" r="7" fill="#3a3530"/><circle cx="82" cy="28" r="7" fill="#3a3530"/>
+  <rect x="320" y="13" width="480" height="30" rx="15" fill="#1a1816" stroke="#3a3530"/>
+  <text x="560" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#a49c90" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#292524" stroke-width="1"/>
+  <circle cx="28" cy="79" r="5" fill="#e5825a"/>
+  <text x="42" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">Beanline Analyst</text>
+  <text x="1096" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#78716c" text-anchor="end">session cost $0.0877</text>
+  <line x1="220" y1="102" x2="220" y2="803" stroke="#292524" stroke-width="1"/>
+  <rect x="14" y="116" width="192" height="36" rx="9" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="110" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">+ New analysis</text>
+  <rect x="10" y="166" width="200" height="44" rx="9" fill="#292524"/>
+  <text x="20" y="185" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e7e5e4">Add a sale to the database: 202…</text>
+  <text x="20" y="201" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c">1s ago</text>
+  <text x="20" y="233" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e7e5e4">What was total revenue in March…</text>
+  <text x="20" y="249" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c">2m ago</text>
+  
+  <rect x="497" y="130" width="483" height="62" rx="18" fill="#f5f5f4"/>
+  <text x="514" y="155" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#1c1917">Add a sale to the database: 2026-07-01, Downtown, Espresso,</text>
+  <text x="514" y="177" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#1c1917">10 units, 32 dollars. Report exactly what happens.</text>
+  
+  <text x="340" y="225" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#e7e5e4">I'll add the sale to the database and report what happens.</text>
+  <rect x="340" y="244" width="560" height="38" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="355" y="268" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#4ade80">&#x2713;</text>
+  <text x="376" y="268" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Reading the beanline schema</text>
+  <text x="862" y="267" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="end">MCP__BEANLINE__GET_SCHEMA</text>
+  <path d="M 874 260 l 5 6 l 5 -6" fill="none" stroke="#78716c" stroke-width="1.8"/>
+  <rect x="340" y="294" width="560" height="289" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <line x1="340" y1="332" x2="900" y2="332" stroke="#292524" stroke-width="1"/>
+  <text x="355" y="318" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#4ade80">&#x2713;</text>
+  <text x="376" y="318" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Querying the beanline database</text>
+  <text x="862" y="317" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="end">MCP__BEANLINE__QUERY_DATABASE</text>
+  <path d="M 874 316 l 5 -6 l 5 6" fill="none" stroke="#78716c" stroke-width="1.8"/>
+  <text x="356" y="352" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#78716c">INPUT</text>
+  <rect x="354" y="358" width="532" height="136" rx="8" fill="#292524"/>
+  <text x="368" y="376" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">{</text>
+  <text x="368" y="395" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">  "sql": "INSERT INTO sales (date, store_id, product_id, units, revenue)</text>
+  <text x="368" y="414" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">          SELECT '2026-07-01', s.store_id, p.product_id, 10, 32</text>
+  <text x="368" y="433" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">          FROM stores s, products p</text>
+  <text x="368" y="452" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">          WHERE s.name = 'Downtown' AND p.name = 'Espresso'"</text>
+  <text x="368" y="471" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">}</text><text x="356" y="518" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#78716c">ERROR</text>
+  <rect x="354" y="524" width="532" height="41" rx="8" fill="#292524"/>
+  <text x="368" y="542" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#f87171" xml:space="preserve">SQL error: attempt to write a readonly database</text>
+  
+  <text x="340" y="616" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">The insert failed: The database connection is read-only. The tool</text>
+  
+  <text x="340" y="644" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#e7e5e4">explicitly states "The connection is read-only: INSERT, UPDATE,</text>
+  <text x="340" y="668" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#e7e5e4">DELETE, and schema changes fail with an error."</text>
+  <text x="340" y="699" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#78716c">$0.0145 · 10s</text>
+  <line x1="220" y1="727" x2="1120" y2="727" stroke="#292524" stroke-width="1"/>
+  <rect x="340" y="745" width="46" height="42" rx="12" fill="none" stroke="#292524" stroke-width="1.5"/>
+  <text x="363" y="772" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#78716c" text-anchor="middle">+</text>
+  <rect x="396" y="745" width="500" height="42" rx="12" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="412" y="771" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#78716c">Ask about your data&#8230;</text>
+  <rect x="906" y="745" width="74" height="42" rx="12" fill="#e5825a" opacity="0.45"/>
+  <text x="943" y="771" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  
+</svg>
