@@ -1,0 +1,576 @@
+---
+title: "Claude Agent SDK in Production, Part 3: The Agent UI"
+subtitle: "Tool calls become live badges, the answer types itself out, and the analyst finally looks like a product. The backend does not change by a single line."
+image: "/images/series/agent-sdk/part-3/cover-light.svg"
+imageDark: "/images/series/agent-sdk/part-3/cover-dark.svg"
+createdAt: "2026-07-05T00:00:00.000Z"
+updatedAt: "2026-07-05T00:00:00.000Z"
+tags: ["claude-agent-sdk", "nextjs", "react", "tutorial"]
+series: "claude-agent-sdk-fastapi-nextjs"
+seriesPart: 3
+---
+
+A chat UI shows you what the model *said*. An agent UI has a harder job: the interesting part of an agent's turn is not the answer, it's the eleven things it did on the way there. Which files it opened. Which command failed. What it tried next. Hide that and your product is a spinner with trust issues; show it and users watch their analyst work like a colleague at the next desk. That difference has a name in this series: **tool visibility**, and it's the defining UX of the whole agent category. Today you build it.
+
+{/* [ANECDOTE slot, optional upgrade (WRITING-STYLE §6): a true first-person story from Yadnesh about a user or stakeholder who trusted (or refused to trust) an automated system depending on whether they could see it working, 3 beats, 5 sentences. If provided, it lands right after this dessert shot. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-3/browser-answer-light.svg"
+  srcDark="/images/series/agent-sdk/part-3/browser-answer-dark.svg"
+  alt="A browser window titled Beanline Analyst. A user bubble asks which store had the highest revenue in March. Below it, collapsed tool badges show a failed pandas attempt marked with a red cross and a successful stdlib Python rerun marked with a green check, then a markdown answer: The Downtown store had the highest revenue in March with $51,319.60, followed by a ranked list of all six stores. A receipt line reads $0.0253 and 25s, and the header shows session cost $0.0253."
+  caption="The end of this part, from a real run. Every badge is a real tool call, the red cross is a real failure the agent recovered from, and the receipt is the real bill."
+  width={1120}
+  height={762}
+/>
+
+And here's the part that should make you smile: **the backend from Part 2 does not change. Not one line, not one import.** The six-word event vocabulary was designed to be rendered, and today the only thing we build is the thing that renders it. If the vocabulary design felt over-engineered last part for an audience of `curl`, this is the first installment of the payoff.
+
+## Scaffold, checklist style
+
+You know this dance, so we do it at review speed ([LangGraph Part 4](/blog/langgraph-4-nextjs-frontend) builds a chat UI from an empty folder if you'd rather walk). From the `beanline-analyst/` project root, next to `backend/`:
+
+```bash
+npx create-next-app@latest frontend --ts --tailwind --eslint --app --no-src-dir --use-npm
+cd frontend
+npm install react-markdown remark-gfm
+```
+
+Two packages beyond the scaffold: `react-markdown` and `remark-gfm`, because the analyst answers in markdown and loves a good table. That's the entire dependency list. No component library, no chat SDK, no state manager: the reference app this series is modeled on renders its production chat with plain React and Tailwind, and at this app's size a component library is more furniture than floor.
+
+The frontend needs one piece of configuration, the backend's address:
+
+```bash filename="frontend/.env.local"
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+```
+
+And two small edits to the scaffold's `globals.css`: the series accent color as a design token, and the page palette wired for both light and dark (your analyst will get screenshotted in both today):
+
+```css filename="frontend/app/globals.css" repo="part-03-agent-ui/frontend/app/globals.css" lines="3-23"
+:root {
+  --background: #fafaf9;
+  --foreground: #1c1917;
+  --accent: #b3441a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0c0a09;
+    --foreground: #e7e5e4;
+    --accent: #e5825a;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+```
+
+The `@theme inline` block is Tailwind 4's way of minting utilities from CSS variables: declaring `--color-accent` there is what makes `bg-accent` and `text-accent` exist as classes. One quiet fix while you're in the file: the scaffold's `body` rule hardcodes `font-family: Arial`, so swap it to `var(--font-sans), Arial, sans-serif` or your app will silently ignore the nice Geist font the scaffold itself installed.
+
+## The block model, decided before any pixels
+
+Here's the one decision in this part that deserves slow thinking, and it's a data-model decision, not a visual one. What *is* an assistant message in an agent app?
+
+In a plain chatbot it's a string. But you watched the real thing in [Part 1's message anatomy](/blog/agent-sdk-1-first-agent#anatomy-of-the-message-stream): an agent's turn is prose, then a tool call, then more prose, then three more tool calls, in an order that matters, because the order *is* the story of the investigation. A string can't hold that. So an assistant turn in our UI is a **sequence of blocks**:
+
+```ts filename="frontend/lib/types.ts" repo="part-03-agent-ui/frontend/lib/types.ts" lines="24-46"
+export type TextBlock = { type: "text"; text: string };
+
+export type ToolBlock = {
+  type: "tool_use";
+  id: string;
+  name: string;
+  input: Record<string, unknown>;
+  result?: string;
+  isError?: boolean;
+  done: boolean;
+};
+
+export type Block = TextBlock | ToolBlock;
+
+export type ChatMessage =
+  | { role: "user"; text: string }
+  | {
+      role: "assistant";
+      blocks: Block[];
+      status: "working" | "done" | "error" | "stopped";
+      costUsd?: number;
+      durationMs?: number;
+    };
+```
+
+If this shape looks familiar, that's the point: it's `AssistantMessage.content` from Part 1 wearing UI clothes. The SDK models a turn as content blocks, the reference app's production frontend models it as content blocks, and we're starting there on day one instead of arriving via a painful refactor. (The LangGraph series *earns* this model the hard way, by outgrowing a string-based one; if you did that series, this is the lesson cashing in.) A `ToolBlock` is born the moment the agent reaches for a tool, lives with `done: false` while the tool runs, and is completed in place when the result lands. That lifecycle is about to drive every spinner in the app.
+
+The wire events get the same treatment, one type per row of Part 2's table:
+
+```ts filename="frontend/lib/types.ts" repo="part-03-agent-ui/frontend/lib/types.ts" lines="1-19"
+// The Part 2 wire vocabulary, as TypeScript sees it. One discriminated
+// union: switch on `type`, and the compiler knows the payload's shape.
+export type AgentEvent =
+  | { type: "session_start"; session_id: string }
+  | { type: "text_delta"; text: string }
+  | {
+      type: "tool_use_start";
+      tool_id: string;
+      tool_name: string;
+      tool_input: Record<string, unknown>;
+    }
+  | { type: "tool_result"; tool_id: string; content: string; is_error: boolean }
+  | {
+      type: "complete";
+      usage: Record<string, unknown>;
+      total_cost_usd: number | null;
+      duration_ms: number;
+    }
+  | { type: "error"; message: string };
+```
+
+<Callout type="info" title="Discriminated unions, in one box">
+A discriminated union is TypeScript's version of the parser contract from Part 2: every variant carries a literal `type` field, and once you check it (`if (event.type === "tool_result")`), the compiler narrows the payload so `event.tool_id` exists and `event.text` is a type error. The wire format and the type system are enforcing the same rule, which is why this file almost wrote itself.
+</Callout>
+
+<Figure
+  src="/images/series/agent-sdk/part-3/fig-block-model-light.svg"
+  srcDark="/images/series/agent-sdk/part-3/fig-block-model-dark.svg"
+  alt="Diagram in three stages. Left: wire events from a real run arrive in order: text_delta fragments, tool_use_start for Bash, tool_result, more deltas. Middle: the block array they build: a text block reading I'll help you find, then a tool block for Bash with done: true and its result, then another text block. Arrows show text_delta appending to the last text block and tool_result completing its tool block by id. Right: the rendered turn: a prose paragraph, a collapsed tool badge with a green check, more prose. A footer line notes that the order of blocks is the order of the investigation."
+  caption="One turn, three forms: parcels on the wire, blocks in state, pixels on screen. The middle column is the design decision; the other two follow from it."
+  width={1240}
+  height={560}
+/>
+
+## Reading the stream
+
+The browser's half of the SSE contract is a fetch, a reader, and a buffer that respects frame boundaries. You built this from zero in [LangGraph Part 5](/blog/langgraph-5-streaming#teach-the-browser-to-read-a-firehose), including the split-frame bug that bites everyone who skips the buffer, so here it's one tidy async generator:
+
+```ts filename="frontend/lib/readSse.ts" repo="part-03-agent-ui/frontend/lib/readSse.ts"
+import type { AgentEvent } from "./types";
+
+// Read a fetch Response as a stream of parsed SSE events. Frames are
+// delimited by a blank line (\n\n), and a frame can arrive split across
+// network chunks, so we buffer until each delimiter shows up. LangGraph
+// Part 5 walks through this parsing (and the bug you get without the
+// buffer) from zero; here it's four moves: read, buffer, split, parse.
+export async function* readSse(res: Response): AsyncGenerator<AgentEvent> {
+  const reader = res.body!.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const frames = buffer.split("\n\n");
+    buffer = frames.pop()!;
+    for (const frame of frames) {
+      const line = frame.trim();
+      if (line.startsWith("data: ")) {
+        yield JSON.parse(line.slice(6)) as AgentEvent;
+      }
+    }
+  }
+}
+```
+
+Now the heart of the whole part: the function that folds one wire event into the block list. Study this one; everything else in the file is furniture around it.
+
+```tsx filename="frontend/app/page.tsx" repo="part-03-agent-ui/frontend/app/page.tsx" lines="21-43"
+function applyEvent(blocks: Block[], event: AgentEvent): Block[] {
+  if (event.type === "text_delta") {
+    const last = blocks[blocks.length - 1];
+    if (last?.type === "text") {
+      return [...blocks.slice(0, -1), { ...last, text: last.text + event.text }];
+    }
+    return [...blocks, { type: "text", text: event.text }];
+  }
+  if (event.type === "tool_use_start") {
+    return [
+      ...blocks,
+      { type: "tool_use", id: event.tool_id, name: event.tool_name, input: event.tool_input, done: false },
+    ];
+  }
+  if (event.type === "tool_result") {
+    return blocks.map((b) =>
+      b.type === "tool_use" && b.id === event.tool_id
+        ? { ...b, result: event.content, isError: event.is_error, done: true }
+        : b,
+    );
+  }
+  return blocks;
+}
+```
+
+Three rules, one per event type. A `text_delta` extends the last block if it's text, otherwise it starts a fresh one; that's what makes prose resume cleanly *after* a tool call instead of gluing onto the paragraph before it. A `tool_use_start` appends a `ToolBlock` with `done: false`, which the UI will render as a spinner within the next frame. And a `tool_result` finds its block **by id and only by id**.
+
+That last rule is worth a paragraph, because it's where a plausible-looking shortcut corrupts your UI. "The result must belong to the latest tool block" holds right up until the agent issues several tool calls in one breath, and it does this constantly: in my test runs it read `stores.csv`, `sales.csv`, and `products.csv` as *three parallel calls*, and the results came back in whatever order the files got read. Match by position and the wrong badge resolves with the wrong output; match by `tool_use_id`, the way [Part 1's anatomy](/blog/agent-sdk-1-first-agent#anatomy-of-the-message-stream) said results point at their calls, and parallel tools are just three spinners resolving out of order, which is exactly what they are.
+
+And the quiet fourth rule at the bottom: an event type this function doesn't recognize **falls through untouched**. When Part 4 starts sending `artifact_update` parcels, this exact build of the client will ignore them without an error. The vocabulary grows; the parser shrugs. You'll hear that sentence again.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels in a single row separated by thin vertical black dividers, about watching an AI agent work live like a police bodycam show. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny necktie and now also a tiny police-style body camera strapped to its lid. Panel 1: Yad sits on a couch with a big bowl of popcorn, watching a TV; on the TV screen the laptop-analyst dramatically pulls open a filing cabinet drawer; a TV caption bar at the bottom of the screen reads "LIVE: READING sales.csv". Panel 2: same couch, Yad leaning far forward gripping the popcorn, tense; on the TV the laptop-analyst types furiously at a tiny desk; the TV caption bar reads "RUNNING awk". Panel 3: Yad on his feet cheering, popcorn flying everywhere; on the TV the laptop-analyst holds up a page in triumph; the TV caption bar reads "FOUND: DOWNTOWN". Clean readable hand-lettered speech-free panels, caption text only on the TV bars, minimal text. No caption box outside the TV, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-3/comic-bodycam.png"
+  alt="Comic in three panels. Panel one: Yad, a bearded developer with headphones, sits on his couch with popcorn watching TV, where a laptop analyst wearing a body camera dramatically opens a filing cabinet under the caption LIVE: READING sales.csv. Panel two: Yad leans forward gripping the popcorn as the analyst types furiously under the caption RUNNING awk. Panel three: Yad leaps up cheering, popcorn flying, as the analyst holds up a page in triumph under the caption FOUND: DOWNTOWN."
+  caption="Tool visibility, the entertainment cut. Same investigation as Part 2's sticky notes, now produced for television."
+  width={1536}
+  height={1024}
+/>
+
+## The tool badge
+
+Each `ToolBlock` renders as a badge: one calm line while collapsed, the whole truth when clicked. One housekeeping note before the code: this component, the toast, and the page itself all open with `"use client"`, because they hold state and handle clicks; if that directive is fuzzy for you, [LangGraph Part 4](/blog/langgraph-4-nextjs-frontend#teach-the-page-what-a-message-is) meets it properly, error message first. The status icon is the block lifecycle made visible:
+
+```tsx filename="frontend/components/ToolBadge.tsx" repo="part-03-agent-ui/frontend/components/ToolBadge.tsx" lines="7-17"
+function StatusIcon({ block }: { block: ToolBlock }) {
+  if (!block.done) {
+    return (
+      <span className="size-3.5 shrink-0 animate-spin rounded-full border-2 border-stone-300 border-t-accent dark:border-stone-600" />
+    );
+  }
+  if (block.isError) {
+    return <span className="shrink-0 text-sm leading-none text-red-600 dark:text-red-400">&#x2715;</span>;
+  }
+  return <span className="shrink-0 text-sm leading-none text-green-700 dark:text-green-400">&#x2713;</span>;
+}
+```
+
+Spinner while `done` is false, red cross when the world said no, green check otherwise. No timers, no extra state: the icon is a pure function of the block, so the moment `applyEvent` completes a block, the spinner becomes a verdict on its own.
+
+The badge row itself is a button, and its label comes from a small translation map, because `Bash` with an input of `{"command": "awk -F',' ..."}` is the truth but `Running: awk -F',' ...` reads like a colleague narrating:
+
+```ts filename="frontend/lib/toolLabel.ts" repo="part-03-agent-ui/frontend/lib/toolLabel.ts" lines="11-30"
+// One friendly line per tool call for the collapsed badge. The default
+// branch matters most: a tool this map has never heard of still renders
+// as its name, so new tools in later parts appear here without edits.
+export function toolLabel(block: ToolBlock): string {
+  const { input } = block;
+  switch (block.name) {
+    case "Read":
+      return `Reading ${basename(str(input, "file_path"))}`;
+    case "Write":
+      return `Writing ${basename(str(input, "file_path"))}`;
+    case "Glob":
+      return `Finding files: ${str(input, "pattern")}`;
+    case "Grep":
+      return `Searching for "${str(input, "pattern")}"`;
+    case "Bash":
+      return str(input, "description") || `Running: ${str(input, "command")}`;
+    default:
+      return block.name;
+  }
+}
+```
+
+(`str` and `basename` are four-line helpers at the top of the file; the GitHub icon above takes you to them.) Then the badge assembles the pieces: icon, truncated label, mono tool name, chevron:
+
+```tsx filename="frontend/components/ToolBadge.tsx" repo="part-03-agent-ui/frontend/components/ToolBadge.tsx" lines="38-60"
+export function ToolBadge({ block }: { block: ToolBlock }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="my-1.5 max-w-xl overflow-hidden rounded-lg border border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center gap-2.5 px-3 py-2 text-left hover:bg-stone-50 dark:hover:bg-stone-800/60"
+      >
+        <StatusIcon block={block} />
+        <span className="min-w-0 flex-1 truncate text-[13px] text-stone-600 dark:text-stone-300">
+          {toolLabel(block)}
+        </span>
+        <span className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-stone-400 dark:text-stone-500">
+          {block.name}
+        </span>
+        <svg
+          viewBox="0 0 16 16"
+          className={`size-3 shrink-0 fill-stone-400 transition-transform ${open ? "rotate-180" : ""}`}
+        >
+          <path d="M4.4 6 8 9.6 11.6 6l.9.9L8 11.4 3.5 6.9z" />
+        </svg>
+      </button>
+```
+
+Notice the defensive geometry, because it's load-bearing: `max-w-xl` caps the badge, `min-w-0 flex-1 truncate` forces the label to ellipsize instead of stretching the row. The expanded panel below it (lines 61 to 75 in the file) shows the full input as pretty-printed JSON and the result in a `<pre>` capped at `max-h-48` with its own scrollbar and `break-all`. Every one of those classes exists because of the same rule from Part 2's `clip()`: **narration in the chat, data behind a click.** An agent will happily Read a 300-line file; the first time a raw payload floods your chat column, you'll come back for these classes.
+
+<Figure
+  src="/images/series/agent-sdk/part-3/browser-midrun-light.svg"
+  srcDark="/images/series/agent-sdk/part-3/browser-midrun-dark.svg"
+  alt="The Beanline Analyst mid-investigation. Under the user's March question, prose blocks alternate with tool badges: a completed find command with a green check, three Read badges for products.csv, stores.csv and sales.csv marked with red crosses, a completed pwd and ls check, then two Read badges with green checks. At the bottom a pulsing dot reads Working, 13s, and the send button has become a Stop button."
+  caption="Thirteen seconds into a real run. The agent guessed wrong paths for its first three reads (red crosses), checked the directory, and recovered. You get to watch it happen now."
+  width={1120}
+  height={862}
+/>
+
+Look at those three red crosses in the middle of that capture and appreciate what the UI is doing: the agent guessed wrong paths, the reads failed, and it self-corrected two badges later, live, in front of you. In Part 1 that drama lived in a terminal; in Part 2 it was JSON scrolling past `curl`. Now it's legible to someone who has never heard of either.
+
+## Markdown answers and the empty desk
+
+Text blocks go through a `Markdown` component: `react-markdown` with `remark-gfm`, plus a components map that restyles each element with Tailwind classes so tables get borders, code gets a mono chip, and lists stop pretending to be paragraphs. It's mechanical; skim it in the repo and move on:
+
+```tsx filename="frontend/components/Markdown.tsx" repo="part-03-agent-ui/frontend/components/Markdown.tsx" lines="1-16"
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+// The analyst answers in markdown: headers, bold store names, and (with
+// remark-gfm) the tables it loves. Each element gets app styling here,
+// so answers look native instead of pasted-in.
+export function Markdown({ text }: { text: string }) {
+  return (
+    <div className="space-y-3 text-[15px] leading-relaxed">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          h1: ({ children }) => <h3 className="text-base font-semibold">{children}</h3>,
+          h2: ({ children }) => <h3 className="text-base font-semibold">{children}</h3>,
+          h3: ({ children }) => <h4 className="text-[15px] font-semibold">{children}</h4>,
+          ul: ({ children }) => <ul className="list-disc space-y-1 pl-5">{children}</ul>,
+```
+
+The page also needs something to say before the first message, and "empty white rectangle" is not it. The empty state introduces the analyst and offers three sample questions as clickable chips wired straight to `send()`; the first click a user ever makes teaches them what the product is for. Cheap to build, and it will quietly star in every demo you ever record.
+
+<Figure
+  src="/images/series/agent-sdk/part-3/browser-empty-light.svg"
+  srcDark="/images/series/agent-sdk/part-3/browser-empty-dark.svg"
+  alt="The Beanline Analyst empty state: a small accent dot, the heading Ask the analyst, a line explaining that it reads the Beanline CSVs and shows every step of its work, and three sample question chips: highest revenue in March, best product category on weekends, and each store's best-selling product. Below, an input reading Ask about the Beanline data with a disabled Send button."
+  caption="The empty desk. Three chips that each fire a real investigation; nobody has to guess what to type."
+  width={1120}
+  height={620}
+/>
+
+## The send loop, and a UI that tells the truth about time
+
+Wiring it together is one `send()` function: push the user message plus an empty assistant turn, open the stream, and fold events in as they arrive.
+
+```tsx filename="frontend/app/page.tsx" repo="part-03-agent-ui/frontend/app/page.tsx" lines="87-107"
+  async function send(text: string) {
+    const question = text.trim();
+    if (!question || working) return;
+    setInput("");
+    setWorking(true);
+    setStartedAt(Date.now());
+    setMessages((all) => [
+      ...all,
+      { role: "user", text: question },
+      { role: "assistant", blocks: [], status: "working" },
+    ]);
+    const controller = new AbortController();
+    abortRef.current = controller;
+    try {
+      const res = await fetch(`${API_BASE}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: question }),
+        signal: controller.signal,
+      });
+      if (!res.ok || !res.body) throw new Error(`The server said ${res.status}.`);
+```
+
+The loop itself switches on the event type: `complete` stamps the turn with its cost and duration, `error` raises a toast, and everything else goes through `applyEvent`:
+
+```tsx filename="frontend/app/page.tsx" repo="part-03-agent-ui/frontend/app/page.tsx" lines="108-133"
+      let gotReceipt = false;
+      for await (const event of readSse(res)) {
+        if (event.type === "complete") {
+          patchLastTurn({
+            status: "done",
+            costUsd: event.total_cost_usd ?? undefined,
+            durationMs: event.duration_ms,
+          });
+          setTotalCost((cost) => cost + (event.total_cost_usd ?? 0));
+          setWorking(false); // the receipt is in; don't keep offering Stop
+          setStartedAt(null);
+          gotReceipt = true;
+        } else if (event.type === "error") {
+          patchLastTurn({ status: "error" });
+          setToast(event.message);
+          setWorking(false);
+          setStartedAt(null);
+          gotReceipt = true;
+        } else {
+          setMessages((all) => {
+            const last = all[all.length - 1];
+            if (last?.role !== "assistant") return all;
+            return [...all.slice(0, -1), { ...last, blocks: applyEvent(last.blocks, event) }];
+          });
+        }
+      }
+```
+
+(`patchLastTurn` is a six-line helper that rewrites the last assistant message; it's right above `send` in the file.) Right now you have: a chat page that renders a real investigation live, badges resolving by id, prose accumulating between them. What's left is everything a *long* turn demands, and agent turns are long. Twenty-five seconds is routine; a hard question can run minutes. Three pieces of honesty, in ascending order of effort:
+
+**A clock, not a pulse.** A bare spinner says "something is happening, probably". An elapsed counter says "we've been at this for 23 seconds and I'm not hiding it". One tiny component, driven by a one-second interval:
+
+```tsx filename="frontend/app/page.tsx" repo="part-03-agent-ui/frontend/app/page.tsx" lines="45-58"
+function WorkingTimer({ startedAt }: { startedAt: number }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const seconds = Math.max(0, Math.round((now - startedAt) / 1000));
+  return (
+    <div className="mt-2 flex items-center gap-2 text-[13px] text-stone-400 dark:text-stone-500">
+      <span className="size-2 animate-pulse rounded-full bg-accent" />
+      Working… {seconds}s
+    </div>
+  );
+}
+```
+
+**Auto-scroll with manners.** New content should follow the bottom of the conversation, unless the user scrolled up to study an earlier badge, in which case yanking them down is hostile. The trick is a "stuck to the bottom" flag maintained in the scroll handler (`stickRef`, set when the user is within 80px of the bottom) and consulted by an effect that scrolls on every message change. Seven lines in the file, and the difference between a UI that follows the story and one that fights you for the scrollbar.
+
+**A Stop button, with an honest asterisk.** While a turn is working, the Send button becomes Stop, wired to the `AbortController` you saw in `send()`. Clicking it kills the fetch, the catch branch marks the turn `stopped`, and the UI is yours again instantly. But say precisely what happened: **you hung up the phone; you didn't stop the worker.** The SDK subprocess on the server doesn't die until the server next tries to write into the closed pipe. I measured it: after an abort, the agent kept working for 10 to 15 more seconds before the cleanup reaped it, finishing its current tool call on the way out. For a local single-user app that's acceptable and cheap. For a real product it isn't, and the genuine fix, a server-side interrupt on a decoupled worker, is exactly what [Part 9](/blog/agent-sdk-9-durable-streams) builds. Debt named, on the ledger.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels in a single row separated by thin vertical black dividers, about a Stop button that only hangs up the phone while the worker keeps working. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny necktie. Panel 1: Yad at his desk dramatically slams a big red button labeled "STOP" with his palm, looking satisfied; on his monitor a small progress spinner. Panel 2: cut to another office: the laptop-analyst keeps typing furiously at its desk, papers flying, while an old-fashioned phone receiver dangles off the hook next to it; a small speech bubble from the dangling receiver reads "CLICK." The analyst hasn't noticed at all. Panel 3: the laptop-analyst proudly holds up a finished stamped report labeled "DONE" and turns around to present it to an office that is completely empty, one tumbleweed-style dust ball on the floor. Clean readable hand-lettered labels, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-3/comic-hangup.png"
+  alt="Comic in three panels. Panel one: Yad, a bearded developer with headphones, slams a big red STOP button with his palm. Panel two: in another office the laptop analyst keeps typing furiously, not noticing the phone receiver dangling off the hook saying CLICK. Panel three: the analyst proudly presents a stamped report reading DONE to a completely empty office."
+  caption="AbortController closes the pipe, not the office. For about fifteen more seconds, somebody is finishing a report nobody will read."
+  width={1536}
+  height={1024}
+/>
+
+## Break it on purpose: the failure the vocabulary can't see
+
+Part 2 established that in-stream failures become `error` parcels. But there's a whole class of failure the vocabulary *cannot* carry, and your UI has to survive it anyway: the belt itself snapping. Mid-investigation, go to the backend terminal and kill the server dead (Ctrl+C twice in a row does it; the first one waits politely for open streams):
+
+<Figure
+  src="/images/series/agent-sdk/part-3/browser-toast-light.svg"
+  srcDark="/images/series/agent-sdk/part-3/browser-toast-dark.svg"
+  alt="The Beanline Analyst mid-turn after the backend was killed. The partial turn shows one completed Bash badge and a cut-off sentence, with a receipt line reading ended with an error. In the bottom right corner a toast with a red warning triangle reads: Lost the connection to the server. Is the backend running? The browser console underneath shows net::ERR_INCOMPLETE_CHUNKED_ENCODING."
+  caption="The server died mid-sentence. The reader threw, the catch branch marked the turn, and the toast says so in words. Nothing white-screened."
+  width={1120}
+  height={558}
+/>
+
+In the browser console this surfaces as `net::ERR_INCOMPLETE_CHUNKED_ENCODING`, which is Chrome for "the response promised more chunks and the socket died instead". Our reader loop throws, the catch branch distinguishes it from a deliberate abort by checking for `AbortError`, and the failure lands in two places at once: the turn's receipt line reads *ended with an error*, and a toast says it in a full sentence. The toast is thirty lines of our own code (`components/Toast.tsx`, self-dismissing, no library), and this is exactly the kind of failure it exists for: transport errors don't belong inside the transcript, because they're not part of the conversation; they're news about the *app*.
+
+So the client now handles three distinct failure channels, and it's worth saying them out loud once: **error parcels** (the turn failed, the server told us on the belt), **transport death** (the belt snapped; catch block), and the sneaky third one, **a stream that just ends** without ever delivering `complete` or `error`. That last one is two lines in the send loop (`gotReceipt`), and if you're wondering who'd ever need it: any proxy that times out idle connections, any laptop that sleeps mid-run, any server that restarts gracefully. Streams die without goodbyes constantly. A turn that ends without a receipt is a failed turn, and the UI says so instead of leaving a spinner up forever.
+
+## Try it end to end
+
+Boot both halves (backend from `backend/`, frontend from `frontend/`):
+
+```bash
+# terminal 1
+uv run uvicorn app.main:app --reload
+# terminal 2
+npm run dev
+```
+
+Open `localhost:3000`, click the March chip, and watch the whole Part 1 story replay as product: badges bloom and resolve, prose types between them, and 25 seconds later the answer lands with a receipt. In my recorded run the agent's first Python attempt died on `ModuleNotFoundError: No module named 'pandas'` (a red cross, right there in the chat), and it rewrote the analysis with the standard library's `csv` module on the next badge without being asked. Click that failed badge and the expanded panel shows the exact heredoc it tried; click the one after and there's the rewrite. Your users can now perform the Part 1 anatomy lesson on any turn, by clicking.
+
+<Figure
+  src="/images/series/agent-sdk/part-3/browser-expanded-light.svg"
+  srcDark="/images/series/agent-sdk/part-3/browser-expanded-dark.svg"
+  alt="The Beanline Analyst with a tool badge expanded. The badge, Running python3 heredoc with a green check, opens to reveal an INPUT section showing the full python command using csv.DictReader to sum March revenue by store, and a RESULT section listing March Revenue by Store: Downtown $51,319.60, Airport $43,425.90, Harborview $33,339.30, Old Town $27,282.10, University $26,772.40, Riverside $24,676.50."
+  caption="One click on a badge: the exact code the agent wrote and the exact output it read. The full truth was never gone, only folded."
+  width={1120}
+  height={802}
+/>
+
+## The cost ritual
+
+The header now carries a running `session cost`, summed from every `complete` parcel, and each finished turn wears its own price tag. The ritual went from a print statement (Part 1), to a field on the wire (Part 2), to something a user can see without being a developer. Today's ledger, all real runs through this UI:
+
+| Run | Result | Cost |
+|---|---|---|
+| March question, via the UI | right answer, 11 badges, one wrong-path recovery | $0.0260 · 21s |
+| March question, demo recording | right answer, pandas failure + stdlib rewrite on camera | $0.0253 · 25s |
+| Weekend question, stopped at 5s | turn marked *stopped*, no receipt | see below |
+| Backend killed mid-turn | turn marked *ended with an error*, toast | $0 billed to nobody |
+
+The stopped run is the honest asterisk again, now in dollars: the client shows no receipt because no `complete` ever arrived, but the server-side agent worked on for those extra seconds before cleanup, and that work was real tokens. The bill for a stopped turn exists; this UI just can't see it yet. Cheap at Haiku prices, worth remembering at Sonnet prices, and one more reason Part 9's real interrupt is on the roadmap.
+
+<DemoVideo
+  src="/videos/agent-sdk/part-3-demo.mp4"
+  poster="/videos/agent-sdk/part-3-poster.jpg"
+  caption="A real run, recorded: the March question typed in, badges resolving live (including a real pandas failure and recovery), the markdown answer, and a badge expanded to show the agent's actual code."
+  label="Screen recording of Part 3: the chat UI streaming a live agent investigation with tool badges, working timer, and receipt"
+/>
+
+<Recap
+  part={3}
+  items={[
+    "A block model that mirrors the SDK: assistant turns are sequences of text and tool blocks, designed before any UI and stable for the rest of the series.",
+    "Live tool badges: spinner to verdict by pure function of the block, friendly labels via a tiny map, full input/result one click away, and geometry that keeps big payloads from flooding the chat.",
+    "applyEvent as the client's whole contract: three rules plus ignore-the-unknown, with tool results matched by id so parallel tool calls resolve correctly.",
+    "Long-turn honesty: an elapsed working clock, auto-scroll that respects the reader, and a Stop button that admits it only hangs up the phone.",
+    "Three failure channels handled: error parcels, transport death (a real ERR_INCOMPLETE_CHUNKED_ENCODING), and streams that end without a receipt, each surfaced in the transcript or the toast.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "The agent reads stores.csv, sales.csv, and products.csv as three parallel tool calls, and the results arrive out of order. Why does the UI still resolve every badge correctly?",
+      options: [
+        "The SDK guarantees results arrive in the order the calls were made",
+        "tool_result events are matched to blocks by tool_id, never by position in the list",
+        "The translator on the server reorders results before sending",
+        "React batches the updates so order doesn't matter",
+      ],
+      answer: 1,
+      explain: "Every ToolUseBlock has an id and every result points back at one. applyEvent maps over the blocks and completes the one whose id matches, so three spinners resolving out of order is business as usual.",
+    },
+    {
+      q: "Why is an assistant turn modeled as a list of blocks instead of one markdown string?",
+      options: [
+        "Strings are slower to render in React",
+        "An agent's turn interleaves prose and tool calls in an order that carries meaning, and the SDK's own AssistantMessage is already a list of content blocks",
+        "react-markdown requires input to be split into segments",
+        "Blocks compress better when stored in localStorage",
+      ],
+      answer: 1,
+      explain: "The order of blocks is the story of the investigation: read, fail, retry, conclude. A string can't hold tool calls, and flattening them away would delete exactly the visibility this part exists to build.",
+    },
+    {
+      q: "A user clicks Stop five seconds into a turn. What actually happens?",
+      options: [
+        "The agent process is killed instantly on the server",
+        "The fetch is aborted so the UI is released, but the server-side agent keeps working until the next write to the closed pipe fails, around 10 to 15 seconds later",
+        "The SDK receives an interrupt signal and rolls back the turn",
+        "Nothing until the current tool call finishes, then the server checks a flag",
+      ],
+      answer: 1,
+      explain: "AbortController closes the client's end of the pipe. The subprocess is only reaped when the server trips over the dead connection, which I measured at 10 to 15 seconds. The real server-side interrupt arrives with Part 9's decoupled worker.",
+    },
+    {
+      q: "In Part 4 the server starts emitting a brand-new artifact_update event type. What does today's client do with it?",
+      options: [
+        "Crashes with an unhandled exception in readSse",
+        "Shows a raw JSON badge for the unknown event",
+        "applyEvent falls through and returns the blocks unchanged, so the event is ignored and nothing breaks",
+        "Displays the toast because unknown events are errors",
+      ],
+      answer: 2,
+      explain: "The parser contract from Part 2, kept: switch on type, ignore what you don't know. applyEvent's final return blocks line is that contract in code, and it's why the vocabulary can grow for eleven more parts without breaking this client.",
+    },
+    {
+      q: "The backend dies mid-turn and no error event ever arrives. How does the UI find out?",
+      options: [
+        "It can't; the spinner stays up until refresh",
+        "The fetch reader throws (ERR_INCOMPLETE_CHUNKED_ENCODING), the catch branch sees it isn't an AbortError, marks the turn errored, and raises the toast",
+        "A heartbeat timer pings /health every second",
+        "React Query retries the request automatically",
+      ],
+      answer: 1,
+      explain: "Transport death can't ride the belt, because the belt is what died. It surfaces as a thrown read, and the catch distinguishes a deliberate Stop (AbortError) from a snapped connection, which gets the toast and the error receipt.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add frontend
+git commit -m "part 3: a chat UI that shows the work"
+```
+
+Your analyst looks like a product now, but it's an analyst with one desk and one drawer: everyone who opens the page works out of the same `workspace/` folder, on CSVs *we* put there. In [Part 4](/blog/agent-sdk-4-workspaces-artifacts) every conversation gets its own workspace, you upload your own files, and the analyst starts handing back deliverables: charts and reports, in a panel built for them.
+
+The complete, tested code for this part lives in [`part-03-agent-ui`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/tree/main/part-03-agent-ui) in the [companion repo](https://github.com/yadneshSalvi/claude-agent-sdk-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.

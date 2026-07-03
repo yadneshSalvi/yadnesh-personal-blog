@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="802" viewBox="0 0 1120 802" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="802" fill="#fafaf9"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#f3f1ec"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#e2ded4" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#d6d1c5"/><circle cx="56" cy="28" r="7" fill="#d6d1c5"/><circle cx="82" cy="28" r="7" fill="#d6d1c5"/>
+  <rect x="320" y="13" width="480" height="30" rx="15" fill="#ffffff" stroke="#e2ded4"/>
+  <text x="560" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#5b554c" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#e7e5e4" stroke-width="1"/>
+  <circle cx="28" cy="79" r="5" fill="#b3441a"/>
+  <text x="42" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Beanline Analyst</text>
+  <text x="1096" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a8a29e" text-anchor="end">session cost $0.0253</text>
+  
+  
+  <text x="200" y="147" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#1c1917">Let me use a different approach with built-in Python tools:</text>
+  <rect x="200" y="170" width="576" height="460" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <line x1="200" y1="208" x2="776" y2="208" stroke="#e7e5e4" stroke-width="1"/>
+  <text x="215" y="194" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="236" y="194" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Running: python3 &lt;&lt; 'EOF' import csv from collections import defaultdi…</text>
+  <text x="738" y="193" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">BASH</text>
+  <path d="M 750 192 l 5 -6 l 5 6" fill="none" stroke="#a8a29e" stroke-width="1.8"/>
+  <text x="216" y="228" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#a8a29e">INPUT</text>
+  <rect x="214" y="234" width="548" height="174" rx="8" fill="#f5f5f4"/>
+  <text x="228" y="252" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">{</text>
+  <text x="228" y="271" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">  "command": "python3 &lt;&lt; 'EOF'\nimport csv\nfrom collections import</text>
+  <text x="228" y="290" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">  defaultdict\n\n# Read sales data\nsales_by_store = defaultdict(float)</text>
+  <text x="228" y="309" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">  \nwith open('sales.csv', 'r') as f:\n    reader = csv.DictReader(f)</text>
+  <text x="228" y="328" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">  \n    for row in reader:\n        date = row['date']\n        if</text>
+  <text x="228" y="347" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">  date.startswith('2026-03'):\n            sales_by_store[row['store_id']]</text>
+  <text x="228" y="366" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">  += float(row['revenue'])\n…"</text>
+  <text x="228" y="385" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">}</text><text x="216" y="432" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#a8a29e">RESULT</text>
+  <rect x="214" y="438" width="548" height="174" rx="8" fill="#f5f5f4"/>
+  <text x="228" y="456" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">March Revenue by Store:</text>
+  <text x="228" y="475" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">--------------------------------------------------</text>
+  <text x="228" y="494" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">Downtown             ($51,319.60)</text>
+  <text x="228" y="513" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">Airport              ($43,425.90)</text>
+  <text x="228" y="532" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">Harborview           ($33,339.30)</text>
+  <text x="228" y="551" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">Old Town             ($27,282.10)</text>
+  <text x="228" y="570" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">University           ($26,772.40)</text>
+  <text x="228" y="589" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">Riverside            ($24,676.50)</text>
+  
+  <text x="200" y="665" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#1c1917">The Downtown store had the highest revenue in March with $51,319.60.</text>
+  <text x="200" y="698" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a8a29e">$0.0253 · 25s</text>
+  <line x1="0" y1="726" x2="1120" y2="726" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="200" y="744" width="636" height="42" rx="12" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="216" y="770" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#a8a29e">Ask about the Beanline data&#8230;</text>
+  <rect x="846" y="744" width="74" height="42" rx="12" fill="#b3441a" opacity="0.45"/>
+  <text x="883" y="770" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  
+</svg>

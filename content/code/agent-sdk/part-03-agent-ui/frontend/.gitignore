@@ -40,21 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# agent
-.claude
-.agent
-
-# local authoring docs & helpers (not published)
-/WRITING-STYLE.md
-/scripts/generate-image.mjs
-/scripts/gen-part2-svgs.mjs
-/scripts/gen-part3-svgs.mjs
-/scripts/gen-part4-svgs.mjs
-/scripts/gen-part5-svgs.mjs
-/scripts/gen-part6-svgs.mjs
-/scripts/gen-part7-svgs.mjs
-/scripts/gen-part8-svgs.mjs
-/plans/scripts/gen-agent-sdk-series-svgs.mjs
-/scripts/gen-agent-sdk-part1-svgs.mjs
-/scripts/gen-agent-sdk-part2-svgs.mjs
-/scripts/gen-agent-sdk-part3-svgs.mjs
+# keep the example env file in git (the post and README rely on it)
+!.env.local.example
