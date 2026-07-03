@@ -1,0 +1,448 @@
+---
+title: "Claude Agent SDK in Production, Part 1: Setup and Your First Agent"
+subtitle: "One pip package contains the whole engine inside Claude Code. By the end of this page it's reading your CSVs, writing its own analysis code, and handing you the bill."
+image: "/images/series/agent-sdk/part-1/cover-light.svg"
+imageDark: "/images/series/agent-sdk/part-1/cover-dark.svg"
+createdAt: "2026-07-03T00:00:00.000Z"
+updatedAt: "2026-07-03T00:00:00.000Z"
+tags: ["claude-agent-sdk", "python", "agents", "tutorial"]
+series: "claude-agent-sdk-fastapi-nextjs"
+seriesPart: 1
+---
+
+Here's a terminal transcript from the end of this part. I asked, in plain English, which store in a six-store coffee chain had the best March. An agent found three CSV files it had never seen, read them, wrote an `awk` one-liner to aggregate 11,000 rows, joined the store names in, and answered: Downtown, $51,319.60, beating the runner-up by $7,893.70. Every number is right. It took nine turns, 22 seconds, and 2.4 cents. The agent code is 56 lines, and you didn't write the hard part of any of them.
+
+## Where this series is going
+
+This is Part 1 of **Claude Agent SDK in Production**, a fourteen-part series that builds an AI data analyst: upload a CSV, ask questions in English, get back charts and written reports. By the end of the series it looks like this, and it's running on a real server:
+
+<Figure
+  src="/images/series/agent-sdk/part-1/fig-finished-app-light.svg"
+  srcDark="/images/series/agent-sdk/part-1/fig-finished-app-dark.svg"
+  alt="A browser window with the finished Beanline analyst app: on the left a chat panel with a user question, two completed tool badges for Read and Bash, a resolved approval card for writing report.md, and a streaming answer; on the right an artifacts panel with a revenue bar chart and the start of a written report."
+  caption="The destination. Chat on the left with live tool activity and an approval card; deliverables on the right as they're created. Everything in this window gets built across the series."
+  width={1280}
+  height={520}
+/>
+
+Act I (Parts 1 to 5) builds that product end to end: this part's terminal agent, then HTTP streaming, then the UI, then file uploads and artifacts, then memory. Act II makes it governable: custom tools, human approvals, audit hooks, streams that survive a page refresh. Act III makes it smart and shippable: plan mode, subagents, sandboxing, evals, and a real VM deployment.
+
+One thing this series is *not*: a from-zero web tutorial. It assumes you can write a FastAPI endpoint and a React component. If you can't yet, that's fine, there's a whole series for you: [LangGraph from Scratch](/series/langgraph-fastapi-nextjs) teaches FastAPI, Next.js, and streaming from an empty folder, and this series links the exact part whenever it leans on one of those basics. Do that one first, then come back. This page, though, is pure Python; everyone's welcome.
+
+## What the Agent SDK actually is
+
+Claude Code, the terminal agent people use for day-to-day programming work, runs on an engine: a loop that reads a request, decides which tool to use, runs it for real, reads the result, and goes again until the job is done. The [Claude Agent SDK](https://code.claude.com/docs/en/agent-sdk/overview) is that exact engine, shipped as a Python package. Not a re-implementation, not "inspired by": the pip wheel literally bundles the Claude Code runtime, so `pip install claude-agent-sdk` (or `uv add`) is the entire installation story. No Node setup, no separate CLI download.
+
+That's a different proposition from calling a model API. With the [Messages API](/blog/agent-sdk-concepts#agent-sdk-vs-messages-api) you supervise every nail: parse the tool request, run the tool, append the result, call again. With the SDK you hire the contractor. You state the job; the loop, the tools, and the context management come with the package. This series spends fourteen parts on what that buys you and what it costs you, starting with the buying.
+
+## Setup, checklist style
+
+The whole series was written and tested against pinned versions. When something behaves differently on your machine, check this table before blaming yourself:
+
+| Tool | Version |
+|---|---|
+| Python | 3.13 |
+| uv | 0.8.x |
+| claude-agent-sdk | 0.2.110 (bundles Claude Code CLI 2.1.191) |
+| Model | `claude-haiku-4-5` |
+| Node.js | 22 LTS (not needed until Part 3) |
+
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) if you don't have it (one curl command on their install page), then make the project. This series uses uv for all Python work: it creates the virtual environment, pins the lockfile, and runs scripts, all without you ever activating anything.
+
+```bash
+mkdir beanline-analyst && cd beanline-analyst
+uv init backend --bare --python 3.13
+cd backend
+uv add "claude-agent-sdk==0.2.110" "fastapi==0.136.3" "uvicorn[standard]==0.49.0" "python-dotenv==1.1.1"
+```
+
+`--bare` means "no starter files, thanks". FastAPI and uvicorn won't be touched until [Part 2](/blog/agent-sdk-2-fastapi-streaming); installing everything now means the versions are locked together and you never interrupt a later part for a dependency. If uv itself is new to you, it replaces the `python -m venv` + `pip install` dance from [LangGraph Part 1](/blog/langgraph-1-setup#your-backend-a-server-in-eight-lines); `uv run` quietly uses the project's own environment every time.
+
+<Callout type="info" title="Windows readers: use WSL2">
+The SDK spawns the Claude Code runtime as a subprocess, and that path is best-tested on Unix-like systems. On Windows, run everything in this series inside [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install). It's a one-command install, and your terminal life will be better for it generally.
+</Callout>
+
+### Two ways to authenticate, pick one
+
+The SDK needs a way to call Claude, and there are two:
+
+**Option A, you already pay for Claude.** If Claude Code is installed and logged in on this machine, you're already done; the SDK picks up that login automatically, and usage draws on your subscription like any Claude Code session. If you have a subscription but not the CLI, install it and log in once: `npm install -g @anthropic-ai/claude-code`, then run `claude` and follow the login prompt. This is the path I used for every run in this series.
+
+**Option B, an API key.** Create one at [console.anthropic.com](https://console.anthropic.com), and before anything else set a **monthly budget of $5** under Settings → Limits. Then make it available to your shell:
+
+```bash filename="~/.zshrc (or ~/.bashrc)"
+export ANTHROPIC_API_KEY=sk-ant-your-actual-key-here
+```
+
+<Callout type="warning" title="An API key is a password">
+Anyone holding that string can spend your money. It never goes in source code, never in a screenshot, never in git. The $5 cap is not because you'll spend it (this whole series costs a couple of dollars in Haiku calls); it's so you never have to think about it. Keys are disposable; budgets are not.
+</Callout>
+
+Costs in this series are real either way: the SDK reports the computed cost of every run even on a subscription, and I'll quote my actual numbers throughout.
+
+## Hello, agent
+
+Eleven lines, no options, no model wiring, no message list:
+
+```python filename="backend/hello.py" repo="part-01-first-agent/backend/hello.py"
+import asyncio
+
+from claude_agent_sdk import query
+
+
+async def main():
+    async for message in query(prompt="What's 144 * 89?"):
+        print(message)
+
+
+asyncio.run(main())
+```
+
+`query()` starts an agent turn and gives you back an async iterator. Everything the engine does arrives through that iterator as message objects, and for now we dump their raw `repr` to see what we're dealing with. Run it:
+
+```bash
+uv run python hello.py
+```
+
+<Figure
+  src="/images/series/agent-sdk/part-1/term-hello.svg"
+  alt="A dark terminal running uv run python hello.py. Three message objects print: a SystemMessage with subtype init carrying a session_id and model name, an AssistantMessage whose TextBlock says 12,816, and a ResultMessage with total_cost_usd=0.34184. A comment notes the bare default billed 34 cents for one multiplication."
+  caption="First contact, trimmed. An init handshake, the answer, and a receipt. Note that cost: $0.34 for one multiplication. That's a lesson, and we collect it below."
+  width={1040}
+  height={480}
+/>
+
+<Callout type="info" title="What's async for?">
+`query()` produces messages over time, as the agent works, not all at once at the end. `async for` is Python's way of saying "give me each one as it arrives". The `asyncio.run(main())` line at the bottom is the standard way to start an async program from a plain script. That's all the async knowledge this part needs.
+</Callout>
+
+The answer is right (144 × 89 is 12,816), and three kinds of objects scrolled past: a `SystemMessage` handshake, an `AssistantMessage` with the answer, and a `ResultMessage` receipt. Yours may also show a few housekeeping events between them; ignore those for now, we'll formally meet the whole cast later this page.
+
+But look at that receipt. **$0.34.** For one multiplication. Two things went wrong, both defaults: with no options, the SDK used the default model configured for Claude Code on my machine (a big one), and it loaded the full default toolbox, whose definitions ride along in every request. The fix for both is the options object, which is where the real agent starts.
+
+## Give it a workspace
+
+An analyst needs something to analyze. Meet **Beanline**, the fictional specialty-coffee chain whose data the whole series runs on: six stores, twelve products, six months of daily sales. Three CSVs, about 11,000 rows, generated by a deterministic script so your copy is byte-for-byte identical to mine and every number in these posts reproduces on your machine.
+
+```bash
+mkdir workspace && cd workspace
+BASE=https://raw.githubusercontent.com/yadneshSalvi/claude-agent-sdk-in-production/main/data
+curl -sO $BASE/stores.csv -O $BASE/products.csv -O $BASE/sales.csv
+cd ..
+```
+
+Peek at what arrived:
+
+```bash
+head -3 workspace/sales.csv
+# date,store_id,product_id,units,revenue
+# 2026-01-01,S01,P01,44,140.80
+# 2026-01-01,S01,P02,77,354.20
+```
+
+The `workspace/` folder is the agent's desk: the one place it works, with everything it needs on top. In [Part 4](/blog/agent-sdk-4-workspaces-artifacts) every conversation will get its own desk; for now there's one. Keeping the agent at a desk, rather than loose in your home directory, is more than tidiness. It's the first safety decision of the series, and it matters in about ninety seconds.
+
+## The options object
+
+Now the real file. Create `agent.py` next to `hello.py`, starting with imports and configuration:
+
+```python filename="backend/agent.py" repo="part-01-first-agent/backend/agent.py" lines="1-25"
+"""Part 1: a terminal data analyst. Ask it a question, watch it work."""
+
+import asyncio
+import sys
+
+from claude_agent_sdk import (
+    AssistantMessage,
+    ClaudeAgentOptions,
+    ResultMessage,
+    SystemMessage,
+    TextBlock,
+    ToolResultBlock,
+    ToolUseBlock,
+    UserMessage,
+    query,
+)
+
+MODEL = "claude-haiku-4-5"
+
+OPTIONS = ClaudeAgentOptions(
+    cwd="workspace",
+    tools=["Read", "Glob", "Grep", "Bash", "Write"],
+    permission_mode="bypassPermissions",
+    model=MODEL,
+)
+```
+
+Four decisions, each earning its keep:
+
+- **`model=MODEL`**: Haiku, the cheap end of the current lineup, as a constant so upgrading to a bigger model is a one-line change in Part 13 when we can measure whether it's worth it. Agent loops multiply tokens; default to cheap.
+- **`cwd="workspace"`**: the desk. Every relative path the agent touches resolves inside this folder.
+- **`tools=[...]`**: the toolbox, cut down to five. The agent's tools are real: `Read` reads actual files, `Bash` runs actual shell commands. Listing exactly what the job needs makes the agent safer *and* cheaper, because every tool definition you don't ship is context you don't pay for. The full catalog is on the [concepts page](/blog/agent-sdk-concepts#built-in-tools).
+- **`permission_mode="bypassPermissions"`**: the one that deserves its own section.
+
+<Callout type="info" title="The five tools, in one breath">
+`Glob` finds files by pattern, `Grep` searches inside them, `Read` reads one, `Bash` runs any shell command, `Write` creates files. Between them an agent can explore, inspect, compute, and produce. There's also an `allowed_tools` option you'll meet in [Part 7](/blog/agent-sdk-7-approvals); it controls *permission to use* rather than *existence of*, and the difference becomes the hinge of the whole safety story.
+</Callout>
+
+## The permission wall
+
+Before I explain `bypassPermissions`, watch what happens without it. I deleted that one line and ran the March question. Here's the run, and it's the most instructive failure in this part:
+
+<Figure
+  src="/images/series/agent-sdk/part-1/term-wall.svg"
+  alt="A dark terminal transcript of the agent running without a permission mode. Glob succeeds, but Read, Write, and every Bash command that computes are refused with messages like 'Claude requested permissions but you haven't granted it yet' and 'This command requires approval'. After a note that 50 more attempts were denied, the agent gives a confidently wrong final answer, $59,278.80, marked wrong in the capture, after 62 turns and $0.3668."
+  caption="No permission mode, nobody to approve. Reads mostly pass, computation is refused, and after 62 turns of creative denial-dodging the agent does the math 'manually' and gets it wrong. Denied its tools, a determined agent guesses."
+  width={1040}
+  height={704}
+/>
+
+Read that ending again, because it's the most important sentence in Part 1: **denied every path to actually compute, the agent eventually "calculated manually" and produced wrong numbers with full confidence.** $59,278.80 is not Downtown's March revenue. Nothing crashed. No error was raised. A polite, plausible, wrong answer, delivered after burning 62 turns and 37 cents trying everything else first.
+
+Here's what was happening. Every tool call passes a permission check, and [`permission_mode`](/blog/agent-sdk-concepts#permission-modes) sets the posture. The default posture is interactive: harmless reads pass, and anything with side effects or arbitrary execution waits for a human to approve it. Claude Code has a human at the keyboard for exactly that. Our script has nobody wired up to answer, so every request for approval is refused, and the agent works around, and around, and around.
+
+`bypassPermissions` removes the checkpoint entirely: every tool call is allowed, no questions asked. Which makes this the right moment for the series' recurring warning:
+
+<Callout type="warning" title="Running with scissors, until Parts 7 and 8">
+`bypassPermissions` means the agent can run any shell command your user account can run. Deleting files, installing packages, making network calls: if you can, it can. We accept that today for three reasons: the agent works at a desk (`cwd="workspace"`) with nothing valuable on it, the toolbox is cut to five, and this is a local experiment, not a service. That's containment by convention, not enforcement, and the series treats it as an open debt: [Part 7](/blog/agent-sdk-7-approvals) wires tool calls to a human Approve button, and [Part 8](/blog/agent-sdk-8-hooks) adds rules that block dangerous commands outright. Until then: scissors. Walk, don't run.
+</Callout>
+
+Put the `permission_mode="bypassPermissions"` line back. The wall run also quietly demonstrated something worth naming: the refusals went *into the conversation* and the agent adapted its plan each time. Feedback of any kind, even "no", is information the loop uses. That mechanism becomes the whole human-in-the-loop design in Act II.
+
+## Ask a real question
+
+Now the rest of `agent.py`: a printing loop that turns the message stream into a readable trace, and a `main` you can pass questions to:
+
+```python filename="backend/agent.py" repo="part-01-first-agent/backend/agent.py" lines="28-48"
+def first_value(tool_input: dict) -> str:
+    """One short line describing a tool call, e.g. the command or file path."""
+    return next((str(v) for v in tool_input.values() if v), "")[:90]
+
+
+async def main(prompt: str) -> None:
+    async for message in query(prompt=prompt, options=OPTIONS):
+        if isinstance(message, SystemMessage) and message.subtype == "init":
+            print(f"[session {message.data['session_id']}]\n")
+        elif isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock):
+                    print(block.text)
+                elif isinstance(block, ToolUseBlock):
+                    print(f"  -> {block.name}  {first_value(block.input)}")
+        elif isinstance(message, UserMessage) and isinstance(message.content, list):
+            for block in message.content:
+                if isinstance(block, ToolResultBlock) and block.is_error:
+                    print(f"  !! {str(block.content)[:120]}")
+        elif isinstance(message, ResultMessage):
+            print(f"\n[{message.num_turns} turns · ${message.total_cost_usd:.4f}]")
+```
+
+Don't sweat every branch yet; the next section names each message type properly. The shape is the point: one `async for`, a small `isinstance` ladder, and each kind of message becomes one line of output. Text prints as prose, tool calls print as `->` lines, failed tool results print as `!!` lines, and the receipt prints last. Finish the file:
+
+```python filename="backend/agent.py" repo="part-01-first-agent/backend/agent.py" lines="51-56"
+if __name__ == "__main__":
+    question = " ".join(sys.argv[1:]) or (
+        "Which store had the highest total revenue in March? Give the store's "
+        "name, and how much it beat the runner-up by."
+    )
+    asyncio.run(main(question))
+```
+
+And run it:
+
+```bash
+uv run python agent.py
+```
+
+<Figure
+  src="/images/series/agent-sdk/part-1/term-first-question.svg"
+  alt="A dark terminal transcript of the March revenue run. The agent narrates its plan, calls Bash find and Read, hits a wrong path error, corrects itself with pwd and ls, reads all three CSVs, runs an awk aggregation over sales.csv, reads stores.csv for names, and answers: Downtown had the highest total revenue in March with $51,319.60, beating the Airport store by $7,893.70. The receipt reads 9 turns, $0.0240."
+  caption="The dessert. Watch the middle: it guesses a wrong path, reads the error, corrects course, and keeps going. Nine turns, 2.4 cents, every number right."
+  width={1040}
+  height={760}
+/>
+
+This is the moment the series is named after, so let it land. You did not tell it there were three files. You did not tell it the schema, or that revenue lives in `sales.csv` but names live in `stores.csv`, or that March means filtering a date column. It discovered all of that, wrote an `awk` aggregation I would have had to look up the syntax for, joined the names, and did the subtraction. And when it guessed a wrong file path early on, it read the error message and fixed its own mistake, the same think-act-observe loop, running on a failure instead of a success.
+
+<Figure
+  src="/images/series/agent-sdk/part-1/fig-agent-loop-light.svg"
+  srcDark="/images/series/agent-sdk/part-1/fig-agent-loop-dark.svg"
+  alt="Diagram of the agent loop. On the left, a box labeled YOUR CODE containing query(prompt, options) sends one call into a dashed region labeled INSIDE THE SDK, THE LOOP, and receives back a dashed async-for message stream. Inside the region three stations: THINK (the model reads everything so far), ACT (a tool runs for real), OBSERVE (result joins the conversation), connected in a cycle labeled repeat until the job is done. An exit arrow leads to a green box: answer plus the bill, ResultMessage."
+  caption="The whole mental model of this series. Your code is one call in and a narrated stream out; the think-act-observe cycle in the middle belongs to the SDK."
+  width={1240}
+  height={660}
+/>
+
+One honest note: the plan for this part said "watch it write pandas", and instead my agent reached for `awk`. It picks its own tools, and for an 11,000-row aggregation a shell one-liner *is* the sensible choice; that's the intern with a toolbox showing judgment, not a bug to fix. When the questions get heavier (charts in [Part 4](/blog/agent-sdk-4-workspaces-artifacts), whole reports), it reaches for Python without being asked. Ask it something yourself and see what it picks:
+
+```bash
+uv run python agent.py "Which product category makes the most money on weekends?"
+```
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels side by side with thin vertical black dividers, about hiring an AI data analyst that investigates on its own. The same cute anthropomorphic laptop character appears in all three panels: an open laptop with little arms and legs, a simple smiling face on its screen, wearing a tiny formal necktie. Panel 1: Yad sits at his desk and leans toward the laptop-analyst, asking in a speech bubble: "WHAT WAS OUR MARCH REVENUE?". The laptop-analyst listens attentively. Panel 2: the laptop-analyst is diving head-first into an open filing cabinet drawer, only its legs and tie sticking out, loose papers flying everywhere; Yad watches with wide eyes holding a coffee mug; a small sound-effect text reads "RUSTLE RUSTLE". Panel 3: the laptop-analyst stands proudly on the desk presenting a tall stack of paper charts and graphs; its speech bubble says: "$51,319.60. I ALSO MADE THREE CHARTS." Yad, slightly buried behind the paper stack, deadpan. Clean readable hand-lettered speech bubbles, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-1/comic-analyst.png"
+  alt="Comic in three panels. Panel one: Yad, a bearded developer with headphones, asks a laptop wearing a tiny necktie 'WHAT WAS OUR MARCH REVENUE?'. Panel two: the laptop has dived head-first into a filing cabinet drawer, papers flying, sound effect RUSTLE RUSTLE, while Yad watches wide-eyed with his coffee. Panel three: the laptop proudly presents a stack of charts taller than Yad's head and announces '$51,319.60. I ALSO MADE THREE CHARTS.'"
+  caption="You ask one question; the loop decides how much work it takes. Sometimes the answer comes with charts nobody ordered."
+  width={1536}
+  height={1024}
+/>
+
+## Anatomy of the message stream
+
+You've now seen the stream twice: raw reprs in `hello.py`, and through a printing loop in `agent.py`. Time to learn it properly, because **this stream is the series' raw material**. Part 2 translates it into server-sent events; Part 3 renders it as UI; Part 7 pauses it for approvals. Four message types carry everything:
+
+<Figure
+  src="/images/series/agent-sdk/part-1/fig-message-anatomy-light.svg"
+  srcDark="/images/series/agent-sdk/part-1/fig-message-anatomy-dark.svg"
+  alt="Annotated diagram of the four message types from one real run. A SystemMessage init card carries session_id, model, tools, and cwd, annotated as the handshake whose session_id matters in Part 5. An AssistantMessage card holds a TextBlock and a ToolUseBlock with name Bash and an awk command, annotated: a list of blocks, not a string. A UserMessage card holds a ToolResultBlock with matching tool_use_id and the awk output, annotated: tool results wear a user badge. After a marker reading times-9 rounds, a ResultMessage card shows num_turns 9, total_cost_usd 0.0240 and the final answer, annotated as the receipt."
+  caption="The Rosetta stone, drawn from the actual March run. Everything the rest of the series builds is a translation of these four shapes."
+  width={1240}
+  height={980}
+/>
+
+The two shapes worth staring at:
+
+**`AssistantMessage.content` is a list of blocks, not a string.** One assistant message can carry prose (`TextBlock`) and an action (`ToolUseBlock` with a `name`, an `input` dict, and an `id`) side by side. Hold onto that: when we design the chat UI's data model in [Part 3](/blog/agent-sdk-3-agent-ui), assistant turns will be *sequences of blocks* for exactly this reason, and the design will feel inevitable instead of clever.
+
+**Tool results arrive inside a `UserMessage`.** That surprises everyone once. From the model's point of view there are only two speakers: itself, and the world. Your typed question and a tool's output are both "the world said something", so the awk output rides back wearing a user badge, as a `ToolResultBlock` whose `tool_use_id` points at the `ToolUseBlock` that asked for it. That id-matching is how you'll pair spinners with results in the UI, two parts from now.
+
+The `is_error` field on a tool result is `True` for failures like our wrong-path `Read`, and the model reads those failures like any other input. And the final `ResultMessage` is the receipt: `num_turns`, duration, `usage` token counts, the final text, and `total_cost_usd`. Which brings us to a habit.
+
+## The cost ritual
+
+Every part of this series ends its runs by printing `total_cost_usd`, and every part quotes the real measured numbers. Here's today's ledger, from my actual runs:
+
+| Run | What | Cost |
+|---|---|---|
+| `hello.py` | default model, default toolbox | **$0.3418** |
+| Wall run | no permission mode, 62 flailing turns | **$0.3668** |
+| The March question | Haiku, five tools, nine turns | **$0.0240** |
+
+The spread is the lesson. Same SDK, same machine, same kind of question: a 14x difference, decided entirely by configuration. Model choice dominates, toolbox size compounds (every tool definition ships with every request), and failure modes burn turns. Agent cost is a *product decision you make in code*, which is why the habit starts on day one and why [Part 13](/blog/agent-sdk-13-structured-evals) graduates it from watching costs to enforcing budgets with `max_budget_usd`. The mechanics of how turns are billed live on the [concepts page](/blog/agent-sdk-concepts#cost-and-tokens).
+
+You know the version of this lesson from the wild: the demo that cost pennies all week, the "let's just run it on the full dataset" Friday, and the Saturday email from billing. Agents don't make that story worse, but they do make it faster. Print the receipt.
+
+{/* [ANECDOTE slot, optional upgrade (WRITING-STYLE §6): a true first-person story from Yadnesh about an LLM/API bill surprise or a cost-control save, 3 beats, 5 sentences. If provided, it replaces the "You know the version of this lesson" paragraph above. */}
+
+## The diary the SDK keeps
+
+One more discovery before we ship this part, and it costs nothing to look at. The SDK has been keeping records this whole time:
+
+<Figure
+  src="/images/series/agent-sdk/part-1/term-diary.svg"
+  alt="A dark terminal. ls ~/.claude/projects/ shows a folder named after the workspace directory path. Inside it, a JSONL file named with the session id from the March run. head shows the first JSON line containing the original question. A comment says every turn you've ever run is in here, and Part 5 cashes this in."
+  caption="The agent's diary: one folder per working directory, one JSONL file per session, one JSON line per event. We didn't build this. It came with the engine."
+  width={1040}
+  height={452}
+/>
+
+Every session you've run today is on disk, as one JSONL file per session, filed under the working directory it ran in. That `[session ...]` id our script prints is the filename. We're not going to *use* the diary yet, but notice what it means: conversation persistence already exists, for free, before we've written a single line of storage code. [Part 5](/blog/agent-sdk-5-sessions) turns this folder into full conversation memory and a sessions sidebar, mostly by asking the SDK to read its own [diary](/blog/agent-sdk-concepts#sessions-and-jsonl) back.
+
+## Wrap it in git
+
+Standard series ritual, from the `beanline-analyst/` project root. The `.gitignore` matters more than usual because agents create files when you're not looking:
+
+```text filename=".gitignore"
+.venv/
+__pycache__/
+.env
+.env.local
+node_modules/
+workspaces/
+.DS_Store
+```
+
+`workspaces/` (plural) doesn't exist yet; it's the Part 4 per-conversation desks, ignored in advance so no agent-generated scratch work ever lands in a commit. Then:
+
+```bash
+git init
+git add .
+git commit -m "part 1: a terminal analyst that answers from real data"
+```
+
+Glance at `git status` before that commit, today and every day: if `.env` or anything you didn't recognize is staged, stop and fix the ignore file first.
+
+<DemoVideo
+  src="/videos/agent-sdk/part-1-demo.mp4"
+  poster="/videos/agent-sdk/part-1-poster.jpg"
+  caption="A real run of agent.py: the question goes in, tool calls scroll as the agent investigates, and the answer lands with the cost receipt."
+  label="Screen recording of Part 1: the terminal agent answering the March revenue question with live tool activity"
+/>
+
+<Recap
+  part={1}
+  items={[
+    "A working agent in 56 lines: `query()` plus `ClaudeAgentOptions`, with the think-act-observe loop, real tools, and context management all inherited from the Claude Code engine.",
+    "A configured toolbox: `cwd` as the agent's desk, `tools` cut to the five the job needs, `MODEL` pinned to Haiku, and the 14x cost spread that justifies all three.",
+    "The message stream, decoded: init handshake with a `session_id`, `AssistantMessage` as a list of blocks, tool results arriving in `UserMessage` wearing a user badge, and the `ResultMessage` receipt.",
+    "A working knowledge of the permission wall: what `bypassPermissions` trades away, why the default mode refuses a headless agent, and the scissors debt Parts 7 and 8 repay.",
+    "The cost ritual: print `total_cost_usd` every run, quote real numbers, never be surprised by a bill again.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "Your agent calls the Bash tool and the command's output comes back in the stream. What object carries it?",
+      options: [
+        "A ToolResultBlock inside an AssistantMessage",
+        "A ToolResultBlock inside a UserMessage",
+        "A SystemMessage with subtype tool_result",
+        "The ResultMessage at the end of the turn",
+      ],
+      answer: 1,
+      explain: "To the model there are two speakers: itself and the world. Tool output is the world talking, so it arrives inside a UserMessage as a ToolResultBlock, whose tool_use_id points back at the ToolUseBlock that asked.",
+    },
+    {
+      q: "Run without any permission_mode, our headless agent produced a confident, wrong answer. What actually happened?",
+      options: [
+        "Haiku is too small a model for arithmetic at this scale",
+        "The CSVs were corrupted by the failed tool calls",
+        "Every compute path needed an approval nobody could grant, so after dozens of denials the agent estimated the answer itself",
+        "The SDK crashed and returned a cached response",
+      ],
+      answer: 2,
+      explain: "The default posture waits for a human to approve anything with side effects. A script has no human wired up, so the approvals were refused, and a determined agent eventually guessed. Denials are feedback, not walls; Part 7 puts a real human behind them.",
+    },
+    {
+      q: "What's the difference between tools=['Read', ...] and bypassPermissions in ClaudeAgentOptions?",
+      options: [
+        "They're synonyms with different spellings",
+        "tools decides which tools exist for the run; the permission mode decides what may run without asking",
+        "tools is for built-in tools, bypassPermissions is for custom ones",
+        "bypassPermissions disables the tools list entirely",
+      ],
+      answer: 1,
+      explain: "Two separate dials. The toolbox (tools=) controls existence: five tools listed means five tools exist, and fewer definitions also means fewer tokens per request. The permission mode controls the checkpoint in front of each call.",
+    },
+    {
+      q: "Where did the March conversation end up after the run finished?",
+      options: [
+        "Nowhere; the process exited and the conversation is gone",
+        "In a SQLite database the SDK created in the project",
+        "In a JSONL file under ~/.claude/projects/, filed by working directory and named by session_id",
+        "In the workspace/ folder next to the CSVs",
+      ],
+      answer: 2,
+      explain: "The SDK writes a diary whether or not you read it: one JSONL per session, sharded by cwd. The session_id from the init handshake is the filename, which is exactly how Part 5 will resume old conversations.",
+    },
+    {
+      q: "hello.py cost $0.34 and the March analysis cost $0.024. What explains a trivial question costing 14x more than a real one?",
+      options: [
+        "The first run of any SDK project is billed at a setup rate",
+        "hello.py ran on the machine's default model with the full default toolbox, both of which we later pinned down in ClaudeAgentOptions",
+        "Multiplication is expensive for language models",
+        "The March run was cached from my earlier testing",
+      ],
+      answer: 1,
+      explain: "No options means default everything: a bigger model, and a full toolbox whose definitions ride in the prompt. Pinning model=MODEL and cutting tools to five is what made the real question cost pennies. Cost is a configuration decision.",
+    },
+  ]}
+/>
+
+Your analyst lives in a terminal and answers one question per process. Nothing streams, nothing remembers, and only you can use it. In [Part 2](/blog/agent-sdk-2-fastapi-streaming) it goes behind a URL: FastAPI in front, and the message stream you decoded today translated into a server-sent-event vocabulary that the next twelve parts extend without ever breaking a client.
+
+Every part of this series has a companion folder in the [`claude-agent-sdk-in-production` repo](https://github.com/yadneshSalvi/claude-agent-sdk-in-production): the complete, tested project exactly as it exists at the end of that part. This part's folder is [`part-01-first-agent`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/tree/main/part-01-first-agent). Code blocks with a GitHub icon in the header link straight to the exact file, and "View full file" shows the whole file in place with this section's lines highlighted.

@@ -16,6 +16,11 @@ const SERIES = [
     source: path.resolve(process.cwd(), "../langgraph-from-scratch"),
     dest: path.resolve(process.cwd(), "content/code/langgraph"),
   },
+  {
+    // local checkout of https://github.com/yadneshSalvi/claude-agent-sdk-in-production
+    source: path.resolve(process.cwd(), "../claude-agent-sdk-in-production"),
+    dest: path.resolve(process.cwd(), "content/code/agent-sdk"),
+  },
 ];
 
 // Only vendor text files a post might display.

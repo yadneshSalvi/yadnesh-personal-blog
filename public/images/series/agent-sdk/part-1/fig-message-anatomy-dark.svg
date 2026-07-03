@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="980" viewBox="0 0 1240 980">
+  <rect width="1240" height="980" fill="#151311"/>
+  <text x="60" y="40" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#756d62">WHAT query() YIELDS &#183; ONE REAL RUN, FOUR KINDS OF MESSAGE</text>
+  <rect x="60" y="60" width="760" height="232" rx="14" fill="#211e1a" stroke="#5e463a" stroke-width="1.5"/>
+  <text x="86" y="98" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="19" font-weight="700" fill="#ebe7df">SystemMessage</text>
+  <text x="794" y="98" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2" fill="#e5825a" text-anchor="end">SUBTYPE &#183; INIT</text>
+  <line x1="60" y1="112" x2="820" y2="112" stroke="#2b2723" stroke-width="1"/>
+  <text x="86" y="128" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#a49c90" xml:space="preserve">data = {</text>
+  <text x="86" y="158" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#e5825a" xml:space="preserve">  'session_id': 'd22f446b-ea4d-4b32-…',</text>
+  <text x="86" y="188" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#ebe7df" xml:space="preserve">  'model': 'claude-haiku-4-5',</text>
+  <text x="86" y="218" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#ebe7df" xml:space="preserve">  'tools': ['Bash','Glob','Grep','Read','Write'],</text>
+  <text x="86" y="248" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#a49c90" xml:space="preserve">  'cwd': '…/backend/workspace', … }</text>
+  <line x1="828" y1="95" x2="850" y2="95" stroke="#e5825a" stroke-width="1.5"/><text x="860" y="100" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#e5825a">The handshake.</text><text x="860" y="126" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">Arrives first, once. That</text><text x="860" y="152" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">session_id is the key to</text><text x="860" y="178" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">everything in Part 5:</text><text x="860" y="204" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">write it down.</text>
+  <line x1="120" y1="300" x2="120" y2="336" stroke="#756d62" stroke-width="2"/>
+  <path d="M 113 334 L 127 334 L 120 346 Z" fill="#756d62"/>
+  
+  <rect x="60" y="354" width="760" height="232" rx="14" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="86" y="392" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="19" font-weight="700" fill="#ebe7df">AssistantMessage</text>
+  <text x="794" y="392" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2" fill="#756d62" text-anchor="end">THE AGENT SPEAKS AND ACTS</text>
+  <line x1="60" y1="406" x2="820" y2="406" stroke="#2b2723" stroke-width="1"/>
+  <text x="86" y="422" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#a49c90" xml:space="preserve">content = [</text>
+  <text x="86" y="452" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#ebe7df" xml:space="preserve">  TextBlock(text="I'll help you find…"),</text>
+  <text x="86" y="482" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#e5825a" xml:space="preserve">  ToolUseBlock(id='toolu_01Qfr…',</text>
+  <text x="86" y="512" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#e5825a" xml:space="preserve">    name='Bash',</text>
+  <text x="86" y="542" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#e5825a" xml:space="preserve">    input={'command': "awk -F',' …"}) ]</text>
+  <line x1="828" y1="389" x2="850" y2="389" stroke="#e5825a" stroke-width="1.5"/><text x="860" y="394" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#e5825a">A list of blocks, not a</text><text x="860" y="420" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#e5825a">string.</text><text x="860" y="446" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">Prose and tool calls ride</text><text x="860" y="472" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">in one message. This block</text><text x="860" y="498" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">model IS Part 3's UI model.</text>
+  <line x1="120" y1="594" x2="120" y2="630" stroke="#756d62" stroke-width="2"/>
+  <path d="M 113 628 L 127 628 L 120 640 Z" fill="#756d62"/>
+  
+  <rect x="60" y="648" width="760" height="232" rx="14" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="86" y="686" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="19" font-weight="700" fill="#ebe7df">UserMessage</text>
+  <text x="794" y="686" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2" fill="#756d62" text-anchor="end">THE WORLD ANSWERS</text>
+  <line x1="60" y1="700" x2="820" y2="700" stroke="#2b2723" stroke-width="1"/>
+  <text x="86" y="716" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#a49c90" xml:space="preserve">content = [</text>
+  <text x="86" y="746" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#ebe7df" xml:space="preserve">  ToolResultBlock(</text>
+  <text x="86" y="776" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#e5825a" xml:space="preserve">    tool_use_id='toolu_01Qfr…',</text>
+  <text x="86" y="806" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#ebe7df" xml:space="preserve">    content='Downtown 51319.60\nAirport…',</text>
+  <text x="86" y="836" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#a3c57d" xml:space="preserve">    is_error=None) ]</text>
+  <line x1="828" y1="683" x2="850" y2="683" stroke="#e5825a" stroke-width="1.5"/><text x="860" y="688" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#e5825a">Tool results wear a user</text><text x="860" y="714" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#e5825a">badge.</text><text x="860" y="740" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">To the model, the world's</text><text x="860" y="766" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">reply is input like yours.</text><text x="860" y="792" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">Match it by tool_use_id.</text>
+  <line x1="120" y1="888" x2="120" y2="924" stroke="#756d62" stroke-width="2"/>
+  <path d="M 113 922 L 127 922 L 120 934 Z" fill="#756d62"/>
+  <text x="144" y="916" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#756d62">&#215; 9 rounds in our March run</text>
+  <rect x="60" y="942" width="760" height="202" rx="14" fill="#211e1a" stroke="#5e463a" stroke-width="1.5"/>
+  <text x="86" y="980" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="19" font-weight="700" fill="#ebe7df">ResultMessage</text>
+  <text x="794" y="980" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2" fill="#e5825a" text-anchor="end">THE RECEIPT</text>
+  <line x1="60" y1="994" x2="820" y2="994" stroke="#2b2723" stroke-width="1"/>
+  <text x="86" y="1010" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#ebe7df" xml:space="preserve">num_turns=9,  duration_ms=21748,</text>
+  <text x="86" y="1040" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#e5825a" xml:space="preserve">total_cost_usd=0.0240,</text>
+  <text x="86" y="1070" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#a49c90" xml:space="preserve">usage={'input_tokens': …, 'output_tokens': …},</text>
+  <text x="86" y="1100" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#ebe7df" xml:space="preserve">result='Downtown had the highest…'</text>
+  <line x1="828" y1="977" x2="850" y2="977" stroke="#e5825a" stroke-width="1.5"/><text x="860" y="982" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#e5825a">Arrives last, once.</text><text x="860" y="1008" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">The whole turn's bill,</text><text x="860" y="1034" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">the final text, and the</text><text x="860" y="1060" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">session_id again. Print</text><text x="860" y="1086" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#a49c90">the cost. Every time.</text>
+</svg>

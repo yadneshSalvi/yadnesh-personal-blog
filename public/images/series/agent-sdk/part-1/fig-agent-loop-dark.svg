@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="660" viewBox="0 0 1240 660">
+  <rect width="1240" height="660" fill="#151311"/>
+
+  <!-- your code -->
+  <rect x="60" y="210" width="250" height="190" rx="14" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="84" y="246" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#756d62">YOUR CODE</text>
+  <text x="84" y="286" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" font-weight="700" fill="#ebe7df">query(</text>
+  <text x="104" y="312" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#a49c90">prompt,</text>
+  <text x="104" y="336" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#a49c90">options,</text>
+  <text x="84" y="362" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" font-weight="700" fill="#ebe7df">)</text>
+
+  <!-- one call in -->
+  <line x1="310" y1="270" x2="388" y2="270" stroke="#e5825a" stroke-width="3"/>
+  <path d="M 388 263 L 388 277 L 400 270 Z" fill="#e5825a"/>
+  <text x="355" y="254" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14.5" fill="#e5825a" text-anchor="middle">one call</text>
+
+  <!-- message stream out -->
+  <line x1="400" y1="360" x2="310" y2="360" stroke="#a49c90" stroke-width="2.5" stroke-dasharray="7 5"/>
+  <path d="M 322 353 L 322 367 L 310 360 Z" fill="#a49c90"/>
+  <text x="355" y="386" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14.5" fill="#a49c90" text-anchor="middle">async for message</text>
+  <text x="355" y="406" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#756d62" text-anchor="middle">a running narration</text>
+
+  <!-- the loop region -->
+  <rect x="400" y="90" width="780" height="440" rx="20" fill="none" stroke="#2b2723" stroke-width="1.5" stroke-dasharray="8 6"/>
+  <rect x="424" y="76" width="270" height="28" rx="14" fill="#151311"/>
+  <text x="440" y="95" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#756d62">INSIDE THE SDK &#183; THE LOOP</text>
+
+  
+  <rect x="460" y="160" width="200" height="108" rx="14" fill="#2a201a" stroke="#5e463a" stroke-width="1.5"/>
+  <text x="560" y="190" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" letter-spacing="2.5" fill="#e5825a" text-anchor="middle">THINK</text>
+  <text x="560" y="218" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#ebe7df" text-anchor="middle">The model reads</text>
+  <text x="560" y="244" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#a49c90" text-anchor="middle">everything so far</text>
+  
+  <rect x="920" y="160" width="200" height="108" rx="14" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="1020" y="190" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" letter-spacing="2.5" fill="#756d62" text-anchor="middle">ACT</text>
+  <text x="1020" y="218" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#ebe7df" text-anchor="middle">A tool runs, for real</text>
+  <text x="1020" y="244" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#a49c90" text-anchor="middle">Read &#183; Bash &#183; Glob &#183; Write</text>
+  
+  <rect x="690" y="350" width="200" height="108" rx="14" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="790" y="380" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" letter-spacing="2.5" fill="#756d62" text-anchor="middle">OBSERVE</text>
+  <text x="790" y="408" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#ebe7df" text-anchor="middle">Result joins the</text>
+  <text x="790" y="434" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#a49c90" text-anchor="middle">conversation</text>
+
+  <!-- think -> act -->
+  <line x1="660" y1="214" x2="908" y2="214" stroke="#e5825a" stroke-width="2.5"/>
+  <path d="M 908 207 L 908 221 L 920 214 Z" fill="#e5825a"/>
+  <text x="790" y="200" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#e5825a" text-anchor="middle">"I need to see sales.csv"</text>
+
+  <!-- act -> observe -->
+  <line x1="1020" y1="268" x2="880.2899151085505" y2="351.82605093486967" stroke="#a49c90" stroke-width="2.5"/>
+  <path d="M 883.8913853965432 357.8285014148575 L 876.6884448205578 345.82360045488184 L 870 358 Z" fill="#a49c90"/>
+  <!-- observe -> think -->
+  <line x1="710" y1="358" x2="580.2249118356938" y2="278.2810172704976" stroke="#a49c90" stroke-width="2.5"/>
+  <path d="M 576.5609850945701 284.2455491746523 L 583.8888385768174 272.31648536634293 L 570 272 Z" fill="#a49c90"/>
+  <text x="790" y="316" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#a49c90" text-anchor="middle">repeat until the job is done</text>
+
+  <!-- exit -->
+  <line x1="790" y1="458" x2="790" y2="568" stroke="#a3c57d" stroke-width="3"/>
+  <path d="M 797 568 L 783 568 L 790 580 Z" fill="#a3c57d"/>
+  <rect x="600" y="580" width="380" height="56" rx="12" fill="#1d2314" stroke="#a3c57d" stroke-width="1.5"/>
+  <text x="790" y="614" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#a3c57d" text-anchor="middle">Answer + the bill: ResultMessage</text>
+
+  <!-- caption strip -->
+  <text x="60" y="626" font-family="Georgia, 'Times New Roman', serif" font-size="23" fill="#ebe7df">You wrote none of this loop. That's the entire pitch.</text>
+</svg>

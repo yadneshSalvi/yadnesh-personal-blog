@@ -16,12 +16,29 @@ export const TUTORIAL_REPOS: Record<string, { github: string; localDir: string }
     github: "https://github.com/yadneshSalvi/langgraph-from-scratch",
     localDir: path.join(process.cwd(), "content/code/langgraph"),
   },
+  "agent-sdk": {
+    github: "https://github.com/yadneshSalvi/claude-agent-sdk-in-production",
+    localDir: path.join(process.cwd(), "content/code/agent-sdk"),
+  },
 };
 
 const DEFAULT_REPO = "langgraph";
+
+/**
+ * Part-folder names are unique across series (part-01-setup vs
+ * part-01-first-agent), so a repoPath's owning repo can be inferred by
+ * checking which vendored tree contains it.
+ */
+function repoForPath(repoPath: string): string {
+  for (const [key, conf] of Object.entries(TUTORIAL_REPOS)) {
+    if (fs.existsSync(path.join(conf.localDir, repoPath))) return key;
+  }
+  return DEFAULT_REPO;
+}
+
 const cache = new Map<string, string | null>();
 
-export function readTutorialFile(repoPath: string, repo: string = DEFAULT_REPO): string | null {
+export function readTutorialFile(repoPath: string, repo: string = repoForPath(repoPath)): string | null {
   const key = `${repo}:${repoPath}`;
   if (cache.has(key)) return cache.get(key) ?? null;
 
@@ -41,7 +58,7 @@ export function readTutorialFile(repoPath: string, repo: string = DEFAULT_REPO):
   return result;
 }
 
-export function githubFileUrl(repoPath: string, lines?: string, repo: string = DEFAULT_REPO): string {
+export function githubFileUrl(repoPath: string, lines?: string, repo: string = repoForPath(repoPath)): string {
   const conf = TUTORIAL_REPOS[repo] ?? TUTORIAL_REPOS[DEFAULT_REPO];
   let anchor = "";
   const first = (lines ?? "").split(",")[0]?.trim();
