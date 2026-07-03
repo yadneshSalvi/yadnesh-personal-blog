@@ -1,5 +1,6 @@
 import * as React from "react";
 import CodeBlock from "@/components/CodeBlock";
+import { readTutorialFile, githubFileUrl, parseLineRanges } from "@/lib/tutorialCode";
 import Tweet from "@/components/mdx/Tweet";
 import Callout from "@/components/mdx/Callout";
 import YouTube from "@/components/mdx/YouTube";
@@ -91,6 +92,15 @@ const MDXComponents: Record<string, (props: unknown) => React.ReactNode> = {
         const collapsed = meta.collapsed === true || meta.collapse === true;
         const wrap = meta.wrap === "true" || meta.wrap === true ? true : meta.wrap === "false" ? false : undefined;
 
+        // Companion-repo integration: repo="part-05-streaming/backend/app/main.py" lines="36-45"
+        // adds a GitHub icon linking to the exact file and a "View full file" toggle that
+        // shows the whole (vendored) file in place with the added lines highlighted.
+        const repoPath = typeof meta.repo === "string" ? meta.repo : undefined;
+        const repoLines = typeof meta.lines === "string" ? meta.lines : undefined;
+        const fullCode = repoPath ? readTutorialFile(repoPath) ?? undefined : undefined;
+        const githubUrl = repoPath ? githubFileUrl(repoPath, repoLines) : undefined;
+        const highlightLines = repoPath ? parseLineRanges(repoLines) : undefined;
+
         return (
           <CodeBlock
             language={language}
@@ -100,6 +110,9 @@ const MDXComponents: Record<string, (props: unknown) => React.ReactNode> = {
             collapsible={!noCollapse}
             initialCollapsed={collapsed}
             {...(wrap !== undefined ? { wrapLongLines: wrap } : {})}
+            {...(fullCode !== undefined ? { fullCode } : {})}
+            {...(repoPath !== undefined ? { repoPath, githubUrl } : {})}
+            {...(highlightLines && highlightLines.length ? { highlightLines } : {})}
           />
         );
       }

@@ -42,9 +42,15 @@ Unlike the LangGraph series (pure beginner), this one explicitly serves two read
   human-in-the-loop tool approvals, durable streams that survive a page refresh, subagents and
   skills.
 
-Every Act II part opens with a one-line jump-in instruction ("Start from the `part-9-sessions`
-branch of the companion repo") so an intermediate dev can skip Act I entirely. The series landing
+Every Act II part opens with a one-line jump-in instruction ("Start from the `part-09-sessions`
+folder of the companion repo") so an intermediate dev can skip Act I entirely. The series landing
 page gets a short "Two ways to read this series" section making the same offer.
+
+> **Companion repo convention (2026-07-03, follow WRITING-STYLE §13):** like
+> `langgraph-from-scratch`, this series ships a public repo with ONE FOLDER PER PART (not
+> branches), each folder the complete runnable end-of-part project, tested for real before
+> publishing. Posts wire partial-update fences with `repo=`/`lines=` meta (GitHub icon + in-place
+> "View full file" with highlights), synced into the blog via `npm run sync:code`.
 
 ### How this relates to the LangGraph series
 

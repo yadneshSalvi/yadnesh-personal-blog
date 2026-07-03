@@ -4,7 +4,7 @@ import matter from "gray-matter";
 import { compileMDX } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import MDXComponents from "@/components/mdx/MDXComponents";
-import { getAllPostsMeta, type PostMeta, type PostListItem } from "@/lib/posts";
+import { getAllPostsMeta, rehypeCodeMeta, type PostMeta, type PostListItem } from "@/lib/posts";
 
 const SERIES_DIR = path.join(process.cwd(), "content", "series");
 
@@ -102,7 +102,7 @@ export async function getSeriesBySlug(slug: string): Promise<Series | null> {
     options: {
       parseFrontmatter: true,
       blockJS: false,
-      mdxOptions: { remarkPlugins: [remarkGfm] },
+      mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [rehypeCodeMeta] },
     },
     components: MDXComponents,
   });

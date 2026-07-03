@@ -3,6 +3,11 @@ import next from "eslint-config-next";
 export default [
   ...next,
   {
+    // Vendored companion-repo sources (rendered by the FullFile code-block
+    // feature, synced by scripts/sync-tutorial-code.mjs); not app source.
+    ignores: ["content/code/**"],
+  },
+  {
     // New stricter rules introduced by eslint-plugin-react-hooks (ships with
     // eslint-config-next@16 for React 19.2). Downgraded from error to warn so
     // `npm run lint` exits 0 through the Next 16 migration. The underlying code

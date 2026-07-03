@@ -29,7 +29,7 @@ Two libraries do the heavy lifting, both sitting in your `.venv` since [Part 1's
 | Tool | Version used here |
 |---|---|
 | LangChain | 1.3.9 |
-| LangGraph | 1.2.4 |
+| LangGraph | 1.2.5 |
 
 You installed `langchain-openai` and `langchain-anthropic` back then too. You finally pick one of them in a few minutes, and that choice sticks for the rest of the series.
 
@@ -68,7 +68,7 @@ Hold that picture. We'll build it from the bottom up: first the tray, then the s
 
 A station needs to know what's on the tray before it can add to it, so the tray's shape is the first thing to define. Make a new file named `graph.py` in your package, right next to `main.py`:
 
-```python filename="backend/app/graph.py"
+```python filename="backend/app/graph.py" repo="part-03-first-graph/backend/app/graph.py" lines="5-7,10-11"
 from typing import Annotated, TypedDict
 from langchain_core.messages import AnyMessage
 from langgraph.graph.message import add_messages
@@ -128,7 +128,7 @@ The tray is defined. Now the station that does the work, and this is the moment 
 
 <Tab label="OpenAI">
 
-```python filename="backend/app/graph.py"
+```python filename="backend/app/graph.py" repo="part-03-first-graph/backend/app/graph.py" lines="14-17,20-22"
 from langchain_openai import ChatOpenAI
 
 MODEL = "gpt-5.4-mini"
@@ -174,7 +174,7 @@ LangChain models don't take a bare string; they take a list of [typed messages](
 
 Two pieces left: tell LangGraph the station exists, and lay the belts. Add this to the bottom of `graph.py`:
 
-```python filename="backend/app/graph.py"
+```python filename="backend/app/graph.py" repo="part-03-first-graph/backend/app/graph.py" lines="25-31"
 from langgraph.graph import StateGraph, START, END
 
 builder = StateGraph(State)
@@ -233,7 +233,7 @@ Checkpoint. Right now you have: a compiled graph with one node that calls a real
 
 Open `app/main.py`. The `/chat` endpoint still echoes from [Part 2](/blog/langgraph-2-fastapi-basics#teach-it-to-listen); you're going to replace its body with a call to the graph. Two new imports up top, and a new function body:
 
-```python filename="backend/app/main.py"
+```python filename="backend/app/main.py" repo="part-03-first-graph/backend/app/main.py" lines="4-5,30-34"
 from langchain_core.messages import HumanMessage  # new, with the other imports
 from app.graph import graph                        # new
 
@@ -261,7 +261,7 @@ Read it bottom-up, the habit from [Part 2](/blog/langgraph-2-fastapi-basics#now-
 
 That something is [`python-dotenv`](https://pypi.org/project/python-dotenv/), which you installed in [Part 1](/blog/langgraph-1-setup#your-backend-a-server-in-eight-lines) and haven't used until this exact moment. Add two lines at the very top of `graph.py`, above every other line, so the key lands in the environment before the model goes looking for it:
 
-```python filename="backend/app/graph.py"
+```python filename="backend/app/graph.py" repo="part-03-first-graph/backend/app/graph.py" lines="1-3"
 from dotenv import load_dotenv
 
 load_dotenv()  # reads backend/.env into the environment, before the model is built
@@ -385,7 +385,7 @@ git commit -m "part 3: /chat answers with a real LLM through a one-node graph"
 
 Your backend thinks now, but it thinks in private: the reply lands all at once, after a wait, with no screen to show it on. In [Part 4](/blog/langgraph-4-nextjs-frontend#wire-it-to-the-brain) you'll build the actual chat UI in Next.js, type into a browser, and watch these answers arrive in a real interface.
 
-{/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-3-first-graph) in the intro once it exists. */}
+The complete, tested code for this part lives in [`part-03-first-graph`](https://github.com/yadneshSalvi/langgraph-from-scratch/tree/main/part-03-first-graph) in the [companion repo](https://github.com/yadneshSalvi/langgraph-from-scratch). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.
 
 {/* TODO once the Concepts page (langgraph-concepts.mdx) ships: link "TypedDict", "Annotated / reducers", "HumanMessage / AIMessage", and "async def" to /blog/langgraph-concepts#typed-dict, #annotated-reducers, etc. instead of defining only inline. */}
 

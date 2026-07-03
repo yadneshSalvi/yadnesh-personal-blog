@@ -7,7 +7,8 @@
     "build": "node scripts/build-search-index.js && next build",
     "start": "next start",
     "lint": "eslint .",
-    "build-index": "node scripts/build-search-index.js"
+    "build-index": "node scripts/build-search-index.js",
+    "sync:code": "node scripts/sync-tutorial-code.mjs"
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",

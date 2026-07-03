@@ -138,7 +138,7 @@ export async function getPostBySlug(slug: string): Promise<{
       // GFM enables pipe tables, strikethrough, task lists, and autolinks.
       mdxOptions: {
         remarkPlugins: [remarkGfm],
-        rehypePlugins: [rehypeSlugHeadings],
+        rehypePlugins: [rehypeSlugHeadings, rehypeCodeMeta],
       },
     },
     components: MDXComponents,
@@ -290,7 +290,26 @@ type HastNode = {
   value?: string;
   properties?: Record<string, unknown>;
   children?: HastNode[];
+  data?: { meta?: string };
 };
+
+/**
+ * MDX v3 keeps a code fence's info string ("filename=... repo=... lines=...")
+ * on node.data.meta and never forwards it as a prop, so MDXComponents' pre
+ * handler was reading an undefined `metastring`. Copy it onto properties so it
+ * arrives as a real prop.
+ */
+export function rehypeCodeMeta() {
+  return (tree: HastNode) => {
+    const visit = (node: HastNode) => {
+      if (node.type === "element" && node.tagName === "code" && node.data?.meta) {
+        node.properties = { ...node.properties, metastring: node.data.meta };
+      }
+      for (const child of node.children || []) visit(child);
+    };
+    visit(tree);
+  };
+}
 
 function rehypeSlugHeadings() {
   return (tree: HastNode) => {

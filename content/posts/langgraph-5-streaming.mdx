@@ -74,7 +74,7 @@ Open `app/main.py`. Your `/chat` endpoint currently calls `graph.invoke(...)`, w
 
 First, a one-line helper that formats an envelope, and the generator itself. Add these above your `/chat` endpoint:
 
-```python filename="backend/app/main.py"
+```python filename="backend/app/main.py" repo="part-05-streaming/backend/app/main.py" lines="30-45"
 import json
 from fastapi.responses import StreamingResponse
 
@@ -101,7 +101,7 @@ async def token_stream(message: str):
 
 Now the endpoint. It stops returning a single object and starts returning a stream, so the `-> ChatResponse` annotation comes off and `StreamingResponse` takes over. Replace your old `/chat`:
 
-```python filename="backend/app/main.py"
+```python filename="backend/app/main.py" repo="part-05-streaming/backend/app/main.py" lines="48-53"
 @app.post("/chat")
 async def chat(request: ChatRequest):
     return StreamingResponse(
@@ -143,7 +143,7 @@ setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
 
 Start with a small helper that grows the last message. Add it inside the component, next to `sendMessage`:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="27-34"
 function appendToken(token: string) {
   setMessages((prev) => {
     const next = [...prev];
@@ -158,7 +158,7 @@ It's the same immutability rule from [Part 4](/blog/langgraph-4-nextjs-frontend#
 
 Next, when the user sends, add both the user's message and an empty assistant bubble in one shot. That empty bubble is the thing `appendToken` will fill:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="45-49"
 setMessages((prev) => [
   ...prev,
   { role: "user", content: text },
@@ -205,7 +205,7 @@ Read it like the errors from [Part 3](/blog/langgraph-3-first-graph#hand-the-con
 
 This is why you put a blank line after every envelope. The `\n\n` is a fence between messages, and the fix is to respect the fence: pile every chunk into a buffer, cut it on `\n\n`, handle the complete pieces, and keep the unfinished tail for next time.
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="66-74,76-81"
 const reader = res.body.getReader();
 const decoder = new TextDecoder();
 let buffer = "";
@@ -256,7 +256,7 @@ Streaming opens a new problem. A long answer might run for fifteen seconds, and 
 
 The browser's tool for canceling an in-flight `fetch` is an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController). You make one per request, hand its `signal` to `fetch`, and calling `.abort()` tears the connection down. Add a piece of state to hold the current controller, and a `stop` function:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="20,36-38"
 const [controller, setController] = useState<AbortController | null>(null);
 
 function stop() {
@@ -266,7 +266,7 @@ function stop() {
 
 In `sendMessage`, create a controller before the fetch, pass its signal, and remember it so `stop` can reach it:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="54-55,58-61,63"
 const controller = new AbortController();
 setController(controller);
 
@@ -280,7 +280,7 @@ const res = await fetch(`${API_BASE}/chat`, {
 
 When you abort, `fetch` throws an `AbortError`. That's not a real failure, so your `catch` should ignore it instead of flashing the red "could not reach the backend" banner from [Part 4](/blog/langgraph-4-nextjs-frontend#give-it-a-pulse-and-a-safety-net). Adjust the `catch` and `finally`:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="82-89"
 } catch (err) {
   if ((err as Error).name !== "AbortError") {
     setError("Could not reach the backend. Is it running on :8000?");
@@ -293,7 +293,7 @@ When you abort, `fetch` throws an `AbortError`. That's not a real failure, so yo
 
 Last, swap the footer button while a reply is streaming. Send becomes Stop:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="123-129"
 {loading ? (
   <Button type="button" variant="outline" onClick={stop}>
     Stop
@@ -322,7 +322,7 @@ Watch the backend terminal while you do it. The instant you hit Stop, Uvicorn no
 
 Two small touches separate "it works" from "it feels alive." First, that blinking cursor you saw in every screenshot. It's the honest version of [Part 4's "Thinking..." line](/blog/langgraph-4-nextjs-frontend#give-it-a-pulse-and-a-safety-net): delete that line, because the answer writing itself is a better indicator than any spinner, and add a cursor to the streaming bubble instead. Inside your `messages.map`, render it on the last assistant bubble while `loading` is true:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="102-106"
 <span className={/* the bubble classes from Part 4 */}>
   {m.content}
   {loading && m.role === "assistant" && i === messages.length - 1 && (
@@ -333,7 +333,7 @@ Two small touches separate "it works" from "it feels alive." First, that blinkin
 
 Second, auto-scroll. As the bubble grows past the bottom of the window, the newest words slide out of view and the reader has to chase them. Fix it by keeping an empty marker pinned to the bottom of the list and scrolling to it whenever the messages change. This needs a `useRef`:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="21-25"
 const bottomRef = useRef<HTMLDivElement>(null);
 
 useEffect(() => {
@@ -343,7 +343,7 @@ useEffect(() => {
 
 Then drop the marker at the very end of the scrolling messages `<div>`, just after the `.map(...)`:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="109"
 <div ref={bottomRef} />
 ```
 
@@ -353,7 +353,7 @@ Then drop the marker at the very end of the scrolling messages `<div>`, just aft
 
 Remember to widen your React import for the two new hooks:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="3"
 import { useState, useRef, useEffect, type FormEvent } from "react";
 ```
 
@@ -361,7 +361,7 @@ Send one more message and watch it land: the cursor blinks at the empty bubble, 
 
 Right now you have: a backend that streams a model's reply token by token over SSE, a frontend that reads that stream through a buffer that never trips on a chunk boundary, a Stop button that genuinely cancels the work, and a UI that scrolls and blinks like the apps you use every day. Here's the full `page.tsx`, in case a piece drifted while you built it up:
 
-```tsx filename="frontend/app/page.tsx" collapsed
+```tsx filename="frontend/app/page.tsx" collapsed repo="part-05-streaming/frontend/app/page.tsx"
 "use client";
 
 import { useState, useRef, useEffect, type FormEvent } from "react";
@@ -578,7 +578,7 @@ git commit -m "part 5: stream tokens over SSE with a Stop button"
 
 Your bot answers fast now, but it only knows what the model already carries in its head. Ask it for today's news or to multiply two big numbers exactly, and it will cheerfully make something up. In [Part 6](/blog/langgraph-6-tools#what-tool-calling-actually-is) you'll hand it tools, real functions it can call mid-answer, and they'll ride the exact belt you just built.
 
-{/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-5-streaming) in the intro once it exists. */}
+The complete, tested code for this part lives in [`part-05-streaming`](https://github.com/yadneshSalvi/langgraph-from-scratch/tree/main/part-05-streaming) in the [companion repo](https://github.com/yadneshSalvi/langgraph-from-scratch). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.
 
 {/* TODO once the Concepts page (langgraph-concepts.mdx) ships: link "SSE", "ReadableStream", and "AbortController" to /blog/langgraph-concepts#sse, #readable-stream, and #abort-controller instead of defining only inline. */}
 

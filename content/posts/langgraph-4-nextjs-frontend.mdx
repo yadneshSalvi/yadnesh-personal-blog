@@ -90,7 +90,7 @@ Start the dev server again (`npm run dev`) and let's write some React.
 
 A chat is a list of messages, and each message has two facts: who said it, and what they said. Before you can store a conversation, you have to describe its shape, the same instinct as [Part 2's Pydantic models](/blog/langgraph-2-fastapi-basics#the-kitchen-gets-an-order-form), just in TypeScript this time. Type this into your empty `app/page.tsx`:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="8-11,15-17"
 import { useState } from "react";
 
 interface Message {
@@ -124,7 +124,7 @@ Save the file, and the dev server falls over instead of reloading clean:
 
 Read it like [Part 2 taught you](/blog/langgraph-2-fastapi-basics#now-break-it-on-purpose), except this one is friendly enough to read top-down: `useState` only works in a Client Component. Here's the idea behind that sentence. Next.js renders most components on the *server*, ahead of time, where there's no browser, no clicks, and no state that changes. A component that holds state and responds to typing has to run in the *browser* instead. Next.js won't guess which kind you meant; you have to say so, with one line at the very top of the file:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="1"
 "use client";
 
 import { useState } from "react";
@@ -140,7 +140,7 @@ The rule of thumb: add it the moment a component needs to *react* to something i
 
 Right now the page renders the words "chat goes here". Time to render the actual conversation. First, bring in the shadcn pieces by adding to your imports:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="4-6"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -148,7 +148,7 @@ import { Card } from "@/components/ui/card";
 
 Now replace that placeholder `return` with a real layout: a card holding a header, a scrolling list of message bubbles, nothing else yet.
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="47-60,62,79-81"
 return (
   <main className="mx-auto flex h-dvh max-w-2xl flex-col p-4">
     <Card className="flex flex-1 flex-col overflow-hidden">
@@ -209,13 +209,13 @@ function sendMessage(e: FormEvent) {
 
 That handler uses a `FormEvent` type, so widen your React import to bring it in:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="3"
 import { useState, type FormEvent } from "react";
 ```
 
 Now the form itself. Add it inside the `Card`, right after the messages `<div>`:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="68-72,74,76-78"
 <form onSubmit={sendMessage} className="flex gap-2 border-t p-4">
   <Input
     value={input}
@@ -245,7 +245,7 @@ Flat cartoon comic, bold black outlines, flat colors, warm off-white paper backg
 
 Here's the cable. Your `sendMessage` currently adds the user's bubble and stops. It needs to take the next step: send that text to the backend, wait for the reply, and add the answer as a second bubble. Replace `sendMessage` with this:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="21-45"
 async function sendMessage(e: FormEvent) {
   e.preventDefault();
   const text = input.trim();
@@ -277,13 +277,13 @@ Look past the new `loading` and `error` lines for a second (they get their own s
 
 Two small things hold this together. First, `API_BASE`. Add it near the top of the file, just under the imports:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="13"
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 ```
 
 That reads the backend URL you saved in `frontend/.env.local` back in [Part 1](/blog/langgraph-1-setup#tell-your-code-about-the-key). You also need the two new state variables the handler uses; widen your state block:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="18-19"
 const [loading, setLoading] = useState(false);
 const [error, setError] = useState<string | null>(null);
 ```
@@ -315,13 +315,13 @@ Two rough edges remain, and you already wrote half the fix. While the model thin
 
 First, a thinking indicator. Inside the messages `<div>`, right after the `.map(...)`, add:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="61"
 {loading && <p className="text-muted-foreground">Thinking...</p>}
 ```
 
 Then an error banner and a disabled input while a request is in flight. Put the banner just above the `<form>`, and add `disabled={loading}` to both the `Input` and the `Button`:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="63-67"
 {error && (
   <p className="mx-5 mb-2 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">
     {error}
@@ -357,7 +357,7 @@ Right now you have: a chat UI in the browser that takes a message, posts it to y
 
 Here's the whole file, in case a piece drifted out of place while you built it up:
 
-```tsx filename="frontend/app/page.tsx" collapsed
+```tsx filename="frontend/app/page.tsx" collapsed repo="part-04-nextjs-frontend/frontend/app/page.tsx"
 "use client";
 
 import { useState, type FormEvent } from "react";
@@ -522,7 +522,7 @@ git commit -m "part 4: a real chat UI wired to the backend over fetch"
 
 There's still a pause in the middle of every conversation, the few seconds where the UI just says "Thinking..." and waits for the whole reply to land at once. Real chat apps don't make you wait like that; the words appear as the model writes them. In [Part 5](/blog/langgraph-5-streaming#why-three-seconds-feels-like-forever) you'll replace that pause with text streaming in one token at a time.
 
-{/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-4-nextjs-frontend) in the intro once it exists. */}
+The complete, tested code for this part lives in [`part-04-nextjs-frontend`](https://github.com/yadneshSalvi/langgraph-from-scratch/tree/main/part-04-nextjs-frontend) in the [companion repo](https://github.com/yadneshSalvi/langgraph-from-scratch). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.
 
 {/* TODO once the Concepts page (langgraph-concepts.mdx) ships: link "use client", "fetch API", and "JSX" to /blog/langgraph-concepts#use-client, #fetch-api, and #jsx instead of defining only inline. */}
 

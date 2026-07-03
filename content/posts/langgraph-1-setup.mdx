@@ -48,9 +48,9 @@ This series was written against pinned versions. If something behaves differentl
 | Next.js | 16.2.9 |
 | FastAPI | 0.136.3 |
 | Uvicorn | 0.49.0 |
-| LangGraph | 1.2.4 |
+| LangGraph | 1.2.5 |
 | LangChain | 1.3.9 |
-| langchain-openai / langchain-anthropic | 1.3.0 / 1.4.6 |
+| langchain-openai / langchain-anthropic | 1.3.2 / 1.4.6 |
 
 Already have Python and Node installed? Verify the versions, then skim ahead to the "One folder, two halves" section.
 
@@ -152,7 +152,7 @@ While that downloads, the traditional first-time question: *why a whole framewor
 
 Now the code. Create a new file named `main.py` inside `backend/`, right next to the `.venv` folder, in whatever editor you like (VS Code, Cursor, even Notepad). Paste in these eight lines and save:
 
-```python filename="backend/main.py"
+```python filename="backend/main.py" repo="part-01-setup/backend/main.py" lines="1-8"
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -460,6 +460,6 @@ And one more thing that's harder to see: you now know your environment works. Wh
 
 Right now your backend can say exactly one thing, to anyone, forever: `{"status": "ok"}`. In [Part 2](/blog/langgraph-2-fastapi-basics#teach-it-to-listen) you'll teach it to actually listen: request bodies, validation, and the interactive docs page FastAPI has been quietly building for you this whole time.
 
-{/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-1-setup) in the intro once it exists. */}
+Every part of this series has a companion folder in the [`langgraph-from-scratch` repo](https://github.com/yadneshSalvi/langgraph-from-scratch): the complete, tested project exactly as it exists at the end of that part. This part's folder is [`part-01-setup`](https://github.com/yadneshSalvi/langgraph-from-scratch/tree/main/part-01-setup). And whenever a code block above shows a GitHub icon in its header, that icon links straight to the exact file, and "View full file" shows the whole file in place with this section's lines highlighted.
 
 {/* ANECDOTE slot (optional upgrade, WRITING-STYLE §6): a real first-person story from Yadnesh about an environment/setup disaster (a global pip install or Python version clash that ate an evening, for example), 3 beats, 5 sentences max. If provided, it replaces the "haunted laptop" paragraph after the virtual-environment callout. */}

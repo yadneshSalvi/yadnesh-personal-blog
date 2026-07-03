@@ -1,0 +1,16 @@
+app = "langgraph-chatbot"
+primary_region = "iad"
+
+[build]
+
+[http_service]
+  internal_port = 8080        # must match uvicorn's --port in the Dockerfile
+  force_https = true
+  auto_stop_machines = "off"  # keep the one machine awake; memory lives in it
+  auto_start_machines = true
+  min_machines_running = 1    # never scale to zero
+
+[[vm]]
+  memory = "512mb"            # 256mb is too small once the model clients load
+  cpu_kind = "shared"
+  cpus = 1

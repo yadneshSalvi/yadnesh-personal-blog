@@ -52,7 +52,7 @@ Right now your backend runs because *your* machine happens to have the right Pyt
 
 First, pin your dependencies so the server installs the same versions you tested with. From inside `backend/`, with your virtual environment active, you could run `pip freeze`, but a hand-written list is cleaner for a tutorial. Create `requirements.txt`:
 
-```text filename="backend/requirements.txt"
+```text filename="backend/requirements.txt" repo="part-08-deploy/backend/requirements.txt"
 fastapi==0.136.3
 uvicorn[standard]==0.49.0
 langgraph==1.2.5
@@ -65,7 +65,7 @@ python-dotenv==1.0.1
 
 Next, a [`Dockerfile`](https://docs.docker.com/reference/dockerfile/): a recipe a server follows to build a tiny Linux box with your app inside. It starts from a slim Python image, installs the requirements, copies your code, and runs uvicorn on port 8080.
 
-```dockerfile filename="backend/Dockerfile"
+```dockerfile filename="backend/Dockerfile" repo="part-08-deploy/backend/Dockerfile"
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -83,7 +83,7 @@ Copying `requirements.txt` and installing *before* copying the rest of your code
 
 One more file, and it matters more than it looks. A [`.dockerignore`](https://docs.docker.com/build/concepts/context/#dockerignore-files) keeps junk out of the image, including the two things that must never go in: your fat `.venv` folder and your `.env` full of secrets.
 
-```text filename="backend/.dockerignore"
+```text filename="backend/.dockerignore" repo="part-08-deploy/backend/.dockerignore"
 .venv
 __pycache__
 *.pyc
@@ -96,7 +96,7 @@ That `.env` line is not housekeeping; it's a lock on the door. If your API keys 
 
 Last, the one code change. Back in [Part 2](/blog/langgraph-2-fastapi-basics#one-locked-door-between-you-and-part-4) you told the backend to welcome `http://localhost:3000`, and the text promised that in Part 8 "the origin list gets pinned to your real frontend URL." Here's that promise. Instead of hard-coding the URL, read it from an environment variable so the same code runs locally and in production. Update the CORS block in `main.py`:
 
-```python filename="backend/app/main.py"
+```python filename="backend/app/main.py" repo="part-08-deploy/backend/app/main.py" lines="1,10-17"
 import os  # at the top with the other imports
 
 FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "http://localhost:3000")
@@ -121,7 +121,7 @@ fly launch --no-deploy
 
 [`fly launch`](https://fly.io/docs/launch/) notices your `Dockerfile` and uses it, asks you to name the app and pick a region, and offers to set up a database (say no, you don't need one). It writes a [`fly.toml`](https://fly.io/docs/reference/configuration/), the config file for your app. Open it and make sure of three things, two of which are the difference between memory that works and memory that doesn't:
 
-```toml filename="backend/fly.toml"
+```toml filename="backend/fly.toml" repo="part-08-deploy/backend/fly.toml"
 app = "langgraph-chatbot"
 primary_region = "iad"
 
@@ -382,7 +382,7 @@ git commit -m "part 8: deploy the frontend to Vercel and the backend to Fly"
 
 Your bot is on the internet now, the same as any app you admire, served from two clouds to whoever you send the link. Eight parts ago it was an empty folder and a little fear of the word "agents." The next thing this bot learns, you're the one who gets to teach it.
 
-{/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-8-deploy) in the intro once it exists. */}
+The complete, tested code for this part lives in [`part-08-deploy`](https://github.com/yadneshSalvi/langgraph-from-scratch/tree/main/part-08-deploy) in the [companion repo](https://github.com/yadneshSalvi/langgraph-from-scratch). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.
 
 {/* TODO once the Concepts page (langgraph-concepts.mdx) ships: link "Docker", "CORS", "build-time vs runtime env vars", and "checkpointer" to /blog/langgraph-concepts#... instead of defining only inline. New anchor this part needs: #build-time-vs-runtime-env-vars. */}
 

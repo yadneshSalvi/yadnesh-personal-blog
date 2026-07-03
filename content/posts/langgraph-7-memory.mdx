@@ -74,7 +74,7 @@ A **thread** is one continuous conversation: all the back-and-forth that should 
 
 The thing that reads and writes those notebooks is a **checkpointer**. LangGraph ships one that keeps everything in your computer's memory, [`InMemorySaver`](https://reference.langchain.com/python/langgraph/checkpoints), and wiring it in is genuinely one line of import and one line of use. Open `graph.py` and find the spot at the bottom where you compile the graph. Right now it reads `graph = builder.compile()`. Give it a checkpointer:
 
-```python filename="backend/app/graph.py"
+```python filename="backend/app/graph.py" repo="part-07-memory/backend/app/graph.py" lines="32,41-42"
 from langgraph.checkpoint.memory import InMemorySaver
 
 checkpointer = InMemorySaver()
@@ -105,7 +105,7 @@ Save `graph.py`, restart the server, and send a message from the UI. Instead of 
 
 Two small changes wire the thread through. First, the request needs to carry a `thread_id`, so add it to your `ChatRequest` model in `main.py`:
 
-```python filename="backend/app/main.py"
+```python filename="backend/app/main.py" repo="part-07-memory/backend/app/main.py" lines="17-19"
 class ChatRequest(BaseModel):
     message: str
     thread_id: str
@@ -113,7 +113,7 @@ class ChatRequest(BaseModel):
 
 Second, `token_stream` has to pass that id into the graph as config. LangGraph reads the thread from a nested dict under the `configurable` key, and that dict goes in as the second argument to `astream_events`. Update the generator and the endpoint that calls it:
 
-```python filename="backend/app/main.py"
+```python filename="backend/app/main.py" repo="part-07-memory/backend/app/main.py" lines="39-42,61,64-69"
 async def token_stream(message: str, thread_id: str):
     inputs = {"messages": [HumanMessage(content=message)]}
     config = {"configurable": {"thread_id": thread_id}}
@@ -151,7 +151,7 @@ The backend is ready to remember, but the frontend isn't sending a `thread_id` y
 
 Add a piece of state for the current thread and an effect that sets it up once:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-07-memory/frontend/app/page.tsx" lines="40,44-50,52"
 const [threadId, setThreadId] = useState("");
 
 useEffect(() => {
@@ -166,7 +166,7 @@ useEffect(() => {
 
 On the first visit there's nothing stored, so [`crypto.randomUUID()`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/randomUUID) mints a fresh id like `a1b2c3d4-...` and saves it. On every visit after, the stored id comes straight back, so the same browser keeps talking to the same notebook. Now send it: add `thread_id` to the body of your `fetch`:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-07-memory/frontend/app/page.tsx" lines="134"
 body: JSON.stringify({ message: text, thread_id: threadId }),
 ```
 
@@ -189,7 +189,7 @@ Save both files, send your name, then ask for it back. The bot remembers. Same s
 
 One thread is a great start, but you'll want to begin a clean conversation without the old one bleeding in. That's a "New chat" button, and it's three lines of logic: mint a new id, point `localStorage` at it, and clear the messages on screen.
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-07-memory/frontend/app/page.tsx" lines="88-94"
 function newChat() {
   const id = crypto.randomUUID();
   localStorage.setItem("thread_id", id);
@@ -200,7 +200,7 @@ function newChat() {
 
 The old conversation isn't deleted; its notebook still sits in the checkpointer under its old id. You've just opened a brand-new blank one and pointed the UI at it. Drop a button in your card header next to the title:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-07-memory/frontend/app/page.tsx" lines="172-173"
 <div className="flex items-center justify-between border-b px-5 py-4">
   <span className="font-semibold">Chatbot</span>
   <Button variant="outline" size="sm" onClick={newChat}>
@@ -221,7 +221,7 @@ Here's the honest scope before you start, because this is the one section in the
 
 The checkpointer already holds every conversation. You need a way to ask it for one. LangGraph exposes the saved state through `get_state`, and there's an async version, `aget_state`, that fits a `async def` endpoint cleanly. Add this to `main.py`:
 
-```python filename="backend/app/main.py"
+```python filename="backend/app/main.py" repo="part-07-memory/backend/app/main.py" lines="72-74,77-86"
 class StoredMessage(BaseModel):
     role: str
     content: str
@@ -259,7 +259,7 @@ Prove it works before touching the UI. Open a Python shell in your backend and r
 
 Back in `page.tsx`. The frontend needs to remember which threads exist and let you click between them. Keep a small list of `{ id, title }` objects in state and in `localStorage`, alongside the active thread id:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-07-memory/frontend/app/page.tsx" lines="12,41,44,51-52"
 type Thread = { id: string; title: string };
 const [threads, setThreads] = useState<Thread[]>([]);
 
@@ -270,7 +270,7 @@ useEffect(() => {
 
 When a brand-new thread sends its first message, record it with that message as its title. Add this at the top of `sendMessage`, right where you append the user's message:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-07-memory/frontend/app/page.tsx" lines="115-119"
 if (messages.length === 0) {
   const entry = { id: threadId, title: text };
   const updated = [entry, ...threads];
@@ -281,7 +281,7 @@ if (messages.length === 0) {
 
 To reopen a thread, point at its id and pull its messages from the new endpoint. Two small functions handle it:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-07-memory/frontend/app/page.tsx" lines="96-105"
 async function loadThread(id: string) {
   const res = await fetch(`${API_BASE}/threads/${id}/messages`);
   if (res.ok) setMessages(await res.json());
@@ -296,7 +296,7 @@ function switchThread(id: string) {
 
 `loadThread` asks the backend for a thread's history and drops it into `messages`; the `{role, content}` objects it returns already match your assistant and user bubbles, so they render with no extra work. `switchThread` makes that thread the active one so your next message continues it. Finally, render the list as a sidebar and let the whole layout sit side by side:
 
-```tsx filename="frontend/app/page.tsx"
+```tsx filename="frontend/app/page.tsx" repo="part-07-memory/frontend/app/page.tsx" lines="170-187"
 <aside className="w-56 shrink-0 border-r p-3">
   <Button variant="outline" size="sm" className="w-full" onClick={newChat}>
     + New chat
@@ -338,7 +338,7 @@ The fix is to swap the saver for one that writes to durable storage. LangGraph s
 
 Here's the full `frontend/app/page.tsx` after this part, sidebar and all, in case a piece drifted while you wired it up:
 
-```tsx filename="frontend/app/page.tsx" collapsed
+```tsx filename="frontend/app/page.tsx" collapsed repo="part-07-memory/frontend/app/page.tsx"
 "use client";
 
 import { useState, useRef, useEffect, type FormEvent } from "react";
@@ -655,7 +655,7 @@ git commit -m "part 7: give the bot conversation memory with a checkpointer and 
 
 Your bot remembers you now, runs tools, and streams its answers, the whole thing humming on your laptop. There's one wall left: it only exists on your machine. In [Part 8](/blog/langgraph-8-deploy#it-answers-from-anywhere-now) you'll put it on the public internet, share the link, and [watch it forget everyone the first time you redeploy](/blog/langgraph-8-deploy#watch-it-forget-you), which turns out to be the perfect reason to care about everything this part taught you.
 
-{/* TODO before publishing: link the companion repo (yadneshsalvi/langgraph-tutorial, branch part-7-memory) in the intro once it exists. */}
+The complete, tested code for this part lives in [`part-07-memory`](https://github.com/yadneshSalvi/langgraph-from-scratch/tree/main/part-07-memory) in the [companion repo](https://github.com/yadneshSalvi/langgraph-from-scratch). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.
 
 {/* TODO once the Concepts page (langgraph-concepts.mdx) ships: link "checkpointer", "threads", and "localStorage" to /blog/langgraph-concepts#checkpointers, #threads (or #react-pattern neighborhood), and #local-storage instead of defining only inline. */}
 
