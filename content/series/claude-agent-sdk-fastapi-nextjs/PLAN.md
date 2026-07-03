@@ -292,8 +292,11 @@ is the agent loop they didn't write, and we get there fast.
   happened: no model wiring, no message list.
 - *Give it a workspace* — `workspace/` with the **Beanline** sample dataset (§5.1: `stores.csv`,
   `products.csv`, `sales.csv`; deterministic generator script in the companion repo).
-- *ClaudeAgentOptions* — `cwd="workspace"`, `allowed_tools=["Read","Glob","Grep","Bash","Write"]`,
-  `permission_mode="bypassPermissions"`, `model=MODEL`.
+- *ClaudeAgentOptions* — `cwd="workspace"`, `tools=["Read","Glob","Grep","Bash","Write"]`,
+  `permission_mode="bypassPermissions"`, `model=MODEL`. *(Revised 2026-07-03 during Part 1
+  writing: `tools=` — which controls tool existence, shrinking the prompt — is the right
+  Act I teaching; `allowed_tools=` controls auto-approval and is introduced in Part 7 where
+  permissions are taught. Parts 2–6 code uses `tools=` accordingly.)*
 - *Break it on purpose (the permission wall)* — run first **without** `permission_mode`, read
   the refusal. Permission-modes tour (`#permission-modes`), then the honest scary callout:
   `bypassPermissions` means *the agent can run any shell command you can*. Sandbox-cwd

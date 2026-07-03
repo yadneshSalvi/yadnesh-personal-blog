@@ -199,6 +199,17 @@ Before I explain `bypassPermissions`, watch what happens without it. I deleted t
 
 Read that ending again, because it's the most important sentence in Part 1: **denied every path to actually compute, the agent eventually "calculated manually" and produced wrong numbers with full confidence.** $59,278.80 is not Downtown's March revenue. Nothing crashed. No error was raised. A polite, plausible, wrong answer, delivered after burning 62 turns and 37 cents trying everything else first.
 
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 4-panel comic strip, panels in a single row separated by thin vertical black dividers, about an AI analyst that is denied every tool and then guesses. The same cute anthropomorphic laptop character in all panels: an open laptop with little arms and legs, simple face on its screen, tiny formal necktie. Panel 1: the laptop-analyst reaches eagerly for a toolbox labeled "TOOLS" that is wrapped in a chain with a padlock; a large red rubber stamp mark reading "DENIED" is stamped across the scene. Panel 2: the laptop-analyst hopefully holds up a tiny pencil stub; another big red "DENIED" stamp; behind it the wall is covered in many small red DENIED slips. The laptop looks increasingly desperate. Panel 3: the laptop-analyst stands confidently, eyes closed, chest puffed out, one finger raised, speech bubble: "IT'S $59,278.80. I COUNTED IN MY HEAD." Panel 4: Yad does a spit-take with his coffee, eyes bulging in horror, while holding a printed sheet that clearly reads "$51,319.60". Clean readable hand-lettered speech bubbles and stamp text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-1/comic-denied.png"
+  alt="Comic in four panels. Panel one: a laptop wearing a tiny necktie reaches happily for a toolbox labeled TOOLS that is wrapped in chains and padlocked, while a giant red DENIED stamp lands across the scene. Panel two: the laptop, now desperate, holds up a tiny pencil while a wall of red DENIED slips piles up behind another big DENIED stamp. Panel three: the laptop, serene and confident, raises one finger and announces 'IT'S $59,278.80. I COUNTED IN MY HEAD.' Panel four: Yad, a bearded developer with headphones, spit-takes his coffee while holding the real printout, which reads $51,319.60."
+  caption="The wall run, in four panels. Deny an agent every tool and it does not stop; it guesses, beautifully formatted."
+  width={1536}
+  height={1024}
+/>
+
 Here's what was happening. Every tool call passes a permission check, and [`permission_mode`](/blog/agent-sdk-concepts#permission-modes) sets the posture. The default posture is interactive: harmless reads pass, and anything with side effects or arbitrary execution waits for a human to approve it. Claude Code has a human at the keyboard for exactly that. Our script has nobody wired up to answer, so every request for approval is refused, and the agent works around, and around, and around.
 
 `bypassPermissions` removes the checkpoint entirely: every tool call is allowed, no questions asked. Which makes this the right moment for the series' recurring warning:
