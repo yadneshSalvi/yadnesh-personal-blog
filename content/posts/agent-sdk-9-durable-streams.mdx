@@ -1,0 +1,558 @@
+---
+title: "Claude Agent SDK in Production, Part 9: Durable Streams: Survive the Refresh"
+subtitle: "POST /chat becomes a claim ticket, a background worker cooks on, and a SQLite flight recorder makes every stream replayable. Refresh mid-run, keep your approval cards, and meet a Stop button that finally stops."
+image: "/images/series/agent-sdk/part-9/cover-light.svg"
+imageDark: "/images/series/agent-sdk/part-9/cover-dark.svg"
+createdAt: "2026-07-11T00:00:00.000Z"
+updatedAt: "2026-07-11T00:00:00.000Z"
+tags: ["claude-agent-sdk", "sse", "sqlite", "tutorial"]
+series: "claude-agent-sdk-fastapi-nextjs"
+seriesPart: 9
+---
+
+I did the homework Part 8 assigned. Started a real analysis, watched two badges light up, and hit refresh at the nine-second mark. Blank page. New empty desk, cheerful sample chips, as if nothing had ever happened. The server logs tell the other half: the agent kept working, the audit log kept recording, the answer arrived complete at second twenty-six, and the server wrote it to a socket nobody held anymore. The work was perfect. The delivery address had ceased to exist. Root cause, named plainly: **the agent's lifetime is chained to one HTTP response**, and it has been since Part 2, because `POST /chat` returns the stream, so whoever holds that response IS the audience, and when their tab dies the pipe dies with it. Today we break that chain. By the end of this page a refresh costs you 130 milliseconds of blank screen and nothing else: not the transcript, not the live tail, not even a pending approval card.
+
+<Figure
+  src="/images/series/agent-sdk/part-9/browser-hero-light.svg"
+  srcDark="/images/series/agent-sdk/part-9/browser-hero-dark.svg"
+  alt="The Beanline Analyst after a completed chart request. The transcript shows schema and query badges with green checks, an approved Bash badge that ran matplotlib, an approved Write badge for report.md, and a bold reply naming Riverside and Old Town as the strongest growers. The artifacts panel lists q1_vs_q2_revenue.png and report.md and previews the bar chart. The receipt reads 4.05 cents and 26 seconds."
+  caption="The end of this part, from a real run: every green chip in this transcript was approved in a DIFFERENT page load than the one that asked the question. The card was pending, I refreshed, the card came back, the click still worked. $0.0405, 26 seconds."
+  width={1120}
+  height={894}
+/>
+
+That screenshot looks like Part 7. That's the point. Nothing about the product changed; what changed is that the conversation you're looking at was torn down and rebuilt from disk halfway through, and neither the agent nor the approval machinery noticed. This is the deepest architecture lesson in the series, it's how the production reference app streams, and it pays three debts at once: Part 3's Stop button that only hung up the phone, Part 5's apology that a turn in flight still dies with the tab, and Part 7's confession that approval events lived only on the wire. All three, on camera, today.
+
+## The autopsy: one pipe, one audience
+
+Look at what `/chat` has returned since [Part 2 designed the envelope](/blog/agent-sdk-2-fastapi-streaming#designing-the-envelope): a `StreamingResponse`. The agent runs *inside* that response's generator. Close the response and FastAPI cancels the generator, the cleanup tears down the client, and everything downstream of your question stops mattering. A refresh is nothing but the rudest way to close a response.
+
+The fix is a separation you've seen in every restaurant: [the kitchen keeps cooking even if the waiter changes shifts](/blog/agent-sdk-concepts#event-source). Running the agent becomes a background job that talks to nobody in particular; watching the agent becomes a cheap, disposable subscription anyone can open, drop, and reopen. Between the two sits the part that makes it durable: a log. Every event the agent produces gets written down before anyone gets to see it, so "catching up" and "watching live" become the same operation with different starting points. The flight recorder doesn't care who's in the cockpit.
+
+{/* [ANECDOTE slot (WRITING-STYLE §6): a true first-person story from Yadnesh about losing a long-running job's output to a dead connection (SSH drop, laptop lid, a closed CI tab) and what it cost, 3 beats, 5 sentences. Lands here. */}
+
+## The claim ticket
+
+Here's the whole decoupling, visible in one endpoint. `POST /chat` stops streaming:
+
+```python filename="backend/app/main.py" repo="part-09-durable-streams/backend/app/main.py" lines="154-166"
+@app.post("/chat")
+async def chat(request: ChatRequest) -> dict:
+    """Start a run. Note what this does NOT return: a stream. The agent's
+    lifetime now belongs to the worker; this response is a claim ticket."""
+    workspace_id = request.workspace_id or create_workspace()
+    workspace = workspace_path(workspace_id)
+    request_id = uuid.uuid4().hex
+    start_request(request_id, workspace, workspace_id, request.session_id, request.message)
+    return {
+        "request_id": request_id,
+        "workspace_id": workspace_id,
+        "stream_url": f"/stream/{request_id}",
+    }
+```
+
+It returns in milliseconds, and it returns a **claim ticket**: a `request_id` and the address where this run's events will be available, forever, to anyone who asks. The `session_id` flow from Part 5 is untouched; the ticket is about one *turn*, not the conversation. Hold onto the shape of this response, because the whole frontend rewrite later amounts to "keep the ticket somewhere a refresh can't reach."
+
+## The worker owns the run
+
+`start_request` lives in a new file, `app/runner.py`, and the first thing in it is a dictionary with a secret second job:
+
+```python filename="backend/app/runner.py" repo="part-09-durable-streams/backend/app/runner.py" lines="63-76"
+@dataclass
+class RunningRequest:
+    """One live run: the task doing the work, the client that can
+    interrupt it, and the bridge holding its unanswered cards."""
+    task: asyncio.Task
+    client: ClaudeSDKClient
+    bridge: ApprovalBridge
+
+
+# Every run currently in flight. This dict is ALSO doing invisible,
+# load-bearing work: asyncio holds only weak references to tasks, so a
+# create_task() result nobody stores can be garbage-collected mid-run.
+# Keeping the task here is what keeps it alive.
+RUNNING: dict[str, RunningRequest] = {}
+```
+
+Read that comment twice, because it's the classic `asyncio.create_task` trap and it fails in the cruelest way. The event loop does **not** keep your tasks alive; it holds weak references, and a task nobody stores can be garbage-collected mid-run, silently, sometimes, depending on memory pressure: a background agent that works in every test and occasionally evaporates in production. We need `RUNNING` anyway (the cancel endpoint has to find the client), so the reference-keeping comes free, but if you ever fire-and-forget a task elsewhere, store it on purpose.
+
+Now the spawn itself. Two nested functions: a sink and a worker:
+
+```python filename="backend/app/runner.py" repo="part-09-durable-streams/backend/app/runner.py" lines="79-100"
+def start_request(
+    request_id: str,
+    workspace: Path,
+    workspace_id: str,
+    session_id: str | None,
+    message: str,
+) -> None:
+    """Spawn the worker for one run and return immediately."""
+    seq = 0
+
+    async def emit(event: dict) -> None:
+        """The single sink for this run. Log first (the truth), then
+        broadcast (the courtesy). Every event gets the next seq."""
+        nonlocal seq
+        seq += 1
+        await eventlog.append(request_id, seq, event)
+        hub.publish(request_id, seq, event)
+
+    bridge = ApprovalBridge(workspace_id, emit)
+    client = ClaudeSDKClient(
+        options=build_options(workspace, session_id, bridge.gate)
+    )
+```
+
+`emit` is the only door out of this run, and it does two things in a fixed order: write the event to the log with the next sequence number, then hand a copy to whoever is currently listening. Log first. The log is the truth; the broadcast is a courtesy. Notice who else got handed `emit`: the approval bridge from Part 7, which used to drop its cards into a per-response queue. From this line on, **approval events are logged like everything else**, and that one change is what closes [Part 7's honesty note](/blog/agent-sdk-7-approvals#the-card) about cards living only on the wire. We'll collect that payoff properly in a few sections.
+
+The worker is the same pipeline you've been growing since Part 2, wearing a new coat:
+
+```python filename="backend/app/runner.py" repo="part-09-durable-streams/backend/app/runner.py" lines="102-124"
+    async def run() -> None:
+        try:
+            await client.connect()
+            await client.query(message)
+            stream = with_artifacts(translate(client.receive_response()), workspace)
+            async for event in stream:
+                if event["type"] == "session_start":
+                    event = {**event, "workspace_id": workspace_id}
+                await emit(event)
+        except Exception as exc:  # noqa: BLE001 - failures become logged events
+            await emit({"type": "error", "message": str(exc)})
+        finally:
+            bridge.deny_all()  # a card nobody can answer anymore is a deny
+            try:
+                await client.disconnect()
+            finally:
+                hub.close_request(request_id)
+                RUNNING.pop(request_id, None)
+
+    hub.open_request(request_id)
+    RUNNING[request_id] = RunningRequest(
+        task=asyncio.create_task(run()), client=client, bridge=bridge
+    )
+```
+
+`connect`, `query`, `receive_response`, the translator, the artifact watcher: all unchanged since Parts 2 through 7. What changed is the audience. Nobody holds a pipe to this function. It cooks whether anyone watches or not, and one behavior quietly flipped because of that: in Part 8, a browser hanging up denied every pending approval card, because the response's teardown was the only cleanup we had. Now a dead browser means *nothing*. The run continues, the cards keep waiting (Part 7's [120-second timeout](/blog/agent-sdk-7-approvals#timeouts-hangups-and-the-leak-i-shipped-for-an-hour) is still the backstop), and `deny_all` fires only when the run itself ends or gets cancelled. Disconnection stopped being an opinion about your intentions.
+
+Checkpoint: `POST /chat` answers instantly with a ticket, and a worker runs the agent with no audience required. Right now every event vanishes into `emit`. Time to build the two places it goes.
+
+## The flight recorder
+
+SQLite finally enters the series, and it enters on a leash: one table, one hand-written migration, no ORM.
+
+```python filename="backend/app/eventlog.py" repo="part-09-durable-streams/backend/app/eventlog.py" lines="17-29"
+# The one migration, by hand. seq restarts at 1 for every request, so
+# (request_id, seq) is the natural primary key, and "replay from where I
+# left off" is a WHERE clause.
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS events (
+    request_id TEXT NOT NULL,
+    seq        INTEGER NOT NULL,
+    type       TEXT NOT NULL,
+    payload    TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    PRIMARY KEY (request_id, seq)
+);
+"""
+```
+
+The payload column stores the exact JSON dict the translator produced, envelope and all. We're not modeling the events, we're *recording* them; the type column exists only so you can grep the log without parsing JSON. The whole API is two functions:
+
+```python filename="backend/app/eventlog.py" repo="part-09-durable-streams/backend/app/eventlog.py" lines="46-63"
+async def append(request_id: str, seq: int, event: dict) -> None:
+    """One event, one row. Committed before anyone gets to see it: the
+    log is the source of truth, the broadcast is a courtesy copy."""
+    await _db.execute(
+        "INSERT INTO events (request_id, seq, type, payload) VALUES (?, ?, ?, ?)",
+        (request_id, seq, event["type"], json.dumps(event)),
+    )
+    await _db.commit()
+
+
+async def replay(request_id: str, after_seq: int = 0) -> list[tuple[int, dict]]:
+    """Everything this run has said after a given point, in order."""
+    cursor = await _db.execute(
+        "SELECT seq, payload FROM events WHERE request_id = ? AND seq > ? ORDER BY seq",
+        (request_id, after_seq),
+    )
+    rows = await cursor.fetchall()
+    return [(seq, json.loads(payload)) for seq, payload in rows]
+```
+
+`aiosqlite` keeps the writes off the event loop's back, a `lifespan` hook in `main.py` opens the connection at boot, and that's the entire database story. `WHERE seq > after_seq` is the sentence that makes streams resumable; everything else in this part is delivery.
+
+<Callout type="info" title="SQLite is the event log, not the sessions database">
+Part 5's rule stands: conversation memory stays SDK-native, in the session JSONL the SDK has kept since Part 1. This table stores something the SDK does not: OUR wire events, in OUR envelope, with sequence numbers, per request. Two different jobs, two different stores, and no ORM ceremony for a single INSERT and a single SELECT.
+</Callout>
+
+## The hub carries the present
+
+The log remembers the past. For the present, a subscriber needs the events that arrive *while they're watching*, and that's a broadcast hub: the second new file, `app/hub.py`, and it's barely a file at all. A dict of queues per `request_id`, `publish` fans an event out to every queue, `subscribe` adds a queue, `close_request` wakes everyone with a `None` so they know to hang up. It holds nothing durable and remembers nothing; if the hub ever loses an event, the log already has it.
+
+```python filename="backend/app/hub.py" repo="part-09-durable-streams/backend/app/hub.py" lines="36-55"
+def publish(request_id: str, seq: int, event: dict) -> None:
+    """Hand one event to every current subscriber. Fire and forget: the
+    log has already committed it, so a subscriber who misses it (or shows
+    up later) recovers by replaying."""
+    for queue in _subscribers.get(request_id, set()):
+        queue.put_nowait((seq, event))
+
+
+def close_request(request_id: str) -> None:
+    """The worker is done: wake every subscriber with the hang-up signal
+    and forget the request. The log is the only thing that outlives this."""
+    _live.discard(request_id)
+    for queue in _subscribers.pop(request_id, set()):
+        queue.put_nowait(None)
+
+
+def subscribe(request_id: str) -> asyncio.Queue:
+    queue: asyncio.Queue = asyncio.Queue()
+    _subscribers.setdefault(request_id, set()).add(queue)
+    return queue
+```
+
+One design question hides in here, the kind that pages you at 2 a.m.: a new subscriber needs the past (from the log) and the present (from the hub). In which order? Replay first and subscribe second, and an event that lands *between* the two is gone for that subscriber, invisibly, forever. So the rule is **subscribe first, replay second**: open your queue before you read the log, and accept that an event might now arrive twice, once from the replay and once from the queue. Duplicates are solvable, because every event carries its `seq`; you drop what you've already seen. A lost event is not solvable. At-least-once plus deduplication beats at-most-once every time someone's watching.
+
+## The dumb pipe
+
+Now the endpoint that replaces streaming-from-`/chat`, and the reason this part uses the word "dumb" with affection. `GET /stream/{request_id}` knows nothing about agents, models, or approvals. It reads a log, drains a queue, and never finds out what any of it meant:
+
+```python filename="backend/app/main.py" repo="part-09-durable-streams/backend/app/main.py" lines="178-195"
+@app.get("/stream/{request_id}")
+async def stream(request_id: str, request: Request) -> StreamingResponse:
+    """The dumb pipe: replay-then-follow. It knows nothing about agents;
+    it reads a log and drains a queue. Open it twice, close it, reopen
+    it mid-run: the worker never notices."""
+    # A reconnecting browser sends the last SSE id it saw; replay resumes
+    # from there instead of repeating the whole run.
+    last_id = request.headers.get("last-event-id", "")
+    after = int(last_id.rsplit(":", 1)[-1]) if ":" in last_id else 0
+
+    async def frames():
+        queue = hub.subscribe(request_id)  # subscribe FIRST, replay second:
+        try:                               # no gap for an event to fall through
+            last = after
+            replayed = await eventlog.replay(request_id, after)
+            for seq, event in replayed:
+                last = seq
+                yield sse(event, event_id=f"{request_id}:{seq}")
+```
+
+Then the follow phase, which is Part 7's keepalive loop pointed at a queue instead of a translator:
+
+```python filename="backend/app/main.py" repo="part-09-durable-streams/backend/app/main.py" lines="204-218"
+            while True:
+                try:
+                    item = await asyncio.wait_for(queue.get(), timeout=10)
+                except asyncio.TimeoutError:
+                    yield ": keepalive\n\n"  # Part 7's trick, same job:
+                    continue                 # fail fast on a dead socket
+                if item is None:
+                    return  # the worker hung up the hub; the log has the rest
+                seq, event = item
+                if seq <= last:
+                    continue  # already replayed; at-least-once, deduped by seq
+                last = seq
+                yield sse(event, event_id=f"{request_id}:{seq}")
+        finally:
+            hub.unsubscribe(request_id, queue)
+```
+
+Two details carry the architecture. First, `seq <= last: continue` is the dedup guard the hub section promised, four characters of insurance on the subscribe-then-replay overlap. Second, every frame now goes out with an **SSE `id:` field**, and this is where an eight-part-old decision pays out. SSE always had a second field we never used: `id:` rides *outside* the JSON payload, at the protocol level, and browsers remember the last one they saw. The [Part 2 vocabulary](/blog/agent-sdk-2-fastapi-streaming#designing-the-envelope) needed **zero changes** to become durable. No event type was added, none was modified; the sequence number lives on the envelope's envelope. Collect the payoff explicitly: we've extended the vocabulary six times in eight parts (artifacts, approvals, and today an `id:` line), and the Part 3 parser, the badges, the cards, the panel: none of them ever changed. That's what "design the envelope before you need it" buys.
+
+One tiny change in `events.py` makes it possible, and it's the whole diff there:
+
+```python filename="backend/app/events.py" repo="part-09-durable-streams/backend/app/events.py" lines="39-44"
+def sse(event: dict, event_id: str | None = None) -> str:
+    """Frame one event dict as a server-sent event. The optional id is
+    SSE's own bookmark field: browsers remember the last one they saw
+    and send it back as Last-Event-ID when they reconnect."""
+    head = f"id: {event_id}\n" if event_id else ""
+    return head + f"data: {json.dumps(event)}\n\n"
+```
+
+And because the pipe is dumb, it's also honest about the one thing it can't survive: a server that died mid-run. If the log holds a story with no ending and no live worker, the pipe replays what exists and appends an apology `error` event, so a rejoining client renders everything up to the crash and knows the rest is gone. The log is on disk; even `kill -9` only costs you the events that were never written.
+
+The whole machine, on one page:
+
+<Figure
+  src="/images/series/agent-sdk/part-9/fig-architecture-light.svg"
+  srcDark="/images/series/agent-sdk/part-9/fig-architecture-dark.svg"
+  alt="Architecture diagram of durable streams. The browser POSTs to /chat and gets back a claim ticket with a request id and stream URL. start_request spawns the worker, an asyncio task holding the ClaudeSDKClient, the translator pipeline, and the approval bridge, kept alive by the RUNNING dict because asyncio holds only weak references to tasks. The worker's emit function appends every event to the SQLite event log first, then publishes to the broadcast hub. The log shows real rows: seq 1 session_start through seq 31 complete. The hub fans out to three subscribers: tab A following live since seq 1 with a receipt of 3.51 cents, tab A reloaded mid-run which replayed seq 1 to 15 in one burst with the question back in 126 milliseconds, and a second tab or curl that joined mid-run. A cancel endpoint looks up RUNNING and calls client.interrupt, with a receipt 39 milliseconds after the click. A serif line reads: the log remembers the past, the hub carries the present, every subscriber does replay, then follow. A scope note says the hub is one process's memory and production swaps it for Redis pub/sub or Postgres LISTEN/NOTIFY: SQLite is the training wheels, the architecture is the lesson."
+  caption="Act II's closing diagram: run the agent once, watch it from anywhere. Solid arrows are the live tail (hub); dashed is the replay (log). Every number on it is from a real run of this exact code."
+  width={1240}
+  height={916}
+/>
+
+And here's the part I find quietly beautiful: the flight recorder sits *right there* on disk, inspectable with tools you already have. A run's whole story, then the same story over the wire, bookmarks and all:
+
+<Figure
+  src="/images/series/agent-sdk/part-9/term-flightrecorder.svg"
+  alt="A dark terminal titled the flight recorder. A sqlite3 query selects seq and type from events for one request id, returning 31 rows: session_start, then alternating tool_use_start and tool_result for seven query rounds, then text deltas, then complete. Below, curl -N against the stream URL replays the same run as SSE frames, each with an id line carrying the request id and sequence number, and a note that it replays to 31 and closes, and running it again gives the same story."
+  caption="The recorded demo's month-by-month run, interrogated twice: sqlite3 reads the log, curl -N replays the stream. Same 31 events, any number of times, $0 per replay."
+  width={1040}
+  height={592}
+/>
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 4-panel comic strip, panels in a single row separated by thin vertical black dividers, about a flight recorder that lets an AI analyst resume mid-sentence after a power cut. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny formal necktie. Panel 1: the laptop-analyst stands at an easel presenting a revenue chart to Yad, who sits with a coffee mug taking notes on a notepad; the analyst's speech bubble reads "AND THE BEST MONTH WAS-". Panel 2: the entire panel is almost fully black, a power cut; only two pairs of startled cartoon eyes glow in the dark, and a small jagged sound effect reads "POP!". Panel 3: lights back on; the laptop-analyst calmly pulls a paper tape out of a small bright orange box on the desk labeled "FLIGHT RECORDER", reading it like a receipt. Panel 4: the analyst, back at the easel, continues its speech bubble exactly "-MAY." while Yad frantically flips through his own messy notepad, his speech bubble reads "WAIT, WHERE WAS I?". Clean readable hand-lettered speech bubbles and labels, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-9/comic-blackout.png"
+  alt="Comic in four panels. Panel one: a laptop analyst with a tiny necktie presents a revenue chart on an easel to Yad, a bearded developer with headphones taking notes, and says: and the best month was. Panel two: total blackout, two pairs of startled eyes in the dark and a POP sound effect. Panel three: lights back on, the analyst calmly reads a paper tape pulled from a bright orange box labeled flight recorder. Panel four: the analyst finishes its sentence exactly where it stopped, saying May, while Yad flips through his own messy notes asking: wait, where was I?"
+  caption="The flight recorder doesn't lose its place. The human with the notepad is another matter."
+  width={1536}
+  height={1024}
+/>
+
+## EventSource, six parts late
+
+Since [Part 3](/blog/agent-sdk-3-agent-ui#reading-the-stream) the frontend has parsed SSE by hand with a fetch-reader, and the honest reason was transport: the stream came from a POST with a JSON body, and the browser's built-in SSE client only speaks GET. That constraint just evaporated. `GET /stream/{request_id}` is exactly the URL shape [`EventSource`](/blog/agent-sdk-concepts#event-source) was born for, so `readSse.ts`, the first file the frontend ever owned, retires with honors. Its replacement brings a superpower we'd otherwise have to build: **automatic reconnection**. When the connection drops, the browser retries on its own, sending the last `id:` it saw as a `Last-Event-ID` header, which the stream endpoint already parses into `after`. The reconnect path was ten lines of server code and *zero* lines of client code.
+
+<Callout type="info" title="fetch-reader vs EventSource, honestly">
+The fetch-reader can POST a body, set headers, and show you every parsing step, which is why the series taught it first and LangGraph Part 5 teaches it from zero. EventSource can do none of that; it GETs a URL and that's its whole personality. But it reconnects automatically with Last-Event-ID, which the fetch-reader version of this part would need a retry loop, backoff, and bookmark plumbing to match. Use the one whose constraints you're already meeting; today the stream became a plain GET, so the constraint vanished and the free reconnection stayed.
+</Callout>
+
+The client's half of the bargain is remembering its claim ticket somewhere a refresh can't destroy. That place is `sessionStorage`: it survives reloads (and rides into a duplicated tab), but dies with the browser session, which is exactly the lifetime "a run I'm currently watching" wants; conversations that *finished* are already the sidebar's job. `send()` stores the ticket the moment `POST /chat` answers, and attaching to the stream becomes its own small function, because two different callers need it:
+
+```typescript filename="frontend/app/page.tsx" repo="part-09-durable-streams/frontend/app/page.tsx" lines="355-377"
+  // Attach to a run's stream: replay first, then the live tail. Called by
+  // send() right after the ticket arrives, and by the resume effect after
+  // a refresh. Neither caller can tell the difference; that's the point.
+  function followStream(requestId: string) {
+    esRef.current?.close();
+    requestIdRef.current = requestId;
+    const es = new EventSource(`${API_BASE}/stream/${requestId}`);
+    esRef.current = es;
+    let lastSeq = 0;
+    es.onmessage = (e) => {
+      // The dedup guard. Replay-then-follow delivers at least once; the
+      // seq in the SSE id makes it exactly once where it matters.
+      const seq = Number(e.lastEventId.split(":").pop());
+      if (seq) {
+        if (seq <= lastSeq) return;
+        lastSeq = seq;
+      }
+      handleEvent(JSON.parse(e.data) as AgentEvent, es);
+    };
+    // No onerror theatrics: on a dropped connection EventSource retries
+    // by itself with Last-Event-ID, the server replays what we missed,
+    // and the guard above swallows any overlap.
+  }
+```
+
+`handleEvent` is the same switch that has lived inside the send loop since Part 3, extracted whole; `types.ts` didn't change by a character. The second caller is the new star, a mount effect that checks for an orphaned ticket:
+
+```typescript filename="frontend/app/page.tsx" repo="part-09-durable-streams/frontend/app/page.tsx" lines="427-446"
+  // The resume: if this tab was watching a run, pick it back up. Prior
+  // turns come from Part 5's history endpoint; the in-flight turn is
+  // rebuilt, event by event, from the log's replay.
+  useEffect(() => {
+    const pending = readPending();
+    if (!pending) return;
+    (async () => {
+      let past: ChatMessage[] = [];
+      if (pending.workspaceId) {
+        setWorkspaceId(pending.workspaceId);
+        if (pending.sessionId) {
+          setSessionId(pending.sessionId);
+          try {
+            const { messages: hist, files: desk } = await fetchConversation(
+              pending.workspaceId,
+              pending.sessionId,
+            );
+            past = hist as ChatMessage[];
+            // The diary already holds pieces of the turn in flight; drop
+            // them and let the replay rebuild that turn instead.
+```
+
+Earlier turns come back through [Part 5's replay endpoint](/blog/agent-sdk-5-sessions#replaying-a-conversation-you-werent-there-for), exactly as if you'd clicked the conversation in the sidebar. The turn in flight is deliberately *not* taken from there: the session diary already contains pieces of it, but the event log holds the authoritative, sequenced version, so the effect trims the diary at the in-flight question and lets the replay rebuild the rest, deltas, badges, cards and all, through the same `applyEvent` reducer that built them live. One code path, two tenses.
+
+Try the break that opened this part. Start the month-by-month walk, let a few badges land, refresh:
+
+<Figure
+  src="/images/series/agent-sdk/part-9/browser-refresh-light.svg"
+  srcDark="/images/series/agent-sdk/part-9/browser-refresh-dark.svg"
+  alt="The Beanline Analyst immediately after a mid-run page refresh. The user's month-by-month question is back in its bubble, seven completed query badges have been rebuilt from replay, the working timer reads 9 seconds and keeps counting, the file chips are restored, and the send button is a Stop button. The sidebar lists the conversation."
+  caption="The same run, 200 milliseconds after a mid-run refresh. Question from sessionStorage, seven badges from the log's replay, and the timer honest at 9s because the ticket stored when the question was sent. Measured: question re-rendered 126ms after reload, live tail attached at 127ms. Receipt: $0.0351, 11s, on the reopened pipe."
+  width={1120}
+  height={740}
+/>
+
+The working timer deserves its sentence: it reads 9 seconds, not 0, because the ticket stores `sentAt` and the resume passes it straight to the timer. Small lie removed, and the kind of detail that makes refresh-survival feel like *continuity* instead of recovery.
+
+## A Stop button with nothing to apologize for
+
+Part 3 shipped a Stop button with an asterisk I've been dragging along for six parts: [you hung up the phone; you didn't stop the worker](/blog/agent-sdk-3-agent-ui#the-send-loop-and-a-ui-that-tells-the-truth-about-time). `AbortController` killed the fetch, the SDK subprocess kept working 10 to 15 more seconds until a write hit the dead pipe, and the stopped turn's cost vanished unrecorded, which Part 3's cost table explicitly lamented. Today the asterisk dies. The worker holds a live `ClaudeSDKClient`, and that client has the method this series has owed you since the day the button appeared:
+
+```python filename="backend/app/runner.py" repo="part-09-durable-streams/backend/app/runner.py" lines="127-136"
+async def cancel_request(request_id: str) -> bool:
+    """The real Stop button. interrupt() tells the SDK to abandon the
+    turn; the stream then ends with a normal ResultMessage, so even a
+    stopped turn gets a receipt in the log. False = nothing to stop."""
+    running = RUNNING.get(request_id)
+    if running is None:
+        return False
+    running.bridge.deny_all()  # unpark the agent if it's waiting on a card
+    await running.client.interrupt()
+    return True
+```
+
+`POST /chat/{request_id}/cancel` calls it, and the frontend's Stop button swaps `abort()` for that POST while *keeping the stream open*, because the receipt is still coming. Note the `deny_all` first: if the agent is parked on an approval card, the interrupt can't land until the callback returns, so cancelling a run answers its open questions with "no" on the way out. Measured, on this app, repeatedly: the `complete` event hit the log **10 to 50 milliseconds** after the cancel POST. Against Part 3's 10-to-15-second afterlife, that's three orders of magnitude, and this time the button's label is telling the truth.
+
+<Figure
+  src="/images/series/agent-sdk/part-9/browser-stopped-light.svg"
+  srcDark="/images/series/agent-sdk/part-9/browser-stopped-dark.svg"
+  alt="The Beanline Analyst after the Stop button was clicked mid-analysis. The month-by-month question sits above a schema badge and four completed query badges, and the turn ends with a receipt line reading stopped, 1.17 cents, 8 seconds. The session cost in the header shows the same amount."
+  caption="A stopped turn with a receipt: 'stopped · $0.0117 · 8s', rendered 39 milliseconds after the click. Part 3's cost table had a row that said 'see below' because the stopped turn's bill was invisible. This is below."
+  width={1120}
+  height={712}
+/>
+
+One honest wrinkle, measured because it surprised me. The interrupted turn's `ResultMessage` reports whatever accounting the SDK had finalized when the turn died: stop between API rounds and the receipt carries real numbers ($0.0159 in one run, $0.0117 in the screenshot); stop in the middle of a round and `usage` can come back all zeros, `$0.0000` on a turn that visibly ran five tool calls. The tokens were still consumed; only the receipt is short. You get a receipt *event* either way, which is the architectural point, but don't build billing on interrupted turns' receipts. On 0.2.110 the tell is `usage.iterations`: empty list means the accounting died with the round.
+
+## Approvals meet durability
+
+Now the composition test, the moment where you find out whether two features you built separately are actually one system. Part 7 parks the agent on an `asyncio.Future` until a human clicks. Part 9 claims the watching tab is disposable. So: ask for a chart, wait for the Bash card, and refresh *while the agent is parked*.
+
+<Figure
+  src="/images/series/agent-sdk/part-9/browser-cardrefresh-light.svg"
+  srcDark="/images/series/agent-sdk/part-9/browser-cardrefresh-dark.svg"
+  alt="The Beanline Analyst after a refresh while an approval card was pending. The rebuilt transcript shows the chart question, prose, a completed schema badge, a completed query badge, a spinning Bash badge, and an approval card with the full matplotlib command and Approve and Deny buttons. The working timer reads 17 seconds and the send button is a Stop button."
+  caption="Refreshed while the agent was parked on this card. Replay rebuilt the transcript including the card (approval events are in the log now), the Future is still parked server-side, and the timer never lied. Measured: card re-rendered 162ms after reload; the Approve click worked; the chart landed. $0.0405 for the whole turn."
+  width={1120}
+  height={889}
+/>
+
+Walk the machinery, because all of Act II shows up for this one frame. The `approval_request` event is **in the log** now (the bridge emits through the worker's sink), so the replay re-renders the card. The `asyncio.Future` never lived in the HTTP response's world at all; it's parked in the server's `PENDING` dict, still attached to the paused `can_use_tool` callback. Your click POSTs to the same decision endpoint as ever, which resolves the Future, un-parks the agent, and emits `approval_resolved` through the sink for the log to record and the hub to broadcast to the *new* tab. Approve, and the chart arrives in a page load that didn't exist when the question was asked.
+
+This formally closes [Part 7's honesty note](/blog/agent-sdk-7-approvals#the-card): approval events were wire-only, replayed conversations showed denied results without the cards that produced them, and I promised you a durable home. Every parcel has one now. The note comes off the wall the same way Part 1's scissors warning did in Part 7.
+
+## Two tabs, one run
+
+The dessert is the show-off version of everything above. Start a run, then open the same analysis in a second tab (duplicate the tab, or copy the ticket; the demo below does it live). Both tabs subscribe to the same hub, both render the same events, and when the receipt comes, it comes to both:
+
+<Figure
+  src="/images/series/agent-sdk/part-9/browser-twotabs-light.svg"
+  srcDark="/images/series/agent-sdk/part-9/browser-twotabs-dark.svg"
+  alt="Two browser windows side by side showing the Beanline Analyst with the same conversation. Both show the question about which three products drive the most revenue, the same query badge, and identical tables listing Latte at 280,379.20 dollars, Cappuccino at 174,350.00 and Drip Coffee at 144,743.20 with unit counts, and the same receipt of 1.01 cents in 5 seconds. The left tab is labeled as the one that asked, following since sequence 1; the right tab joined mid-run, replayed the log, then followed the same hub."
+  caption="One run, two subscribers, byte-identical transcripts (verified programmatically, not by squinting). The right tab joined mid-run: replay, then follow. The model billed once: $0.0101. Extra audiences are free."
+  width={1250}
+  height={618}
+/>
+
+The transcripts are byte-identical because there's exactly one source of truth and both tabs are reading it. And the second subscriber doesn't have to be a browser: `curl -N localhost:8000/stream/{request_id}` follows the same run from a terminal, because a dumb pipe doesn't check who's drinking from it.
+
+<Callout type="warning" title="The hub is one process's memory">
+Everything durable in this part is in SQLite; the hub is not durable and not shared. Run two uvicorn workers and you get two half-blind hubs: a subscriber on worker A never hears live events from a run on worker B. That's not a bug in the pattern, it's the honest boundary of the tutorial-sized version. Production systems keep this exact shape and swap the parts: the log becomes a Postgres table, the fan-out becomes Redis pub/sub or LISTEN/NOTIFY, and replay-then-follow with seq dedup survives the upgrade untouched. SQLite is the training wheels. The architecture is the lesson.
+</Callout>
+
+## The cost ritual
+
+All real runs from building this part:
+
+| Run | Result | Cost |
+|---|---|---|
+| First decoupled run (March question) | claim ticket + pipe, correct answer | $0.0254 · 7s |
+| Month-by-month walk, refreshed mid-run | replay + live tail + receipt | $0.0351 · 11s |
+| Replaying any finished run | the whole story again, no model | $0 · instant |
+| Follow-up in the same conversation | memory intact through the decoupling | $0.0088 · 4s |
+| Chart run, card approved after a refresh | the composition test | $0.0405 · 26s |
+| Stop between API rounds | receipt 10ms after the POST | $0.0159 · 7s |
+| Stop, staged in the UI | 'stopped · $0.0117 · 8s', 39ms after click | $0.0117 · 8s |
+| Stop mid-round | receipt arrives, accounting zeroed (the wrinkle) | $0.0000 shown |
+| Second tab on a live run | identical transcript, billed once | $0 extra |
+| The recorded demo (chart turn + stopped walk) | everything above, on camera | $0.0389 + $0.0097 |
+
+Read the middle rows together: durability's marginal cost is a SQLite file. Replays are free, extra subscribers are free, and the architecture's only new spend is the disk it takes to remember what you already paid the model to say once.
+
+<DemoVideo
+  src="/videos/agent-sdk/part-9-demo.mp4"
+  poster="/videos/agent-sdk/part-9-poster.jpg"
+  caption='A real run, recorded: a chart request pauses on an approval card, the tab navigates away entirely and comes back to find the card still waiting, Approve lands the chart, then a month-by-month walk gets refreshed mid-stream (badges replay, tail continues) and the Stop button ends it mid-sentence with a receipt on camera: "stopped · $0.0097 · 9s".'
+  label="Screen recording of Part 9: an approval card surviving a full page navigation, a stream refreshed mid-run resuming instantly, and a server-side Stop with a stopped receipt"
+/>
+
+<Recap
+  part={9}
+  items={[
+    "The decoupling: POST /chat returns a claim ticket in milliseconds and the agent runs in an asyncio worker; the RUNNING dict both routes cancels and keeps the task alive (asyncio holds only weak references, the classic create_task trap).",
+    "The flight recorder: every event is committed to a SQLite events table (request_id, seq, type, payload) via aiosqlite before anyone sees it; replay is WHERE seq > last_seen. Sessions stay SDK-native; this log holds only OUR wire events.",
+    "Replay-then-follow: subscribe to the hub first, replay the log second, deduplicate by seq; the SSE id: field plus Last-Event-ID made the streams resumable with zero changes to the Part 2 event vocabulary.",
+    "EventSource replaced the fetch-reader the moment the stream became a GET, bringing automatic reconnection for free; a sessionStorage claim ticket revives the in-flight turn ~130ms after a refresh, pending approval cards included, which closes Part 7's wire-only honesty note.",
+    "A real Stop button: POST /chat/{id}/cancel calls client.interrupt(), the receipt lands 10-50ms later instead of Part 3's 10-15s afterlife, and stopped turns finally get receipts (with an honest wrinkle: mid-round interrupts can zero the accounting).",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "What does POST /chat return in Part 9, and why does that survive a refresh?",
+      options: [
+        "The same SSE stream as before, but with retry headers",
+        "A claim ticket (request_id + stream_url) in milliseconds; the agent's lifetime belongs to a background worker, so closing the page only closes a disposable GET subscription",
+        "A WebSocket upgrade",
+        "The full transcript, polled every second",
+      ],
+      answer: 1,
+      explain: "The chain this part breaks is 'agent lives inside one HTTP response'. Running and watching are decoupled: the run belongs to the worker, and any number of dumb pipes can watch it, die, and come back.",
+    },
+    {
+      q: "A new subscriber needs the past and the present. Why subscribe to the hub BEFORE replaying the log?",
+      options: [
+        "It's faster, because the queue buffers while SQLite reads",
+        "Order doesn't matter if the database commits quickly",
+        "Replay-first leaves a gap where an event lands after the SELECT but before the subscription: lost, invisibly. Subscribe-first turns that gap into harmless duplicates, which the seq guard drops",
+        "Because EventSource requires an open queue first",
+      ],
+      answer: 2,
+      explain: "At-least-once plus dedup beats at-most-once. Events carry their seq exactly so duplicates are cheap to drop; a silently missing event can't be fixed by anything.",
+    },
+    {
+      q: "Why does the RUNNING dict matter beyond routing cancel requests?",
+      options: [
+        "It persists runs across server restarts",
+        "asyncio keeps only weak references to tasks, so a create_task() result nobody stores can be garbage-collected mid-run; the dict entry is what keeps the worker alive",
+        "FastAPI requires background tasks to be registered globally",
+        "It makes the tasks run in parallel",
+      ],
+      answer: 1,
+      explain: "The cruelest asyncio trap: fire-and-forget tasks work in every test and occasionally evaporate under memory pressure. Store the task somewhere on purpose, always.",
+    },
+    {
+      q: "You refresh while an approval card is pending. Why does your later click still work?",
+      options: [
+        "The frontend re-sends the whole question after a refresh",
+        "The SDK re-asks for permission when a client reconnects",
+        "The card is stored in localStorage",
+        "The approval_request event is in the durable log (so replay re-renders the card) and the asyncio.Future never lived in the HTTP response's world: it's parked server-side in PENDING, still attached to the paused callback",
+      ],
+      answer: 3,
+      explain: "The composition test. Part 7's bridge now emits through the worker's sink, so the card replays; the Future was always server-side state, so the decision endpoint resolves it exactly as if you'd never left.",
+    },
+    {
+      q: "How does Part 9's Stop button differ from Part 3's, measured?",
+      options: [
+        "It aborts the fetch faster",
+        "It calls client.interrupt() on the worker's live client via a cancel endpoint: the receipt landed 10-50ms after the POST, versus the 10-15 seconds the subprocess used to keep working after an abort, and the stopped turn now gets a logged receipt",
+        "It kills the uvicorn process",
+        "There is no difference; the label changed",
+      ],
+      answer: 1,
+      explain: "Part 3's button closed the client's pipe and the worker only noticed when a write failed. interrupt() stops the turn server-side, the stream ends with a ResultMessage, and even a stopped turn leaves a receipt in the log (sometimes zeroed if the interrupt lands mid-round, an honest SDK wrinkle).",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 9: durable streams - event log, broadcast hub, and a real stop button"
+```
+
+And that's the curtain on Act II. Look at what the last four parts actually assembled: a real database behind a read-only custom tool (Part 6), a human between the agent and anything risky (Part 7), deterministic law and an audit trail underneath the human (Part 8), and now runs that outlive any browser tab, with every event on disk and a Stop button that stops (Part 9). The analyst from Act I *worked*; this one can be **trusted, audited, interrupted, and rejoined**. That's the difference between a demo and a product, and it's also, not coincidentally, the shape of the production reference app this series shadows. Act III makes the analyst *better* at its actual job: planning before it acts, asking you structured questions, showing its thinking, delegating to a reviewer that catches its mistakes, reaching the outside world safely, proving its quality with evals, and finally shipping to a real server. First stop, [Part 10](/blog/agent-sdk-10-interactive): the agent proposes a plan before touching anything expensive, and asks you real questions instead of guessing.
+
+The complete, tested code for this part lives in [`part-09-durable-streams`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/tree/main/part-09-durable-streams) in the [companion repo](https://github.com/yadneshSalvi/claude-agent-sdk-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.

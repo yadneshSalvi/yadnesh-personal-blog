@@ -23,3 +23,6 @@ audit.jsonl
 
 # OS
 .DS_Store
+
+# The Part 9 event log (runtime data; the schema lives in app/eventlog.py)
+events.db

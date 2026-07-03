@@ -5,7 +5,7 @@ image: "/images/series/agent-sdk/concepts-cover-light.svg"
 imageDark: "/images/series/agent-sdk/concepts-cover-dark.svg"
 imageAlt: "A cover in the series style reading 'Concepts, in plain words', with a large section-sign numeral and the Anthropic, FastAPI, and Next.js logos."
 createdAt: "2026-07-03T00:00:00.000Z"
-updatedAt: "2026-07-10T00:00:00.000Z"
+updatedAt: "2026-07-11T00:00:00.000Z"
 tags: ["claude-agent-sdk", "reference"]
 series: "claude-agent-sdk-fastapi-nextjs"
 kind: "reference"
@@ -119,7 +119,7 @@ This entry stays short on purpose: [LangGraph Part 5](/blog/langgraph-5-streamin
 
 `EventSource` is the browser's built-in SSE client: point it at a URL and it fires an event per message, reconnecting automatically when the connection drops. The catch: it only speaks GET, with no request body, which is why chat apps that POST a message and stream the answer usually parse the stream by hand with `fetch` and a reader instead ([LangGraph Part 5](/blog/langgraph-5-streaming) builds that parser).
 
-This series starts with the fetch-reader for the same reason, then switches to `EventSource` in Part 9, at the exact moment streams become resumable GETs and the automatic reconnection (with its `Last-Event-ID` header) becomes the feature we want.
+This series starts with the fetch-reader for the same reason, then switches to `EventSource` in [Part 9](/blog/agent-sdk-9-durable-streams), at the exact moment streams become resumable GETs. From then on the browser's free machinery does the heavy lifting: each SSE frame can carry an `id:` line, the browser remembers the last one it saw, and on reconnect it sends that bookmark back as a `Last-Event-ID` header so the server can resume from there. One caveat rides along: reconnection plus replay means events can arrive more than once, so a client should deduplicate (Part 9 keys every frame's id with a sequence number and drops anything already seen).
 
 ## Futures and events
 

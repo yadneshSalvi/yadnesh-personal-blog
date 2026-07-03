@@ -14,6 +14,7 @@ Every folder below is the **complete, runnable project as it exists at the end o
 | 6 | [`part-06-custom-tools`](part-06-custom-tools) | A real SQLite database behind custom `@tool`s, served by an in-process MCP server, read-only by construction | [Custom Tools: Give the Analyst a Database](https://yadneshsalvi.com/blog/agent-sdk-6-custom-tools) |
 | 7 | [`part-07-approvals`](part-07-approvals) | Human-in-the-loop approvals: risky tool calls pause on a Future until you click Approve or Deny | [Approvals: The Human in the Loop](https://yadneshsalvi.com/blog/agent-sdk-7-approvals) |
 | 8 | [`part-08-hooks`](part-08-hooks) | Hooks: a PreToolUse tripwire that blocks `rm`, a JSONL audit log of every tool call, and injected desk facts | [Hooks: Guardrails and Audit Trails](https://yadneshsalvi.com/blog/agent-sdk-8-hooks) |
+| 9 | [`part-09-durable-streams`](part-09-durable-streams) | Durable streams: a SQLite event log, replay-then-follow over `EventSource`, refresh-proof runs and approval cards, and a Stop button that actually stops | [Durable Streams: Survive the Refresh](https://yadneshsalvi.com/blog/agent-sdk-9-durable-streams) |
 
 *(The series is in progress — 14 parts across three acts. Folders appear here as parts publish.)*
 

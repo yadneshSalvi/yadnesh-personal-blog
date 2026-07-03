@@ -1,0 +1,666 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { AgentEvent, Artifact, Block, ChatMessage } from "@/lib/types";
+import {
+  API_BASE,
+  cancelChat,
+  createWorkspace,
+  decideApproval,
+  fetchConversation,
+  fetchConversations,
+  forkConversation,
+  loadSampleData,
+  renameConversation,
+  startChat,
+  uploadFile,
+  type Conversation,
+  type WorkspaceFile,
+} from "@/lib/api";
+import { ApprovalCard } from "@/components/ApprovalCard";
+import { Markdown } from "@/components/Markdown";
+import { ToolBadge } from "@/components/ToolBadge";
+import { Toast } from "@/components/Toast";
+import { ArtifactsPanel } from "@/components/ArtifactsPanel";
+import { UploadZone } from "@/components/UploadZone";
+import { Sidebar } from "@/components/Sidebar";
+
+// The claim ticket we hold across a refresh. sessionStorage survives a
+// reload (and rides along into a duplicated tab), which is exactly the
+// lifetime a "run I am currently watching" wants. localStorage would
+// outlive the browser session; that's the sidebar's job, not this.
+type PendingRun = {
+  requestId: string;
+  question: string;
+  workspaceId: string | null;
+  sessionId: string | null;
+  sentAt: number;
+};
+
+const PENDING_KEY = "beanline-pending-run";
+
+function readPending(): PendingRun | null {
+  try {
+    const raw = sessionStorage.getItem(PENDING_KEY);
+    return raw ? (JSON.parse(raw) as PendingRun) : null;
+  } catch {
+    return null;
+  }
+}
+
+const SAMPLE_QUESTIONS = [
+  "Which store grew fastest between January and June?",
+  "Chart monthly revenue by store and write up what you see.",
+  "How did each store do in the second quarter?",
+];
+
+// One wire event goes in, a new block list comes out. text_delta appends to
+// an open text block (or starts one), tool_use_start opens a tool block,
+// tool_result completes it BY ID, never by position. New in Part 7: an
+// approval_request opens a pending card, and approval_resolved settles it
+// by id, the same lifecycle a tool badge lives. Anything else falls
+// through untouched; workspace and artifact events are the page's problem,
+// not the transcript's.
+function applyEvent(blocks: Block[], event: AgentEvent): Block[] {
+  if (event.type === "text_delta") {
+    const last = blocks[blocks.length - 1];
+    if (last?.type === "text") {
+      return [...blocks.slice(0, -1), { ...last, text: last.text + event.text }];
+    }
+    return [...blocks, { type: "text", text: event.text }];
+  }
+  if (event.type === "tool_use_start") {
+    return [
+      ...blocks,
+      { type: "tool_use", id: event.tool_id, name: event.tool_name, input: event.tool_input, done: false },
+    ];
+  }
+  if (event.type === "tool_result") {
+    return blocks.map((b) =>
+      b.type === "tool_use" && b.id === event.tool_id
+        ? { ...b, result: event.content, isError: event.is_error, done: true }
+        : b,
+    );
+  }
+  if (event.type === "approval_request") {
+    return [
+      ...blocks,
+      {
+        type: "approval",
+        id: event.approval_id,
+        toolName: event.tool_name,
+        toolInput: event.tool_input,
+        status: "pending",
+      },
+    ];
+  }
+  if (event.type === "approval_resolved") {
+    return blocks.map((b) =>
+      b.type === "approval" && b.id === event.approval_id
+        ? { ...b, status: event.decision === "allow" ? "allowed" : "denied", reason: event.reason }
+        : b,
+    );
+  }
+  return blocks;
+}
+
+function WorkingTimer({ startedAt }: { startedAt: number }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const seconds = Math.max(0, Math.round((now - startedAt) / 1000));
+  return (
+    <div className="mt-2 flex items-center gap-2 text-[13px] text-stone-400 dark:text-stone-500">
+      <span className="size-2 animate-pulse rounded-full bg-accent" />
+      Working… {seconds}s
+    </div>
+  );
+}
+
+export default function Home() {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState("");
+  const [working, setWorking] = useState(false);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
+  const [totalCost, setTotalCost] = useState(0);
+  const [toast, setToast] = useState<{ message: string; tone?: "error" | "success" } | null>(null);
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [convs, setConvs] = useState<Conversation[]>([]);
+  const [files, setFiles] = useState<string[]>([]);
+  const [artifacts, setArtifacts] = useState<Artifact[]>([]);
+  const [selectedArtifact, setSelectedArtifact] = useState<string | null>(null);
+  const esRef = useRef<EventSource | null>(null);
+  const requestIdRef = useRef<string | null>(null);
+  const stopRequestedRef = useRef(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const stickRef = useRef(true);
+
+  // A stable identity, or the toast's 6s timer resets on every render
+  // and a busy stream keeps the banner up forever (found on camera).
+  const dismissToast = useCallback(() => setToast(null), []);
+
+  // Follow the conversation as it grows, unless the reader scrolled up
+  // to study something; then leave them alone. Part 9 nuance: replayed
+  // events land in bursts, so measure the height after paint, not before.
+  useEffect(() => {
+    if (stickRef.current) {
+      requestAnimationFrame(() => {
+        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
+      });
+    }
+  }, [messages]);
+
+  function refreshConversations() {
+    fetchConversations().then(setConvs).catch(() => {});
+  }
+  useEffect(refreshConversations, []);
+
+  function patchLastTurn(patch: Partial<Extract<ChatMessage, { role: "assistant" }>>) {
+    setMessages((all) => {
+      const last = all[all.length - 1];
+      if (last?.role !== "assistant") return all;
+      return [...all.slice(0, -1), { ...last, ...patch }];
+    });
+  }
+
+  // The desk is created lazily: the first upload (or the first message)
+  // is what mints a workspace, so idle visitors never make folders.
+  async function ensureWorkspace(): Promise<string> {
+    if (workspaceId) return workspaceId;
+    const id = await createWorkspace();
+    setWorkspaceId(id);
+    return id;
+  }
+
+  async function addFiles(list: File[]) {
+    if (list.length === 0) return;
+    const added: string[] = [];
+    let failure: string | null = null;
+    try {
+      const id = await ensureWorkspace();
+      for (const file of list) {
+        try {
+          added.push((await uploadFile(id, file)).filename);
+        } catch (err) {
+          failure = (err as Error).message;
+        }
+      }
+    } catch (err) {
+      failure = (err as Error).message;
+    }
+    if (added.length > 0) {
+      setFiles((all) => [...new Set([...all, ...added])]);
+    }
+    setToast(
+      failure
+        ? { message: failure }
+        : {
+            message:
+              added.length === 1
+                ? `${added[0]} is on the analyst's desk.`
+                : `${added.length} files are on the analyst's desk.`,
+            tone: "success",
+          },
+    );
+  }
+
+  async function loadSample() {
+    try {
+      const id = await ensureWorkspace();
+      const names = await loadSampleData(id);
+      setFiles((all) => [...new Set([...all, ...names])]);
+      setToast({ message: `Sample data loaded: ${names.join(", ")}.`, tone: "success" });
+    } catch (err) {
+      setToast({ message: (err as Error).message });
+    }
+  }
+
+  function recordArtifact(event: Extract<AgentEvent, { type: "artifact_update" }>) {
+    const updated: Artifact = {
+      path: event.path,
+      kind: event.kind,
+      size: event.size,
+      updatedAt: Date.now(),
+    };
+    setArtifacts((all) => {
+      const i = all.findIndex((a) => a.path === event.path);
+      if (i === -1) return [...all, updated];
+      return all.map((a, j) => (j === i ? updated : a));
+    });
+    setSelectedArtifact(event.path); // the panel follows the newest deliverable
+  }
+
+  // Fresh desk, fresh diary: drop every id the server ever echoed to us.
+  function newAnalysis() {
+    if (working) return;
+    setMessages([]);
+    setSessionId(null);
+    setWorkspaceId(null);
+    setFiles([]);
+    setArtifacts([]);
+    setSelectedArtifact(null);
+    setInput("");
+  }
+
+  // Replay an old conversation: history into the block model, and the
+  // desk's current files split into chips (your data) and artifacts
+  // (the analyst's output).
+  async function openConversation(c: Conversation) {
+    if (working) return;
+    try {
+      const { messages: history, files: desk } = await fetchConversation(
+        c.workspace_id,
+        c.session_id,
+      );
+      setMessages(history as ChatMessage[]);
+      setSessionId(c.session_id);
+      setWorkspaceId(c.workspace_id);
+      const all = desk as WorkspaceFile[];
+      setFiles(all.filter((f) => f.kind === "file").map((f) => f.path));
+      const outputs: Artifact[] = all
+        .filter((f) => f.kind !== "file")
+        .map((f) => ({ path: f.path, kind: f.kind, size: f.size, updatedAt: Date.now() }));
+      setArtifacts(outputs);
+      setSelectedArtifact(outputs[outputs.length - 1]?.path ?? null);
+    } catch (err) {
+      setToast({ message: (err as Error).message });
+    }
+  }
+
+  async function handleRename(c: Conversation, title: string) {
+    try {
+      await renameConversation(c.workspace_id, c.session_id, title);
+      refreshConversations();
+      setToast({ message: "Renamed.", tone: "success" });
+    } catch (err) {
+      setToast({ message: (err as Error).message });
+    }
+  }
+
+  async function handleFork(c: Conversation) {
+    try {
+      const branch = await forkConversation(c.workspace_id, c.session_id);
+      refreshConversations();
+      await openConversation({ ...c, session_id: branch.session_id });
+      setToast({ message: "Duplicated. You're on the branch now.", tone: "success" });
+    } catch (err) {
+      setToast({ message: (err as Error).message });
+    }
+  }
+
+  async function handleDecision(id: string, decision: "allow" | "deny", always: boolean) {
+    try {
+      await decideApproval(id, decision, always);
+      // No local state change here: the server emits approval_resolved on
+      // the stream, and the card settles when that parcel arrives. One
+      // source of truth, even for our own clicks.
+    } catch (err) {
+      setToast({ message: (err as Error).message });
+    }
+  }
+
+  // One wire event arrives (live, replayed, it makes no difference).
+  // This is the same switch that lived inside send()'s read loop since
+  // Part 3; only its transport changed.
+  function handleEvent(event: AgentEvent, es: EventSource) {
+    if (event.type === "complete") {
+      patchLastTurn({
+        status: stopRequestedRef.current ? "stopped" : "done",
+        costUsd: event.total_cost_usd ?? undefined,
+        durationMs: event.duration_ms,
+      });
+      setTotalCost((cost) => cost + (event.total_cost_usd ?? 0));
+      stopRequestedRef.current = false;
+      endRun(es);
+      refreshConversations(); // the diary just grew; the sidebar should know
+    } else if (event.type === "error") {
+      patchLastTurn({ status: "error" });
+      setToast({ message: event.message });
+      endRun(es);
+    } else if (event.type === "session_start") {
+      // Both echoes, collected, plus a third home: the pending ticket in
+      // sessionStorage learns its session id, so a refresh can restore
+      // the earlier turns of this conversation too.
+      if (event.workspace_id) setWorkspaceId(event.workspace_id);
+      setSessionId(event.session_id);
+      const pending = readPending();
+      if (pending && pending.requestId === requestIdRef.current) {
+        sessionStorage.setItem(
+          PENDING_KEY,
+          JSON.stringify({ ...pending, sessionId: event.session_id }),
+        );
+      }
+    } else if (event.type === "artifact_update") {
+      recordArtifact(event);
+    } else {
+      setMessages((all) => {
+        const last = all[all.length - 1];
+        if (last?.role !== "assistant") return all;
+        return [...all.slice(0, -1), { ...last, blocks: applyEvent(last.blocks, event) }];
+      });
+    }
+  }
+
+  function endRun(es: EventSource) {
+    es.close(); // or EventSource would dutifully reconnect to a finished run
+    sessionStorage.removeItem(PENDING_KEY);
+    requestIdRef.current = null;
+    setWorking(false);
+    setStartedAt(null);
+  }
+
+  // Attach to a run's stream: replay first, then the live tail. Called by
+  // send() right after the ticket arrives, and by the resume effect after
+  // a refresh. Neither caller can tell the difference; that's the point.
+  function followStream(requestId: string) {
+    esRef.current?.close();
+    requestIdRef.current = requestId;
+    const es = new EventSource(`${API_BASE}/stream/${requestId}`);
+    esRef.current = es;
+    let lastSeq = 0;
+    es.onmessage = (e) => {
+      // The dedup guard. Replay-then-follow delivers at least once; the
+      // seq in the SSE id makes it exactly once where it matters.
+      const seq = Number(e.lastEventId.split(":").pop());
+      if (seq) {
+        if (seq <= lastSeq) return;
+        lastSeq = seq;
+      }
+      handleEvent(JSON.parse(e.data) as AgentEvent, es);
+    };
+    // No onerror theatrics: on a dropped connection EventSource retries
+    // by itself with Last-Event-ID, the server replays what we missed,
+    // and the guard above swallows any overlap.
+  }
+
+  async function send(text: string) {
+    const question = text.trim();
+    if (!question || working) return;
+    setInput("");
+    setWorking(true);
+    setStartedAt(Date.now());
+    setMessages((all) => [
+      ...all,
+      { role: "user", text: question },
+      { role: "assistant", blocks: [], status: "working" },
+    ]);
+    try {
+      const ticket = await startChat(question, workspaceId, sessionId);
+      setWorkspaceId(ticket.workspace_id);
+      sessionStorage.setItem(
+        PENDING_KEY,
+        JSON.stringify({
+          requestId: ticket.request_id,
+          question,
+          workspaceId: ticket.workspace_id,
+          sessionId,
+          sentAt: Date.now(),
+        } satisfies PendingRun),
+      );
+      followStream(ticket.request_id);
+    } catch {
+      patchLastTurn({ status: "error" });
+      setToast({ message: "Could not reach the server. Is the backend running?" });
+      setWorking(false);
+      setStartedAt(null);
+    }
+  }
+
+  // The Stop button, finally honest: it asks the server to interrupt the
+  // worker. The stream stays open, because the receipt for the stopped
+  // turn is still going to arrive on it.
+  async function stop() {
+    const requestId = requestIdRef.current;
+    if (!requestId) return;
+    stopRequestedRef.current = true;
+    try {
+      await cancelChat(requestId);
+    } catch (err) {
+      stopRequestedRef.current = false;
+      setToast({ message: (err as Error).message });
+    }
+  }
+
+  // The resume: if this tab was watching a run, pick it back up. Prior
+  // turns come from Part 5's history endpoint; the in-flight turn is
+  // rebuilt, event by event, from the log's replay.
+  useEffect(() => {
+    const pending = readPending();
+    if (!pending) return;
+    (async () => {
+      let past: ChatMessage[] = [];
+      if (pending.workspaceId) {
+        setWorkspaceId(pending.workspaceId);
+        if (pending.sessionId) {
+          setSessionId(pending.sessionId);
+          try {
+            const { messages: hist, files: desk } = await fetchConversation(
+              pending.workspaceId,
+              pending.sessionId,
+            );
+            past = hist as ChatMessage[];
+            // The diary already holds pieces of the turn in flight; drop
+            // them and let the replay rebuild that turn instead.
+            const texts = past.map((m) => (m.role === "user" ? m.text : null));
+            const cut = texts.lastIndexOf(pending.question);
+            if (cut !== -1) past = past.slice(0, cut);
+            const all = desk as WorkspaceFile[];
+            setFiles(all.filter((f) => f.kind === "file").map((f) => f.path));
+          } catch {
+            // History is a nicety; the live turn still replays without it.
+          }
+        }
+      }
+      setMessages([
+        ...past,
+        { role: "user", text: pending.question },
+        { role: "assistant", blocks: [], status: "working" },
+      ]);
+      setWorking(true);
+      setStartedAt(pending.sentAt); // the timer resumes honestly, not from zero
+      followStream(pending.requestId);
+      // A restored transcript can be long; make sure the view lands on the
+      // live tail, then let the stick-to-bottom logic take over as usual.
+      requestAnimationFrame(() => {
+        stickRef.current = true;
+        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
+      });
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Whatever happens to this component, don't leave a stream open behind it.
+  useEffect(() => () => esRef.current?.close(), []);
+
+  return (
+    <div className="flex h-dvh flex-col">
+      <header className="flex items-center justify-between border-b border-stone-200 px-5 py-3 dark:border-stone-800">
+        <div className="flex items-center gap-2.5">
+          <span className="size-2.5 rounded-full bg-accent" />
+          <h1 className="text-[15px] font-semibold tracking-tight">Beanline Analyst</h1>
+        </div>
+        {totalCost > 0 && (
+          <span className="font-mono text-xs text-stone-400 dark:text-stone-500">
+            session cost ${totalCost.toFixed(4)}
+          </span>
+        )}
+      </header>
+
+      <div className="flex min-h-0 flex-1">
+        <Sidebar
+          conversations={convs}
+          activeId={sessionId}
+          onNew={newAnalysis}
+          onOpen={openConversation}
+          onRename={handleRename}
+          onFork={handleFork}
+        />
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div
+            ref={scrollRef}
+            onScroll={() => {
+              const el = scrollRef.current;
+              if (el) stickRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+            }}
+            className="flex-1 overflow-y-auto"
+          >
+            <main className="mx-auto w-full max-w-3xl px-5 py-6">
+              {messages.length === 0 && (
+                <div className="mt-16 flex flex-col items-center text-center">
+                  <span className="mb-4 size-3 rounded-full bg-accent" />
+                  <h2 className="text-lg font-semibold">Ask the analyst</h2>
+                  <p className="mt-1.5 max-w-sm text-sm text-stone-500 dark:text-stone-400">
+                    Give it your CSVs, ask questions in plain English, and collect the charts and
+                    reports it writes back.
+                  </p>
+                  <div className="mt-6 flex w-full flex-col items-center gap-3">
+                    <UploadZone onFiles={addFiles} />
+                    <button
+                      type="button"
+                      onClick={loadSample}
+                      className="text-sm text-accent underline underline-offset-4 hover:opacity-80"
+                    >
+                      or load the Beanline sample data
+                    </button>
+                  </div>
+                  {files.length > 0 && (
+                    <div className="mt-8 flex flex-col gap-2">
+                      {SAMPLE_QUESTIONS.map((q) => (
+                        <button
+                          key={q}
+                          type="button"
+                          onClick={() => send(q)}
+                          className="rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm text-stone-600 hover:border-accent hover:text-accent dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300"
+                        >
+                          {q}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {messages.map((message, i) =>
+                message.role === "user" ? (
+                  <div key={i} className="mb-5 flex justify-end">
+                    <p className="max-w-[85%] rounded-2xl rounded-br-md bg-stone-900 px-4 py-2.5 text-[15px] text-stone-50 dark:bg-stone-100 dark:text-stone-900">
+                      {message.text}
+                    </p>
+                  </div>
+                ) : (
+                  <div key={i} className="mb-6">
+                    {message.blocks.map((block, j) =>
+                      block.type === "text" ? (
+                        <Markdown key={j} text={block.text} />
+                      ) : block.type === "approval" ? (
+                        <ApprovalCard key={block.id} block={block} onDecide={handleDecision} />
+                      ) : (
+                        <ToolBadge key={block.id} block={block} />
+                      ),
+                    )}
+                    {message.status === "working" && startedAt !== null && (
+                      <WorkingTimer startedAt={startedAt} />
+                    )}
+                    {(message.status === "stopped" ||
+                      message.status === "error" ||
+                      message.costUsd !== undefined ||
+                      message.durationMs !== undefined) && (
+                      <p className="mt-2 font-mono text-xs text-stone-400 dark:text-stone-500">
+                        {[
+                          message.status === "stopped" ? "stopped" : null,
+                          message.status === "error" ? "ended with an error" : null,
+                          message.costUsd !== undefined ? `$${message.costUsd.toFixed(4)}` : null,
+                          message.durationMs !== undefined
+                            ? `${Math.round(message.durationMs / 1000)}s`
+                            : null,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
+                    )}
+                  </div>
+                ),
+              )}
+            </main>
+          </div>
+
+          <footer className="border-t border-stone-200 px-5 py-4 dark:border-stone-800">
+            {files.length > 0 && (
+              <div className="mx-auto mb-2.5 flex w-full max-w-3xl flex-wrap gap-1.5">
+                {files.map((f) => (
+                  <span
+                    key={f}
+                    className="rounded-md border border-stone-200 bg-stone-100 px-2 py-0.5 font-mono text-[11px] text-stone-500 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-400"
+                  >
+                    {f}
+                  </span>
+                ))}
+              </div>
+            )}
+            <form
+              className="mx-auto flex w-full max-w-3xl gap-2.5"
+              onSubmit={(e) => {
+                e.preventDefault();
+                send(input);
+              }}
+            >
+              <label
+                title="Add files to the workspace"
+                className="flex cursor-pointer items-center rounded-xl border border-stone-200 px-3.5 text-lg leading-none text-stone-400 hover:border-accent hover:text-accent dark:border-stone-800"
+              >
+                +
+                <input
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => {
+                    addFiles([...(e.target.files ?? [])]);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask about your data…"
+                className="min-w-0 flex-1 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-[15px] outline-none placeholder:text-stone-400 focus:border-accent dark:border-stone-800 dark:bg-stone-900"
+              />
+              {working ? (
+                <button
+                  type="button"
+                  onClick={stop}
+                  className="rounded-xl border border-stone-300 px-5 text-sm font-medium text-stone-600 hover:border-red-400 hover:text-red-600 dark:border-stone-700 dark:text-stone-300"
+                >
+                  Stop
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={!input.trim()}
+                  className="rounded-xl bg-accent px-5 text-sm font-medium text-white disabled:opacity-40"
+                >
+                  Send
+                </button>
+              )}
+            </form>
+          </footer>
+        </div>
+
+        {artifacts.length > 0 && workspaceId && (
+          <ArtifactsPanel
+            workspaceId={workspaceId}
+            artifacts={artifacts}
+            selected={selectedArtifact}
+            onSelect={setSelectedArtifact}
+          />
+        )}
+      </div>
+
+      {toast && <Toast message={toast.message} tone={toast.tone} onDismiss={dismissToast} />}
+    </div>
+  );
+}

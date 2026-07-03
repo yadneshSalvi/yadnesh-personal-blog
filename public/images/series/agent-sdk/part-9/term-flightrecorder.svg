@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="592" viewBox="0 0 1040 592" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="592" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; backend/ &#183; the flight recorder</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62">$</tspan> sqlite3 events.db "SELECT seq, type FROM events</text>
+    <text x="32" y="116" xml:space="preserve">    WHERE request_id = '53cb43faca154f10aeb15ad9b1b27c41' ORDER BY seq"</text>
+    <text x="32" y="144" xml:space="preserve">1|<tspan fill="#e5825a">session_start</tspan></text>
+    <text x="32" y="172" xml:space="preserve">2|tool_use_start</text>
+    <text x="32" y="200" xml:space="preserve">3|tool_result</text>
+    <text x="32" y="228" xml:space="preserve"><tspan fill="#756d62">… (seq 4-15: six more query rounds) …</tspan></text>
+    <text x="32" y="256" xml:space="preserve">16|text_delta</text>
+    <text x="32" y="284" xml:space="preserve"><tspan fill="#756d62">… (seq 17-30: the tables, token by token) …</tspan></text>
+    <text x="32" y="312" xml:space="preserve">31|<tspan fill="#8fb573">complete</tspan></text>
+    <text x="32" y="340" xml:space="preserve"></text>
+    <text x="32" y="368" xml:space="preserve"><tspan fill="#756d62">$</tspan> curl -N localhost:8000/stream/53cb43faca154f10aeb15ad9b1b27c41</text>
+    <text x="32" y="396" xml:space="preserve"><tspan fill="#e5825a">id:</tspan> 53cb43faca154f10aeb15ad9b1b27c41:<tspan fill="#e5825a">1</tspan></text>
+    <text x="32" y="424" xml:space="preserve">data: {"type": "session_start", "session_id": "e0d79fc7-…"}</text>
+    <text x="32" y="452" xml:space="preserve"></text>
+    <text x="32" y="480" xml:space="preserve"><tspan fill="#e5825a">id:</tspan> 53cb43faca154f10aeb15ad9b1b27c41:<tspan fill="#e5825a">2</tspan></text>
+    <text x="32" y="508" xml:space="preserve">data: {"type": "tool_use_start", "tool_name": "mcp__beanline__query_…"}</text>
+    <text x="32" y="536" xml:space="preserve"><tspan fill="#756d62">… replays to 31, then the connection closes. Run it again: same story.</tspan></text>
+  </g>
+</svg>
