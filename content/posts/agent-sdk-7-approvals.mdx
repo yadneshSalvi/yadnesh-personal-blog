@@ -1,0 +1,435 @@
+---
+title: "Claude Agent SDK in Production, Part 7: Approvals: The Human in the Loop"
+subtitle: "Risky tool calls pause mid-turn on an asyncio.Future and wait for your click. bypassPermissions is deleted, denials become information, and Part 1's oldest debt starts getting repaid."
+image: "/images/series/agent-sdk/part-7/cover-light.svg"
+imageDark: "/images/series/agent-sdk/part-7/cover-dark.svg"
+createdAt: "2026-07-09T00:00:00.000Z"
+updatedAt: "2026-07-09T00:00:00.000Z"
+tags: ["claude-agent-sdk", "fastapi", "asyncio", "tutorial"]
+series: "claude-agent-sdk-fastapi-nextjs"
+seriesPart: 7
+---
+
+Six seconds. I asked yesterday's app to delete the three CSVs on its desk, and six seconds later they were gone: one `rm`, zero questions, $0.0231, receipt printed like any other job well done. Nothing malfunctioned. That's the part to sit with: since Part 1, *nothing asking* has been the designed behavior, papered over with a folder boundary and a recurring warning box. Today the paper comes off the wall. By the end of this page, that same request stops mid-turn and a card with two buttons appears, and the agent is not faking patience while it waits: it is parked on a single `await` that only your click can resume. I measured the pause. It costs nothing.
+
+<Figure
+  src="/images/series/agent-sdk/part-7/browser-hero-light.svg"
+  srcDark="/images/series/agent-sdk/part-7/browser-hero-dark.svg"
+  alt="The Beanline Analyst showing a full approval arc from the recorded demo. A Bash badge with a red cross sits above a compact Denied chip, then a Write badge with another Denied chip, then the agent's fallback: a markdown table of all six stores' total revenue, with a receipt of 3.95 cents and 18 seconds. Below, the user says: alright, chart it. A Bash badge with a green check sits above an Approved chip, the agent replies that the chart is saved, and the artifacts panel previews the bar chart. The second receipt reads 0.97 cents and 7 seconds."
+  caption="The end of this part, from the recorded demo: two denials, a graceful fallback to a table (every number exact), a change of heart, one approval, and the chart. The Denied and Approved chips are the new event types, resolved in place."
+  width={1120}
+  height={957}
+/>
+
+That screenshot is the whole part in one window: the same analyst, the same tools, but now there's a *conversation about permission* woven through the conversation about coffee revenue. Getting there takes the biggest backend change of the series so far, and it's still only about a hundred lines: `query()` retires in favor of `ClaudeSDKClient`, a permission callback bridges the SDK to your UI through an `asyncio.Future`, and two new parcels join the Part 2 vocabulary. This is the pattern I'd rank as the single most valuable one in the production reference app this series shadows. It gets the space it deserves.
+
+## The incident, in today's app
+
+First, the before-picture, properly. Yesterday's app, sample data loaded, and a request phrased the way a real user would phrase it:
+
+<Figure
+  src="/images/series/agent-sdk/part-7/browser-incident-light.svg"
+  srcDark="/images/series/agent-sdk/part-7/browser-incident-dark.svg"
+  alt="The Part 6 Beanline Analyst asked to delete products.csv, stores.csv and sales.csv from its working directory. A single Bash badge labeled 'Delete the three CSV files and verify they're gone' completes with a green check, and the agent replies in bold: Done. All three CSV files have been deleted from the working directory. The receipt reads 2.31 cents and 6 seconds."
+  caption="Part 6's app, verbatim: request to rm in six seconds, no confirmation, friendly green check. The file chips under the input still list the files. They no longer exist."
+  width={1120}
+  height={565}
+/>
+
+The deletion isn't even the unsettling part; the user *asked* for it. The unsettling part is that nothing in the system could have told the difference if they hadn't. `bypassPermissions` means every `rm`, every `pip install`, every `curl` is pre-forgiven. We've earned the right to say this plainly now, because Part 6 watched an agent `DELETE` 314 database rows with the same cheerfulness. The fix isn't a smarter model or a sterner prompt. It's a checkpoint with a human behind it.
+
+{/* [ANECDOTE slot (WRITING-STYLE §6): a true first-person story from Yadnesh about an automated system doing something destructive with confidence (a cleanup script, a sync job, a migration), 3 beats, 5 sentences. Lands here. */}
+
+## Why query() can't do this
+
+Here's the mechanical problem. An approval flow needs a **live two-way channel**: mid-turn, the SDK has to ask your code a question ("may I run this?") and wait for an answer that may take a human minute to arrive. `query()` is a one-way street by design: prompt in, message stream out, no way to talk back. It isn't subtle about it, either. Hand `query()` a `can_use_tool` callback and it raises immediately:
+
+```text
+ValueError: can_use_tool callback requires streaming mode.
+```
+
+I tried the workaround the error hints at (streaming input mode) and the truth on `claude-agent-sdk` 0.2.110 is blunter than the docs: the callback never fires, and every gated tool call dies with `Tool permission request failed: Error: Stream closed`. The one-shot transport tears down its control channel too early. So Part 7 is where the series graduates to `query()`'s bigger sibling, [`ClaudeSDKClient`](/blog/agent-sdk-concepts#can-use-tool): an object you `connect()`, `query()`, and iterate `receive_response()` on, holding a live channel the whole time. The migration inside `/chat` is small enough to read in one breath:
+
+```python filename="backend/app/main.py" repo="part-07-approvals/backend/app/main.py" lines="191-202"
+    async def run_agent() -> None:
+        try:
+            await client.connect()
+            await client.query(request.message)
+            stream = with_artifacts(translate(client.receive_response()), workspace)
+            async for event in stream:
+                await queue.put(event)
+        except Exception as exc:  # noqa: BLE001 - failures become wire events
+            await queue.put({"type": "error", "message": str(exc)})
+        finally:
+            await client.disconnect()
+            await queue.put(None)  # end of turn
+```
+
+Three lines replaced one (`connect`/`query`/`receive_response` instead of calling `query()` directly), and the translator pipeline from Parts 2 through 6 didn't change at all: it eats the client's message stream exactly as it ate the function's. But notice where the events go now: into an `asyncio.Queue` instead of straight out the socket. That queue is the quiet architectural move of this part. The HTTP response used to be a pipe with one producer. Today a second producer arrives, one that isn't part of the message stream: the permission gate, injecting its own parcels between the agent's. Two producers, one belt; `frames()` drains it and nothing more.
+
+## The gate: an event out, a Future in
+
+New file, `app/approvals.py`. The cast first:
+
+```python filename="backend/app/approvals.py" repo="part-07-approvals/backend/app/approvals.py" lines="14-32"
+APPROVAL_TIMEOUT_SECONDS = 120
+
+DENIED_MESSAGE = (
+    "The user denied this tool call. Do not retry the same call; adjust "
+    "your approach, or explain what you would need it for."
+)
+TIMEOUT_MESSAGE = (
+    "Nobody answered the approval request in time. Stop this line of work "
+    "and summarize what you were doing and why."
+)
+
+# Every unresolved card in the whole app, keyed by approval_id. The decision
+# endpoint resolves Futures it finds here; each Future belongs to exactly
+# one paused can_use_tool callback somewhere up the stack.
+PENDING: dict[str, asyncio.Future] = {}
+
+# "Approve and don't ask again": tool names the human has waved through,
+# per workspace. The desk is the conversation, so forks share this too.
+ALWAYS_ALLOWED: dict[str, set[str]] = {}
+```
+
+Look at those two message strings before anything else, because they're doing Part 6's tool-descriptions-are-prompts lesson from the other side: **a denial is a prompt too.** Whatever string you put in `PermissionResultDeny(message=...)` arrives in the model's context as the tool result, verbatim, and the model acts on it. Write "denied" and you'll get retry loops; write *what to do instead* and you get adaptation. You'll see both strings land, word for word, later on this page.
+
+Now the gate itself, the function the SDK calls before any tool it considers risky. First half: turn the question into a parcel and park:
+
+```python filename="backend/app/approvals.py" repo="part-07-approvals/backend/app/approvals.py" lines="49-65"
+    async def gate(
+        self, tool_name: str, tool_input: dict, ctx: ToolPermissionContext
+    ) -> PermissionResultAllow | PermissionResultDeny:
+        if tool_name in ALWAYS_ALLOWED.get(self.workspace_id, set()):
+            return PermissionResultAllow()
+
+        approval_id = uuid.uuid4().hex
+        future: asyncio.Future = asyncio.get_running_loop().create_future()
+        PENDING[approval_id] = future
+        self.issued.add(approval_id)
+        await self.queue.put({
+            "type": "approval_request",
+            "approval_id": approval_id,
+            "tool_id": ctx.tool_use_id,  # matches the badge's tool_use_start
+            "tool_name": tool_name,
+            "tool_input": tool_input,
+        })
+```
+
+An [`asyncio.Future`](/blog/agent-sdk-concepts#futures-and-events) is a promise with no worker attached: an empty slot that some *other* piece of code, anywhere in the process, can fill exactly once. That's the entire trick. The gate creates one, files it under a fresh `approval_id`, announces the question on the wire, and then does the thing that makes this architecture honest:
+
+```python filename="backend/app/approvals.py" repo="part-07-approvals/backend/app/approvals.py" lines="67-90"
+        reason = "user"
+        try:
+            decision, always = await asyncio.wait_for(
+                future, timeout=APPROVAL_TIMEOUT_SECONDS
+            )
+        except asyncio.TimeoutError:
+            decision, always, reason = "deny", False, "timeout"
+        finally:
+            PENDING.pop(approval_id, None)
+            self.issued.discard(approval_id)
+
+        if decision == "allow" and always:
+            ALWAYS_ALLOWED.setdefault(self.workspace_id, set()).add(tool_name)
+        await self.queue.put({
+            "type": "approval_resolved",
+            "approval_id": approval_id,
+            "decision": decision,
+            "reason": reason,
+        })
+        if decision == "allow":
+            return PermissionResultAllow()
+        return PermissionResultDeny(
+            message=TIMEOUT_MESSAGE if reason == "timeout" else DENIED_MESSAGE
+        )
+```
+
+`await asyncio.wait_for(future, ...)` suspends the callback. And because the SDK is awaiting your callback, *the whole tool call* suspends with it: no tool execution, no next model call, no tokens burning. The agent is genuinely paused, not politely spinning. When something fills the Future, the await wakes up, an `approval_resolved` parcel reports the verdict to every watching client, and the callback returns the SDK's answer. Here is that lifecycle against the clock of a real run:
+
+<Figure
+  src="/images/series/agent-sdk/part-7/fig-sequence-light.svg"
+  srcDark="/images/series/agent-sdk/part-7/fig-sequence-dark.svg"
+  alt="Sequence diagram with three lanes: the agent, your server, and the human, with real timestamps down the left edge. At 12.85 seconds a ToolUseBlock for Bash flows from agent to server. At 12.87 the callback fires, a Future is parked, and an approval_request parcel flows to the human, rendering the card. A highlighted band spans 12.87 to 18.87 labeled six seconds of genuine silence: zero events, zero API calls, zero tokens, one parked await. At 18.87 the human POSTs the allow decision; at 18.88 the Future resolves and the callback returns PermissionResultAllow, the SDK lets the tool run, and an approval_resolved parcel goes out. At 29.49 the tool result arrives and the panel lights up. A serif line reads: an event goes out, a Future waits, a click comes back."
+  caption="One real approve flow, timestamped from the stream. The six-second hole in the middle is the feature: nothing polled, nothing spun, nothing billed. The receipt for this turn read 38 seconds because wall-clock time now includes you."
+  width={1240}
+  height={780}
+/>
+
+The human's half of the bridge is an endpoint so small it barely deserves the name:
+
+```python filename="backend/app/main.py" repo="part-07-approvals/backend/app/main.py" lines="167-174"
+@app.post("/approvals/{approval_id}/decision")
+async def decide(approval_id: str, request: DecisionRequest) -> dict:
+    """The human's half of the bridge: resolve the Future a gate() is
+    parked on. 404 means the card is stale (decided, timed out, or the
+    stream it belonged to is gone)."""
+    if not resolve(approval_id, request.decision, request.always):
+        raise HTTPException(status_code=404, detail="No such pending approval.")
+    return {"approval_id": approval_id, "decision": request.decision}
+```
+
+`resolve()` is eight lines in `approvals.py`: look up the Future in `PENDING`, `set_result()` if it's still unresolved, report whether it was. The 404 branch matters more than it looks: cards can go stale (someone else decided, the timeout won, the stream died), and a click on a stale card should say so instead of pretending.
+
+<Callout type="info" title="Never block the event loop in the callback">
+The gate awaits; it never sleeps, polls, or does blocking I/O. Everything in this bridge (the SDK's control channel, the SSE stream, the decision endpoint) shares one event loop, and a callback that blocks it would freeze every conversation on the server, including the one whose button click would have freed it. `asyncio.Future` is the tool for "wait here until someone else acts" precisely because awaiting it costs the loop nothing.
+</Callout>
+
+## The scissors come off
+
+With the bridge built, the options object finally gets the edit six parts have been promising:
+
+```python filename="backend/app/main.py" repo="part-07-approvals/backend/app/main.py" lines="54-71"
+def build_options(workspace: Path, session_id: str | None, gate) -> ClaudeAgentOptions:
+    """Part 7: bypassPermissions is GONE. Reads and the read-only database
+    tools are auto-approved by name; everything else (Bash, Write) routes
+    through the gate, which is a human with two buttons."""
+    return ClaudeAgentOptions(
+        cwd=str(workspace),
+        tools=["Read", "Glob", "Grep", "Bash", "Write"],
+        mcp_servers={"beanline": beanline_server},
+        allowed_tools=[
+            "Read", "Glob", "Grep",
+            "mcp__beanline__query_database", "mcp__beanline__get_schema",
+        ],
+        can_use_tool=gate,
+        model=MODEL,
+        include_partial_messages=True,
+        system_prompt={"type": "preset", "preset": "claude_code", "append": ANALYST_PROMPT},
+        resume=session_id,
+    )
+```
+
+`permission_mode` is gone entirely: the app runs on `default` for the first time since Part 1's permission wall, and it doesn't hit the wall, because now somebody's home when the SDK asks. The policy reads exactly like you'd brief a new hire: reading and searching, go ahead (`Read`, `Glob`, `Grep`); the database tools, go ahead, they're [read-only by construction](/blog/agent-sdk-6-custom-tools#break-it-on-purpose-ask-it-to-write); anything that *changes* the world (`Bash`, `Write`) comes past my desk. Part 6's naming section pays off here too: those `mcp__beanline__*` entries are matched by the full names, and one typo would put a card in front of every database query.
+
+<Callout type="success" title="The scissors, retired (mostly)">
+Part 1 called it: "That's containment by convention, not enforcement, and the series treats it as an open debt: Part 7 wires tool calls to a human Approve button, and Part 8 adds rules that block dangerous commands outright." Half of that sentence just happened. `bypassPermissions` is deleted from the codebase, the cleanup incident up top now produces a card instead of a deletion, and "walk, don't run" is finally enforced by something other than a callout box. The other half of the debt (rules that don't need a human awake) is one part away.
+</Callout>
+
+## The card
+
+The frontend's job is familiar by now: two new parcel types, two new rules in `applyEvent`, one new component. The rules mirror the tool-badge lifecycle exactly, born pending and resolved in place by id:
+
+```tsx filename="frontend/app/page.tsx" repo="part-07-approvals/frontend/app/page.tsx" lines="61-79"
+  if (event.type === "approval_request") {
+    return [
+      ...blocks,
+      {
+        type: "approval",
+        id: event.approval_id,
+        toolName: event.tool_name,
+        toolInput: event.tool_input,
+        status: "pending",
+      },
+    ];
+  }
+  if (event.type === "approval_resolved") {
+    return blocks.map((b) =>
+      b.type === "approval" && b.id === event.approval_id
+        ? { ...b, status: event.decision === "allow" ? "allowed" : "denied", reason: event.reason }
+        : b,
+    );
+  }
+```
+
+The card renders inline in the transcript, right under the spinner badge of the tool call it's holding hostage, with the full input visible because *that's the point*: you're deciding about this exact command, not about commands in general.
+
+<Figure
+  src="/images/series/agent-sdk/part-7/browser-card-light.svg"
+  srcDark="/images/series/agent-sdk/part-7/browser-card-dark.svg"
+  alt="The Beanline Analyst mid-run. Two completed database badges are followed by a Bash badge with a live spinner, and beneath it an accent-bordered card titled Approval needed. The card shows the exact python3 heredoc command with matplotlib and the real monthly revenue numbers inline, an Approve button, a Deny button, and a checkbox reading: don't ask again for Bash in this conversation. Below the card the working timer reads 12 seconds and the Send button has become Stop."
+  caption="A real pending card. The badge above it still spins, the timer still climbs, and the server is parked on one await. Note the command preview: the model baked the query results straight into its script, and you get to read them before anything runs."
+  width={1120}
+  height={851}
+/>
+
+One design decision in the click handler is worth naming. When you press Approve, the frontend does *not* optimistically flip the card; it POSTs the decision and waits for the `approval_resolved` parcel to come back around the belt like any other event. One source of truth, even for your own clicks, which is exactly what keeps two open tabs (or Part 9's reconnecting streams) from arguing about what happened.
+
+## The evaluation order, honestly
+
+Time for the fine print, because your mental model of "every Bash call now asks me" is about to be corrected by the machine. Ask the new app *"How many lines are in sales.csv? Use wc -l."*:
+
+The answer comes back in five seconds, correct (11,082 lines), for $0.0229, and **no card ever appears**. Bash ran. Nobody asked you. Your callback never fired; I logged it to be sure. Before the SDK consults your allow list or your gate, the engine applies its own judgment, and it waves through what it can prove is read-only: `wc`, `ls`-shaped commands, file reads inside the working directory. Your callback is the *last* gate in a gauntlet, not the front door:
+
+<Figure
+  src="/images/series/agent-sdk/part-7/fig-evalorder-light.svg"
+  srcDark="/images/series/agent-sdk/part-7/fig-evalorder-dark.svg"
+  alt="Diagram of the permission gauntlet a tool call passes before reaching the developer. Five stacked gates: one, hooks, dashed and marked as Part 8's subject; two, the engine's own judgment, which approves in-cwd reads and read-only shell commands before any user rule; three, allowed_tools name matches like Read, Glob, Grep and the mcp beanline tools; four, permission_mode, default from today; five, can_use_tool, you, receiving only mutating Bash and Write. A receipts panel notes that wc -l sales.csv ran via Bash with no card for 2.29 cents while rm, matplotlib, and Write produced cards, and concludes: auto-approved calls never reach you; the layer that sees everything is Part 8."
+  caption="Verified against this exact app: the wc run never touched the callback, the rm run never got past it. Gates 2 and 3 are conveniences and holes at the same time, depending on whether you wanted a decision or a record."
+  width={1240}
+  height={700}
+/>
+
+Two more honest edges from testing. First, the allow list matches **names, not arguments**: `Glob` is waved through, and in one test run the agent globbed the entire repository outside its workspace, legally. Read-shaped tools with path arguments deserve path-shaped rules eventually; name-level allows are a coarse instrument and today we're accepting that trade knowingly. Second, and this is the sentence the next part grows from: an approval system decides about the risky calls and is *blind to everything it auto-approves*. If the question is "may it?", you now have an answer. If the question is "what did it actually do, all of it?", nothing you've built so far can answer that. That layer is [Part 8](/blog/agent-sdk-8-hooks).
+
+## Deny is information
+
+Now the flow that makes this part's design feel alive instead of bureaucratic. Ask for a chart, and when the card appears for the matplotlib script, press **Deny**. Here's the exact sequence from the recorded demo run:
+
+The denial message (`DENIED_MESSAGE`, word for word) rides back as the tool result. The agent doesn't crash, doesn't sulk, doesn't retry the same call, because the message told it not to. It tries `Write` instead (a reasonable reading of "adjust your approach"), meets a second card, gets denied again, and then does the genuinely intelligent thing: **it delivers the analysis anyway**, as a markdown table straight from the `query_database` results it already holds, every number matching my ground-truth SQL to the cent, and closes with "Would you like me to proceed with saving the chart and report files?". Both refusals went into the loop as information, the same mechanism as Part 1's permission wall, but this time with a human's actual intent behind each no. Say "Alright, chart it", approve the single card that comes back, and seven seconds and $0.0097 later the chart is in the panel. That whole arc is the hero screenshot at the top of this page, and the demo video below shows it live.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 4-panel comic strip, panels in a single row separated by thin vertical black dividers, about an AI analyst that must ask permission and treats a refusal as useful information. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny formal necktie. Panel 1: the laptop-analyst stands politely at Yad's desk holding up a large printed sign that reads "MAY I RUN rm?", with an innocent hopeful smile; Yad is mid-sip of coffee. Panel 2: Yad does a huge spit-take, coffee spraying everywhere, as his palm slams a big red desk button labeled "DENY"; the laptop-analyst's eyes go wide. Panel 3: the laptop-analyst calmly reads a small printed slip that says "REQUEST DENIED", one hand on its chin, thoughtful, its speech bubble reads: "NOTED. ADAPTING." Panel 4: the laptop-analyst presents a tray holding a neat paper table of numbers to Yad, who is still wiping coffee off his beard but looks impressed; the analyst's speech bubble reads: "NO CHART. BUT HERE ARE THE NUMBERS." Clean readable hand-lettered speech bubbles and labels, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-7/comic-deny.png"
+  alt="Comic in four panels. Panel one: a laptop analyst with a tiny necktie politely holds up a sign reading MAY I RUN rm? while Yad, a bearded developer with headphones, sips coffee. Panel two: Yad spit-takes coffee everywhere as his palm slams a big red button labeled DENY, the analyst wide-eyed. Panel three: the analyst calmly reads a slip reading REQUEST DENIED and says: noted, adapting. Panel four: the analyst presents a tray with a tidy table of numbers to a coffee-stained but impressed Yad, saying: no chart, but here are the numbers."
+  caption="The deny flow in four panels. The button stops the command; the message on the slip is what turns a refusal into a plan."
+  width={1536}
+  height={1024}
+/>
+
+## Timeouts, hangups, and the leak I shipped for an hour
+
+An unresolved Future is a paused agent *forever*, so every escape hatch from this bridge matters. The first one you saw in the gate already: `asyncio.wait_for` with a 120-second budget, deny-on-timeout. Here's what it looks like when nobody's home, from a real run where I let the card rot:
+
+<Figure
+  src="/images/series/agent-sdk/part-7/browser-timeout-light.svg"
+  srcDark="/images/series/agent-sdk/part-7/browser-timeout-dark.svg"
+  alt="The Beanline Analyst asked to create hello.txt. A Write badge with a red cross sits above a chip reading: Denied, nobody answered in time. The agent's reply summarizes calmly: I was attempting to create a file called hello.txt with a greeting message in the current working directory; the operation required approval and timed out waiting for user permission. The receipt reads 2.91 cents and 126 seconds."
+  caption="120 seconds on the dot, then the timeout message becomes the tool result and the agent wraps up gracefully, because TIMEOUT_MESSAGE told it exactly how to. A 126-second receipt for a one-file task is what an unattended approval looks like in the ledger."
+  width={1120}
+  height={484}
+/>
+
+The second escape hatch taught me something, because my first version of it silently didn't work, and the way it didn't work is a lesson about streaming servers generally. The plan was obvious: when the browser hangs up mid-card, the stream generator's `finally` runs `deny_all()`, resolving every orphaned Future as a denial. Clean. Except when I tested it (kill the client while a card is pending, watch the server), the agent subprocess lived on for over two minutes. The `finally` never ran, because **nothing told the server the client was gone**: this stack notices a dead socket when it next *writes* to it, and a server whose agent is parked on a Future writes nothing at all. Perfect stillness, in both directions, indefinitely. The fix is old SSE wisdom, six lines in `frames()`:
+
+```python filename="backend/app/main.py" repo="part-07-approvals/backend/app/main.py" lines="207-217"
+            while True:
+                try:
+                    event = await asyncio.wait_for(queue.get(), timeout=10)
+                except asyncio.TimeoutError:
+                    # A parked agent writes nothing, and a silent stream is
+                    # how a dead client goes unnoticed: this server only
+                    # learns the browser is gone when a write fails. The
+                    # keepalive is a comment frame (SSE parsers skip it)
+                    # whose real job is to fail early on a closed socket.
+                    yield ": keepalive\n\n"
+                    continue
+```
+
+A line starting with a colon is an SSE comment: every parser ignores it, including ours from Part 3, so no client changes. Its only job is to be a write, because a write to a dead socket fails, and *that* triggers the teardown: `deny_all()` fires, the worker is cancelled, the client disconnects the subprocess. Re-tested: hang up mid-card and the whole apparatus is reaped within eight seconds, and the file the card was guarding never gets written. Production systems go further (the reference app runs a TTL reaper that sweeps orphaned approvals on a schedule, belt and suspenders); the keepalive is the honest minimum that makes teardown *reachable*.
+
+## Always allow: policy is your code
+
+The last piece is mercy for your clicking finger. The card's checkbox ("Don't ask again for Bash in this conversation") sends `always: true` with the decision, the gate records it in `ALWAYS_ALLOWED`, and the check at the top of `gate()` short-circuits before any card is created. Measured across two turns of the same conversation: first chart request, two cards; second chart request, zero cards, $0.0150, no human in sight. The scope is deliberately narrow, per tool *and* per workspace, so trust you extend in one conversation doesn't leak into the next (though a forked conversation shares its original's desk, and therefore its allowances; the fork caveat from [Part 5](/blog/agent-sdk-5-sessions#duplicate-chat-sessions-are-a-tree) collects one more consequence).
+
+The deeper point hides in how boring that code is: a dict, a set, an if-statement. **The SDK doesn't have an "always allow" feature; you didn't need one.** Once the permission decision is your callback, permission *policy* is whatever Python you feel like writing: per-tool, per-command-prefix, per-user-role when Part 14's real deployment adds users, per-anything. The SDK only asks the question. Deciding is yours now, which is the entire meaning of the scissors coming off.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels in a single row separated by thin vertical black dividers, about pre-approving a trusted tool so it stops asking every time. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny formal necktie. Panel 1: Yad at his desk buried under a tall wobbly stack of little approval cards, each visible card reads "APPROVE BASH?"; he wearily stamps one with a rubber stamp, eyes half closed. Panel 2: Yad hands the laptop-analyst a shiny laminated badge on a lanyard that reads "BASH: PRE-APPROVED"; smaller text under it reads "THIS CONVERSATION ONLY"; the analyst receives it with sparkling eyes. Panel 3: the laptop-analyst struts past an empty approval desk (a small counter with a bell and a sign reading "APPROVALS") proudly wearing the badge, while Yad leans back with his coffee, feet up, relaxed. Clean readable hand-lettered speech-free panels with clear labels, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-7/comic-pass.png"
+  alt="Comic in three panels. Panel one: Yad, a bearded developer with headphones, slumps at a desk buried in a wobbly stack of cards all reading APPROVE BASH?, wearily rubber-stamping one. Panel two: Yad hands the laptop analyst a laminated badge on a lanyard reading BASH: PRE-APPROVED, this conversation only, and the analyst's eyes sparkle. Panel three: the analyst struts past an empty approvals counter wearing the badge while Yad leans back with his coffee, feet up."
+  caption="Always-allow in three panels. Note the fine print on the badge: the laminate expires with the conversation, which is the entire difference between convenience and bypassPermissions."
+  width={1536}
+  height={1024}
+/>
+
+## The cost ritual
+
+All real runs from building this part:
+
+| Run | Result | Cost |
+|---|---|---|
+| The incident (Part 6 app, bypass) | 3 files deleted, no questions | $0.0231 · 6s |
+| Approve flow (2 cards, ~6s human each) | chart + report, verified | $0.0392 · 38s |
+| Deny flow (demo take: 2 cards denied) | fallback table, all numbers exact | $0.0395 · 18s |
+| "Alright, chart it." (1 card approved) | the chart, from memory | $0.0097 · 7s |
+| `wc -l` via Bash | no card, callback never fired | $0.0229 · 5s |
+| Unanswered card | denied at 120.0s, graceful summary | $0.0291 · 126s |
+| Hang up mid-card (after the keepalive fix) | Future denied, subprocess reaped | ≤8s cleanup |
+| Always-allow, second turn | zero cards, zero waiting | $0.0150 · 13s |
+
+The new column to read is *time*, not money. Approvals barely move the bill (a paused await bills nothing), but they put a human inside the wall-clock: the 38-second approve run spent twelve of those seconds waiting on my scripted thinking time, and the receipt in the UI happily counts it. That's not overhead; that's what supervision costs, and the always-allow row is the dial that tunes it per conversation.
+
+<DemoVideo
+  src="/videos/agent-sdk/part-7-demo.mp4"
+  poster="/videos/agent-sdk/part-7-poster.jpg"
+  caption='A real run, recorded: the chart request pauses on a live card, two denials produce the fallback table (all six numbers exact against the database), then "Alright, chart it.", one approval, and the chart lands. Both receipts on camera.'
+  label="Screen recording of Part 7: an approval card pausing a live agent turn, deny leading to adaptation, then approve leading to the chart"
+/>
+
+<Recap
+  part={7}
+  items={[
+    "ClaudeSDKClient replaces query(): a connected client with a live two-way channel, adopted at the exact moment a feature (the permission callback) needs one, with the translator pipeline untouched.",
+    "The approval bridge: can_use_tool emits an approval_request parcel, parks an asyncio.Future in PENDING, and suspends the tool call until POST /approvals/{id}/decision resolves it. Measured: six seconds of genuine, zero-token silence.",
+    "The scissors retired: bypassPermissions is deleted, reads and the read-only database tools ride the allow list, and mutating Bash/Write meet a human with two buttons.",
+    "The evaluation order, verified live: the engine auto-approves read-only work (wc -l ran with no card, ever), allow-listed names skip you too, and your callback only sees what survives the gauntlet. Seeing everything is Part 8's job.",
+    "Denials as prompts: PermissionResultDeny(message) lands in the model's context verbatim, so a well-written refusal produces adaptation (the fallback table) instead of retry loops, and timeouts plus a keepalive-triggered deny_all keep orphaned Futures from parking agents forever.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "While an approval card is pending, what is the agent doing server-side?",
+      options: [
+        "Polling the decision endpoint every few seconds",
+        "Nothing: the can_use_tool callback is suspended on an awaited Future, so no tools run, no model calls happen, and no tokens are billed until it resolves",
+        "Continuing with other tool calls while it waits",
+        "Retrying the tool call with exponential backoff",
+      ],
+      answer: 1,
+      explain: "The gate awaits asyncio.wait_for(future, ...) and the SDK awaits the gate, so the whole tool call is parked. The sequence figure shows six seconds with zero events and zero cost; the click resolves the Future and everything wakes up.",
+    },
+    {
+      q: "Why did the series switch from query() to ClaudeSDKClient in this exact part?",
+      options: [
+        "ClaudeSDKClient is faster for long turns",
+        "query() cannot host the permission callback: it raises ValueError for string prompts, and on 0.2.110 even streaming-input mode fails with 'Stream closed' when the callback should fire; the callback needs the client's live channel",
+        "query() was deprecated in 0.2.110",
+        "Sessions can only be resumed through the client",
+      ],
+      answer: 1,
+      explain: "Verified both failure modes live. The callback is a mid-turn conversation between the SDK and your code, and only ClaudeSDKClient keeps that control channel open. Interrupts, arriving in Part 9, need the same client.",
+    },
+    {
+      q: "The user asked 'How many lines are in sales.csv? Use wc -l.' and Bash ran with no card. Why?",
+      options: [
+        "Bash is in allowed_tools",
+        "The frontend suppressed the card for read-only commands",
+        "The engine's own evaluation approved a provably read-only command before the allow list or the callback were ever consulted; auto-approved calls never reach can_use_tool",
+        "wc is a built-in tool, not a Bash command",
+      ],
+      answer: 2,
+      explain: "Bash is deliberately NOT allow-listed, and the callback log confirms it never fired. The engine green-lights read-only work on its own, which is convenient for UX and exactly the visibility hole Part 8's hooks exist to close.",
+    },
+    {
+      q: "What makes the denied agent produce a useful fallback table instead of retrying the same command?",
+      options: [
+        "The SDK automatically retries with a smaller tool",
+        "The deny message is delivered to the model as the tool result, verbatim, and ours says 'do not retry the same call; adjust your approach', which the model then does",
+        "Denied tool calls roll back the whole turn",
+        "The frontend re-prompts the agent after a denial",
+      ],
+      answer: 1,
+      explain: "A denial is a prompt. The model read DENIED_MESSAGE, tried Write instead, was denied again, and delivered the numbers it already had from the auto-approved database tool. Write 'denied' with no guidance and you'd get retry loops instead.",
+    },
+    {
+      q: "Why does frames() emit an SSE comment line every 10 idle seconds?",
+      options: [
+        "To keep the browser's EventSource from timing out",
+        "To make the UI's working timer tick",
+        "Because a parked agent writes nothing and this server only notices a dead client when a write fails; the keepalive is a write, so a hang-up mid-card triggers deny_all within seconds instead of after the 120s timeout",
+        "It's required by the SSE specification for streams longer than a minute",
+      ],
+      answer: 2,
+      explain: "The leak I shipped for an hour: kill the client mid-card and the finally block never ran, because nothing wrote to the dead socket. The comment frame is invisible to every parser; its job is to fail. Measured cleanup went from 125+ seconds to under eight.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 7: approvals - the human in the loop"
+```
+
+Your analyst now asks before it acts, and a refusal makes it smarter instead of stuck. But run one honest audit tonight: everything on the allow list, everything the engine waves through on its own, every `wc` and `Read` and database query, happened without a card *and without a record*. The approval system is a gate, not a log; it decides for the risky calls and is blind to the rest. In [Part 8](/blog/agent-sdk-8-hooks), hooks give you the layer that sees every tool call, deterministically: a tripwire that blocks `rm` before any human is even asked, and an audit trail that can answer "what did the agent actually do last Tuesday?"
+
+The complete, tested code for this part lives in [`part-07-approvals`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/tree/main/part-07-approvals) in the [companion repo](https://github.com/yadneshSalvi/claude-agent-sdk-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.

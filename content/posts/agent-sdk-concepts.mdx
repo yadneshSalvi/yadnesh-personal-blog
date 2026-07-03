@@ -5,7 +5,7 @@ image: "/images/series/agent-sdk/concepts-cover-light.svg"
 imageDark: "/images/series/agent-sdk/concepts-cover-dark.svg"
 imageAlt: "A cover in the series style reading 'Concepts, in plain words', with a large section-sign numeral and the Anthropic, FastAPI, and Next.js logos."
 createdAt: "2026-07-03T00:00:00.000Z"
-updatedAt: "2026-07-08T00:00:00.000Z"
+updatedAt: "2026-07-09T00:00:00.000Z"
 tags: ["claude-agent-sdk", "reference"]
 series: "claude-agent-sdk-fastapi-nextjs"
 kind: "reference"
@@ -55,6 +55,18 @@ Every tool call passes a permission check before it runs, and `permission_mode` 
 
 Think of it as how much you trust a new employee: shadowing only, supervised, or keys to the building. The series runs Act I on `bypassPermissions` pointed at a sandbox folder, names that trade-off loudly every time, and then spends Act II building the grown-up alternative: approvals routed to a human and hooks that see everything.
 
+## Can use tool
+
+`can_use_tool` is the permission callback: an async function you hand to `ClaudeAgentOptions`, called by the SDK before a gated tool runs, with the tool's name, its exact input, and a context object (whose `tool_use_id` matches the tool call in the stream). You return `PermissionResultAllow()` or `PermissionResultDeny(message=...)`, and until you return, the tool call is suspended: no execution, no next model call, no tokens.
+
+Two contracts matter. First, the callback needs `ClaudeSDKClient`'s live two-way channel; plain `query()` refuses it (and its streaming-input loophole doesn't actually deliver callbacks on current versions). Second, the deny `message` is delivered to the model as the tool result, verbatim, so it's a prompt: write what to do instead, not just "no". `PermissionResultAllow` can also carry `updated_input`, which quietly rewrites the call before it runs.
+
+## Permission evaluation order
+
+A tool call passes a gauntlet before it reaches your callback, and every earlier gate that says yes means you never hear about the call at all. Hooks run first (they see everything). Then the engine applies its own judgment: reads inside the working directory and provably read-only shell commands are approved by the engine itself, with no rule of yours consulted. Then `allowed_tools` name matches are waved through, then the `permission_mode` has its say, and only what survives all of that reaches `can_use_tool`.
+
+The design consequence: approvals are a gate, not a log. Auto-approved calls are invisible to the callback by construction, which is a feature for UX (nobody wants to approve every file read) and a hole for accountability. When the question changes from "may it?" to "what did it actually do?", the answer lives in hooks, the layer that runs before everything and sees everything.
+
 ## Sessions and JSONL
 
 The SDK writes a transcript of every conversation to disk whether or not you ever read it: one JSONL file per session under `~/.claude/projects/<escaped-working-directory>/<session_id>.jsonl`, where each line is a JSON record of one event (a user message, an assistant message, a tool result). This is the agent's diary, and it's the entire persistence story for Act I: no database, no schema, nothing to set up.
@@ -100,6 +112,12 @@ This entry stays short on purpose: [LangGraph Part 5](/blog/langgraph-5-streamin
 `EventSource` is the browser's built-in SSE client: point it at a URL and it fires an event per message, reconnecting automatically when the connection drops. The catch: it only speaks GET, with no request body, which is why chat apps that POST a message and stream the answer usually parse the stream by hand with `fetch` and a reader instead ([LangGraph Part 5](/blog/langgraph-5-streaming) builds that parser).
 
 This series starts with the fetch-reader for the same reason, then switches to `EventSource` in Part 9, at the exact moment streams become resumable GETs and the automatic reconnection (with its `Last-Event-ID` header) becomes the feature we want.
+
+## Futures and events
+
+An `asyncio.Future` is a promise with no worker attached: an empty result slot that any other code in the process can fill exactly once, and that any number of coroutines can await. Awaiting an unresolved Future suspends the awaiter and costs the event loop nothing; `set_result()` from anywhere wakes it up. The idiom "a promise someone else resolves" is exactly what human-in-the-loop needs: the agent's side parks on the Future, and an HTTP endpoint (a button, a webhook, a timeout) fills it.
+
+This series pairs a Future with an event: the server emits an `approval_request` parcel so the world knows a decision is wanted, parks a Future keyed by the request's id, and resolves it when the decision POST arrives. Guard the pattern with `asyncio.wait_for` (a Future nobody resolves is a coroutine parked forever) and resolve-all-on-teardown, because a stream that dies takes its resolvers with it.
 
 ## Cost and tokens
 
