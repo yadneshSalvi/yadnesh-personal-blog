@@ -150,6 +150,10 @@ load_dotenv()  # put this at the very top, above the Tavily import
 
 Restart, and the server boots clean. You now have two tools sitting in a file. The model still has no idea they exist.
 
+<Callout type="info" title="macOS quirk: if search later fails with CERTIFICATE_VERIFY_FAILED">
+One machine-specific trap worth knowing before it bites: on macOS, Python installed from the python.org installer ships without root certificates wired up, so the first real Tavily call can fail with `SSL: CERTIFICATE_VERIFY_FAILED` even though your key is fine. The fix is one double-click: run the `Install Certificates.command` file sitting in your `/Applications/Python 3.x/` folder. (Alternative: `pip install certifi`, then launch the server with `SSL_CERT_FILE=$(python -m certifi)` in front of the uvicorn command.) Homebrew and Linux Pythons don't have this problem.
+</Callout>
+
 ## Teaching the model the tools exist
 
 Open `graph.py`. The model you built in [Part 3](/blog/langgraph-3-first-graph#the-one-station-that-does-the-thinking) was created with `ChatOpenAI(...)` or `ChatAnthropic(...)`, whichever tab you picked. Right after that line, bind the tools to it:
