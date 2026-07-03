@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="508" viewBox="0 0 1040 508" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="508" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; the diary the SDK keeps</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62">$</tspan> ls ~/.claude/projects/ | grep part-05</text>
+    <text x="32" y="116" xml:space="preserve">-Users-yadneshsalvi-&#8230;-part-05-sessions-backend-<tspan fill="#e5825a">workspaces-10e36807f6a742d4a078d400b9f10558</tspan></text>
+    <text x="32" y="144" xml:space="preserve">-Users-yadneshsalvi-&#8230;-part-05-sessions-backend-<tspan fill="#e5825a">workspaces-d0df4e91c2a348a1a18b1f4ff4603c2a</tspan></text>
+    <text x="32" y="172" xml:space="preserve"><tspan fill="#756d62"># one shard per working directory. since Part 4, that means one per workspace.</tspan></text>
+    <text x="32" y="200" xml:space="preserve"></text>
+    <text x="32" y="228" xml:space="preserve"><tspan fill="#756d62">$</tspan> ls &#8230;workspaces-d0df4e91&#8230;/</text>
+    <text x="32" y="256" xml:space="preserve"><tspan fill="#8fb573">8664da65-3b4b-4a55-a41a-96d9a90571e8.jsonl</tspan>   <tspan fill="#756d62"># the conversation</tspan></text>
+    <text x="32" y="284" xml:space="preserve"><tspan fill="#8fb573">caf6b788-f7f0-4dd1-b57d-e8591c2113d3.jsonl</tspan>   <tspan fill="#756d62"># its fork (later)</tspan></text>
+    <text x="32" y="312" xml:space="preserve"></text>
+    <text x="32" y="340" xml:space="preserve"><tspan fill="#756d62">$</tspan> head -3 &#8230;/8664da65-&#8230;.jsonl | cut -c1-90</text>
+    <text x="32" y="368" xml:space="preserve">{"type":"queue-operation","operation":"enqueue","timestamp":"2026-07-03T12:18:52.6&#8230;</text>
+    <text x="32" y="396" xml:space="preserve">{"type":"queue-operation","operation":"dequeue","timestamp":"2026-07-03T12:18:52.6&#8230;</text>
+    <text x="32" y="424" xml:space="preserve">{"parentUuid":null,&#8230;,"type":<tspan fill="#8fb573">"user"</tspan>,"message":{"role":"user","content":<tspan fill="#8fb573">"Which sto&#8230;</tspan></text>
+    <text x="32" y="452" xml:space="preserve"><tspan fill="#756d62"># every turn you've run since Part 1 wrote a file like this. nobody was reading it.</tspan></text>
+  </g>
+</svg>

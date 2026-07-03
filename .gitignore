@@ -59,3 +59,4 @@ next-env.d.ts
 /scripts/gen-agent-sdk-part2-svgs.mjs
 /scripts/gen-agent-sdk-part3-svgs.mjs
 /scripts/gen-agent-sdk-part4-svgs.mjs
+/scripts/gen-agent-sdk-part5-svgs.mjs

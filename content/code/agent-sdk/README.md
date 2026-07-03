@@ -10,6 +10,7 @@ Every folder below is the **complete, runnable project as it exists at the end o
 | 2 | [`part-02-fastapi-streaming`](part-02-fastapi-streaming) | The agent behind HTTP, streaming six event types over SSE | [The FastAPI Bridge and the Event Vocabulary](https://yadneshsalvi.com/blog/agent-sdk-2-fastapi-streaming) |
 | 3 | [`part-03-agent-ui`](part-03-agent-ui) | A chat UI with live tool badges, markdown answers, and a Stop button | [The Agent UI](https://yadneshsalvi.com/blog/agent-sdk-3-agent-ui) |
 | 4 | [`part-04-workspaces-artifacts`](part-04-workspaces-artifacts) | Per-conversation workspaces, file uploads, and an artifacts panel for charts and reports | [Workspaces and Artifacts](https://yadneshsalvi.com/blog/agent-sdk-4-workspaces-artifacts) |
+| 5 | [`part-05-sessions`](part-05-sessions) | Session memory, a conversations sidebar, rename, and forkable analyses | [Sessions: The Analyst Remembers](https://yadneshsalvi.com/blog/agent-sdk-5-sessions) |
 
 *(The series is in progress — 14 parts across three acts. Folders appear here as parts publish.)*
 

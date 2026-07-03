@@ -1,0 +1,396 @@
+---
+title: "Claude Agent SDK in Production, Part 5: Sessions: The Analyst Remembers"
+subtitle: "One line of backend code turns amnesia into memory. Then the SDK's own session store powers a conversations sidebar, renames, and forkable analyses, and Act I closes."
+image: "/images/series/agent-sdk/part-5/cover-light.svg"
+imageDark: "/images/series/agent-sdk/part-5/cover-dark.svg"
+createdAt: "2026-07-07T00:00:00.000Z"
+updatedAt: "2026-07-07T00:00:00.000Z"
+tags: ["claude-agent-sdk", "fastapi", "nextjs", "tutorial"]
+series: "claude-agent-sdk-fastapi-nextjs"
+seriesPart: 5
+---
+
+Ask your analyst "Which store grew fastest between January and June?" and it answers: Riverside, 70.6% growth. Now type the follow-up that every real conversation contains: **"Now chart *that store's* weekly numbers."** In every part so far, that sentence was a coin flip pointed at a confused agent. Today the analyst filters `store_id == "S04"` without being told, because it remembers which store you were both talking about. The entire backend change that makes this work is **one line**. The rest of this part is discovering how much machinery the SDK already built while nobody was looking, and closing Act I with a product.
+
+<Figure
+  src="/images/series/agent-sdk/part-5/browser-memory-light.svg"
+  srcDark="/images/series/agent-sdk/part-5/browser-memory-dark.svg"
+  alt="The Beanline Analyst with a new conversations sidebar on the left. The chat shows the end of a first answer: Riverside grew fastest with 70.6% growth, from $19.7K to $33.5K, with a receipt of $0.0391 and 36 seconds. Below it the user asks: now chart that store's weekly numbers. The agent runs one Bash badge and answers with Riverside's weekly revenue, peaking at $8,070 in week 26, for $0.0114 and 16 seconds. The artifacts panel lists report.md and two charts, previewing riverside_weekly.png, a rising bar chart."
+  caption="The two-message demo, from a real run. Nobody told the second turn which store. The receipt detail worth savoring: the turn WITH full memory cost less than a fifth of the first one."
+  width={1120}
+  height={786}
+/>
+
+That sidebar on the left is new too, and here's the part that should raise an eyebrow: it lists conversations this server never stored. No database was added. No sessions table, no `conversations.json`, no ORM. The SDK has been keeping a diary of every conversation since your first `query()` in Part 1, and today we finally read it.
+
+## Break it first: the goldfish with a job title
+
+Give the Part 4 analyst the follow-up cold, in a fresh conversation, and watch a very expensive goldfish at work:
+
+<Figure
+  src="/images/series/agent-sdk/part-5/browser-amnesia-light.svg"
+  srcDark="/images/series/agent-sdk/part-5/browser-amnesia-dark.svg"
+  alt="The Beanline Analyst asked, in a brand new conversation: now chart that store's weekly numbers. The reply reads: I don't have context about which store or what data you're referring to. Could you provide which store you want to chart, and the data source. Or, if this refers to work from a previous conversation, let me check my memory to see if there's relevant context. Receipt: $0.0113 and 4 seconds."
+  caption="The amnesia run, verbatim, $0.0113. Note the last sentence: it offers to check a memory it does not have. The offer is real; the wiring is what's missing, and it's today's work."
+  width={1120}
+  height={568}
+/>
+
+This is [Part 2's amnesia demo](/blog/agent-sdk-2-fastapi-streaming#the-amnesia-demo) all over again, unchanged after three parts of building: every `query()` starts from zero, and the *files* have been the only memory the whole time. But read the agent's reply closely, because the failure got more interesting since Part 2. "Let me check my memory to see if there's relevant context": the `claude_code` preset we adopted in Part 4 *knows* conversations can have pasts. It's offering to do the exact thing we never wired up. The gap between that sentence and reality is precisely one option on `ClaudeAgentOptions`, and the SDK has been patiently waiting for us to pass it.
+
+## The diary, revisited
+
+In [Part 1](/blog/agent-sdk-1-first-agent#the-diary-the-sdk-keeps) you glanced at `~/.claude/projects/` and moved on. Time to actually open it:
+
+<Figure
+  src="/images/series/agent-sdk/part-5/term-diary.svg"
+  alt="A dark terminal. Listing ~/.claude/projects filtered to part-05 shows two directories whose names end in the workspace ids from the running app, one shard per working directory. Listing inside one shard shows two JSONL files, the conversation and its fork. The first three lines of a session file show queue-operation records and then a user record whose content begins: which store grew fastest. A comment notes that every turn since Part 1 wrote a file like this and nobody was reading it."
+  caption="The session store, on disk, from this part's real runs. One folder per working directory, one JSONL per conversation, one JSON record per event."
+  width={1040}
+  height={508}
+/>
+
+Three facts from that listing run today's whole agenda. **One: every conversation is a JSONL file** whose lines are the raw API messages: user turns, assistant turns with their tool calls, results. A complete transcript, written by the SDK whether or not you care ([the concepts page has the anatomy](/blog/agent-sdk-concepts#sessions-and-jsonl)). **Two: files are named by `session_id`**, the very id we've been dutifully emitting in `session_start` parcels since Part 2 and using for absolutely nothing. That bill comes due today. **Three, and sneakiest: the store is sharded by working directory.** The SDK files each diary under an escaped version of the cwd the agent ran in. In Part 1 that meant one shard for the whole app. But Part 4 gave every conversation its own workspace as `cwd`, which means every conversation now gets its own *shard* too. Hold that thought; it reshapes the sidebar section.
+
+## The memory switch
+
+Here is the entire backend diff that turns amnesia into memory:
+
+```python filename="backend/app/main.py" repo="part-05-sessions/backend/app/main.py" lines="45-56"
+def build_options(workspace: Path, session_id: str | None) -> ClaudeAgentOptions:
+    """Part 4's options plus one line: resume. Hand the SDK a session id
+    and the new turn starts with the whole diary already in its head."""
+    return ClaudeAgentOptions(
+        cwd=str(workspace),
+        tools=["Read", "Glob", "Grep", "Bash", "Write"],
+        permission_mode="bypassPermissions",
+        model=MODEL,
+        include_partial_messages=True,
+        system_prompt={"type": "preset", "preset": "claude_code", "append": ANALYST_PROMPT},
+        resume=session_id,
+    )
+```
+
+`resume=session_id` tells the SDK: reload that diary, and let this turn arrive with everything in it already in context. Same session id, same file, the story continues. (`resume`'s sibling `continue_conversation` reopens "whatever was most recent", which means nothing on a server handling many conversations; [the concepts page draws the line](/blog/agent-sdk-concepts#resume-vs-continue).) With `resume=None` the behavior is exactly what you've had since Part 1: a fresh session. The request model grows the matching field:
+
+```python filename="backend/app/main.py" repo="part-05-sessions/backend/app/main.py" lines="68-71"
+class ChatRequest(BaseModel):
+    message: str
+    workspace_id: str | None = None
+    session_id: str | None = None  # the memory switch: absent = fresh start
+```
+
+And the client plays the same echo game it learned in Part 4 with the workspace id, now for the second id that's been riding `session_start` all along:
+
+```tsx filename="frontend/app/page.tsx" repo="part-05-sessions/frontend/app/page.tsx" lines="286-290"
+        } else if (event.type === "session_start") {
+          // Both echoes, collected: the desk id (Part 4) and, at last, the
+          // diary id we've been forwarding unused since Part 2.
+          if (event.workspace_id) setWorkspaceId(event.workspace_id);
+          setSessionId(event.session_id);
+```
+
+First message: no session id, server starts fresh, `session_start` echoes the new id, client keeps it. Every later message sends it back, and the analyst remembers. Note what the server does *not* do: store anything. It's still a stateless translator between HTTP and the SDK; the state lives in the SDK's files, keyed by ids the client carries. That's the whole architecture.
+
+Run the dessert now. "Which store grew fastest between January and June?" then "Now chart that store's weekly numbers." In my recorded run the first turn cost $0.0397 and took 21 seconds; the follow-up knew *that store* meant Riverside, charted its weekly revenue from $2,674 in week 1 to $7,693 in week 26, and cost **$0.0220 in 18 seconds**. Read those numbers again: the turn carrying a full conversation's memory was cheaper than the turn that started cold. Prompt caching makes the reloaded history nearly free, and the follow-up needed fewer tool calls because the *conversation* already knew where the data lived. Memory isn't a luxury feature with a surcharge; wired this way, it's a discount.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels in a single row separated by thin vertical black dividers, about an AI analyst that keeps a diary of every conversation and actually remembers. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny necktie. Panel 1: Yad leans on the analyst's desk asking casually; speech bubble from Yad: "NOW CHART THAT STORE." Panel 2: the analyst stands at a bookshelf full of identical worn diaries, pulling out one labeled "US" and flipping it open, reading intently with one finger on the page. Panel 3: the analyst, diary open in hand, says warmly; speech bubble: "AH YES. TUESDAY. YOU PREFER BAR CHARTS." Yad looks touched but slightly scared, one hand on his chest, a single sweat drop. Clean readable hand-lettered speech bubbles, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-5/comic-diary.png"
+  alt="Comic in three panels. Panel one: Yad, a bearded developer with headphones, leans on the analyst's desk and says: now chart that store. Panel two: the laptop analyst stands at a bookshelf of identical worn diaries, pulling out one labeled US and reading it intently. Panel three: the analyst, diary in hand, says warmly: ah yes, Tuesday, you prefer bar charts. Yad looks touched but slightly scared, hand on chest, one sweat drop."
+  caption="resume, illustrated. The diary was always being written; the switch decides whether anyone opens it before speaking."
+  width={1536}
+  height={1024}
+/>
+
+## The sidebar, and the trap in the obvious API
+
+A product with memory needs a list of conversations to come back to. The old-fashioned move is a `sessions.json` you maintain yourself; the SDK grew real session utilities while nobody was watching (`list_sessions`, `get_session_info`, `get_session_messages`, `rename_session`, `fork_session`), and hand-rolling an index now would be teaching a workaround. So the sidebar is SDK-native. But the obvious first call is a trap, and it's worth stepping in it deliberately.
+
+`list_sessions()`, no arguments, on my machine: **415 sessions.** Every Claude Code conversation I have ever had, on any project, anywhere on this laptop. The unscoped call reads the *entire* store, and a sidebar built on it would cheerfully leak the developer's whole working life into the product. This is the per-cwd sharding fact paying off: scoped with `directory=`, the same call returns only the diaries of that one folder. And since Part 4 made every conversation's cwd its own workspace, the app's conversations are exactly the union of its workspace shards:
+
+```python filename="backend/app/sessions.py" repo="part-05-sessions/backend/app/sessions.py" lines="23-41"
+    rows = []
+    if not WORKSPACES_ROOT.is_dir():
+        return rows
+    for ws in WORKSPACES_ROOT.iterdir():
+        if not ws.is_dir():
+            continue
+        for s in list_sessions(directory=str(ws)):
+            # first_prompt, not summary: the summary drifts to whatever the
+            # LATEST turn was about, so two-turn chats kept renaming
+            # themselves mid-conversation. The first question is the
+            # stable name (until the user renames it).
+            rows.append({
+                "session_id": s.session_id,
+                "workspace_id": ws.name,
+                "title": s.custom_title or s.first_prompt or "Untitled analysis",
+                "last_modified": s.last_modified,  # epoch milliseconds
+            })
+    rows.sort(key=lambda r: r["last_modified"], reverse=True)
+    return rows
+```
+
+The walk is the design: *our* `workspaces/` folder provides the scope, the SDK provides the data, and no third source of truth ever exists. Every row keeps its `workspace_id` next to its `session_id`, because reopening a conversation means restoring both the diary *and* the desk.
+
+<Figure
+  src="/images/series/agent-sdk/part-5/fig-shards-light.svg"
+  srcDark="/images/series/agent-sdk/part-5/fig-shards-dark.svg"
+  alt="Diagram titled: where the diaries live. On the left, the server's backend/workspaces folder with two workspace directories holding CSVs and generated charts. Dashed arrows labeled one shard per cwd point to the right side, the SDK's ~/.claude/projects folder, where each workspace has its own directory of JSONL session files, one marked as the conversation and one as its fork. Below, a highlighted box titled the sidebar walk shows the two-line loop calling list_sessions with directory equals each workspace. A warning underneath notes that unscoped list_sessions returned every session on the machine, 415 conversations, including the developer's own Claude Code history."
+  caption="Two worlds, joined by the cwd. The sidebar never queries anything it doesn't own: our folder list scopes the SDK's store."
+  width={1240}
+  height={520}
+/>
+
+That comment about `first_prompt` earns its lines: the plan was to title rows with the SDK's `summary` field, until live testing showed the summary *drifts*. It tracks the newest turn, so after the follow-up question, both test conversations proudly renamed themselves "Now chart that store's weekly numbers." A sidebar where titles mutate mid-conversation feels haunted; `first_prompt` is stable, and `custom_title` (set by rename, below) beats both. Small field choice, real product behavior; this is why we test against the live SDK before writing prose.
+
+The rail itself is plain React: rows with a title and a relative time, an active highlight, and two hover actions. The pencil swaps the row for an inline input; submitting calls the rename endpoint, which is `rename_session` wearing two lines of FastAPI (`PATCH /conversations/{ws}/{sid}` in the repo), lands a "Renamed." toast, and from then on `custom_title` wins the title contest:
+
+```tsx filename="frontend/components/Sidebar.tsx" repo="part-05-sessions/frontend/components/Sidebar.tsx" lines="110-124"
+                <span className="absolute right-2 top-2 hidden gap-1.5 group-hover:flex">
+                  <button
+                    type="button"
+                    title="Rename"
+                    onClick={() => {
+                      setEditing(c.session_id);
+                      setDraft(c.title);
+                    }}
+                  >
+                    <PencilIcon />
+                  </button>
+                  <button type="button" title="Duplicate chat" onClick={() => onFork(c)}>
+                    <BranchIcon />
+                  </button>
+                </span>
+```
+
+## Replaying a conversation you weren't there for
+
+Click a sidebar row and the transcript reappears, badges and all. The server rebuilds it from the diary with `get_session_messages`, and the mapping should feel like déjà vu, because it's [Part 3's `applyEvent`](/blog/agent-sdk-3-agent-ui#reading-the-stream) run over the past instead of the present. Text extends the open turn. A `tool_use` block opens a tool block. A `tool_result`, which arrives inside a *user* message exactly as [Part 1's anatomy](/blog/agent-sdk-1-first-agent#anatomy-of-the-message-stream) warned, completes its block **by id**:
+
+```python filename="backend/app/sessions.py" repo="part-05-sessions/backend/app/sessions.py" lines="66-83"
+    for m in get_session_messages(session_id, directory=str(workspace)):
+        content = m.message.get("content")
+        if m.type == "user":
+            if isinstance(content, str):
+                close_turn()
+                messages.append({"role": "user", "text": content})
+                continue
+            for block in content or []:
+                if block.get("type") == "tool_result" and turn:
+                    for b in turn["blocks"]:
+                        if b.get("id") == block.get("tool_use_id"):
+                            raw = block.get("content")
+                            b["result"] = raw if isinstance(raw, str) else ""
+                            b["isError"] = bool(block.get("is_error"))
+                            b["done"] = True
+                elif _text_of(block) is not None:
+                    close_turn()
+                    messages.append({"role": "user", "text": block["text"]})
+```
+
+(The assistant half is eleven more lines in the file: text and `tool_use` blocks appended to the open turn, `thinking` blocks skipped until [Part 10](/blog/agent-sdk-10-interactive) renders them.) The payoff of Part 3's block model lands here: **history and live streaming produce the same shape**, so the frontend renders a replayed conversation with zero new components. The client's half restores the desk too, splitting the workspace's current files the same way Part 4 taught: plain files become chips, images and markdown become the artifacts panel:
+
+```tsx filename="frontend/app/page.tsx" repo="part-05-sessions/frontend/app/page.tsx" lines="199-219"
+  async function openConversation(c: Conversation) {
+    if (working) return;
+    try {
+      const { messages: history, files: desk } = await fetchConversation(
+        c.workspace_id,
+        c.session_id,
+      );
+      setMessages(history as ChatMessage[]);
+      setSessionId(c.session_id);
+      setWorkspaceId(c.workspace_id);
+      const all = desk as WorkspaceFile[];
+      setFiles(all.filter((f) => f.kind === "file").map((f) => f.path));
+      const outputs: Artifact[] = all
+        .filter((f) => f.kind !== "file")
+        .map((f) => ({ path: f.path, kind: f.kind, size: f.size, updatedAt: Date.now() }));
+      setArtifacts(outputs);
+      setSelectedArtifact(outputs[outputs.length - 1]?.path ?? null);
+    } catch (err) {
+      setToast({ message: (err as Error).message });
+    }
+  }
+```
+
+Refresh the page mid-thought and nothing is lost: the sidebar comes back from disk, one click restores transcript, desk, and memory, and the next message resumes the same session. That's the refresh-survival Part 3 could only apologize for. (The stream of a turn *in flight* still dies with the tab; that harder promise is [Part 9](/blog/agent-sdk-9-durable-streams)'s durable streams.)
+
+The "New analysis" button is the inverse and it's exactly as boring as it should be: clear the messages, drop both ids, empty the chips and the panel. Fresh desk, fresh diary; the server mints new ones on the next message.
+
+## Duplicate chat: sessions are a tree
+
+Here's a move no chat product taught you to expect, and the SDK gives it away. Say the Riverside analysis is at a good checkpoint and you want to explore "what if we drop the Airport store?" without wrecking the thread you have. Photocopy the diary:
+
+```python filename="backend/app/main.py" repo="part-05-sessions/backend/app/main.py" lines="135-144"
+@app.post("/conversations/{workspace_id}/{session_id}/fork")
+async def fork_conversation(workspace_id: str, session_id: str) -> dict:
+    """Branch the analysis: a NEW session that inherits the whole history,
+    while the original stays untouched. No model call, no cost; the SDK
+    copies the diary and hands back a fresh id. The desk is shared."""
+    workspace = workspace_path(workspace_id)
+    info = get_session_info(session_id, directory=str(workspace))
+    base = (info and (info.custom_title or info.first_prompt)) or "Analysis"
+    result = fork_session(session_id, directory=str(workspace), title=f"{base} (branch)")
+    return {"session_id": result.session_id, "workspace_id": workspace_id}
+```
+
+`fork_session` is an offline operation: no model call, no tokens, `$0.00`, instant. The fork arrives with the entire history and a new id; the original never notices. I verified the inheritance the honest way, by asking the fork a question only the history could answer, and it answered from turns it was never present for. In the UI this is the branch icon, "Duplicate chat": the client calls the endpoint, opens the branch, and toasts *"Duplicated. You're on the branch now."* Both rows sit in the sidebar, both resumable forever, diverging from a shared past. A conversation is a line; [fork makes it a tree](/blog/agent-sdk-concepts#fork-session).
+
+<Figure
+  src="/images/series/agent-sdk/part-5/fig-tree-light.svg"
+  srcDark="/images/series/agent-sdk/part-5/fig-tree-dark.svg"
+  alt="Timeline diagram using the real session ids from this part's runs. A horizontal line for session 8664da65 shows turn one, grew fastest, turn two, chart that store, and later turns each labeled resume with the same id. From turn three a curved branch labeled fork_session, copies the diary, new id, no model call, zero dollars, drops to a second line for session caf6b788, which inherits turns one to three and continues with its own new turn labeled resume with the fork's id. A note explains both branches stay resumable and share the same desk, because the fork copies the diary, not the workspace. A serif caption reads: a conversation is a line until you photocopy the diary, then it's a tree."
+  caption="The fork from this part's real runs, ids and all. Everything above the curve happened once and is shared; everything after it diverges."
+  width={1240}
+  height={500}
+/>
+
+One honest caveat, visible right in that figure: the fork copies the *diary*, not the *desk*. Both branches keep working in the same workspace folder, so if each branch charts something new, both panels see both charts, and a `report.md` written by one branch overwrites the other's. For "try a different angle on this analysis" that's usually what you want (same data, shared outputs). For true isolation you'd copy the workspace too and re-point the fork's cwd, and the session store's per-cwd sharding makes that a real project rather than a flag; production apps that need it keep conversation state in their own database, which is the honest ceiling of Act I (more below).
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels in a single row separated by thin vertical black dividers, about branching a conversation by photocopying its diary. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny necktie. Panel 1: Yad stands next to the analyst holding a worn diary over an office photocopier, mid-thought; speech bubble from Yad: "WHAT IF WE DROP THE AIRPORT STORE?" Panel 2: the photocopier flashes bright light; out come TWO identical diaries, and now TWO identical laptop-analysts stand side by side, each holding one diary, waving at each other. Panel 3: two small desks side by side; each analyst writes in its own diary; the left diary is labeled "CHAPTER 4: KEEP AIRPORT", the right diary is labeled "CHAPTER 4: NO AIRPORT"; Yad watches happily with crossed arms. Clean readable hand-lettered speech bubbles and labels, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-5/comic-photocopy.png"
+  alt="Comic in three panels. Panel one: Yad holds a worn diary over an office photocopier and wonders: what if we drop the airport store? Panel two: the photocopier flashes and two identical laptop analysts stand side by side, each holding a copy of the diary, waving at each other. Panel three: at two small desks, each analyst writes its own chapter four, one diary labeled keep airport, the other labeled no airport, while Yad watches with crossed arms."
+  caption="fork_session in one office appliance. Same past on both copies; the futures are theirs to write."
+  width={1536}
+  height={1024}
+/>
+
+Here's the whole tree living in the product, after a rename and a duplicate, with the toast still up:
+
+<Figure
+  src="/images/series/agent-sdk/part-5/browser-branch-light.svg"
+  srcDark="/images/series/agent-sdk/part-5/browser-branch-dark.svg"
+  alt="The Beanline Analyst after renaming and duplicating a conversation. The sidebar lists three rows: Riverside growth deep-dive branch, active and one second old, the original Riverside growth deep-dive, and the older conversation titled by its first prompt. The chat shows the inherited history including the Riverside answer and weekly chart turn, the artifacts panel lists three files with store_growth.png previewed, and a green toast reads: Duplicated. You're on the branch now."
+  caption="Rename gave the thread a human name; Duplicate gave it a branch. The branch opened with history it inherited, not history it lived."
+  width={1120}
+  height={514}
+/>
+
+## The bug the camera caught
+
+Recording this part's demo video exposed a real bug that shipped in Parts 3 and 4, and it's too instructive to fix silently. The success toast from "Load sample data" stayed on screen for the entire 30-second agent run, self-dismiss timer be damned. The culprit is a classic React foot-gun:
+
+```tsx filename="frontend/app/page.tsx" repo="part-05-sessions/frontend/app/page.tsx" lines="92-94"
+  // A stable identity, or the toast's 6s timer resets on every render
+  // and a busy stream keeps the banner up forever (found on camera).
+  const dismissToast = useCallback(() => setToast(null), []);
+```
+
+The toast's `useEffect` lists `onDismiss` as a dependency, which is correct; the page was passing `() => setToast(null)` inline, which is a *new function on every render*. Normally you'd never notice. But a streaming turn re-renders the page dozens of times per second, so the effect re-ran constantly, and every re-run cancelled the 6-second timer and started a fresh one. The toast could only die if the app held still for six straight seconds, which a streaming app never does. One `useCallback` pins the identity and the timer finally runs to completion. The lesson travels: **in streaming UIs, unstable identities turn from style nits into visible behavior**, because "re-render" stops being an occasional event and becomes the weather.
+
+## The cost ritual
+
+All real runs from building this part:
+
+| Run | Result | Cost |
+|---|---|---|
+| Follow-up with no session (amnesia) | "which store... could you provide..." | $0.0113 · 4s |
+| "Which store grew fastest?" (fresh) | Riverside +70.6%, chart + report | $0.0397 · 21s |
+| "Now chart that store's weekly numbers." (resumed) | Riverside weekly chart, right store, no hints | $0.0220 · 18s |
+| Duplicate chat (fork_session) | new id, full history inherited | $0.00 · instant |
+| Rename | custom_title set | $0.00 · instant |
+| Reopen conversation (history replay) | transcript + desk restored | $0.00 · one disk read |
+
+The shape of this table is the part's thesis. The two paid rows are model turns; everything session-shaped (fork, rename, replay, the sidebar itself) is file work the SDK does for free. And the resumed turn undercuts the fresh one, because cached history is cheap and remembered context kills redundant exploration. Compare that with the [LangGraph series](/blog/langgraph-7-memory), where memory meant building a checkpointer and wiring threads by hand: same capability, and the contrast is the point of choosing a crate engine.
+
+## Act I, the curtain
+
+Five parts ago this was `uv init` and an empty folder. Count what's on the table now: a terminal agent that became a streaming HTTP service (Parts 1 and 2), a product UI where every tool call is visible and expandable (Part 3), per-conversation workspaces with uploads, a hardened file pipeline, and an artifacts panel collecting charts and reports (Part 4), and now memory, a conversations sidebar, renames, and branching, all riding the SDK's own session store (Part 5). **That is a complete AI data analyst**, and its architecture is worth saying out loud one time: a stateless FastAPI translator, an event vocabulary that has absorbed two extensions without breaking a parser, and state that lives entirely in files the SDK manages.
+
+Honesty about the ceiling: everything is per-machine. The diaries live in this computer's home directory, the workspaces on its disk; two servers would mean two split brains, and there's no login, so every visitor is the same "user". The production reference app this series shadows keeps conversations in Postgres with real auth for exactly these reasons. Act I's job was *works on my machine, works well*; the gap between that and production is not more features, it's trust: what the agent may do, who approves it, what gets logged, and what survives a crash. That's Act II: a real database behind a **custom tool** (Part 6), risky commands pausing for a human **Approve** click (Part 7), **hooks** that see every tool call and write the audit log (Part 8), and streams that survive a refresh mid-turn (Part 9). The scissors from Part 1 finally get taken away, one guardrail at a time.
+
+<DemoVideo
+  src="/videos/agent-sdk/part-5-demo.mp4"
+  poster="/videos/agent-sdk/part-5-poster.jpg"
+  caption='A real run, recorded: sample data loaded, the growth question answered (Riverside, +70.6%), then the follow-up "Now chart that store&apos;s weekly numbers" charted the right store from memory, $2,674 in week 1 to $7,693 in week 26, all numbers verified against the dataset.'
+  label="Screen recording of Part 5: a two-message conversation proving session memory, with the conversations sidebar and artifacts panel"
+/>
+
+<Recap
+  part={5}
+  items={[
+    "Conversation memory in one line: resume=session_id reloads the SDK's diary, the client echoes the id back each turn, and the server stays stateless.",
+    "A conversations sidebar with zero new storage: our workspaces folder scopes list_sessions(directory=...) per shard, dodging the unscoped call that returns every session on the machine.",
+    "History replay through the same block model as live streaming: get_session_messages mapped by the applyEvent rules, so old conversations render with zero new components.",
+    "Rename and Duplicate chat riding rename_session and fork_session: forks inherit the whole history for zero dollars, and sessions become a tree.",
+    "Act I complete: a working AI data analyst with streaming, tool visibility, workspaces, artifacts, and memory, all state in SDK-managed files.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "Why does the sidebar call list_sessions(directory=ws) once per workspace instead of list_sessions() once?",
+      options: [
+        "The unscoped call is slower because it reads more files",
+        "The unscoped call returns every session on the entire machine, including the developer's unrelated Claude Code history; directory= scopes it to one shard",
+        "list_sessions() without arguments raises an exception",
+        "Sessions can only be read from the directory that created them",
+      ],
+      answer: 1,
+      explain: "The session store is machine-global and sharded by cwd. Unscoped, my laptop returned 415 conversations. The workspaces folder is the app's natural scope: walk it, query each shard, merge.",
+    },
+    {
+      q: "What does resume=session_id actually change about a query() call?",
+      options: [
+        "It makes the SDK reuse the previous turn's answer from a cache",
+        "It appends the new question to the JSONL file without calling the model",
+        "The SDK reloads that session's transcript so the new turn starts with the full conversation in context, and keeps writing to the same session",
+        "It moves the session file into the current working directory",
+      ],
+      answer: 2,
+      explain: "resume is the memory switch: same id, same diary, story continues. The model is still called normally; it arrives knowing everything the session contains, which is why 'that store' resolved to Riverside.",
+    },
+    {
+      q: "What does fork_session give you, and what does it cost?",
+      options: [
+        "A new session id that inherits the full history while the original stays untouched, for zero model calls and zero dollars",
+        "A copy of the workspace folder including all charts",
+        "A live second agent that answers in parallel",
+        "A summary of the conversation so far, billed as one model call",
+      ],
+      answer: 0,
+      explain: "It's an offline file operation: the diary is copied under a new id. Both branches resume independently forever. The desk is NOT copied; branches share the workspace, which the post calls out as the honest caveat.",
+    },
+    {
+      q: "Why do sidebar rows use first_prompt (or custom_title) instead of the SDK's summary field?",
+      options: [
+        "summary is not available in SDKSessionInfo",
+        "first_prompt is shorter and always fits the rail",
+        "summary is only generated after ten or more turns",
+        "Live testing showed summary drifts to describe the latest turn, so titles kept changing mid-conversation; first_prompt is stable and custom_title wins after a rename",
+      ],
+      answer: 3,
+      explain: "Both test conversations renamed themselves to the follow-up question the moment it was asked. A title should name the thread, not narrate it; first_prompt does that until the user picks a better name.",
+    },
+    {
+      q: "When history() replays a session, where do tool results come from and how do they reach the right badge?",
+      options: [
+        "From assistant messages, matched by their position in the turn",
+        "From tool_result blocks inside user messages, matched to their tool block by tool_use_id, exactly like the live applyEvent rules",
+        "From a separate results.jsonl file the SDK writes",
+        "The server re-runs each tool to regenerate its output",
+      ],
+      answer: 1,
+      explain: "The diary stores raw API messages, and in that format tool results ride user messages, as Part 1's anatomy showed. The replay applies Part 3's rules to the past: complete the block by id, never by position.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 5: sessions - memory, sidebar, rename, and fork"
+```
+
+Your analyst remembers, but it still trusts everyone and everything: it runs whatever shell command it likes on Part 1's scissors, and its only data source is whatever CSVs land on the desk. In [Part 6](/blog/agent-sdk-6-custom-tools) Beanline's live numbers move into a real SQLite database and the analyst gets its first **custom tool** to query it, read-only by construction, which is the first rung of Act II's safety ladder.
+
+The complete, tested code for this part lives in [`part-05-sessions`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/tree/main/part-05-sessions) in the [companion repo](https://github.com/yadneshSalvi/claude-agent-sdk-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.
