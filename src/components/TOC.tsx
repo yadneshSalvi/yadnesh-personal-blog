@@ -4,12 +4,20 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Slugger from "github-slugger";
 import clsx from "clsx";
+import PanelIcon from "@/components/PanelIcon";
 
 type Heading = { id: string; text: string; level: number };
 
 type TOCProps = {
   contentSelector?: string;
   initialHeadings?: Heading[];
+  /** Rail heading, e.g. "Contents" (default) or "On this page" */
+  label?: string;
+  /**
+   * Which side of the article the rail sits on. The right rail only appears
+   * from xl up (series pages show the chapter rail from lg, this from xl).
+   */
+  side?: "left" | "right";
 };
 
 const EMPTY_HEADINGS: Heading[] = [];
@@ -47,6 +55,8 @@ function normalizeHeadingText(text: string): string {
 export default function TOC({
   contentSelector = "#post-content",
   initialHeadings = EMPTY_HEADINGS,
+  label = "Contents",
+  side = "left",
 }: TOCProps) {
   const pathname = usePathname();
   const [headings, setHeadings] = useState<Heading[]>(() => initialHeadings);
@@ -149,39 +159,49 @@ export default function TOC({
 
   if (headings.length === 0) return null;
 
+  const isRight = side === "right";
+
   return (
     <nav
+      aria-label={label}
       className={clsx(
-        "sticky top-20 hidden shrink-0 self-start transition-[width] duration-300 lg:block",
+        "sticky top-20 hidden shrink-0 self-start transition-[width] duration-300",
+        isRight ? "xl:block" : "lg:block",
         collapsed
-          ? "w-0 overflow-visible"
-          : "max-h-[calc(100vh-6rem)] w-64 overflow-auto pr-10"
+          ? clsx("w-0 overflow-visible", isRight && "flex justify-end")
+          : clsx(
+              "max-h-[calc(100vh-6rem)] w-64 overflow-auto",
+              isRight ? "pl-10" : "pr-10"
+            )
       )}
     >
       {collapsed ? (
         <button
           type="button"
           onClick={() => setCollapsed(false)}
-          aria-label="Expand contents"
-          title="Expand contents"
-          className="rounded p-1 text-faint transition-colors hover:bg-surface hover:text-ink"
+          aria-label={`Expand ${label.toLowerCase()}`}
+          title={`Expand ${label.toLowerCase()}`}
+          className={clsx(
+            "rounded p-1 text-faint transition-colors hover:bg-surface hover:text-ink",
+            isRight && "-ml-6"
+          )}
         >
-          <PanelIcon open={false} />
+          <PanelIcon open={false} mirrored={isRight} />
         </button>
       ) : (
         <>
           <div className="mb-4 flex items-center justify-between">
             <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
-              Contents
+              {label}
             </span>
             <button
               type="button"
               onClick={() => setCollapsed(true)}
-              aria-label="Collapse contents"
-              title="Collapse contents"
+              aria-label={`Collapse ${label.toLowerCase()}`}
+              title={`Collapse ${label.toLowerCase()}`}
               className="rounded p-1 text-faint transition-colors hover:bg-surface hover:text-ink"
             >
-              <PanelIcon open />
+              <PanelIcon open mirrored={isRight} />
             </button>
           </div>
           <ul className="space-y-1 border-l border-line">
@@ -207,24 +227,5 @@ export default function TOC({
         </>
       )}
     </nav>
-  );
-}
-
-function PanelIcon({ open }: { open: boolean }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-4 w-4"
-      aria-hidden
-    >
-      <rect x="3" y="4" width="18" height="16" rx="2" />
-      <path d="M9 4v16" />
-      {open ? <path d="M15.5 10l-2 2 2 2" /> : <path d="M14 10l2 2-2 2" />}
-    </svg>
   );
 }

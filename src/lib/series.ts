@@ -113,6 +113,16 @@ export async function getSeriesBySlug(slug: string): Promise<Series | null> {
   };
 }
 
+/**
+ * Chapter title as shown in the series sidebar: the part of the post title
+ * after "Part N:", falling back to the full title.
+ * "LangGraph from Scratch, Part 4: The Next.js Frontend" → "The Next.js Frontend"
+ */
+export function shortPartTitle(title: string): string {
+  const match = title.match(/Part\s+\d+\s*:\s*(.+)$/i);
+  return match ? match[1].trim() : title;
+}
+
 /** Series context for an individual part page (badge above the title) */
 export function getSeriesContextForPost(post: PostMeta): {
   series: SeriesMeta;

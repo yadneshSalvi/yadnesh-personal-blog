@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import TOC from "@/components/TOC";
+import SeriesNav from "@/components/SeriesNav";
 import ZoomableImage from "@/components/ZoomableImage";
 import JsonLd from "@/components/JsonLd";
 import { getAllPostSlugs, getPostBySlug, getPostMetaBySlug } from "@/lib/posts";
-import { getSeriesContextForPost } from "@/lib/series";
+import { getSeriesContextForPost, getSeriesParts, shortPartTitle } from "@/lib/series";
 import { SITE_DESCRIPTION, SITE_URL, AUTHOR, absoluteUrl, ogImageFor } from "@/lib/seo";
 
 export const dynamic = "force-static";
@@ -73,6 +74,13 @@ export default async function BlogPost({
   if (!post) return notFound();
   const { meta, content, headings } = post;
   const seriesCtx = getSeriesContextForPost(meta);
+  const seriesNavParts = seriesCtx
+    ? getSeriesParts(seriesCtx.series.slug).map((p) => ({
+        slug: p.slug,
+        part: p.seriesPart ?? 0,
+        title: shortPartTitle(p.title),
+      }))
+    : [];
   const updatedDiffers =
     formatDate(meta.updatedAt) !== formatDate(meta.createdAt);
 
@@ -113,15 +121,34 @@ export default async function BlogPost({
   };
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-16">
+    <main
+      className={`mx-auto px-6 py-16 ${seriesCtx ? "max-w-7xl" : "max-w-6xl"}`}
+    >
       <JsonLd data={blogPostingSchema} />
       <JsonLd data={breadcrumbSchema} />
-      <div className="grid grid-cols-1 lg:grid-cols-[auto_minmax(0,1fr)]">
-        <TOC
-          key={slug}
-          contentSelector="#post-content"
-          initialHeadings={headings}
-        />
+      <div
+        className={`grid grid-cols-1 ${
+          seriesCtx
+            ? "lg:grid-cols-[auto_minmax(0,1fr)] xl:grid-cols-[auto_minmax(0,1fr)_auto]"
+            : "lg:grid-cols-[auto_minmax(0,1fr)]"
+        }`}
+      >
+        {seriesCtx ? (
+          <SeriesNav
+            key={`nav-${slug}`}
+            seriesName={seriesCtx.series.name}
+            seriesSlug={seriesCtx.series.slug}
+            totalParts={seriesCtx.totalParts}
+            parts={seriesNavParts}
+            currentSlug={slug}
+          />
+        ) : (
+          <TOC
+            key={slug}
+            contentSelector="#post-content"
+            initialHeadings={headings}
+          />
+        )}
         <article className="w-full max-w-3xl lg:mx-auto">
           <header>
             {seriesCtx ? (
@@ -183,6 +210,15 @@ export default async function BlogPost({
             {content}
           </div>
         </article>
+        {seriesCtx ? (
+          <TOC
+            key={`toc-${slug}`}
+            contentSelector="#post-content"
+            initialHeadings={headings}
+            label="On this page"
+            side="right"
+          />
+        ) : null}
       </div>
     </main>
   );
