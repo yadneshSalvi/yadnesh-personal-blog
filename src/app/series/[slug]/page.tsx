@@ -170,8 +170,17 @@ export default async function SeriesPage({
           The parts
         </h2>
         <ol className="divide-y divide-line border-b border-line">
-          {parts.map((part) => (
+          {parts.map((part) => {
+            const stage = meta.stages?.find(
+              (s) => s.from === (part.seriesPart ?? 0)
+            );
+            return (
             <li key={part.slug}>
+              {stage ? (
+                <p className="border-b border-line pb-3 pt-6 font-mono text-[11px] uppercase tracking-[0.25em] text-faint">
+                  {stage.name}
+                </p>
+              ) : null}
               <Link
                 href={`/blog/${part.slug}`}
                 className="group flex flex-col gap-5 py-8 sm:flex-row sm:items-center sm:gap-8"
@@ -216,7 +225,8 @@ export default async function SeriesPage({
                 </span>
               </Link>
             </li>
-          ))}
+            );
+          })}
         </ol>
         {published < planned ? (
           <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.15em] text-faint">

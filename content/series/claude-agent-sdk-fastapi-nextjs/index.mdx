@@ -1,0 +1,44 @@
+---
+name: "Claude Agent SDK in Production"
+accentWord: "Production"
+tagline: "Build an AI data analyst with FastAPI and Next.js: an agent that reads your files, writes its own Python, and streams every step, taken from first run all the way to a real server."
+plannedParts: 14
+image: "/images/series/agent-sdk/cover-light.svg"
+imageDark: "/images/series/agent-sdk/cover-dark.svg"
+imageAlt: "A browser window showing the finished Beanline analyst: a chat panel with tool badges and a resolved approval card on the left, and an artifacts panel with a revenue bar chart and a written report on the right. Below, the Anthropic, FastAPI, and Next.js logos."
+createdAt: "2026-07-03T00:00:00.000Z"
+updatedAt: "2026-07-03T00:00:00.000Z"
+tags: ["claude-agent-sdk", "fastapi", "nextjs", "tutorial", "series"]
+stages:
+  - { name: "Act I · Build the product", from: 1, to: 5 }
+  - { name: "Act II · Guardrails and durability", from: 6, to: 9 }
+  - { name: "Act III · Advanced capabilities and shipping", from: 10, to: 14 }
+---
+
+The Claude Agent SDK is the engine inside Claude Code, shipped as a Python library. You don't build an agent loop, a tool executor, or a context manager; you `pip install` all of it, working the way it works in a product used by millions. This series is about what you build *around* that engine, and what it takes to trust the result.
+
+What you build is an **AI data analyst** that runs on your machine and, by the end, on a real server. Drop a CSV into its workspace, ask a question in plain English, and watch it read your files, write and run its own pandas, and hand you back a chart and a written report, with every step streaming live into the UI, every risky command waiting for your approval, and every run surviving a page refresh.
+
+Fourteen parts, three acts:
+
+- **Act I (Parts 1 to 5): build the product.** The complete working analyst: agent behind HTTP, streaming UI with live tool activity, file uploads and artifacts, conversation memory.
+- **Act II (Parts 6 to 9): guardrails and durability.** Custom tools with real safety, human-in-the-loop approvals, hooks that audit everything, and streams that survive a refresh.
+- **Act III (Parts 10 to 14): advanced capabilities and shipping.** Plan mode and structured questions, subagents and skills, the MCP ecosystem and sandboxing, evals and budgets, and a real deployment to a Hetzner VM.
+
+## Should you do the LangGraph series first?
+
+This series is deliberately one notch up from [LangGraph from Scratch](/series/langgraph-fastapi-nextjs). That one builds the engine by hand, from a beginner's first FastAPI endpoint to a deployed chatbot; this one drops in a crate engine and builds the car around it. So:
+
+- **If you can write a FastAPI endpoint and a React component**, and you've seen server-sent events at least once, start here. Whenever a basic is needed, the exact LangGraph part that teaches it is linked, and you can detour or not.
+- **If FastAPI or Next.js are new to you**, do the LangGraph series first. It teaches every fundamental this one assumes, and the two apps rhyme on purpose: same backend framework, same streaming wire format, same frontend patterns.
+
+Four rules hold across all fourteen parts:
+
+- **Every part ends with something running.** Never "trust me, this pays off later".
+- **Versions are pinned.** The SDK moves fast; every part states exactly what it was written and tested against, so you can tell version drift from a genuine mistake.
+- **Costs are real.** Agent loops multiply tokens, so every part prints what its runs actually cost, measured, not estimated, and the habit graduates into hard budget enforcement in Part 13.
+- **Errors are part of the curriculum.** Each part breaks something on purpose and reads the real output with you.
+
+All the code lives in the [companion repo, `claude-agent-sdk-in-production`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production): one folder per part, each the complete project exactly as it exists at the end of that part, tested end to end against the live SDK. Inside every part, code blocks with a GitHub icon in the header link straight to the exact file in the repo.
+
+What you need: a laptop (macOS or Linux; on Windows, WSL2), a terminal, and either a Claude subscription you already pay for or a few dollars of API credit. Part 1 covers both auth paths and how to cap what you can possibly spend.

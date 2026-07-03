@@ -11,6 +11,12 @@ export type SeriesNavPart = {
   title: string;
 };
 
+export type SeriesNavStage = {
+  name: string;
+  from: number;
+  to: number;
+};
+
 type SeriesNavProps = {
   seriesName: string;
   seriesSlug: string;
@@ -18,6 +24,8 @@ type SeriesNavProps = {
   totalParts: number;
   parts: SeriesNavPart[];
   currentSlug: string;
+  /** Optional act grouping; renders a divider before each act's first part */
+  stages?: SeriesNavStage[];
 };
 
 /**
@@ -25,12 +33,28 @@ type SeriesNavProps = {
  * one marked, past parts dimmed one step, future parts two. Collapsible to
  * a slim toggle, mirroring the TOC rail on the right.
  */
+function StageDivider({ name, first }: { name: string; first: boolean }) {
+  return (
+    <div
+      className={clsx(
+        "-ml-px border-l border-transparent pb-1.5 pl-3",
+        first ? "" : "mt-3 border-t border-t-line pt-3"
+      )}
+    >
+      <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-faint/80">
+        {name}
+      </span>
+    </div>
+  );
+}
+
 export default function SeriesNav({
   seriesName,
   seriesSlug,
   totalParts,
   parts,
   currentSlug,
+  stages,
 }: SeriesNavProps) {
   const [collapsed, setCollapsed] = useState(false);
   const currentIndex = parts.findIndex((p) => p.slug === currentSlug);
@@ -90,8 +114,12 @@ export default function SeriesNav({
             {parts.map((p, i) => {
               const isCurrent = i === currentIndex;
               const isPast = currentIndex >= 0 && i < currentIndex;
+              const stage = stages?.find((s) => s.from === p.part);
               return (
                 <li key={p.slug}>
+                  {stage ? (
+                    <StageDivider name={stage.name} first={i === 0} />
+                  ) : null}
                   <Link
                     href={`/blog/${p.slug}`}
                     aria-current={isCurrent ? "page" : undefined}
@@ -114,8 +142,15 @@ export default function SeriesNav({
             })}
             {Array.from({ length: comingSoon }, (_, i) => {
               const n = parts.length + i + 1;
+              const stage = stages?.find((s) => s.from === n);
               return (
                 <li key={`soon-${n}`}>
+                  {stage ? (
+                    <StageDivider
+                      name={stage.name}
+                      first={n === 1 && parts.length === 0}
+                    />
+                  ) : null}
                   <span className="-ml-px flex gap-2.5 border-l border-transparent py-1 pl-3 text-[13px] leading-snug text-faint/70">
                     <span className="pt-px font-mono text-[10px] leading-[1.8] tabular-nums">
                       {String(n).padStart(2, "0")}

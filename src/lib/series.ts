@@ -20,10 +20,39 @@ export type SeriesMeta = {
   imageAlt?: string;
   /** Total parts the series will have when complete */
   plannedParts?: number;
+  /**
+   * Optional act/stage grouping for long series. When present, part lists
+   * render a mono uppercase hairline divider before the first part of each
+   * stage; when absent, lists stay flat (unchanged for older series).
+   */
+  stages?: SeriesStage[];
   createdAt: string;
   updatedAt: string;
   tags?: string[];
 };
+
+export type SeriesStage = {
+  name: string;
+  /** First part number in the stage (inclusive) */
+  from: number;
+  /** Last part number in the stage (inclusive) */
+  to: number;
+};
+
+function parseStages(data: Record<string, unknown>): SeriesStage[] | undefined {
+  if (!Array.isArray(data.stages)) return undefined;
+  const stages = data.stages
+    .map((s: unknown) => {
+      if (!s || typeof s !== "object") return null;
+      const o = s as Record<string, unknown>;
+      const from = Number(o.from);
+      const to = Number(o.to);
+      if (!o.name || !Number.isFinite(from) || !Number.isFinite(to)) return null;
+      return { name: String(o.name), from, to };
+    })
+    .filter((s): s is SeriesStage => s !== null);
+  return stages.length > 0 ? stages : undefined;
+}
 
 export type Series = {
   meta: SeriesMeta;
@@ -53,6 +82,7 @@ function parseSeriesMeta(slug: string, data: Record<string, unknown>): SeriesMet
     imageDark: data.imageDark ? String(data.imageDark) : undefined,
     imageAlt: data.imageAlt ? String(data.imageAlt) : undefined,
     plannedParts: data.plannedParts ? Number(data.plannedParts) : undefined,
+    stages: parseStages(data),
     createdAt: String(data.createdAt || new Date().toISOString()),
     updatedAt: String(data.updatedAt || data.createdAt || new Date().toISOString()),
     tags: Array.isArray(data.tags)

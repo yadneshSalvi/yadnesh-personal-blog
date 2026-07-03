@@ -141,6 +141,7 @@ export default async function BlogPost({
             totalParts={seriesCtx.totalParts}
             parts={seriesNavParts}
             currentSlug={slug}
+            stages={seriesCtx.series.stages}
           />
         ) : (
           <TOC
@@ -157,8 +158,10 @@ export default async function BlogPost({
                   href={`/series/${seriesCtx.series.slug}`}
                   className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint transition-colors hover:text-accent"
                 >
-                  Series · {seriesCtx.series.name} · Part {seriesCtx.part} of{" "}
-                  {seriesCtx.totalParts}
+                  Series · {seriesCtx.series.name} ·{" "}
+                  {meta.kind === "reference"
+                    ? "Reference"
+                    : `Part ${seriesCtx.part} of ${seriesCtx.totalParts}`}
                 </Link>
               </p>
             ) : null}
