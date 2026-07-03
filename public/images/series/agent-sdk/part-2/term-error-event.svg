@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="480" viewBox="0 0 1040 480" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="480" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; a second window</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># break it on purpose: make the agent's desk vanish</tspan></text>
+    <text x="32" y="116" xml:space="preserve"><tspan fill="#756d62">$</tspan> mv workspace workspac</text>
+    <text x="32" y="144" xml:space="preserve"><tspan fill="#756d62">$</tspan> curl -sN -X POST localhost:8000/chat \</text>
+    <text x="32" y="172" xml:space="preserve">    -d '{"message": "hello"}'</text>
+    <text x="32" y="200" xml:space="preserve"></text>
+    <text x="32" y="228" xml:space="preserve">data: {"type": "<tspan fill="#d97676">error</tspan>", "message": "<tspan fill="#d97676">Working directory does not</tspan></text>
+    <text x="32" y="256" xml:space="preserve"><tspan fill="#d97676">exist: workspace</tspan>"}</text>
+    <text x="32" y="284" xml:space="preserve"></text>
+    <text x="32" y="312" xml:space="preserve"><tspan fill="#756d62"># note what did NOT happen: no traceback in the browser's face,</tspan></text>
+    <text x="32" y="340" xml:space="preserve"><tspan fill="#756d62"># no dead connection. the failure rode the belt like everything else.</tspan></text>
+    <text x="32" y="368" xml:space="preserve"><tspan fill="#756d62"># HTTP already said 200 when the stream opened; past that point,</tspan></text>
+    <text x="32" y="396" xml:space="preserve"><tspan fill="#756d62"># errors are events. put the desk back:</tspan></text>
+    <text x="32" y="424" xml:space="preserve"><tspan fill="#756d62">$</tspan> mv workspac workspace</text>
+  </g>
+</svg>

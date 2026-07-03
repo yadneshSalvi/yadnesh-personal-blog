@@ -1,0 +1,402 @@
+---
+title: "Claude Agent SDK in Production, Part 2: The FastAPI Bridge and the Event Vocabulary"
+subtitle: "The agent goes behind a URL, and its whole run streams as six kinds of labeled events. This table of six words is the most load-bearing design decision in the series."
+image: "/images/series/agent-sdk/part-2/cover-light.svg"
+imageDark: "/images/series/agent-sdk/part-2/cover-dark.svg"
+createdAt: "2026-07-04T00:00:00.000Z"
+updatedAt: "2026-07-04T00:00:00.000Z"
+tags: ["claude-agent-sdk", "fastapi", "sse", "tutorial"]
+series: "claude-agent-sdk-fastapi-nextjs"
+seriesPart: 2
+---
+
+By the end of this page you'll watch your analyst investigate live over HTTP, tool call by tool call, with nothing fancier than `curl`. But the demo isn't the real product of this part. The real product is a table with six rows in it. Twelve of the fourteen parts in this series ship their features as *new rows in that table*, and the client code that reads it will never change. Getting that table right, today, is the difference between a series that compounds and a series that rewrites itself every third part. So this part moves fast through the plumbing and slow through the design.
+
+## Why a server at all
+
+Part 1's agent runs in your terminal, which means it runs as *you*, with your Claude login, on your machine. Nobody else can use it, and no browser can either: a web page can't hold your credentials, spawn the SDK's subprocess, or touch your filesystem, and it should not be able to do any of those things. So we do what every AI product does: the agent lives behind an HTTP endpoint on a machine we control, and clients talk to the endpoint. FastAPI is the front door, and if FastAPI itself is new to you, [LangGraph Part 2](/blog/langgraph-2-fastapi-basics) teaches it from zero; this part assumes it and moves at review speed.
+
+## The blocking version, in one screen
+
+Start with the obvious thing, so we can watch it fail in an interesting way. Move Part 1's imports into a package (`mkdir app && touch app/__init__.py`, next to `workspace/`), then a first `app/main.py`: request model in, agent run in the middle, reply out.
+
+```python filename="backend/app/main.py (first draft, replaced below)"
+from claude_agent_sdk import ClaudeAgentOptions, ResultMessage, query
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+MODEL = "claude-haiku-4-5"
+
+OPTIONS = ClaudeAgentOptions(
+    cwd="workspace",
+    tools=["Read", "Glob", "Grep", "Bash", "Write"],
+    permission_mode="bypassPermissions",
+    model=MODEL,
+)
+
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+Same four option decisions as Part 1, now module-level: the options don't change per request. The CORS block is the one piece of forward wiring: no browser talks to this server until [Part 3](/blog/agent-sdk-3-agent-ui), but when it does, it'll be a Next.js dev server on `localhost:3000`, and this is the permission slip ([LangGraph Part 2](/blog/langgraph-2-fastapi-basics#one-locked-door-between-you-and-part-4) has the from-zero story on CORS). Then the endpoint:
+
+```python filename="backend/app/main.py (first draft, replaced below)"
+class ChatRequest(BaseModel):
+    message: str
+
+
+class ChatResponse(BaseModel):
+    reply: str
+    total_cost_usd: float
+
+
+@app.post("/chat")
+async def chat(request: ChatRequest) -> ChatResponse:
+    reply, cost = "", 0.0
+    async for message in query(prompt=request.message, options=OPTIONS):
+        if isinstance(message, ResultMessage):
+            reply = message.result or ""
+            cost = message.total_cost_usd or 0.0
+    return ChatResponse(reply=reply, total_cost_usd=cost)
+```
+
+We drain the whole stream, keep only the receipt, and return it. Note `total_cost_usd` riding in the response: the cost ritual goes on the wire from the very first endpoint, so every client this series ever builds can show the bill. Run it from `backend/`:
+
+```bash
+uv run uvicorn app.main:app --reload
+```
+
+And in a second terminal, ask the March question:
+
+<Figure
+  src="/images/series/agent-sdk/part-2/term-curl-blocking.svg"
+  alt="A dark terminal running a timed curl POST to localhost:8000/chat with the March revenue question. Comments mark a long silence with no output while the agent runs ten tool calls server-side. Then the JSON response lands: reply Store S01 had the highest total revenue in March with $51,319.60, total_cost_usd 0.0208133. The time output reads 22.332 total."
+  caption="It works, and the answer is right. It's the experience that's broken: 22 seconds where the client can't tell an agent hard at work from a dead server."
+  width={1040}
+  height={396}
+/>
+
+You've sat through this silence before. Someone demos a prototype, the room asks it a question, and a spinner spins while the presenter narrates what the code is "probably doing right now" to twelve people watching a frozen screen. Every second of that silence converts one believer into a skeptic. Agents make it worse, because the honest answer to "what's it doing?" is genuinely interesting, and the blocking endpoint throws that answer away.
+
+The answer came back correct, with the receipt, for $0.0208. And it took **22.3 seconds of absolute silence**. No progress, no partial output, no sign of life; if that agent had needed forty tool calls instead of ten, your reverse proxy would have killed the connection before the answer existed. Name the problem precisely, because this part exists to fix it: *the agent narrates its work as a stream, and this endpoint flattens the stream into one number and one string.* Part 1's terminal showed you eight events' worth of drama; this JSON shows none of it.
+
+## The amnesia demo
+
+One more failure to meet on purpose, while the server's up. The blocking endpoint answered "which store had the best March" with Downtown. Ask the natural follow-up:
+
+<Figure
+  src="/images/series/agent-sdk/part-2/term-amnesia.svg"
+  alt="A dark terminal. Comments note that a minute ago /chat answered that March's best store was Downtown. A follow-up curl asks 'And how did that store do in April?'. The stream returns a session_start with a new session id, then a text_delta: I don't have any context about which store you're referring to. This seems to be a follow-up question, but I don't have access to previous conversation history. The complete event shows a cost of $0.0028."
+  caption="A minute after naming Downtown, the analyst has never heard of it. Note the session_start event: a brand-new id. Every request is a stranger."
+  width={1040}
+  height={424}
+/>
+
+"I don't have any context about which store you're referring to." That's not a bug in our endpoint; it's the honest shape of what we built. Every call to `query()` starts a fresh session with a fresh id and a blank history. The [diary from Part 1](/blog/agent-sdk-concepts#sessions-and-jsonl) is still being written, one file per one-question conversation, but nobody's handing the agent its old diary back yet. [Part 5](/blog/agent-sdk-5-sessions) does exactly that. Until then, remember the working rule: **the files in the workspace are the only memory.** The agent re-reads the CSVs every request, which is also why it keeps working at all.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 2-panel comic strip, panels side by side with a thin vertical black divider, about a stateless AI that treats every phone call as a call from a stranger. Panel 1: Yad at his desk holding a phone to his ear, casual and friendly, speech bubble: "ABOUT THAT MARCH NUMBER YOU FOUND..." Panel 2: in another office, a cute anthropomorphic laptop with little arms and legs and a tiny necktie answers an old-fashioned desk phone, looking politely baffled; its speech bubble reads: "WHAT MARCH NUMBER? WHO IS THIS?" Behind it, a completely empty desk with a single fresh blank notepad. Clean readable hand-lettered speech bubbles, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-2/comic-stranger.png"
+  alt="Comic in two panels. Panel one: Yad, a bearded developer with headphones, happily says into a desk phone 'ABOUT THAT MARCH NUMBER YOU FOUND...'. Panel two: the laptop analyst with its tiny necktie answers a rotary phone at a completely empty desk with one blank notepad, shrugging, and replies 'WHAT MARCH NUMBER? WHO IS THIS?'"
+  caption="Every query() is a first phone call. The blank notepad is the whole persistence story so far."
+  width={1536}
+  height={1024}
+/>
+
+## Designing the envelope
+
+Now the design section, the one this part is named after. The client needs to see the agent's work as it happens. The agent's work arrives as SDK message objects. We are *not* going to ship SDK objects over HTTP: they're Python dataclasses, they change with SDK versions, and three-quarters of what they carry is bookkeeping no UI needs. Instead we define a wire vocabulary: every event is one JSON object with a `type` field, sent as a [server-sent event](/blog/agent-sdk-concepts#sse). Labeled parcels, one conveyor belt. Six labels today:
+
+| `type` | Payload | Meaning |
+|---|---|---|
+| `session_start` | `session_id` | The turn began; here's the diary key |
+| `text_delta` | `text` | A piece of the answer, in order |
+| `tool_use_start` | `tool_id`, `tool_name`, `tool_input` | The agent reached for a tool |
+| `tool_result` | `tool_id`, `content`, `is_error` | The tool came back |
+| `complete` | `usage`, `total_cost_usd`, `duration_ms` | The receipt; the turn is over |
+| `error` | `message` | Something broke; the turn is over |
+
+Look at what's *not* here, because that's where the design earns its keep. Nothing in this table says "agent", "SDK", or "Claude". A client that reads this vocabulary is coupled to our product, not to our engine. And the parser contract is one sentence: **switch on `type`, ignore types you don't recognize.** That second clause is the whole trick. In Part 4, `artifact_update` events start riding this belt; in Part 7, `approval_request`; in Part 10, `plan_proposed` and `thinking_delta`. Every one of those features will be *additive*: new label, same belt, and a Part 3 client that never heard of approvals keeps working, blind to them, instead of crashing. We're designing today for events we haven't invented yet.
+
+<Callout type="info" title="Why not WebSockets?">
+The traffic here is one-way: the client asks once, the server narrates for a while. SSE does exactly that over plain HTTP, which means normal proxies, normal auth headers, normal curl. WebSockets buy bidirectional chat at the cost of a protocol upgrade and a chattier reconnect story, and nothing in this series needs the second direction on this channel; even Part 7's approvals go back over ordinary POSTs. When you genuinely need two-way, you'll know, because nothing else will work.
+</Callout>
+
+## The translator
+
+New file, `app/events.py`. First the framing and one small mercy:
+
+```python filename="backend/app/events.py" repo="part-02-fastapi-streaming/backend/app/events.py" lines="22-36"
+# A tool can return an enormous payload (Read on a 2,000-line file). The
+# wire narrates the work; it doesn't haul the data. Clip what we forward.
+MAX_TOOL_RESULT_CHARS = 2_000
+
+
+def sse(event: dict) -> str:
+    """Frame one event dict as a server-sent event."""
+    return f"data: {json.dumps(event)}\n\n"
+
+
+def clip(content: object) -> str:
+    text = content if isinstance(content, str) else json.dumps(content, default=str)
+    if len(text) <= MAX_TOOL_RESULT_CHARS:
+        return text
+    return text[:MAX_TOOL_RESULT_CHARS] + f"\n… clipped {len(text) - MAX_TOOL_RESULT_CHARS} chars"
+```
+
+`sse()` is the entire SSE wire format: the JSON, a `data: ` prefix, a blank line as the delimiter. ([LangGraph Part 5](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word) covers why that blank line matters and the client-side bug it causes; we inherit all of it.) `clip()` encodes a rule you'll be glad of in Part 3: when the agent Reads a 2,000-line CSV, the *UI* needs to know the read happened and roughly what came back, not to receive the whole file inside a chat event. Narration on the wire, data on the disk.
+
+Then the translator itself: Part 1's message anatomy, cashed in. One `async for`, and every message type maps to its parcel:
+
+```python filename="backend/app/events.py" repo="part-02-fastapi-streaming/backend/app/events.py" lines="39-59"
+async def translate(messages: AsyncIterator[Message]) -> AsyncIterator[str]:
+    """Map SDK messages onto the wire vocabulary, one SSE frame at a time."""
+    try:
+        async for message in messages:
+            if isinstance(message, SystemMessage) and message.subtype == "init":
+                yield sse({"type": "session_start", "session_id": message.data["session_id"]})
+
+            elif isinstance(message, StreamEvent):
+                delta = message.event.get("delta", {})
+                if delta.get("type") == "text_delta":
+                    yield sse({"type": "text_delta", "text": delta["text"]})
+
+            elif isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, ToolUseBlock):
+                        yield sse({
+                            "type": "tool_use_start",
+                            "tool_id": block.id,
+                            "tool_name": block.name,
+                            "tool_input": block.input,
+                        })
+```
+
+(Ignore the `StreamEvent` branch for a few minutes; it's dormant until we flip a switch below.) The rest of the ladder handles the world answering and the turn ending:
+
+```python filename="backend/app/events.py" repo="part-02-fastapi-streaming/backend/app/events.py" lines="61-79"
+            elif isinstance(message, UserMessage) and isinstance(message.content, list):
+                for block in message.content:
+                    if isinstance(block, ToolResultBlock):
+                        yield sse({
+                            "type": "tool_result",
+                            "tool_id": block.tool_use_id,
+                            "content": clip(block.content),
+                            "is_error": bool(block.is_error),
+                        })
+
+            elif isinstance(message, ResultMessage):
+                yield sse({
+                    "type": "complete",
+                    "usage": message.usage,
+                    "total_cost_usd": message.total_cost_usd,
+                    "duration_ms": message.duration_ms,
+                })
+    except Exception as exc:  # noqa: BLE001 - anything broken becomes a wire event
+        yield sse({"type": "error", "message": str(exc)})
+```
+
+Two Part 1 facts are doing the work here. Tool results arrive inside `UserMessage`, so that's where `tool_result` parcels come from, with the `tool_use_id` passed through as `tool_id` so a client can match result to call. And `ResultMessage` is the receipt, so `complete` carries the cost to every client, always. The `except` at the bottom is the sixth event type earning its row: a translator that dies mid-stream takes the whole story with it, so failures become parcels too. You'll see that fire, for real, before this page ends.
+
+## Block-level streaming: the door becomes a window
+
+Replace the blocking endpoint. This is the whole diff:
+
+```python filename="backend/app/main.py" repo="part-02-fastapi-streaming/backend/app/main.py" lines="34-37"
+@app.post("/chat")
+async def chat(request: ChatRequest) -> StreamingResponse:
+    stream = query(prompt=request.message, options=OPTIONS)
+    return StreamingResponse(translate(stream), media_type="text/event-stream")
+```
+
+Read it as a pipeline, because it is one: `query()` produces SDK messages, `translate()` turns each into a framed parcel, and `StreamingResponse` pushes each parcel out the socket the moment it exists. No buffering, no waiting for the end. (`ChatResponse` and the `ResultMessage` import go in the bin; the receipt is an event now.) The server restarts, and this time watch with `-N`, which tells curl not to buffer:
+
+<Figure
+  src="/images/series/agent-sdk/part-2/term-stream-blocks.svg"
+  alt="A dark terminal running curl -N against /chat asking which product category makes the most money on weekends. SSE events scroll: session_start, tool_use_start for a Bash find command, its tool_result listing the three CSVs, a text_delta containing one whole paragraph at once, more tool rounds including a Read with is_error true, then the final text_delta naming drinks at $315,334.80 and a complete event with cost $0.0256 and duration 30497 ms."
+  caption="Alive. Tool calls and results scroll the moment they happen. Only the prose still arrives in paragraph-sized slabs; that's the next fix. (Drinks at $315,334.80 is correct, verified against the generator.)"
+  width={1040}
+  height={564}
+/>
+
+Same server, same agent, transformed experience: every tool call and result appears the instant it happens, thirty seconds of investigation you can actually watch. This is the part's dessert and it's two lines of FastAPI. But notice what's still clunky: the `text_delta` parcels are huge. One whole paragraph at a time, because the translator is converting *completed* `TextBlock`s. The narration streams; the prose still arrives in slabs.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 2-panel comic strip, panels side by side with a thin vertical black divider, about the difference between a blocking API call and a streaming one. Both panels show the same office door belonging to a tiny AI analyst: an anthropomorphic laptop with little arms and legs wearing a tiny necktie. Panel 1: the office door is completely closed, with a hanging paper sign that reads "PLEASE WAIT 60s". Yad stands outside staring at his wristwatch, bored and anxious, tapping his foot; his speech bubble reads: "IS IT EVEN ALIVE IN THERE?" Panel 2: the same office but the wall is now a big glass window; through it the laptop-analyst is busily working at a desk, and sticky notes are stuck on the inside of the glass in sequence reading "READING sales.csv", "RUNNING awk", "FOUND IT!". Yad watches through the glass, relieved and delighted, saying: "AH. STEP THREE ALREADY." Clean readable hand-lettered speech bubbles and signs, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-2/comic-window.png"
+  alt="Comic in two panels. Panel one: Yad, a bearded developer with headphones, waits anxiously outside a closed office door labeled AI ANALYST with a sign reading PLEASE WAIT 60s, checking his watch and thinking 'IS IT EVEN ALIVE IN THERE?'. Panel two: the same office now has a glass window; inside, the laptop analyst works at its desk while sticky notes on the glass read READING sales.csv, RUNNING awk, FOUND IT!, and Yad smiles: 'AH. STEP THREE ALREADY.'"
+  caption="The whole part in one wall. Same office, same work; the only thing that changed is whether you can see in."
+  width={1536}
+  height={1024}
+/>
+
+## Token-level: flip the switch
+
+The SDK yields whole messages by default: you hear nothing while the model writes a paragraph, then get the finished block. One option changes that. In `main.py`:
+
+```python filename="backend/app/main.py" repo="part-02-fastapi-streaming/backend/app/main.py" lines="13-19"
+OPTIONS = ClaudeAgentOptions(
+    cwd="workspace",
+    tools=["Read", "Glob", "Grep", "Bash", "Write"],
+    permission_mode="bypassPermissions",
+    model=MODEL,
+    include_partial_messages=True,
+)
+```
+
+With [partial messages](/blog/agent-sdk-concepts#partial-messages) on, the stream gains `StreamEvent` objects carrying the model's raw token-by-token deltas, and the dormant branch in the translator wakes up: `content_block_delta` events whose payload is a `text_delta` become our `text_delta` parcels, word-fragment by word-fragment.
+
+One subtlety, and it's the kind that bites silently: partial events *add to* the stream, they don't replace anything. The finished `TextBlock` still arrives afterward inside `AssistantMessage`. If the translator forwarded both, every sentence would go over the wire twice and every client would render the answer twice. That's why the `AssistantMessage` branch you wrote earlier handles *only* `ToolUseBlock` and deliberately ignores text: deltas carry the prose, blocks carry the actions, each said exactly once.
+
+<Figure
+  src="/images/series/agent-sdk/part-2/term-stream-tokens.svg"
+  alt="A dark terminal running curl -N against /chat with the March question. The stream now shows fine-grained text_delta events: 'I'll help you find which', then ' store had the highest total revenue in March...', interleaved with Glob tool_use_start and tool_result events, ending with deltas spelling out Downtown's $51,319.60 answer and a complete event showing cost $0.0216 and duration 60506 ms."
+  caption="The same belt, finer parcels. Prose now arrives in fragments as the model produces it, between the tool events. This exact wire feeds the typing effect in Part 3."
+  width={1040}
+  height={508}
+/>
+
+Right now you have: an HTTP endpoint that runs the full agent loop and narrates it live, in a six-word vocabulary, at whatever granularity the client can render. The only consumer is curl. That's Part 3's opening problem.
+
+## Break it on purpose: the sixth event
+
+The `error` row in the table hasn't done anything yet, and an untested error path is a rumor, not a feature. The cheapest real failure available: make the agent's desk vanish. Stop the server, rename the workspace folder, restart, and ask anything:
+
+<Figure
+  src="/images/series/agent-sdk/part-2/term-error-event.svg"
+  alt="A dark terminal. The workspace folder is renamed with mv workspace workspac, then a curl POST to /chat. The stream returns a single event: data with type error and message 'Working directory does not exist: workspace'. Comments note what did not happen: no traceback in the browser's face, no dead connection; the failure rode the belt like everything else, because HTTP already said 200 when the stream opened. A final command renames the folder back."
+  caption="The sixth parcel, fired for real. The SDK refuses to start without its desk, the translator catches the exception, and the failure arrives as data."
+  width={1040}
+  height={424}
+/>
+
+`{"type": "error", "message": "Working directory does not exist: workspace"}`. Study what happened, because it's subtly important for every streaming API you'll ever build. The HTTP response already said `200 OK` when the stream opened; status codes are spent before the first parcel ships. Past that point, *errors have to be events*, or they're silence. Our translator's `except` clause turned a Python exception into a parcel a client can render as a red banner. Rename the folder back, and this reflex comes with you for the rest of the series: whenever a turn can fail, the failure is a typed event on the belt, never a dropped connection.
+
+## The pipeline, drawn
+
+Everything this part built, in one picture:
+
+<Figure
+  src="/images/series/agent-sdk/part-2/fig-stream-pipeline-light.svg"
+  srcDark="/images/series/agent-sdk/part-2/fig-stream-pipeline-dark.svg"
+  alt="Diagram of one request end to end. Three boxes across the top: THE ENGINE, query(prompt, opts), the Claude Code runtime working; THE TRANSLATOR, translate(stream), SDK messages in, envelopes out, highlighted in accent; THE RESPONSE, StreamingResponse, text/event-stream held open. An arrow drops to a conveyor belt labeled ONE CONVEYOR, LABELED PARCELS carrying six envelope chips: session_start, text_delta 'I'll help', tool_use_start Bash awk, tool_result S01 51319.6, text_delta '**Downtown**', complete $0.0216. The belt feeds THE CLIENT: curl -N today, the browser in Part 3, which switches on type and ignores labels it doesn't know yet. A closing line reads: Twelve more parts will add parcels. Nobody ever rebuilds the belt."
+  caption="The Part 2 pipeline, with the parcels from the real March run riding the belt. The translator in the middle is the only code that knows both worlds."
+  width={1240}
+  height={700}
+/>
+
+Three pieces, one job each. The engine does the work and speaks SDK. The translator speaks both languages and is the *only* code that does; when the SDK changes shape someday, one file cares. The response object keeps the socket open and pushes parcels. And the belt's contract at the bottom is what the whole series builds on: clients switch on `type` and skip what they don't know, so the vocabulary can grow forever without breaking anyone. If you've read the LangGraph series, this is [Part 5's conveyor belt](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word) grown up: same wire format, but carrying a whole agent's narration instead of one model's tokens.
+
+## The cost ritual
+
+Today's ledger, all real runs against this part's endpoint:
+
+| Run | Result | Cost |
+|---|---|---|
+| Blocking `/chat`, March question | right answer, 22s of silence | $0.0208 |
+| Amnesia follow-up | "which store?", instantly | $0.0028 |
+| Block-level stream, weekend question | right answer ($315,334.80, verified) | $0.0256 |
+| Token-level stream, March question | right answer, fully narrated | $0.0216 |
+
+The lesson this time is what *didn't* change: streaming is free. Block-level, token-level, and blocking runs of the same question all land within a cent of each other, because streaming changes when you *see* tokens, not how many exist. The `complete` event now delivers `total_cost_usd` to any client that connects, which means from Part 3 onward, showing the user the bill is a UI decision, not a plumbing project.
+
+{/* [ANECDOTE slot, optional upgrade (WRITING-STYLE §6): a true first-person story from Yadnesh about a demo or production moment where a long silent request destroyed trust (or where adding progress/streaming saved it), 3 beats, 5 sentences. If provided, it replaces the "You've sat through this silence before" paragraph in the blocking section. */}
+
+<DemoVideo
+  src="/videos/agent-sdk/part-2-demo.mp4"
+  poster="/videos/agent-sdk/part-2-poster.jpg"
+  caption="A live curl -N against this part's /chat: the event stream scrolls as the agent works, ending with the complete receipt."
+  label="Screen recording of Part 2: server-sent events streaming live from the FastAPI endpoint while the agent investigates"
+/>
+
+<Recap
+  part={2}
+  items={[
+    "An HTTP front door for the analyst: `POST /chat` with CORS pre-wired for Part 3's frontend, built at review speed on LangGraph Part 2's foundations.",
+    "The event vocabulary: six JSON parcel types on one SSE belt, with the parser contract (switch on `type`, ignore the unknown) that lets twelve future parts add features without breaking a client.",
+    "A translator (`app/events.py`) that is the only code speaking both SDK and wire, including the `clip()` rule: narration on the wire, data on the disk.",
+    "Streaming at two granularities: `StreamingResponse` made tool activity live, and `include_partial_messages=True` made the prose arrive token by token, with the double-render trap dodged deliberately.",
+    "Errors as events: a real failure (`Working directory does not exist`) delivered as the sixth parcel type, because a 200-OK stream can't change its status code after the fact.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "The Part 3 client will read this stream by switching on the type field and ignoring unknown types. Why does that second clause matter so much?",
+      options: [
+        "It makes the parser faster at runtime",
+        "It lets future parts add new event types without breaking older clients, so the vocabulary only ever grows",
+        "It's required by the SSE specification",
+        "It prevents JSON parsing errors on malformed events",
+      ],
+      answer: 1,
+      explain: "That one rule makes the vocabulary additive. Artifacts (Part 4), approvals (Part 7), and plans (Part 10) all arrive as new labels on the same belt, and a client that predates them keeps working instead of crashing.",
+    },
+    {
+      q: "The workspace folder went missing and the agent couldn't start, yet /chat still returned HTTP 200. Why?",
+      options: [
+        "FastAPI swallows all exceptions in production mode",
+        "The SDK retried until it succeeded",
+        "The status code was already sent when the stream opened, so past that point failures must travel as data: the error event",
+        "200 is correct because the request body was valid JSON",
+      ],
+      answer: 2,
+      explain: "A streaming response spends its status code up front. Once parcels are flowing, the only way to report failure is in-band, which is exactly why the vocabulary has an error type and the translator wraps everything in try/except.",
+    },
+    {
+      q: "With include_partial_messages=True, why must the translator ignore TextBlock inside AssistantMessage?",
+      options: [
+        "TextBlock is deprecated in SDK 0.2.x",
+        "Partial deltas add to the stream rather than replacing it, so the finished block still arrives and forwarding both would send every sentence twice",
+        "TextBlock can contain tool calls that would confuse the client",
+        "AssistantMessage arrives before the deltas, so the text would be out of order",
+      ],
+      answer: 1,
+      explain: "Partial mode layers deltas on top of the normal messages. The prose now travels as text_delta parcels; the assembled TextBlock that follows is the same words again. One channel for prose, one for actions, each said once.",
+    },
+    {
+      q: "One minute after the server named Downtown as March's best store, the follow-up 'how did that store do in April?' drew a blank. What's the root cause?",
+      options: [
+        "Haiku has a very short context window",
+        "The workspace CSVs don't contain April data",
+        "CORS blocked the second request's context",
+        "Every query() call starts a fresh session with a new session_id and no history; nothing hands the old conversation back yet",
+      ],
+      answer: 3,
+      explain: "Each request is a stranger: new session, blank notepad. The session files from Part 1 are still being written; Part 5 closes the loop by sending the session_id back in and resuming the diary.",
+    },
+    {
+      q: "Why does the translator clip tool_result content at 2,000 characters instead of forwarding everything?",
+      options: [
+        "SSE events have a hard 2,048-byte protocol limit",
+        "The wire narrates the work; it doesn't haul the data. A Read of a 2,000-line CSV should reach the UI as 'the read happened', not as the whole file inside a chat event",
+        "Longer strings break JSON encoding",
+        "It reduces the model's token costs",
+      ],
+      answer: 1,
+      explain: "There's no protocol limit; it's a product decision. Clients render tool activity as badges, not as file dumps, and anything that needs the full data will read it from disk (the artifacts panel in Part 4 does exactly that).",
+    },
+  ]}
+/>
+
+Commit it, from the project root, in a terminal that isn't hosting the server:
+
+```bash
+git add .
+git commit -m "part 2: the agent behind HTTP, narrating in six event types"
+```
+
+Your analyst streams its whole investigation to anyone who can spell `curl`. Nobody who matters can spell `curl`. In [Part 3](/blog/agent-sdk-3-agent-ui) the real client arrives: a chat UI where prose types itself out, tool calls appear as live badges that resolve in place, and long turns show a working clock instead of a spinner of lies.
+
+The complete, tested code for this part lives in [`part-02-fastapi-streaming`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/tree/main/part-02-fastapi-streaming) in the [companion repo](https://github.com/yadneshSalvi/claude-agent-sdk-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.

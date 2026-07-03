@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="480" viewBox="0 0 1040 480" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="480" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; a second window</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># one minute ago, /chat answered: March's best store was Downtown.</tspan></text>
+    <text x="32" y="116" xml:space="preserve"><tspan fill="#756d62"># ask the obvious follow-up:</tspan></text>
+    <text x="32" y="144" xml:space="preserve"><tspan fill="#756d62">$</tspan> curl -sN -X POST localhost:8000/chat \</text>
+    <text x="32" y="172" xml:space="preserve">    -H "Content-Type: application/json" \</text>
+    <text x="32" y="200" xml:space="preserve">    -d '{"message": "And how did that store do in April?"}'</text>
+    <text x="32" y="228" xml:space="preserve"></text>
+    <text x="32" y="256" xml:space="preserve">data: {"type": "session_start", "session_id": "<tspan fill="#e5825a">18f041d8-…</tspan>"}   <tspan fill="#756d62"># a NEW id</tspan></text>
+    <text x="32" y="284" xml:space="preserve"></text>
+    <text x="32" y="312" xml:space="preserve">data: {"type": "text_delta", "text": "<tspan fill="#d97676">I don't have any context about</tspan></text>
+    <text x="32" y="340" xml:space="preserve"><tspan fill="#d97676">which store you're referring to. This seems to be a follow-up question,</tspan></text>
+    <text x="32" y="368" xml:space="preserve"><tspan fill="#d97676">but I don't have access to previous conversation history.</tspan>"}</text>
+    <text x="32" y="396" xml:space="preserve"></text>
+    <text x="32" y="424" xml:space="preserve">data: {"type": "complete", … "total_cost_usd": <tspan fill="#e5825a">0.0028</tspan>}</text>
+  </g>
+</svg>

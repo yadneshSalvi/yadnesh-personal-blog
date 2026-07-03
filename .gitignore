@@ -56,3 +56,4 @@ next-env.d.ts
 /scripts/gen-part8-svgs.mjs
 /plans/scripts/gen-agent-sdk-series-svgs.mjs
 /scripts/gen-agent-sdk-part1-svgs.mjs
+/scripts/gen-agent-sdk-part2-svgs.mjs

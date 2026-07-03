@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="620" viewBox="0 0 1040 620" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="620" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; a second window</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62">$</tspan> curl -sN -X POST localhost:8000/chat \</text>
+    <text x="32" y="116" xml:space="preserve">    -d '{"message": "Which product category makes the most money on weekends?"}'</text>
+    <text x="32" y="144" xml:space="preserve"></text>
+    <text x="32" y="172" xml:space="preserve">data: {"type": "<tspan fill="#e5825a">session_start</tspan>", "session_id": "c5d51534-…"}</text>
+    <text x="32" y="200" xml:space="preserve">data: {"type": "<tspan fill="#6fa8dc">tool_use_start</tspan>", "tool_id": "toolu_013iF4…", "tool_name":</text>
+    <text x="32" y="228" xml:space="preserve">  "Bash", "tool_input": {"command": "find . -type f -name \"*.csv\" …"}}</text>
+    <text x="32" y="256" xml:space="preserve">data: {"type": "<tspan fill="#6fa8dc">tool_result</tspan>", "tool_id": "toolu_013iF4…", "content":</text>
+    <text x="32" y="284" xml:space="preserve">  "./products.csv\n./stores.csv\n./sales.csv", "is_error": false}</text>
+    <text x="32" y="312" xml:space="preserve">data: {"type": "<tspan fill="#e5825a">text_delta</tspan>", "text": "Let me examine the sales data to find</text>
+    <text x="32" y="340" xml:space="preserve">  which product category makes the most money on weekends."}   <tspan fill="#756d62"># one whole</tspan></text>
+    <text x="32" y="368" xml:space="preserve"><tspan fill="#756d62">                                                            # paragraph at once</tspan></text>
+    <text x="32" y="396" xml:space="preserve">data: {"type": "<tspan fill="#6fa8dc">tool_use_start</tspan>", "tool_name": "Read", …}</text>
+    <text x="32" y="424" xml:space="preserve">data: {"type": "<tspan fill="#6fa8dc">tool_result</tspan>", "is_error": <tspan fill="#d97676">true</tspan>, …}</text>
+    <text x="32" y="452" xml:space="preserve"><tspan fill="#756d62">…six more tool rounds scroll by, live…</tspan></text>
+    <text x="32" y="480" xml:space="preserve">data: {"type": "<tspan fill="#e5825a">text_delta</tspan>", "text": "**The drinks category makes the most</text>
+    <text x="32" y="508" xml:space="preserve">  money on weekends, generating $315,334.80 …**"}</text>
+    <text x="32" y="536" xml:space="preserve">data: {"type": "<tspan fill="#8fb573">complete</tspan>", "usage": {…}, "total_cost_usd": <tspan fill="#e5825a">0.0256</tspan>,</text>
+    <text x="32" y="564" xml:space="preserve">  "duration_ms": 30497}</text>
+  </g>
+</svg>

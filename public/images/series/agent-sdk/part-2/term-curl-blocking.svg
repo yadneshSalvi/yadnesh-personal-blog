@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="424" viewBox="0 0 1040 424" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="424" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; a second window</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62">$</tspan> time curl -s -X POST localhost:8000/chat \</text>
+    <text x="32" y="116" xml:space="preserve">    -H "Content-Type: application/json" \</text>
+    <text x="32" y="144" xml:space="preserve">    -d '{"message": "Which store had the highest total revenue in March?"}'</text>
+    <text x="32" y="172" xml:space="preserve"></text>
+    <text x="32" y="200" xml:space="preserve"><tspan fill="#756d62"># …nothing. no spinner, no progress, no sign of life…</tspan></text>
+    <text x="32" y="228" xml:space="preserve"><tspan fill="#756d62"># (the agent is running ten tool calls server-side)</tspan></text>
+    <text x="32" y="256" xml:space="preserve"></text>
+    <text x="32" y="284" xml:space="preserve">{"reply":"<tspan fill="#8fb573">**Store S01** had the highest total revenue in March</tspan></text>
+    <text x="32" y="312" xml:space="preserve"><tspan fill="#8fb573">with **$51,319.60**.</tspan>","total_cost_usd":<tspan fill="#e5825a">0.0208133</tspan>}</text>
+    <text x="32" y="340" xml:space="preserve"></text>
+    <text x="32" y="368" xml:space="preserve">curl -s -X POST localhost:8000/chat  0.01s user 0.01s system <tspan fill="#e5825a">22.332 total</tspan></text>
+  </g>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="564" viewBox="0 0 1040 564" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="564" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; a second window</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62">$</tspan> curl -sN -X POST localhost:8000/chat \</text>
+    <text x="32" y="116" xml:space="preserve">    -d '{"message": "Which store had the highest total revenue in March? …"}'</text>
+    <text x="32" y="144" xml:space="preserve"></text>
+    <text x="32" y="172" xml:space="preserve">data: {"type": "session_start", "session_id": "6b86a391-…"}</text>
+    <text x="32" y="200" xml:space="preserve">data: {"type": "<tspan fill="#e5825a">text_delta</tspan>", "text": "I'll help you find which"}</text>
+    <text x="32" y="228" xml:space="preserve">data: {"type": "<tspan fill="#e5825a">text_delta</tspan>", "text": " store had the highest total</text>
+    <text x="32" y="256" xml:space="preserve">  revenue in March. Let me search for relevant data files."}</text>
+    <text x="32" y="284" xml:space="preserve">data: {"type": "<tspan fill="#6fa8dc">tool_use_start</tspan>", "tool_name": "Glob", "tool_input":</text>
+    <text x="32" y="312" xml:space="preserve">  {"pattern": "**/*sales*"}}</text>
+    <text x="32" y="340" xml:space="preserve">data: {"type": "<tspan fill="#6fa8dc">tool_result</tspan>", "content": "sales.csv", "is_error": false}</text>
+    <text x="32" y="368" xml:space="preserve"><tspan fill="#756d62">…the investigation streams past, delta by delta…</tspan></text>
+    <text x="32" y="396" xml:space="preserve">data: {"type": "<tspan fill="#e5825a">text_delta</tspan>", "text": "Perfect"}</text>
+    <text x="32" y="424" xml:space="preserve">data: {"type": "<tspan fill="#e5825a">text_delta</tspan>", "text": "! Now let me get the store name…"}</text>
+    <text x="32" y="452" xml:space="preserve">data: {"type": "<tspan fill="#e5825a">text_delta</tspan>", "text": "01) had the highest total revenue</text>
+    <text x="32" y="480" xml:space="preserve">  in March with **$51,319.60**"}</text>
+    <text x="32" y="508" xml:space="preserve">data: {"type": "<tspan fill="#8fb573">complete</tspan>", … "total_cost_usd": <tspan fill="#e5825a">0.0216</tspan>, "duration_ms": 60506}</text>
+  </g>
+</svg>

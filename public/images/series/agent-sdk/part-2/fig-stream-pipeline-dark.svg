@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="700" viewBox="0 0 1240 700">
+  <rect width="1240" height="700" fill="#151311"/>
+  <text x="60" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#756d62">ONE REQUEST, END TO END &#183; POST /chat</text>
+
+  
+  <rect x="60" y="96" width="330" height="130" rx="14" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="84" y="130" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#756d62">THE ENGINE</text>
+  <text x="84" y="164" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="19" font-weight="700" fill="#ebe7df">query(prompt, opts)</text>
+  <text x="84" y="194" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#a49c90">the Claude Code runtime, working</text>
+  <line x1="390" y1="161" x2="454" y2="161" stroke="#a49c90" stroke-width="2.5"/>
+  <path d="M 453 154 L 453 168 L 465 161 Z" fill="#a49c90"/>
+  
+  <rect x="465" y="96" width="330" height="130" rx="14" fill="#2a201a" stroke="#5e463a" stroke-width="1.5"/>
+  <text x="489" y="130" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#e5825a">THE TRANSLATOR</text>
+  <text x="489" y="164" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="19" font-weight="700" fill="#ebe7df">translate(stream)</text>
+  <text x="489" y="194" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#a49c90">SDK messages in, envelopes out</text>
+  <line x1="795" y1="161" x2="859" y2="161" stroke="#a49c90" stroke-width="2.5"/>
+  <path d="M 858 154 L 858 168 L 870 161 Z" fill="#a49c90"/>
+  
+  <rect x="870" y="96" width="330" height="130" rx="14" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="894" y="130" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#756d62">THE RESPONSE</text>
+  <text x="894" y="164" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="19" font-weight="700" fill="#ebe7df">StreamingResponse</text>
+  <text x="894" y="194" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#a49c90">text/event-stream, held open</text>
+
+  <!-- drop from response to belt -->
+  <line x1="1035" y1="226" x2="1035" y2="316" stroke="#a49c90" stroke-width="2.5"/>
+  <path d="M 1028 314 L 1042 314 L 1035 326 Z" fill="#a49c90"/>
+  <text x="1019" y="290" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#756d62" text-anchor="end">data: {"type": …}\n\n</text>
+
+  <!-- the belt -->
+  <rect x="60" y="330" width="1120" height="86" rx="12" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  
+  <rect x="90" y="348" width="168" height="58" rx="9" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="102" y="372" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#a49c90">session_start</text>
+  <text x="102" y="393" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#756d62">ad94f97b…</text>
+  <rect x="268.4" y="348" width="168" height="58" rx="9" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="280.4" y="372" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#e5825a">text_delta</text>
+  <text x="280.4" y="393" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#756d62">"I'll help"</text>
+  <rect x="446.8" y="348" width="168" height="58" rx="9" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="458.8" y="372" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#e5825a">tool_use_start</text>
+  <text x="458.8" y="393" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#756d62">Bash &#183; awk …</text>
+  <rect x="625.2" y="348" width="168" height="58" rx="9" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="637.2" y="372" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#a49c90">tool_result</text>
+  <text x="637.2" y="393" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#756d62">S01 51319.6…</text>
+  <rect x="803.6" y="348" width="168" height="58" rx="9" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="815.6" y="372" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#e5825a">text_delta</text>
+  <text x="815.6" y="393" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#756d62">"**Downtown**"</text>
+  <rect x="982" y="348" width="168" height="58" rx="9" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="994" y="372" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#a3c57d">complete</text>
+  <text x="994" y="393" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#756d62">$0.0216</text>
+  <line x1="76" y1="432" x2="1164" y2="432" stroke="#2b2723" stroke-width="1.5" stroke-dasharray="10 7"/>
+  <text x="60" y="466" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#756d62">THE BELT &#183; ONE CONVEYOR, LABELED PARCELS</text>
+
+  <!-- client -->
+  <line x1="620" y1="480" x2="620" y2="518" stroke="#e5825a" stroke-width="3"/>
+  <path d="M 612 516 L 628 516 L 620 530 Z" fill="#e5825a"/>
+  <rect x="340" y="536" width="560" height="74" rx="12" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="620" y="566" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" font-weight="700" fill="#ebe7df" text-anchor="middle">THE CLIENT &#183; curl -N today, the browser in Part 3</text>
+  <text x="620" y="592" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#a49c90" text-anchor="middle">switches on "type", ignores labels it doesn't know yet</text>
+
+  <text x="60" y="672" font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#ebe7df">Twelve more parts will add parcels. <tspan font-style="italic" fill="#e5825a">Nobody ever rebuilds the belt.</tspan></text>
+</svg>
