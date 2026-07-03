@@ -246,6 +246,8 @@ The card renders inline in the transcript, right under the spinner badge of the 
 
 One design decision in the click handler is worth naming. When you press Approve, the frontend does *not* optimistically flip the card; it POSTs the decision and waits for the `approval_resolved` parcel to come back around the belt like any other event. One source of truth, even for your own clicks, which is exactly what keeps two open tabs (or Part 9's reconnecting streams) from arguing about what happened.
 
+One honest limit while the cards are fresh: these two parcels live on the wire only, so a conversation [reopened from Part 5's sidebar](/blog/agent-sdk-5-sessions#replaying-a-conversation-you-werent-there-for) replays the denied tool results but not the cards that produced them; approval events become replayable in [Part 9](/blog/agent-sdk-9-durable-streams), where every parcel lands in a durable event log.
+
 ## The evaluation order, honestly
 
 Time for the fine print, because your mental model of "every Bash call now asks me" is about to be corrected by the machine. Ask the new app *"How many lines are in sales.csv? Use wc -l."*:
