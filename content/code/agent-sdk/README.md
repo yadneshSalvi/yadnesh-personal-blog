@@ -13,6 +13,7 @@ Every folder below is the **complete, runnable project as it exists at the end o
 | 5 | [`part-05-sessions`](part-05-sessions) | Session memory, a conversations sidebar, rename, and forkable analyses | [Sessions: The Analyst Remembers](https://yadneshsalvi.com/blog/agent-sdk-5-sessions) |
 | 6 | [`part-06-custom-tools`](part-06-custom-tools) | A real SQLite database behind custom `@tool`s, served by an in-process MCP server, read-only by construction | [Custom Tools: Give the Analyst a Database](https://yadneshsalvi.com/blog/agent-sdk-6-custom-tools) |
 | 7 | [`part-07-approvals`](part-07-approvals) | Human-in-the-loop approvals: risky tool calls pause on a Future until you click Approve or Deny | [Approvals: The Human in the Loop](https://yadneshsalvi.com/blog/agent-sdk-7-approvals) |
+| 8 | [`part-08-hooks`](part-08-hooks) | Hooks: a PreToolUse tripwire that blocks `rm`, a JSONL audit log of every tool call, and injected desk facts | [Hooks: Guardrails and Audit Trails](https://yadneshsalvi.com/blog/agent-sdk-8-hooks) |
 
 *(The series is in progress — 14 parts across three acts. Folders appear here as parts publish.)*
 

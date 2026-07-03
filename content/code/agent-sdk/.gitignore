@@ -18,5 +18,8 @@ workspaces/
 # Built artifacts (rebuild with data/build_beanline_db.py, Part 6+)
 beanline.db
 
+# The audit log the Part 8 hooks write (runtime data, not code)
+audit.jsonl
+
 # OS
 .DS_Store

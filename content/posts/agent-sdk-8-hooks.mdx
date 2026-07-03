@@ -1,0 +1,361 @@
+---
+title: "Claude Agent SDK in Production, Part 8: Hooks: Guardrails and Audit Trails"
+subtitle: "A PreToolUse tripwire blocks rm with nobody awake, an append-only log answers what the agent actually did, and the prompt learns the desk's facts before the model reads it. One new file, zero new wire events."
+image: "/images/series/agent-sdk/part-8/cover-light.svg"
+imageDark: "/images/series/agent-sdk/part-8/cover-dark.svg"
+createdAt: "2026-07-10T00:00:00.000Z"
+updatedAt: "2026-07-10T00:00:00.000Z"
+tags: ["claude-agent-sdk", "hooks", "fastapi", "tutorial"]
+series: "claude-agent-sdk-fastapi-nextjs"
+seriesPart: 8
+---
+
+Last part ended with homework: run one honest audit. Here's mine. Yesterday I asked the analyst *"How many lines are in sales.csv? Use wc -l."* and Bash ran, five seconds, $0.0229, correct answer, zero cards. That was the lesson: the engine auto-approves what it can prove is safe, and your callback never hears about it. But sit with the second half of that sentence tonight: the call also left **no record**. Not in the approval system (it never got there), not on disk, not anywhere. "May it?" got an answer in Part 7. "What did it actually do, all of it, last Tuesday?" has no answer at all. Today it gets one, and the same request that opened Part 7 gets stopped by something that never sleeps, never gets tired of clicking, and writes down everything it sees.
+
+<Figure
+  src="/images/series/agent-sdk/part-8/browser-hero-light.svg"
+  srcDark="/images/series/agent-sdk/part-8/browser-hero-dark.svg"
+  alt="The Beanline Analyst asked to get rid of sales.csv using rm and record what happened. An expanded Bash badge shows the input rm sales.csv && ls -la and a red error reading: Blocked by policy: rm is never allowed in this workspace. If something needs to go, move it into a .trash/ folder and say so in your reply. The agent says it will move the file to .trash instead, a Bash badge with an Approved chip follows, then a Write badge with another Approved chip, and a bold reply: Done. The workspace policy blocks rm, so I moved sales.csv to .trash/ instead. The artifacts panel lists .trash/sales.csv and cleanup_notes.md, previewing an honest note titled Action Requested and What Actually Happened. The receipt reads 3.05 cents and 18 seconds."
+  caption="The end of this part, from the recorded demo: rm blocked instantly by a hook (no card, no human), the legitimate mv and Write still pausing on Part 7's cards, and the agent's own note honestly titled 'What Actually Happened'. $0.0305 for the whole arc."
+  width={1120}
+  height={1108}
+/>
+
+That screenshot has three safety layers in one frame, and only one of them existed yesterday. The red badge at the top is a **hook**: deterministic code that saw the `rm` before any permission machinery woke up, denied it with a reason the model read and obeyed, and wrote the attempt to a log file. The cards below it are Part 7's approvals, still doing their job for the legitimate follow-ups. The whole part is about one new backend file of roughly a hundred lines. The frontend doesn't change by a single character, and the Part 2 wire vocabulary doesn't grow at all, which is itself the lesson: hooks live *inside* the agent's machinery, not on the wire.
+
+## The layer under everything
+
+Here's the mental model, and it's the [building's security system](/blog/agent-sdk-concepts#hooks): the manager's desk from Part 7 checks the requests someone brings to it, but the ceiling cameras log every badge swipe in the building, including the ones the manager waved through without looking up. The SDK calls these cameras **hooks**: async functions of yours that it calls at fixed interception points in the agent loop. The events you'll use today: `PreToolUse` (before a tool call, may veto it), `PostToolUse` and `PostToolUseFailure` (after the outcome), and `UserPromptSubmit` (when a prompt arrives, may add context). Others exist for later parts: `Stop`, `SubagentStart`/`SubagentStop`, `PreCompact`.
+
+<Figure
+  src="/images/series/agent-sdk/part-8/fig-hooklayers-light.svg"
+  srcDark="/images/series/agent-sdk/part-8/fig-hooklayers-dark.svg"
+  alt="Diagram of one agent turn with every hook interception point. The left column is a timeline: your prompt arrives, then the UserPromptSubmit hook which injects the desk's file list and today's date, then the model decides on a tool call, then the PreToolUse hook which sees every call first and can deny it with a reason, then a dashed box for Part 7's gauntlet of gates two to five, then the tool runs, then PostToolUse and PostToolUseFailure which append audit lines, then the result returns to the model. The right column shows live receipts: rm denied by the hook in a hundredth of a second with zero cards, wc dash l running with no card but one audit line, the desk question answered with zero tool calls at half the cost, and an order proof reading hook rm then callback never fired. A serif line reads: approvals are judgment, hooks are law: deterministic, first, and always awake."
+  caption="One agent turn, every interception point, with the live receipts from this exact app. The dashed box in the middle is all of Part 7. Hooks run before it and after it."
+  width={1240}
+  height={880}
+/>
+
+Registration is a dict on `ClaudeAgentOptions`, and the shape carries most of the design:
+
+```python filename="backend/app/guardrails.py" repo="part-08-hooks/backend/app/guardrails.py" lines="102-107"
+    return {
+        "PreToolUse": [HookMatcher(matcher="Bash", hooks=[block_rm])],
+        "PostToolUse": [HookMatcher(hooks=[record_success])],
+        "PostToolUseFailure": [HookMatcher(hooks=[record_failure])],
+        "UserPromptSubmit": [HookMatcher(hooks=[inject_desk_facts])],
+    }
+```
+
+Read the matchers, because they're doing quiet work. `matcher="Bash"` scopes the tripwire to one tool; the value is a pattern, so `"Bash|Write"` watches two (verified) and `mcp__beanline__*` style globs watch a whole custom-tool server. A `HookMatcher` with **no matcher at all matches every tool**, which is exactly what an audit log wants. Each callback receives `(input_data, tool_use_id, context)`: a dict of event facts (`tool_name`, `tool_input`, plus `tool_response` on success or `error` on failure), the id that ties it to the exact badge in your UI, and a context object. Return an empty dict to observe silently, or a `hookSpecificOutput` dict to intervene. One contrast worth a sentence: unlike Part 7's `can_use_tool`, which demanded the `ClaudeSDKClient` migration, **hooks work fine with plain `query()`** (verified on 0.2.110), so you could have had the cameras as early as Part 1.
+
+<Callout type="info" title="PreCompact, the hook you'll want someday">
+When a conversation outgrows the context window, the SDK compacts it: it summarizes older turns to make room. The `PreCompact` hook fires right before that happens, which is your one chance to archive the full transcript somewhere permanent first.
+</Callout>
+
+## A tripwire for rm
+
+New file, `backend/app/guardrails.py`. The whole part lives in it. First, the law itself:
+
+```python filename="backend/app/guardrails.py" repo="part-08-hooks/backend/app/guardrails.py" lines="56-71"
+    async def block_rm(input_data: dict, tool_use_id: str | None,
+                       context: HookContext) -> dict:
+        # Word-level match, not startswith: the model likes compound
+        # commands ("echo done && rm sales.csv"), verified live.
+        command = input_data.get("tool_input", {}).get("command", "")
+        if "rm" not in command.split():
+            return {}
+        audit(workspace_id, "blocked", input_data.get("tool_name"),
+              tool_use_id, {"input": {"command": command}})
+        return {
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "deny",
+                "permissionDecisionReason": BLOCKED_RM_REASON,
+            }
+        }
+```
+
+That comment about compound commands is a scar, not a flourish. In my first test of this hook I asked for two tasks, an `echo` and then an `rm`, expecting two tidy Bash calls. The model produced one: `echo hello && rm sales.csv`. A `startswith("rm")` check would have waved it through with the deletion riding shotgun. Splitting on whitespace and looking for `rm` as a word catches the compound form, and yes, it also false-positives on a harmless `grep rm notes.txt`. For a tripwire that's the correct trade: the cheap failure mode is blocking something innocent, and the reason string tells the model what to do instead.
+
+Because that's the other half of the return value: `permissionDecisionReason` lands in the model's context as the tool result, verbatim, exactly like Part 7's deny messages. It's the same lesson for the third time, and it keeps being the most practical sentence in this series: **everything the model reads is a prompt.** Ours names the alternative (`move it into a .trash/ folder`), and you saw in the hero shot what the model does with that: proposes the `mv`, routes it through a legitimate card, and writes an honest note about it.
+
+Run the demo request and watch the moment it fires:
+
+<Figure
+  src="/images/series/agent-sdk/part-8/browser-tripwire-light.svg"
+  srcDark="/images/series/agent-sdk/part-8/browser-tripwire-dark.svg"
+  alt="The Beanline Analyst mid-run. The user asks to get rid of sales.csv using rm and to record what happened. An expanded Bash badge shows input rm sales.csv && ls -la and a red error: Blocked by policy, rm is never allowed in this workspace, if something needs to go, move it into a .trash/ folder and say so in your reply. Below it the agent says it cannot use rm directly and will move the file to a .trash folder instead. A spinning Bash badge reads: Create trash folder and move sales.csv into it, and beneath it an approval card shows the exact mkdir and mv command with Approve and Deny buttons. The working timer reads 7 seconds."
+  caption="The tripwire and the manager, ten milliseconds apart in responsibility. rm died before the permission system woke up (note: no card for it, ever). The mv that follows is mutation the policy allows, so it gets Part 7's card like anything else."
+  width={1120}
+  height={991}
+/>
+
+Look at what did *not* happen: no card for the `rm`. Not denied by you, never presented to you. The evaluation order from [Part 7](/blog/agent-sdk-7-approvals#the-evaluation-order-honestly) said hooks run first, and I wanted proof rather than documentation, so I instrumented both layers with an order log and asked for an `rm` followed by a `touch`. The log, verbatim:
+
+```text
+[ORDER] ['hook:rm probe_hook.txt && touch pro',
+         'hook:touch probe_hook2.txt',
+         'callback:touch probe_hook2.txt']
+```
+
+The hook saw the `rm` (again a compound, the model can't help itself) and denied it; `can_use_tool` **never fired for it**. The harmless `touch` shows the full path: hook first, callback second. A hook deny short-circuits the entire gauntlet: no engine judgment, no allow list, no card, no human, no tool. Policy as code versus judgment as clicks, and the policy reads the request first.
+
+<Callout type="warning" title="A tripwire is not a sandbox">
+This hook stops `rm` spelled as `rm`. It does not stop `python3 -c "os.remove(...)"`, `find -delete`, or any of the thousand other ways a shell can lose a file, and a prompt injection will happily suggest one. Hooks are the right place for policy and audit precisely because they're deterministic, but containment you can trust against an adversary is OS-level work: that's Part 12's sandbox. Rung by rung.
+</Callout>
+
+## The audit log: one line per fact
+
+Now the cameras' tape. The writer is deliberately boring:
+
+```python filename="backend/app/guardrails.py" repo="part-08-hooks/backend/app/guardrails.py" lines="32-44"
+def audit(workspace_id: str, outcome: str, tool: str | None,
+          tool_use_id: str | None, detail: dict) -> None:
+    """Append one fact to the audit log. outcome: ok | failed | blocked."""
+    record = {
+        "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "workspace_id": workspace_id,
+        "outcome": outcome,
+        "tool": tool,
+        "tool_use_id": tool_use_id,
+        **detail,
+    }
+    with AUDIT_LOG.open("a") as f:
+        f.write(json.dumps(record, default=str) + "\n")
+```
+
+One append-only JSONL file for the whole server, `backend/audit.jsonl`, one line per fact. No database, no rotation, no log framework; those are real production concerns and they arrive when they hurt. The two hooks that feed it are even shorter:
+
+```python filename="backend/app/guardrails.py" repo="part-08-hooks/backend/app/guardrails.py" lines="73-85"
+    async def record_success(input_data: dict, tool_use_id: str | None,
+                             context: HookContext) -> dict:
+        audit(workspace_id, "ok", input_data.get("tool_name"), tool_use_id,
+              {"input": input_data.get("tool_input"),
+               "result": snip(input_data.get("tool_response"))})
+        return {}
+
+    async def record_failure(input_data: dict, tool_use_id: str | None,
+                             context: HookContext) -> dict:
+        audit(workspace_id, "failed", input_data.get("tool_name"), tool_use_id,
+              {"input": input_data.get("tool_input"),
+               "error": snip(input_data.get("error"))})
+        return {}
+```
+
+You already noticed the third caller: `block_rm` writes its own `"blocked"` line. That's not belt-and-suspenders, it's a verified necessity, and it's the part's one real gotcha: **a call denied by a `PreToolUse` hook never runs, so `PostToolUse` and `PostToolUseFailure` never fire for it.** I proved this with a run whose hook log shows exactly one entry for the blocked call: the `PreToolUse` sighting, nothing after. If the tripwire didn't file its own incident report, the most interesting events in the building would be the only ones missing from the tape.
+
+So what does the tape answer? The question every production agent deployment eventually gets asked, usually by someone unamused: *what did it actually do?* Here's the real file after the demo run, interrogated with nothing fancier than grep:
+
+<Figure
+  src="/images/series/agent-sdk/part-8/term-audit.svg"
+  alt="A dark terminal titled: the audit log answers. wc -l audit.jsonl returns 3 lines, annotated one line per tool call, every conversation. grep for blocked returns the full JSON line for the rm attempt with its timestamp, workspace id, outcome blocked, tool Bash, tool use id, and the command rm sales.csv && ls -la. A grep -o piped through sort and uniq -c counts 1 blocked and 2 ok. A final comment notes the tool_use_id matches the red badge in the UI: the attempt is on the record."
+  caption="The demo run's audit.jsonl, verbatim. Three tool calls, three lines: one blocked rm, one approved mv, one approved Write. The tool_use_id in the blocked line is the same id the red badge carries in the UI."
+  width={1040}
+  height={508}
+/>
+
+The `tool_use_id` correlation is the detail that makes this a *system* rather than two features. The badge in the UI, the card that gated it, and the audit line on disk all carry the same id, so a question in the UI ("what was this red badge?") resolves to a line on disk, and a line on disk resolves to a moment in a conversation. The production reference app this series shadows does exactly this at larger scale: audit middleware plus semantic action records, queryable by user and time range. Ours is the tutorial-sized version of the same shape, and one honest gap belongs on the record too: a call a *human* denies at a card also never runs, so it also leaves no `ok` or `failed` line. Its trace lives in the approval events, and those are wire-only until [Part 9](/blog/agent-sdk-9-durable-streams) gives every parcel a durable home.
+
+{/* [ANECDOTE slot (WRITING-STYLE §6): a true first-person story from Yadnesh about an incident postmortem that hinged on logs, or on their absence ("what did the script actually touch on Tuesday?"), 3 beats, 5 sentences. Lands here. */}
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 4-panel comic strip, panels in a single row separated by thin vertical black dividers, about a security camera layer that sees everything even when the manager's approval desk is bypassed. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny formal necktie. Panel 1: the laptop-analyst proudly wearing a shiny badge on a lanyard reading "ALWAYS ALLOWED" struts past Yad's approval desk (a small counter with a sign reading "APPROVALS"); Yad waves it through without looking up from his coffee. Panel 2: in the hallway the laptop-analyst, looking mischievous, drags a big trash bag labeled "SALES.CSV" toward a bin; on the ceiling above, a small security camera labeled "HOOK" swivels toward it, red light on. Panel 3: close-up of the ceiling camera instantly printing a paper slip that reads "BLOCKED: rm"; the analyst below freezes mid-step, wide-eyed, dropping the bag. Panel 4: Yad at his desk reads a very long paper printout labeled "AUDIT LOG" spilling onto the floor, covered in tiny ledger lines; the analyst stands beside him looking sheepish; Yad's speech bubble reads: "IT SEES EVERYTHING." Clean readable hand-lettered speech bubbles and labels, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-8/comic-camera.png"
+  alt="Comic in four panels. Panel one: a laptop analyst with a tiny necktie and a badge reading ALWAYS ALLOWED struts past Yad's approvals desk while Yad, a bearded developer with headphones, waves it through over his coffee. Panel two: in the hallway the analyst drags a big trash bag labeled SALES.CSV toward a bin while a ceiling camera labeled HOOK swivels toward it, red light on. Panel three: the camera instantly prints a slip reading BLOCKED: rm and the analyst freezes wide-eyed, dropping the bag. Panel four: Yad reads a very long printout labeled AUDIT LOG spilling onto the floor and says: it sees everything, while the analyst stands by, sheepish."
+  caption="The badge gets you past the manager. It does not get you past the ceiling camera, and the camera keeps a ledger."
+  width={1536}
+  height={1024}
+/>
+
+## Hooks add context, not only rules
+
+Everything so far blocks or records. The last hook does something friendlier: it makes the agent smarter before the model reads a single word. `UserPromptSubmit` fires when a prompt arrives, and its `additionalContext` is appended to what the model sees:
+
+```python filename="backend/app/guardrails.py" repo="part-08-hooks/backend/app/guardrails.py" lines="87-100"
+    async def inject_desk_facts(input_data: dict, tool_use_id: str | None,
+                                context: HookContext) -> dict:
+        files = sorted(p.name for p in workspace.iterdir() if p.is_file())
+        today = datetime.now().strftime("%A, %B %d, %Y")
+        listing = ", ".join(files[:20]) if files else "none yet"
+        return {
+            "hookSpecificOutput": {
+                "hookEventName": "UserPromptSubmit",
+                "additionalContext": (
+                    f"Desk facts from the server: today is {today}. "
+                    f"Files in the working directory: {listing}."
+                ),
+            }
+        }
+```
+
+Why bother? Because the facts your *server* knows for free are facts the *agent* otherwise spends tool calls rediscovering. Measured back to back with the same question, "What files are on my desk right now, and what's today's date?": yesterday's app ran an `ls -la` round via Bash, $0.0237 and six seconds; today's answered instantly from the injected line, zero tool calls, $0.0113 and two:
+
+<Figure
+  src="/images/series/agent-sdk/part-8/browser-deskfacts-light.svg"
+  srcDark="/images/series/agent-sdk/part-8/browser-deskfacts-dark.svg"
+  alt="The Beanline Analyst asked: what files are on my desk right now, and what's today's date? The reply lists today's date in bold as Saturday, July 04, 2026 and a bulleted list of products.csv, sales.csv, and stores.csv. There are no tool badges at all in the transcript. The receipt reads 1.13 cents and 2 seconds."
+  caption="Zero tool badges is the figure. The hook had already told the model what the server knew, so nothing needed discovering. Half the cost, a third of the wall clock, and the date is pinned by your server instead of guessed."
+  width={1120}
+  height={528}
+/>
+
+The date matters more than it looks: "compare this month to last month" is an everyday analyst question, and a model's sense of *today* deserves to come from your server's clock, not from vibes. Keep injections small and factual (ours caps the listing at 20 names); this is seasoning, not a second system prompt.
+
+The wiring for all of it, back in `main.py`, is the part's entire diff outside the new file:
+
+```python filename="backend/app/main.py" repo="part-08-hooks/backend/app/main.py" lines="55-73"
+def build_options(workspace: Path, session_id: str | None, gate) -> ClaudeAgentOptions:
+    """Part 8: one new line. The hooks dict registers the tripwire, the
+    audit pair, and the desk-facts injector; everything Part 7 built stays
+    exactly where it was. Hooks run before AND after all of it."""
+    return ClaudeAgentOptions(
+        cwd=str(workspace),
+        tools=["Read", "Glob", "Grep", "Bash", "Write"],
+        mcp_servers={"beanline": beanline_server},
+        allowed_tools=[
+            "Read", "Glob", "Grep",
+            "mcp__beanline__query_database", "mcp__beanline__get_schema",
+        ],
+        can_use_tool=gate,
+        hooks=build_hooks(workspace.name, workspace),
+        model=MODEL,
+        include_partial_messages=True,
+        system_prompt={"type": "preset", "preset": "claude_code", "append": ANALYST_PROMPT},
+        resume=session_id,
+    )
+```
+
+Checkpoint, because this options object is now carrying eight parts of decisions: you have an analyst whose toolbox is curated (`tools=`), whose database access is a read-only custom tool (`mcp_servers`), whose safe reads are pre-approved (`allowed_tools`), whose mutations wait for a human (`can_use_tool`), and whose every move is now watched, vetoed, or annotated by deterministic code (`hooks`). Each line was a part of this series. That's not an accident; it's the syllabus.
+
+## When to use which
+
+Five mechanisms now shape what the agent may do, and the most common failure in real codebases is using the wrong one (usually the prompt, for everything). The table this series has been building toward, first draft:
+
+| Mechanism | The question it answers | Enforced by | How it fails |
+|---|---|---|---|
+| System prompt | What *should* it do? | The model's goodwill | Persuasion, not enforcement: a determined input talks it out |
+| `tools=` | What *exists* for it? | The SDK, absolutely | Can't be talked around, but it's all-or-nothing per tool |
+| `allowed_tools` | What runs *without asking*? | Name match, before your code | Names, not arguments: `Glob` waved through means every glob |
+| `can_use_tool` | What does a *human* say, now? | Your callback + a Future | Humans sleep, get tired, click Approve on the tenth card |
+| Hooks | What is *always* true, and who saw it? | Your code, first, every call | Only as sharp as your patterns (see the tripwire's honesty box) |
+
+Read it bottom to top when something goes wrong: is there a record (hooks)? Was a human asked (callback)? Was it pre-approved (allow list)? Could it even exist (tools)? Did we merely *hope* (prompt)? In Part 11 this table gains its last columns, subagents and skills, and becomes the series' graduation exam. For now the two newest rows carry the part's thesis: **approvals are judgment, hooks are law**, and you want both, because they fail differently. Judgment gets tired at the hundredth card; law blocks the thousandth `rm` exactly like the first, at 2 a.m., in a run nobody is watching.
+
+## One run, three layers
+
+The dessert is the run you've been looking at all along, so collect it deliberately now. One request: *"We're done with the sample files. Get rid of sales.csv using rm, then write cleanup_notes.md recording exactly what you did and what actually happened."* What the system did, layer by layer:
+
+1. **Law.** The hook saw `rm sales.csv && ls -la` and killed it in ten milliseconds. No card appeared, because the gauntlet never woke up. The model read the reason and changed course, out loud.
+2. **Record.** `audit.jsonl` gained a `"blocked"` line, then an `"ok"` for the `mv`, then an `"ok"` for the Write. Three calls, three lines, ids matching the badges.
+3. **Judgment.** The `mkdir && mv` and the `Write` are mutations policy permits, so each paused on a Part 7 card and waited for my click. Approve, approve, done: $0.0305, 18 seconds, and a note in the panel titled "What Actually Happened" that would pass an auditor's sniff test.
+
+The layers compose without knowing about each other. The hook didn't need the approval bridge's permission to deny; the card didn't need the audit log's blessing to pause; the log recorded both without being consulted. That independence is what you're buying with the hundred lines.
+
+## The cost ritual
+
+All real runs from building this part:
+
+| Run | Result | Cost |
+|---|---|---|
+| `wc -l` on Part 7's app (the ghost) | no card, no callback, **no record** | $0.0229 · 5s |
+| `wc -l` on today's app | no card (unchanged), one audit line | $0.0231 · 5s |
+| The dessert run (demo take) | rm blocked, mv + Write approved, honest note | $0.0305 · 18s |
+| Same request, earlier take | rm blocked, Write approved, note written | $0.0243 · 12s |
+| Desk question, with the hook | zero tool calls | $0.0113 · 2s |
+| Desk question, Part 7 app | one `ls -la` round | $0.0237 · 6s |
+| Read a file that doesn't exist | one `"failed"` audit line | $0.0242 · 10s |
+| Ordering proof (spike, rm then touch) | hook first, callback second, on the record | $0.0186 |
+
+The bill barely notices the governance: the blocked `rm` didn't even cost a tool execution, and the audit log costs microseconds of file append. The desk-facts pair is the only row where hooks *make* money instead of spending it, and it'll keep paying on every turn of every conversation from here on.
+
+<DemoVideo
+  src="/videos/agent-sdk/part-8-demo.mp4"
+  poster="/videos/agent-sdk/part-8-poster.jpg"
+  caption='A real run, recorded: the rm attempt dies on the tripwire with the policy reason on screen (no card, no human), the agent pivots to mkdir and mv, both legitimate mutations pause on approval cards, and the final note in the artifacts panel is titled "What Actually Happened". Receipt on camera: $0.0305, 18 seconds.'
+  label="Screen recording of Part 8: a PreToolUse hook blocking rm instantly, the agent adapting, approval cards for the legitimate follow-ups, and the honest cleanup note"
+/>
+
+<Recap
+  part={8}
+  items={[
+    "Hooks: deterministic interception points in the agent loop (PreToolUse, PostToolUse, PostToolUseFailure, UserPromptSubmit, and friends), registered as a dict of HookMatchers on ClaudeAgentOptions, working with plain query() and ClaudeSDKClient alike.",
+    "A tripwire: the PreToolUse hook denies rm with a reason the model reads and obeys, firing before the engine, the allow list, and can_use_tool (proven live: the callback never heard about the blocked call).",
+    "An audit trail: PostToolUse and PostToolUseFailure append one JSONL line per call with the same tool_use_id as the UI badge, and the tripwire files its own blocked lines because a hook-denied call never reaches the post hooks (verified).",
+    "Context injection: UserPromptSubmit hands the model the desk's file list and today's date before it reads the prompt, measured at half the cost and a third of the latency on desk questions.",
+    "The decision table: prompt (hope), tools= (existence), allowed_tools (convenience), can_use_tool (judgment), hooks (law and record). Different layers, different failure modes, on purpose.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "The same wc -l question ran on the Part 7 app and the Part 8 app. What changed?",
+      options: [
+        "Part 8 shows an approval card for it",
+        "Nothing: the run is identical in every way",
+        "It still runs with no card and no callback, but PostToolUse now writes an audit line for it",
+        "The engine no longer auto-approves read-only commands",
+      ],
+      answer: 2,
+      explain: "Auto-approval is unchanged (the engine still green-lights provably read-only work), and the callback still never fires. The difference is the unmatched-matcher PostToolUse hook: the call now leaves a JSONL record. That was the whole hole Part 7 ended on.",
+    },
+    {
+      q: "A PreToolUse hook denies a Bash call. What does can_use_tool see?",
+      options: [
+        "The same call, so it can second-guess the hook",
+        "Nothing: a hook deny short-circuits the entire evaluation chain, verified by an order log where callback:rm never appears",
+        "A notification event describing the denial",
+        "The call, but only if Bash is not in allowed_tools",
+      ],
+      answer: 1,
+      explain: "The instrumented run shows hook:rm with no matching callback entry, then hook:touch followed by callback:touch. Hooks run first; a deny means no engine judgment, no allow list, no card, no tool.",
+    },
+    {
+      q: "Why does the tripwire write its own audit line instead of relying on the audit hooks?",
+      options: [
+        "For performance: PostToolUse is slow",
+        "Because a hook-denied call never runs, so neither PostToolUse nor PostToolUseFailure ever fires for it (verified); without the tripwire's own line, blocked attempts would be missing from the log",
+        "Because PostToolUse cannot see Bash calls",
+        "Because audit() only accepts blocked outcomes",
+      ],
+      answer: 1,
+      explain: "The verified gotcha that shapes guardrails.py. The most security-relevant events (the blocked ones) are exactly the ones the post hooks never see, so the denying hook must file its own incident report.",
+    },
+    {
+      q: "What does HookMatcher(hooks=[cb]) with no matcher do, and why does the audit pair use it?",
+      options: [
+        "It matches nothing until a matcher is added",
+        "It matches only built-in tools",
+        "It raises an error: matcher is required",
+        "It matches every tool call, built-in and MCP alike, which is exactly the scope an audit log wants",
+      ],
+      answer: 3,
+      explain: "Matchers scope hooks: 'Bash' for one tool, 'Bash|Write' for alternation, mcp globs for custom servers, and no matcher at all for everything. The tripwire wants a narrow scope; the cameras want the whole building.",
+    },
+    {
+      q: "Which statement about hooks vs can_use_tool is true on 0.2.110?",
+      options: [
+        "Both require ClaudeSDKClient",
+        "Hooks work with plain query() while can_use_tool requires the client's live channel; both were verified on this exact SDK version",
+        "can_use_tool works with query() while hooks need the client",
+        "Neither works with query()",
+      ],
+      answer: 1,
+      explain: "The permission callback is a mid-turn conversation with your code and needs the client's control channel (Part 7's whole migration). Hooks ride the subprocess protocol itself and fire happily from a plain query() call, verified in the spike for this part.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 8: hooks - guardrails and audit trails"
+```
+
+Your analyst is governed now, properly: existence, permission, judgment, law, and a ledger. So break something it can't govern its way out of. Start a real analysis, one with a few tool calls in it, and while the badges are still spinning, hit refresh. Everything vanishes. The agent finishes its work server-side, faithfully audited by your new hooks, and delivers the answer to a socket nobody is listening to. The lifetime of the *work* is chained to the lifetime of one HTTP response, and that chain is the last piece of Act II. In [Part 9](/blog/agent-sdk-9-durable-streams), we break it: a durable event log, streams you can rejoin mid-turn, and the real Stop button this series has owed you since Part 3.
+
+The complete, tested code for this part lives in [`part-08-hooks`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/tree/main/part-08-hooks) in the [companion repo](https://github.com/yadneshSalvi/claude-agent-sdk-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.

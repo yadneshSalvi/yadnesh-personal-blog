@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="508" viewBox="0 0 1040 508" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="508" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; backend/ &#183; the audit log answers</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62">$</tspan> wc -l audit.jsonl</text>
+    <text x="32" y="116" xml:space="preserve">       3 audit.jsonl        <tspan fill="#756d62"># one line per tool call, every conversation</tspan></text>
+    <text x="32" y="144" xml:space="preserve"></text>
+    <text x="32" y="172" xml:space="preserve"><tspan fill="#756d62">$</tspan> grep '"blocked"' audit.jsonl</text>
+    <text x="32" y="200" xml:space="preserve">{"ts": "2026-07-03T19:45:23+00:00", "workspace_id": "80c21497<tspan fill="#756d62">&#8230;</tspan>",</text>
+    <text x="32" y="228" xml:space="preserve"> "outcome": <tspan fill="#d97676">"blocked"</tspan>, "tool": "Bash",</text>
+    <text x="32" y="256" xml:space="preserve"> "tool_use_id": "toolu_01UuWALAaLocTi9Tcqp5XSdk",</text>
+    <text x="32" y="284" xml:space="preserve"> "input": {"command": <tspan fill="#d97676">"rm sales.csv &amp;&amp; ls -la"</tspan>}}</text>
+    <text x="32" y="312" xml:space="preserve"></text>
+    <text x="32" y="340" xml:space="preserve"><tspan fill="#756d62">$</tspan> grep -o '"outcome": "[a-z]*"' audit.jsonl | sort | uniq -c</text>
+    <text x="32" y="368" xml:space="preserve">   1 "outcome": <tspan fill="#d97676">"blocked"</tspan></text>
+    <text x="32" y="396" xml:space="preserve">   2 "outcome": <tspan fill="#8fb573">"ok"</tspan></text>
+    <text x="32" y="424" xml:space="preserve"></text>
+    <text x="32" y="452" xml:space="preserve"><tspan fill="#756d62"># same tool_use_id as the red badge in the UI. The attempt is on the record.</tspan></text>
+  </g>
+</svg>

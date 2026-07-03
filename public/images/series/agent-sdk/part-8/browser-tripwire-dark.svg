@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="991" viewBox="0 0 1120 991" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="991" fill="#0c0a09"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#211e1a"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#2b2723" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#3a3530"/><circle cx="56" cy="28" r="7" fill="#3a3530"/><circle cx="82" cy="28" r="7" fill="#3a3530"/>
+  <rect x="320" y="13" width="480" height="30" rx="15" fill="#1a1816" stroke="#3a3530"/>
+  <text x="560" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#a49c90" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#292524" stroke-width="1"/>
+  <circle cx="28" cy="79" r="5" fill="#e5825a"/>
+  <text x="42" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">Beanline Analyst</text>
+  <line x1="220" y1="102" x2="220" y2="991" stroke="#292524" stroke-width="1"/>
+  <rect x="14" y="116" width="192" height="36" rx="9" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="110" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">+ New analysis</text>
+  <rect x="10" y="166" width="200" height="44" rx="9" fill="#292524"/>
+  <text x="20" y="185" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e7e5e4">We're done with the sample files.…</text>
+  <text x="20" y="201" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c">10s ago</text>
+  
+  <rect x="459" y="130" width="521" height="84" rx="18" fill="#f5f5f4"/>
+  <text x="476" y="155" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#1c1917">We're done with the sample files. Get rid of sales.csv using rm,</text>
+  <text x="476" y="177" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#1c1917">then write cleanup_notes.md recording exactly what you did and</text>
+  <text x="476" y="199" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#1c1917">what actually happened.</text>
+  <rect x="340" y="232" width="560" height="289" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <line x1="340" y1="270" x2="900" y2="270" stroke="#292524" stroke-width="1"/>
+  <text x="355" y="256" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#f87171">&#x2715;</text>
+  <text x="376" y="256" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Delete sales.csv and list remaining files</text>
+  <text x="862" y="255" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="end">BASH</text>
+  <path d="M 874 254 l 5 -6 l 5 6" fill="none" stroke="#78716c" stroke-width="1.8"/>
+  <text x="356" y="290" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#78716c">INPUT</text>
+  <rect x="354" y="296" width="532" height="98" rx="8" fill="#292524"/>
+  <text x="368" y="314" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">{</text>
+  <text x="368" y="333" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">  "command": "rm sales.csv &amp;&amp; ls -la",</text>
+  <text x="368" y="352" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">  "description": "Delete sales.csv and list remaining files"</text>
+  <text x="368" y="371" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">}</text><text x="356" y="418" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#78716c">ERROR</text>
+  <rect x="354" y="424" width="532" height="79" rx="8" fill="#292524"/>
+  <text x="368" y="442" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#f87171" xml:space="preserve">Blocked by policy: rm is never allowed in this workspace.</text>
+  <text x="368" y="461" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#f87171" xml:space="preserve">If something needs to go, move it into a .trash/ folder</text>
+  <text x="368" y="480" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#f87171" xml:space="preserve">and say so in your reply.</text>
+  
+  <text x="340" y="552" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#e7e5e4">I can't use rm directly in this workspace. Instead, I'll move the file</text>
+  <text x="340" y="576" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#e7e5e4">to a .trash/ folder and document what happened.</text>
+  <rect x="340" y="595" width="560" height="38" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <circle cx="360" cy="614" r="6.5" fill="none" stroke="#292524" stroke-width="2.5"/>
+  <path d="M 360 607.5 A 6.5 6.5 0 0 1 366.5 614" fill="none" stroke="#e5825a" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="376" y="619" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Create trash folder and move sales.csv into it</text>
+  <text x="862" y="618" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="end">BASH</text>
+  <path d="M 874 611 l 5 6 l 5 -6" fill="none" stroke="#78716c" stroke-width="1.8"/>
+  <rect x="340" y="643" width="560" height="188" rx="10" fill="#1c1917" stroke="#e5825a" stroke-width="2" stroke-opacity="0.55"/>
+  <line x1="340" y1="679" x2="900" y2="679" stroke="#292524" stroke-width="1"/>
+  <circle cx="358" cy="661" r="4.5" fill="#e5825a"/>
+  <text x="372" y="666" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#e7e5e4">Approval needed</text>
+  <text x="884" y="665" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="end">BASH</text>
+  <rect x="352" y="687" width="536" height="96" rx="6" fill="#292524"/>
+  <text x="358" y="701" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">{</text>
+  <text x="358" y="720" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">  "command": "mkdir -p .trash &amp;&amp; mv sales.csv .trash/ &amp;&amp; ls -la",</text>
+  <text x="358" y="739" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">  "description": "Create trash folder and move sales.csv into it"</text>
+  <text x="358" y="758" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">}</text>
+  <rect x="352" y="789" width="88" height="32" rx="9" fill="#e5825a"/>
+  <text x="396" y="810" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Approve</text>
+  <rect x="450" y="789" width="66" height="32" rx="9" fill="none" stroke="#292524" stroke-width="1.5"/>
+  <text x="483" y="810" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1" text-anchor="middle">Deny</text>
+  <rect x="534" y="798" width="13" height="13" rx="3" fill="none" stroke="#78716c" stroke-width="1.5"/>
+  <text x="554" y="809" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#78716c">Don't ask again for Bash in this conversation</text>
+  <circle cx="345" cy="855" r="4.5" fill="#e5825a"/>
+  <text x="358" y="860" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#78716c">Working&#8230; 7s</text>
+  <line x1="220" y1="889" x2="1120" y2="889" stroke="#292524" stroke-width="1"/>
+  <rect x="340" y="901" width="99" height="21" rx="6" fill="#1c1917" stroke="#292524"/>
+  <text x="349" y="915.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a8a29e">products.csv</text>
+  <rect x="446" y="901" width="79" height="21" rx="6" fill="#1c1917" stroke="#292524"/>
+  <text x="455" y="915.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a8a29e">sales.csv</text>
+  <rect x="532" y="901" width="85" height="21" rx="6" fill="#1c1917" stroke="#292524"/>
+  <text x="541" y="915.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a8a29e">stores.csv</text>
+  <rect x="340" y="933" width="46" height="42" rx="12" fill="none" stroke="#292524" stroke-width="1.5"/>
+  <text x="363" y="960" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#78716c" text-anchor="middle">+</text>
+  <rect x="396" y="933" width="500" height="42" rx="12" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="412" y="959" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#78716c">Ask about your data&#8230;</text>
+  <rect x="906" y="933" width="74" height="42" rx="12" fill="#e5825a" opacity="0.45"/>
+  <text x="943" y="959" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  
+</svg>

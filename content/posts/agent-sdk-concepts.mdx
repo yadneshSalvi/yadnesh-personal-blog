@@ -5,7 +5,7 @@ image: "/images/series/agent-sdk/concepts-cover-light.svg"
 imageDark: "/images/series/agent-sdk/concepts-cover-dark.svg"
 imageAlt: "A cover in the series style reading 'Concepts, in plain words', with a large section-sign numeral and the Anthropic, FastAPI, and Next.js logos."
 createdAt: "2026-07-03T00:00:00.000Z"
-updatedAt: "2026-07-09T00:00:00.000Z"
+updatedAt: "2026-07-10T00:00:00.000Z"
 tags: ["claude-agent-sdk", "reference"]
 series: "claude-agent-sdk-fastapi-nextjs"
 kind: "reference"
@@ -66,6 +66,14 @@ Two contracts matter. First, the callback needs `ClaudeSDKClient`'s live two-way
 A tool call passes a gauntlet before it reaches your callback, and every earlier gate that says yes means you never hear about the call at all. Hooks run first (they see everything). Then the engine applies its own judgment: reads inside the working directory and provably read-only shell commands are approved by the engine itself, with no rule of yours consulted. Then `allowed_tools` name matches are waved through, then the `permission_mode` has its say, and only what survives all of that reaches `can_use_tool`.
 
 The design consequence: approvals are a gate, not a log. Auto-approved calls are invisible to the callback by construction, which is a feature for UX (nobody wants to approve every file read) and a hole for accountability. When the question changes from "may it?" to "what did it actually do?", the answer lives in hooks, the layer that runs before everything and sees everything.
+
+## Hooks
+
+Hooks are the SDK's fixed interception points: async functions of yours, called at named moments of the agent loop. The ones that matter first: `PreToolUse` (before a tool call, may veto it), `PostToolUse` and `PostToolUseFailure` (after the outcome, with the result or the error), and `UserPromptSubmit` (when a prompt arrives, may append context the model reads). Others fire around lifecycle moments: `Stop`, `SubagentStart`/`SubagentStop`, `PreCompact`.
+
+Registration is a dict on `ClaudeAgentOptions`: `hooks={"PreToolUse": [HookMatcher(matcher="Bash", hooks=[cb])]}`. The matcher scopes the hook: an exact tool name, an alternation like `"Bash|Write"`, or an `mcp__server__*` glob; a `HookMatcher` with no matcher sees every tool, which is what audit logs want. Callbacks receive `(input_data, tool_use_id, context)` and return either an empty dict (observe) or a `hookSpecificOutput` dict (intervene): on `PreToolUse`, `permissionDecision: "deny"` plus a reason that lands in the model's context verbatim, so the reason is a prompt; on `UserPromptSubmit`, `additionalContext`.
+
+Two facts define the layer's place in the permission story. Hooks run *before* the entire evaluation chain, and a hook deny short-circuits everything after it, including `can_use_tool`. And hooks see the auto-approved calls that never reach the callback, which is why audit trails belong here and not in the approval system. One verified subtlety: a call denied by `PreToolUse` never runs, so the post hooks never fire for it; a denying hook that wants the attempt on the record must write the record itself. Unlike `can_use_tool`, hooks also work with plain `query()`.
 
 ## Sessions and JSONL
 
