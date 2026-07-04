@@ -1,0 +1,514 @@
+---
+title: "Claude Agent SDK in Production, Part 10: Plan Mode, Questions, and Thinking You Can Read"
+subtitle: "Act III opens with an analyst that negotiates: plan mode turns action into a proposal, AskUserQuestion turns guesses into option chips, and extended thinking puts the scratchpad on screen. All three ride machinery you already built."
+image: "/images/series/agent-sdk/part-10/cover-light.svg"
+imageDark: "/images/series/agent-sdk/part-10/cover-dark.svg"
+createdAt: "2026-07-18T00:00:00.000Z"
+updatedAt: "2026-07-18T00:00:00.000Z"
+tags: ["claude-agent-sdk", "plan-mode", "extended-thinking", "tutorial"]
+series: "claude-agent-sdk-fastapi-nextjs"
+seriesPart: 10
+---
+
+I asked the Part 9 analyst for "a full report on Beanline's performance" and let it run. Seven tool calls later it handed me three charts I never asked for, a 3,900-character report full of decisions I never made, and a receipt for $0.1089. Whole half year, its own groupings, its own definition of "performance". So I told it what I actually wanted, "only the second quarter, revenue by store", and paid another $0.0228 for the do-over. Nothing malfunctioned. The agent did exactly what agents do with an underspecified request: it **guessed**, confidently, at production speed. Everything the last four parts built polices what the agent *may do*. Nothing yet improves what it *decides to do* with a vague sentence. That's Act III's job, and it starts today: by the end of this page your analyst proposes a plan before touching anything expensive, asks you structured questions instead of assuming, and streams its reasoning into a drawer you can open. All three patterns run on machinery you already own.
+
+<Figure
+  src="/images/series/agent-sdk/part-10/browser-hero-light.svg"
+  srcDark="/images/series/agent-sdk/part-10/browser-hero-dark.svg"
+  alt="The Beanline Analyst after implementing an approved plan. The user message says: implement the plan you proposed, exactly as written. The transcript shows two query badges, an approved Bash badge, an approved Write badge, and a bold reply stating Downtown outsells University by 76 percent, 73,067 versus 41,590 units, averaging 403.7 units per day versus 229.8. The artifacts panel lists generate_report.py, store_comparison.png, and report.md, previewing a two-line daily sales chart. The receipt reads 7.48 cents and 28 seconds, and the composer shows Answer, Plan first, and Thinking toggles."
+  caption="The end of this part, from a real run: the second half of a negotiation. Turn one asked ONE question and proposed a plan ($0.0488); this turn implemented it, approvals and all ($0.0748). Every number in the reply verified against SQL. Zero redos."
+  width={1120}
+  height={850}
+/>
+
+That screenshot is the *second* turn of a conversation. The first turn is the interesting one: the analyst explored read-only, asked which two stores I meant (with options it wrote itself), and produced a plan card with an Implement button. Nothing ran until I said so. The production reference app behind this series ships all three of these patterns; today we build their tutorial-scale core on top of Part 7's approval bridge, Part 2's event vocabulary, and Part 9's durable log, and we collect the payoff of having built those well.
+
+## The anatomy of an expensive guess
+
+Put the cold open under a microscope, because the waste has a specific shape. The vague request didn't fail; it *fanned out*. Wrong date range assumed, wrong grouping assumed, wrong deliverables assumed, and each assumption spent real tool calls dressing itself up as an answer:
+
+<Figure
+  src="/images/series/agent-sdk/part-10/browser-guess-light.svg"
+  srcDark="/images/series/agent-sdk/part-10/browser-guess-dark.svg"
+  alt="The Part 9 Beanline Analyst after a vague full report request. Seven tool badges show a schema read, four database queries, an approved Bash run, and an approved Write. The bold reply summarizes company-wide performance nobody asked about, listing three chart files and a report. The artifacts panel shows category_mix.png, store_performance.png, top_products.png, and report.md. The receipt reads 10.89 cents and 54 seconds."
+  caption="The expensive guess, on the Part 9 app: a real run, $0.1089 and 54 seconds of confident assumptions. The numbers in it are even correct. They're answers to questions I didn't ask."
+  width={1120}
+  height={978}
+/>
+
+The cost ritual makes the diagnosis precise: the guess cost $0.1089, the correction cost $0.0228, and the correction is the *only part I wanted*. A clarifying question before the fan-out would have cost the model a sentence. This is not a model quality problem, and a better model only shrinks it; it's an interaction design problem. Production agents negotiate: they propose before they act, and they ask before they guess. The SDK ships a surface for each, and both surfaces route through code you wrote three parts ago.
+
+{/* [ANECDOTE slot (WRITING-STYLE §6): a true first-person story about expensive work built on an unasked clarifying question (a contractor, a freelancer brief, a data request that came back answering the wrong question), 3 beats, 5 sentences max. Lands here. */}
+
+Three new parcel types join the [Part 2 vocabulary](/blog/agent-sdk-2-fastapi-streaming#designing-the-envelope) today, and it's worth naming them before the code so you can watch them ride the belt:
+
+| `type` | Payload | Job |
+|---|---|---|
+| `plan_proposed` | `plan_id`, `markdown` | the agent's written estimate, as a first-class event |
+| `question_request` / `question_resolved` | `question_id`, `questions` / `answers` | the approval lifecycle with friendlier cargo |
+| `thinking_delta` | `text` | the scratchpad, token by token |
+
+Same envelope, same belt, same discipline as the six extensions before them: the Part 3 parser won't change, and because every event goes through Part 9's `emit`, all three are **born durable**. We'll collect both payoffs on camera before the end.
+
+## Plan mode: the written estimate
+
+`permission_mode="plan"` is the [permission mode](/blog/agent-sdk-concepts#permission-modes) this series has skipped past since Part 1, and it's the contractor's estimate before any demolition: the agent may explore, read, and query, but instead of doing the work it produces a plan and stops. In our app it becomes a per-request switch. `ChatRequest` grows two fields (the second is for later in this part):
+
+```python filename="backend/app/main.py" repo="part-10-interactive/backend/app/main.py" lines="61-66"
+class ChatRequest(BaseModel):
+    message: str
+    workspace_id: str | None = None
+    session_id: str | None = None  # the memory switch: absent = fresh start
+    mode: Literal["ask", "plan"] = "ask"  # plan = propose before touching anything
+    thinking: bool = False  # extended thinking: a visible, billed scratchpad
+```
+
+and `build_options` in the worker translates the mode into SDK options:
+
+```python filename="backend/app/runner.py" repo="part-10-interactive/backend/app/runner.py" lines="53-68"
+    # AskUserQuestion is a built-in: listing it is what puts it in the
+    # toolbox. It is NOT in allowed_tools, so every call routes through
+    # the gate, exactly like a risky Bash command. Same for ExitPlanMode,
+    # which only exists in plan runs; it's how a plan leaves plan mode.
+    tools = ["Read", "Glob", "Grep", "Bash", "Write", "AskUserQuestion"]
+    if mode == "plan":
+        tools.append("ExitPlanMode")
+    return ClaudeAgentOptions(
+        cwd=str(workspace),
+        tools=tools,
+        mcp_servers={"beanline": beanline_server},
+        allowed_tools=[
+            "Read", "Glob", "Grep",
+            "mcp__beanline__query_database", "mcp__beanline__get_schema",
+        ],
+        permission_mode="plan" if mode == "plan" else None,
+```
+
+Two names in that `tools=` list are new, and one question decides this whole section: **how does a plan get out of plan mode?** Run it and watch. In plan mode the engine auto-approves the read-only exploration (in-workspace reads, our read-only database tools), and, a genuinely nice touch on current versions, it lets the agent write its plan to a scratch file under `~/.claude/plans/` without asking anyone. Then the agent calls a built-in tool named `ExitPlanMode`, and that call's *input* carries the entire plan as markdown. In Claude Code's terminal UI, this is the moment you get the "approve this plan?" prompt. In our headless app, the call arrives somewhere you know intimately: the `can_use_tool` gate you built in [Part 7](/blog/agent-sdk-7-approvals#the-gate-an-event-out-a-future-in). The gate learns two new names:
+
+```python filename="backend/app/approvals.py" repo="part-10-interactive/backend/app/approvals.py" lines="74-81"
+    async def gate(
+        self, tool_name: str, tool_input: dict, ctx: ToolPermissionContext
+    ) -> PermissionResultAllow | PermissionResultDeny:
+        # Part 10: two built-ins get their own protocols instead of a card.
+        if tool_name == "AskUserQuestion":
+            return await self.ask_user(tool_input, ctx)
+        if tool_name == "ExitPlanMode":
+            return await self.capture_plan(tool_input)
+```
+
+and the plan handler is the shortest interception in the series:
+
+```python filename="backend/app/approvals.py" repo="part-10-interactive/backend/app/approvals.py" lines="164-174"
+    async def capture_plan(self, tool_input: dict) -> PermissionResultDeny:
+        """Plan mode's exit ramp. The plan arrives as the tool call's own
+        input; emit it as a first-class event, then DENY the tool with a
+        message that reads like a receipt. No Future here: implementing
+        is a decision for a later turn, not a paused one."""
+        await self.emit({
+            "type": "plan_proposed",
+            "plan_id": uuid.uuid4().hex,
+            "markdown": tool_input.get("plan", ""),
+        })
+        return PermissionResultDeny(message=PLAN_CAPTURED_MESSAGE, interrupt=False)
+```
+
+Read the ending twice, because it's the part that looks wrong and isn't. We **deny** the tool. `ExitPlanMode`'s approval would mean "the user said go, implement now, in this same turn", and that's a terminal-UI assumption; in a product, the human decides on their own clock, possibly tomorrow, possibly after a refresh (which the card survives, thanks to Part 9). So the deny message is a receipt, not a rejection: *"The client captured your proposed plan and will show it to the user. Stop here; do not start implementing."* The model reads it, summarizes its plan in a sentence or two of prose, and ends the turn cleanly with a `ResultMessage` like any other. One turn, one plan, one receipt: the real one below cost $0.0488.
+
+<Figure
+  src="/images/series/agent-sdk/part-10/browser-plan-light.svg"
+  srcDark="/images/series/agent-sdk/part-10/browser-plan-dark.svg"
+  alt="The Beanline Analyst showing a settled question card summarizing the user's picks, Downtown vs University and sales volume, followed by a proposed plan card labeled read-only run. The plan lists a data collection section with five numbered steps and a verification section with two steps, above Implement this plan and Refine it buttons. The reply under the card says the plan is ready for review, with a receipt of 4.88 cents and 25 seconds."
+  caption="A real plan card ($0.0488, 25s): the markdown came out of ExitPlanMode's own tool input. The buttons don't resolve anything server-side; they write the NEXT message. Note what's above the card: the question it asked first. We'll get there."
+  width={1120}
+  height={937}
+/>
+
+The frontend's `PlanCard` renders the markdown with the same `<Markdown>` component the transcript already uses, plus two buttons. Here's the part I want you to steal: **the buttons write the next message instead of resolving state**. There is nothing to resolve; the turn already ended. "Implement this plan" sends a plain follow-up on the same session, and Part 5's `resume` does the rest, because the plan is in the conversation's memory like anything else the agent said:
+
+```typescript filename="frontend/app/page.tsx" repo="part-10-interactive/frontend/app/page.tsx" lines="348-358"
+  // A plan's buttons write the next message. Implementing always runs in
+  // "ask" mode (approvals on): the plan was the permission conversation.
+  function implementPlan() {
+    setMode("ask");
+    send("Implement the plan you proposed, exactly as written.", "ask");
+  }
+
+  function refinePlan() {
+    setInput("Refine the plan: ");
+    inputRef.current?.focus();
+  }
+```
+
+Implementing deliberately runs in normal approvals mode, not some blessed fast lane. The plan told you *what* the agent intends; the Part 7 cards still govern each risky *how*. That's the hero screenshot at the top of this page: two approval chips inside an implemented plan. The reference app takes this lifecycle further, with plan statuses, refinement rounds, and plans persisted as first-class records; what you've built is the honest core of it.
+
+<Callout type="info" title="Plan mode is a permission surface, not a smarter model">
+Same model, same tools, same prompt. The only thing that changed is what the permission system lets calls DO: reads pass, writes into the workspace don't, and the exit ramp hands you a document instead of side effects. That's why a plan run is also a cheap run: the expensive part of a bad guess was never the thinking, it was the acting.
+</Callout>
+
+One honest observation from testing: in plan mode the engine trusts its own read-only judgment, so exploration inside the workspace never touches your gate. But an out-of-workspace read still raises a Part 7 card, plan mode or not. The gauntlet from [Part 7's evaluation order](/blog/agent-sdk-concepts#permission-evaluation-order) composes with the mode; it isn't replaced by it.
+
+## AskUserQuestion: the bridge pays rent twice
+
+Now the question machinery, and the reason this part exists in Act III rather than Act I: it's a fifteen-minute build, because you already built it. In Part 7, a risky tool call parked the agent on an `asyncio.Future` while a human clicked Approve or Deny. Look at what a structured question needs: the agent pauses mid-turn, the UI shows something clickable, a POST resolves the pause, work continues. **It's the same bridge with friendlier cargo.** The SDK ships a built-in tool named `AskUserQuestion`; the model calls it with structured questions, each with a handful of short options:
+
+```json
+{"questions": [{
+  "question": "Which two stores would you like to compare?",
+  "header": "Store Selection",
+  "options": [
+    {"label": "Downtown vs Airport (Portland)",
+     "description": "Compare two Portland locations that have been open longest"},
+    {"label": "Downtown vs University (oldest locations)",
+     "description": "Compare the first two stores that opened"}
+  ],
+  "multiSelect": false
+}]}
+```
+
+That JSON is from a real run, and there's a detail in it that made me grin at my desk: those option labels are not boilerplate. The agent ran a two-cent `SELECT store_id, name FROM stores` *before* asking, so its chips would name actual stores with actual context. A cheap read buys an informed question. We didn't teach it that; the agent loop plus a decent house rule did.
+
+Since `AskUserQuestion` is in `tools=` but not `allowed_tools`, every call lands in the gate, which routes it to the Future pattern you can now write from memory:
+
+```python filename="backend/app/approvals.py" repo="part-10-interactive/backend/app/approvals.py" lines="130-139"
+        question_id = uuid.uuid4().hex
+        future: asyncio.Future = asyncio.get_running_loop().create_future()
+        PENDING_QUESTIONS[question_id] = future
+        self.open_questions.add(question_id)
+        await self.emit({
+            "type": "question_request",
+            "question_id": question_id,
+            "tool_id": ctx.tool_use_id,
+            "questions": tool_input.get("questions", []),
+        })
+```
+
+The agent is now genuinely parked, spending nothing, exactly like it parks on an approval card. The interesting half is the resolution, because a question's answer has to travel *into the tool call itself*, and Part 7 already taught the vehicle: `PermissionResultAllow(updated_input=...)`, the same power that could rewrite a file's content before writing, now used to hand the model its answers:
+
+```python filename="backend/app/approvals.py" repo="part-10-interactive/backend/app/approvals.py" lines="141-162"
+        reason = "user"
+        try:
+            answers = await asyncio.wait_for(
+                future, timeout=QUESTION_TIMEOUT_SECONDS
+            )
+        except asyncio.TimeoutError:
+            answers, reason = None, "timeout"
+        finally:
+            PENDING_QUESTIONS.pop(question_id, None)
+            self.open_questions.discard(question_id)
+
+        await self.emit({
+            "type": "question_resolved",
+            "question_id": question_id,
+            "answers": answers,
+            "reason": reason,
+        })
+        if answers is None:
+            return PermissionResultDeny(message=UNANSWERED_MESSAGE)
+        return PermissionResultAllow(
+            updated_input={**tool_input, "answers": answers}
+        )
+```
+
+With the answers riding inside `updated_input`, the CLI itself formats the tool result the model reads: *"Your questions have been answered: 'Which two stores would you like to compare?'='Downtown vs University'. You can now continue with these answers in mind."* No prompt surgery on our side; the loop resumes mid-turn with your picks in context. The HTTP half is nine lines, a sibling of the decision endpoint with a friendlier payload:
+
+```python filename="backend/app/main.py" repo="part-10-interactive/backend/app/main.py" lines="163-170"
+@app.post("/questions/{question_id}/answers")
+async def answer_question(question_id: str, request: AnswersRequest) -> dict:
+    """The human's half of the question bridge: same Future pattern as
+    approvals, friendlier cargo. 404 means the question expired (answered,
+    timed out, or its run is over)."""
+    if not answer(question_id, request.answers):
+        raise HTTPException(status_code=404, detail="No such pending question.")
+    return {"question_id": question_id}
+```
+
+Timeouts get 300 seconds instead of the approval card's 120 (a question invites reading), the unanswered path denies with a *"do not guess"* instruction, and `deny_all` resolves open questions with `None` on cancel, so a Stop click while a question is parked unparks the agent instantly. Measured: cancel mid-question and the receipt arrives 40 milliseconds later, $0.0247, no orphans.
+
+<Figure
+  src="/images/series/agent-sdk/part-10/browser-question-light.svg"
+  srcDark="/images/series/agent-sdk/part-10/browser-question-dark.svg"
+  alt="The Beanline Analyst mid plan-first run. Above the transcript, a collapsed thinking drawer reads thought for 293 words. Two completed database badges show the analyst reading the schema and querying store names. A bordered card titled the analyst has a question offers chips for store pairings, with Downtown vs University selected, and a second chip row for the comparison metric with Sales volume selected. The composer shows Plan first and Thinking on toggles and a working timer at 14 seconds."
+  caption="The question card from a real plan-first run, chips verbatim from the model. It queried the store list first, then wrote options a human can answer in one click. The agent is parked on a Future underneath; the timer keeps counting because the turn isn't over, it's waiting for you."
+  width={1120}
+  height={906}
+/>
+
+The `QuestionCard` component renders each question's options as chips, enforces one pick per question (or several when `multiSelect` says so), and only enables "Send answers" when every question has a pick. Its lifecycle in `applyEvent` is the approval card's lifecycle with new names:
+
+```typescript filename="frontend/app/page.tsx" repo="part-10-interactive/frontend/app/page.tsx" lines="111-133"
+  if (event.type === "thinking_delta") {
+    const last = blocks[blocks.length - 1];
+    if (last?.type === "thinking") {
+      return [...blocks.slice(0, -1), { ...last, text: last.text + event.text }];
+    }
+    return [...blocks, { type: "thinking", text: event.text }];
+  }
+  if (event.type === "question_request") {
+    return [
+      ...blocks,
+      { type: "question", id: event.question_id, questions: event.questions, status: "pending" },
+    ];
+  }
+  if (event.type === "question_resolved") {
+    return blocks.map((b) =>
+      b.type === "question" && b.id === event.question_id
+        ? { ...b, status: event.answers ? "answered" : "unanswered", answers: event.answers }
+        : b,
+    );
+  }
+  if (event.type === "plan_proposed") {
+    return [...blocks, { type: "plan", id: event.plan_id, markdown: event.markdown }];
+  }
+```
+
+One translator subtlety worth pausing on. The gate emits rich `question_request` and `plan_proposed` parcels, but the SDK stream *also* carries the raw `AskUserQuestion` and `ExitPlanMode` tool calls, which would render as cryptic badges underneath the cards that already tell the story. So the translator learns its first suppression rule in nine parts:
+
+```python filename="backend/app/events.py" repo="part-10-interactive/backend/app/events.py" lines="96-107"
+            elif isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, ToolUseBlock):
+                        if block.name in CARD_BACKED_TOOLS:
+                            hidden.add(block.id)  # the gate already emitted the card
+                            continue
+                        yield {
+                            "type": "tool_use_start",
+                            "tool_id": block.id,
+                            "tool_name": block.name,
+                            "tool_input": block.input,
+                        }
+```
+
+`CARD_BACKED_TOOLS` is a two-element set, and the `hidden` id set swallows their results too. The wire stays clean: one card out, one resolution back.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 4-panel comic strip, panels in a single row separated by thin vertical black dividers, about an AI analyst that plans and asks before acting. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny formal necktie. Panel 1: Yad points at a small wooden chair and tells the laptop-analyst "MOVE THIS CHAIR." Panel 2: the laptop-analyst has unrolled an enormous architectural blueprint across the whole desk, covering everything; Yad, deadpan, says "I ASKED YOU TO MOVE A CHAIR." Panel 3: the laptop-analyst holds up a clipboard with two big checkboxes labeled "WALL A" and "WALL B" and asks "QUESTION 1 OF 2: WHICH WALL?". Panel 4: the chair sits perfectly placed by a sunny window, Yad sips coffee looking genuinely pleased and says "PERFECT SPOT.", the laptop-analyst says "PLANS FIRST." Clean readable hand-lettered speech bubbles and labels, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-10/comic-blueprint.png"
+  alt="Comic in four panels. Panel one: Yad, a bearded developer with headphones, points at a small chair and tells a laptop analyst with a necktie: move this chair. Panel two: the laptop has unrolled an enormous blueprint across the desk while Yad says flatly: I asked you to move a chair. Panel three: the laptop holds a clipboard with checkboxes for wall A and wall B and asks: question one of two, which wall? Panel four: the chair sits perfectly by a sunny window, Yad sips coffee and says perfect spot, and the laptop replies: plans first."
+  caption="Overkill until it isn't: the plan costs a sheet of paper, the question costs one click, and the chair lands in the right spot on the first move."
+  width={1536}
+  height={1024}
+/>
+
+## Three drafts of one house rule
+
+Here's the part most tutorials would hide: the model doesn't reach for `AskUserQuestion` because the tool exists. Left alone, an agent tuned for autonomous work treats asking as a failure mode; the `claude_code` preset spent thousands of hours learning to act without asking. Getting reliable questions took three drafts of one house rule in `ANALYST_PROMPT`, each earned by a measured miss:
+
+1. *Draft one* ("when the request is ambiguous, ask one question") did nothing: "Chart revenue for the quarter" produced a Q1-vs-Q2 chart and zero questions. Mild ambiguity loses to the bias for action every time.
+2. *Draft two* ("do not guess: ask FIRST, with 2 to 4 short options") fired on structural ambiguity, where guessing is impossible rather than impolite: "Compare revenue for two of our stores" reliably produced the chips. Which two? No amount of confidence answers that.
+3. *Draft three* added "never in plain text", after a take in which the agent dutifully asked which stores I meant, in prose, as the final line of its turn. A prose question ends the turn and waits for nothing; a tool question parks the turn on your Future. Same words, completely different machine states.
+
+The current rule, in full, from the system prompt:
+
+```python filename="backend/app/runner.py" repo="part-10-interactive/backend/app/runner.py" lines="40-43"
+- If the request leaves open a choice that changes the output (date range,
+  grouping, metric, chart type), do not guess: ask with the AskUserQuestion
+  tool FIRST, never in plain text, with 2-4 short options per question. One
+  question round, then do the work. Specific requests need no questions."""
+```
+
+Even now it's probabilistic, not mechanical: the same prompt occasionally asks in prose anyway, and a tightly specified request ("one chart, three-line report") can flip the model back into act-first mode because the ambiguity stopped looking load-bearing. That's the honest texture of prompt-shaped behavior, and it's why Part 13 builds an eval suite instead of trusting any single good take. Write the rule, measure the rate, keep the receipts.
+
+## Extended thinking: the scratchpad you're allowed to read
+
+The third surface is the quietest. Since Part 2 the translator has silently dropped an entire category of stream content: thinking. With `include_partial_messages` on, the raw stream carries `thinking_delta` events whenever the model reasons on its scratchpad before acting, and we've been stepping over them for eight parts. The switch that controls the behavior is one option:
+
+```python filename="backend/app/runner.py" repo="part-10-interactive/backend/app/runner.py" lines="69-75"
+        # Explicit both ways: the drawer in the UI should reflect a switch
+        # the user flipped, not a model default that happens to fire.
+        thinking=(
+            {"type": "enabled", "budget_tokens": 8000}
+            if thinking
+            else {"type": "disabled"}
+        ),
+```
+
+We pass `disabled` explicitly when the toggle is off, because on current models thinking can switch itself on adaptively, and a UI drawer that appears when nobody asked reads as a haunting. Explicit both ways: the drawer reflects a switch the user flipped. The translator finally stops skipping:
+
+```python filename="backend/app/events.py" repo="part-10-interactive/backend/app/events.py" lines="87-94"
+            elif isinstance(message, StreamEvent):
+                delta = message.event.get("delta", {})
+                if delta.get("type") == "text_delta":
+                    yield {"type": "text_delta", "text": delta["text"]}
+                # Part 10: the scratchpad streams too. Note the field name:
+                # a thinking delta carries its text in delta["thinking"].
+                elif delta.get("type") == "thinking_delta":
+                    yield {"type": "thinking_delta", "text": delta["thinking"]}
+```
+
+Note the field name: a thinking delta carries `delta["thinking"]`, not `delta["text"]`. That cost me one confused minute and now costs you none. In the UI, thinking gets a drawer, not a bubble: collapsed to one faint mono line while streaming ("Thinking…"), one line when done ("Thought for 293 words"), the full scratchpad on click, styled like margin scribble because that's what it is:
+
+<Figure
+  src="/images/series/agent-sdk/part-10/browser-thinking-light.svg"
+  srcDark="/images/series/agent-sdk/part-10/browser-thinking-dark.svg"
+  alt="The Beanline Analyst with the thinking drawer expanded under a user message asking for a performance report comparing two stores. Inside a dashed border, faint monospace text shows the model's scratchpad: it lists its context, notices it is in plan mode and cannot execute yet, quotes the house rule about not guessing and using the AskUserQuestion tool first, and lays out a three-step approach: explore the data, ask which stores to compare, then create a plan."
+  caption="The drawer open, from the dessert run. Read the middle: the model notices it's in plan mode, then quotes the house rule back to itself before deciding to ask. You can watch your own system prompt fire."
+  width={1120}
+  height={740}
+/>
+
+Read that screenshot's middle lines. The model restates its constraints, notices it's in plan mode, and then *quotes our house rule to itself*, verbatim, before deciding to ask a question. If you've ever wondered whether the system prompt you wrote actually participates in decisions, the scratchpad is where you watch it happen. That's the real production value of rendering thinking: not theater, but a debugging surface for prompts.
+
+What does it cost? Measured, same analytical question, no tools involved: thinking off answered in 2.7 seconds for $0.0022 with 252 output tokens; thinking on took 9.7 seconds and $0.0062 with 1,050 output tokens. Both answers were correct. Roughly 3x cost and 3.5x latency for this class of question, which is why it's a toggle and not a default: flip it on for the genuinely hard analytical asks, off for "which store sold the most lattes". [Thinking tokens are output tokens](/blog/agent-sdk-concepts#cost-and-tokens); the scratchpad is billed like everything else the model writes.
+
+<Callout type="warning" title="The scratchpad is not a transcript of the truth">
+Thinking text is the model reasoning, not the model testifying. It can explore wrong paths, contradict itself, and reference instructions loosely. Render it faint, keep it collapsed by default, and never parse it programmatically; the answer and the tool calls remain the record of what actually happened. The drawer is for humans who want to check the working.
+</Callout>
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 4-panel comic strip, panels in a single row separated by thin vertical black dividers, about being allowed to read an AI's reasoning scratchpad. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny formal necktie. Panel 1: the laptop-analyst stands very still with closed eyes, a small status sign hanging on it reads "THINKING..."; Yad leans in, curious. Panel 2: Yad gently lifts a small hinged hatch on top of the laptop-analyst, labeled "SCRATCHPAD", and peeks inside with one raised eyebrow. Panel 3: close-up of the inside of the hatch: a tiny messy notepad with scribbled handwriting that reads "WHICH TWO STORES?" and below it "DON'T GUESS. ASK." Panel 4: Yad, touched, says "IT QUOTES MY RULES BACK." while the laptop-analyst, eyes open now, says proudly "HOUSE RULES." Clean readable hand-lettered speech bubbles and labels, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-10/comic-scratchpad.png"
+  alt="Comic in four panels. Panel one: a laptop analyst with a necktie stands still with closed eyes and a hanging sign that reads thinking, while Yad leans in curiously. Panel two: Yad lifts a small hatch labeled scratchpad on top of the laptop and peeks inside. Panel three: inside the hatch, a tiny messy notepad reads which two stores, and below it, don't guess, ask. Panel four: Yad says it quotes my rules back, and the laptop, eyes open, proudly replies house rules."
+  caption="The scratchpad you're allowed to read. The best thing you can find in it is your own instructions, being followed."
+  width={1536}
+  height={1024}
+/>
+
+## One turn, on the wire and on the clock
+
+Now watch all three surfaces cooperate in a single real turn. Plan-first mode, thinking on, one underspecified request: "Prepare a performance report comparing two of our stores." Every timestamp below is from the event log of that run, which you can replay today with `curl -N`, because [Part 9's flight recorder](/blog/agent-sdk-9-durable-streams#the-flight-recorder) records negotiations exactly as faithfully as it records tool calls:
+
+<Figure
+  src="/images/series/agent-sdk/part-10/fig-negotiation-light.svg"
+  srcDark="/images/series/agent-sdk/part-10/fig-negotiation-dark.svg"
+  alt="Timeline diagram of one plan-first turn with real timestamps. At 0 seconds the user asks for a performance report comparing two stores. From 1.3 seconds, 23 thinking deltas stream to the drawer, with the scratchpad quoting the house rule about asking instead of guessing. At 6 seconds the agent reads the schema and store names, auto-approved by plan mode. At 11.9 seconds AskUserQuestion reaches the can_use_tool gate, parks on an asyncio Future, and a question_request event renders chips in the UI. At 14.6 seconds a POST resolves the Future and the gate returns allow with updated input carrying the answers. At 21.6 seconds the agent writes its plan file, auto-approved. At 23.1 seconds ExitPlanMode reaches the gate, which emits plan_proposed and denies with a receipt message. At 25 seconds the turn completes for 4.88 cents. A side box notes the next turn implements the plan with approvals for 7.48 cents. A serif line reads: plan mode changes what the agent may do; the bridge you built in Part 7 decides who it talks to."
+  caption="One plan-first turn, real timestamps from the log of run 7031cce6. Everything new in this part happens at the gate: the question parks at 11.9s, the answers return inside updated_input at 14.6s, the plan is captured and denied at 23.1s. $0.0488 for the whole negotiation."
+  width={1240}
+  height={980}
+/>
+
+And because seeing is believing on the wire too, the same run as raw SSE frames. Three new parcel types, riding a belt that has not changed shape since Part 2, each with a [Part 9 sequence number](/blog/agent-sdk-9-durable-streams#the-dumb-pipe) stamped on the envelope:
+
+<Figure
+  src="/images/series/agent-sdk/part-10/term-parcels.svg"
+  alt="A dark terminal replaying an SSE stream with curl. Frames show id lines with sequence numbers and data payloads: a thinking_delta event with text, a question_request event carrying the question and options JSON, a note that the agent is parked on a Future and nothing streams for 2.7 seconds, a question_resolved event with the chosen answers, a plan_proposed event with the plan id and markdown, and finally a complete event with total cost 0.0488. A comment reads: Part 3's parser renders all of it; Part 9's log replays all of it."
+  caption="The negotiation on the wire, replayed from the log after the fact. The 2.7-second silence between seq 34 and 35 is the agent parked on the Future while a human reads chips. Silence, not spend."
+  width={1040}
+  height={676}
+/>
+
+Collect the two payoffs explicitly, because we earned them in earlier parts. First, [Part 3's parser](/blog/agent-sdk-3-agent-ui#reading-the-stream) needed zero changes to survive these events; an old client would shrug at unknown types, and the new client adds three `if` branches to a reducer. Second, all three event types are **durable for free**: refresh the page while a question card is pending and the replay rebuilds it, chips and all, with the Future still parked server-side, exactly like [Part 9's approval-card composition test](/blog/agent-sdk-9-durable-streams#approvals-meet-durability). Measured in this part's e2e run: question card re-rendered 346 milliseconds after a mid-question reload, and the answer clicked in the new page load resolved the old page load's Future. Even the [Part 5 history replay](/blog/agent-sdk-5-sessions#replaying-a-conversation-you-werent-there-for) collects an IOU today: its mapper skipped thinking blocks "until Part 10 renders them", and now it maps them into drawers, and replays old questions as settled cards, because the diary stored `AskUserQuestion`'s input *with* the injected answers.
+
+## Three ways to hold the leash
+
+Step back and look at what the analyst now supports, because this is a product-design synthesis, not a features list. One agent, three interaction modes, chosen per request:
+
+| Mode | Who acts first | Cost shape | Reach for it when |
+|---|---|---|---|
+| Autopilot (Acts I and II, `bypassPermissions` era) | the agent | one turn, cheap, occasionally wasted | requests are specific, stakes are low, you trust the desk |
+| Approval-gated (Part 7, today's default "Answer" mode) | the agent, pausing at risk | one turn plus your clicks | normal work: act freely, gate the blast radius |
+| Plan-first (today's "Plan first" toggle) | you, after reading | two turns, both small | vague, expensive, or novel requests where a wrong guess costs more than a round-trip |
+
+The question tool cuts across all three: it fires wherever ambiguity is structural. And the modes map onto trust the way the [permission modes](/blog/agent-sdk-concepts#permission-modes) always have: shadowing, supervised, keys to the building, except now the *user* holds the dial per request instead of the developer holding it per deployment. The reference app exposes exactly this dial to its users, plus a full-access mode we deliberately don't ship in a tutorial.
+
+## The cost ritual
+
+All real runs from building this part:
+
+| Run | Result | Cost |
+|---|---|---|
+| "Full report" on the Part 9 app | the expensive guess: 3 charts, 7 tool calls, nobody asked | $0.1089 · 54s |
+| The correction turn after it | paying for the guess a second time | $0.0228 · 13s |
+| The same vague ask, plan-first | a plan card, zero files touched | $0.0946 · 19s |
+| "Compare two stores", ask mode | one question round, right work, first try | $0.0422 · 31s |
+| The dessert's plan turn, plan-first + thinking | one question round, a 293-word scratchpad, a plan card | $0.0488 · 25s |
+| "Implement the plan you proposed" | chart + report, two approval cards | $0.0748 · 28s |
+| Thinking off vs on, same question, no tools | both correct; 252 vs 1,050 output tokens | $0.0022 vs $0.0062 |
+| Thinking on, in-app volatility analysis | scratchpad + chart + report | $0.0599 · 39s |
+| Stop clicked while a question was parked | receipt 40ms later, no orphans | $0.0247 · 8s |
+| The recorded demo (question round to chart) | on camera below | $0.0591 · 39s |
+
+Read the first four rows as one story: the guess cost $0.1317 with the redo, the plan-first version of the same request cost $0.0946 and touched nothing until approved, and the question turned a maybe-wasted dime into a definitely-right nickel. Negotiation is cheaper than confidence.
+
+<DemoVideo
+  src="/videos/agent-sdk/part-10-demo.mp4"
+  poster="/videos/agent-sdk/part-10-poster.jpg"
+  caption='A real run, recorded: an underspecified request ("Prepare a performance report comparing two of our stores"), the analyst queries store names and asks which two with chips it wrote itself, the picked answers resume the parked turn, approvals ride along, and the comparison chart plus report land with a receipt on camera: $0.0591, 39s.'
+  label="Screen recording of Part 10: a structured question card with option chips pausing a live run, answers resuming it, and the resulting chart and report arriving in the artifacts panel"
+/>
+
+<Recap
+  part={10}
+  items={[
+    "Plan mode as a product switch: permission_mode='plan' turns a request into read-only exploration plus a proposal; ExitPlanMode's tool input carries the plan markdown, and your Part 7 gate captures it as a plan_proposed event, then denies with a receipt so deciding becomes a later turn.",
+    "The plan card's buttons write the NEXT message: 'Implement this plan' is a plain follow-up on the same session in approvals mode, because the plan was the what and the cards still govern the how.",
+    "AskUserQuestion through the same gate: park a Future, emit question_request, and return the human's picks inside PermissionResultAllow(updated_input=...); the CLI formats the tool result and the turn resumes mid-flight. The bridge you built once pays rent twice.",
+    "Extended thinking on a toggle: thinking={'type':'enabled'|'disabled'}, thinking_delta events (the text lives in delta['thinking']), and a collapsed drawer in the UI. Measured on the same question: about 3x cost and 3.5x latency, so it's a switch, not a default.",
+    "All three new event types were born durable: they ride Part 9's log, so plan cards, question chips, and thinking drawers survive refreshes and replay with curl, and Part 3's parser never changed.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "In this app, how does a plan get from plan mode into the UI?",
+      options: [
+        "The SDK emits a special plan message type that the translator forwards",
+        "The agent calls ExitPlanMode, whose tool INPUT carries the plan markdown; the can_use_tool gate emits plan_proposed and then denies the call with a receipt message",
+        "The backend reads the plan file from ~/.claude/plans and diffs it",
+        "Plan mode streams the plan as ordinary text deltas",
+      ],
+      answer: 1,
+      explain: "The plan travels as the tool call's own input. Denying with a 'your plan was captured, stop here' message ends the turn cleanly, which is exactly what a product wants: proposing now, deciding later.",
+    },
+    {
+      q: "Why does 'Implement this plan' not resolve anything server-side?",
+      options: [
+        "Because the SDK auto-implements approved plans",
+        "Because plan approval uses a hook, not the gate",
+        "Because the plan turn already ended; the button sends a plain follow-up message on the same session, where resume gives the agent its own plan as context, and approvals gate the execution as usual",
+        "Because plans expire after 120 seconds",
+      ],
+      answer: 2,
+      explain: "There's no parked Future for a plan. The negotiation happens across turns: turn one proposes and ends with a receipt; implementing is a new turn in 'ask' mode with the Part 7 cards still on duty.",
+    },
+    {
+      q: "How do the human's answers to an AskUserQuestion reach the model?",
+      options: [
+        "As a new user message appended to the conversation",
+        "Via PermissionResultAllow(updated_input={...tool_input, 'answers': answers}): the gate rewrites the tool call's input, and the CLI formats a tool result from it that the model reads mid-turn",
+        "Through a UserPromptSubmit hook's additionalContext",
+        "The SDK polls the answers endpoint directly",
+      ],
+      answer: 1,
+      explain: "Part 7 taught updated_input as the power to rewrite a call before it runs. Here it's the delivery vehicle: answers ride back inside the same tool call the agent parked on, so the turn resumes exactly where it paused.",
+    },
+    {
+      q: "A thinking_delta arrives on the raw stream. Where's the text?",
+      options: [
+        "delta['text'], like a text_delta",
+        "delta['content'][0]['text']",
+        "delta['thinking']: thinking deltas carry their text under a different key than text deltas",
+        "It only arrives in the final ThinkingBlock, never in deltas",
+      ],
+      answer: 2,
+      explain: "The one-field gotcha of this part's translator work. Text deltas use delta['text']; thinking deltas use delta['thinking']. Both stream, and the complete AssistantMessage still arrives afterward with the full ThinkingBlock.",
+    },
+    {
+      q: "You refresh the page while a question card is pending. What happens, and why?",
+      options: [
+        "The question is lost; questions live only on the wire",
+        "The agent gives up after 120 seconds and guesses",
+        "The card re-renders from Part 9's log replay (question_request is a logged event like any other), the Future is still parked server-side, and answering in the new page load resumes the run; measured re-render was ~350ms after reload",
+        "The SDK re-asks the question on reconnect",
+      ],
+      answer: 2,
+      explain: "The new events were born durable because the gate emits through the worker's sink. Same composition test as Part 9's approval card, passed by cargo that didn't exist when Part 9 shipped. That's what designing the envelope buys.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 10: plan mode, structured questions, and a thinking drawer"
+```
+
+The analyst negotiates now: it plans before it spends, asks before it guesses, and shows its working when you ask. But every check on its work is still *you*, reading plan cards and eyeballing tables, and you already saw in Part 6 what happens when a confident total goes unreviewed. Next: the analyst gets a colleague, a reviewer subagent with fresh eyes and no attachment to the analysis it's checking, and a certain duplicated March row finally meets its match.
+
+The complete, tested code for this part lives in [`part-10-interactive`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/tree/main/part-10-interactive) in the [companion repo](https://github.com/yadneshSalvi/claude-agent-sdk-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.

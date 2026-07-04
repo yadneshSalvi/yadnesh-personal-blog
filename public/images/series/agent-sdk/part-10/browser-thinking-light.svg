@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="740" viewBox="0 0 1120 740" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="740" fill="#fafaf9"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#f3f1ec"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#e2ded4" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#d6d1c5"/><circle cx="56" cy="28" r="7" fill="#d6d1c5"/><circle cx="82" cy="28" r="7" fill="#d6d1c5"/>
+  <rect x="320" y="13" width="480" height="30" rx="15" fill="#ffffff" stroke="#e2ded4"/>
+  <text x="560" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#5b554c" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#e7e5e4" stroke-width="1"/>
+  <circle cx="28" cy="79" r="5" fill="#b3441a"/>
+  <text x="42" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Beanline Analyst</text>
+  <text x="1096" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a8a29e" text-anchor="end">session cost $0.0488</text>
+  <line x1="220" y1="102" x2="220" y2="740" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="14" y="116" width="192" height="36" rx="9" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="110" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#57534e" text-anchor="middle">+ New analysis</text>
+  <rect x="10" y="166" width="200" height="44" rx="9" fill="#f5f5f4"/>
+  <text x="20" y="185" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1c1917">Prepare a performance report c…</text>
+  <text x="20" y="201" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#a8a29e">20s ago</text>
+  
+  <rect x="512" y="130" width="468" height="40" rx="18" fill="#1c1917"/>
+  <text x="529" y="155" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#fafaf9">Prepare a performance report comparing two of our stores.</text>
+  <circle cx="345" cy="194" r="3.5" fill="#a8a29e"/>
+  <text x="356" y="198" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" letter-spacing="1.5" fill="#a8a29e">THOUGHT FOR 293 WORDS  <tspan fill="#e7e5e4">&#9662;</tspan></text>
+  <rect x="340" y="208" width="560" height="288" rx="10" fill="#fafaf9" stroke="#e7e5e4" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="356" y="230" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve">The user is asking me to prepare a performance report comparing</text>
+  <text x="356" y="249" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve">two stores. Let me understand the context:</text>
+  <text x="356" y="268" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve">- I have access to a database (stores, products, sales tables)</text>
+  <text x="356" y="287" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve">- There are CSV files uploaded to the desk</text>
+  <text x="356" y="306" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve">- I'm in plan mode and cannot execute yet - only explore and plan</text>
+  <text x="356" y="325" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve"></text>
+  <text x="356" y="344" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve">The user hasn't specified which two stores. According to my house</text>
+  <text x="356" y="363" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve">rules: "If the request leaves open a choice that changes the</text>
+  <text x="356" y="382" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve">output (date range, grouping, metric, chart type), do not guess:</text>
+  <text x="356" y="401" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve">use the AskUserQuestion tool FIRST, with 2-4 short options per</text>
+  <text x="356" y="420" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve">question."</text>
+  <text x="356" y="439" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve"></text>
+  <text x="356" y="458" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve">So I should: 1. First explore the data 2. Ask which stores they</text>
+  <text x="356" y="477" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e" xml:space="preserve">want to compare 3. Then create a plan for the analysis</text>
+  
+  <text x="340" y="525" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#1c1917">I'll help you prepare a performance report comparing two stores. Let me</text>
+  <text x="340" y="549" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#1c1917">first explore the available data, then I'll ask you which two you'd like to</text>
+  <text x="340" y="573" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#1c1917">compare and what metrics matter most to you.</text>
+  <line x1="220" y1="604" x2="1120" y2="604" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="340" y="616" width="99" height="21" rx="6" fill="#f5f5f4" stroke="#e7e5e4"/>
+  <text x="349" y="630.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c">products.csv</text>
+  <rect x="446" y="616" width="79" height="21" rx="6" fill="#f5f5f4" stroke="#e7e5e4"/>
+  <text x="455" y="630.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c">sales.csv</text>
+  <rect x="532" y="616" width="85" height="21" rx="6" fill="#f5f5f4" stroke="#e7e5e4"/>
+  <text x="541" y="630.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c">stores.csv</text>
+  <rect x="340" y="638" width="174" height="24" rx="8" fill="none" stroke="#e7e5e4" stroke-width="1.5"/>
+  <rect x="418" y="638" width="96" height="24" rx="8" fill="#b3441a"/>
+  <text x="379" y="654" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="middle">ANSWER</text>
+  <text x="466" y="654" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#ffffff" text-anchor="middle">PLAN FIRST</text>
+  <rect x="524" y="638" width="108" height="24" rx="8" fill="none" stroke="#b3441a" stroke-width="1.5"/>
+  <text x="578" y="654" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#b3441a" text-anchor="middle">THINKING ON</text>
+  <rect x="340" y="682" width="46" height="42" rx="12" fill="none" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="363" y="709" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#a8a29e" text-anchor="middle">+</text>
+  <rect x="396" y="682" width="500" height="42" rx="12" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="412" y="708" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#a8a29e">Ask about your data&#8230;</text>
+  <rect x="906" y="682" width="74" height="42" rx="12" fill="#b3441a" opacity="0.45"/>
+  <text x="943" y="708" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  
+</svg>

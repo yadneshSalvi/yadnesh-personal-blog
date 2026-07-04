@@ -5,7 +5,7 @@ image: "/images/series/agent-sdk/concepts-cover-light.svg"
 imageDark: "/images/series/agent-sdk/concepts-cover-dark.svg"
 imageAlt: "A cover in the series style reading 'Concepts, in plain words', with a large section-sign numeral and the Anthropic, FastAPI, and Next.js logos."
 createdAt: "2026-07-03T00:00:00.000Z"
-updatedAt: "2026-07-11T00:00:00.000Z"
+updatedAt: "2026-07-18T00:00:00.000Z"
 tags: ["claude-agent-sdk", "reference"]
 series: "claude-agent-sdk-fastapi-nextjs"
 kind: "reference"
@@ -67,6 +67,12 @@ A tool call passes a gauntlet before it reaches your callback, and every earlier
 
 The design consequence: approvals are a gate, not a log. Auto-approved calls are invisible to the callback by construction, which is a feature for UX (nobody wants to approve every file read) and a hole for accountability. When the question changes from "may it?" to "what did it actually do?", the answer lives in hooks, the layer that runs before everything and sees everything.
 
+## Plan mode
+
+`permission_mode="plan"` changes what tool calls may *do*, not what the model knows: reads and provably read-only commands run, writes into the workspace don't, and the run's job becomes producing a proposal instead of side effects. On current versions the agent drafts its plan into a scratch file under `~/.claude/plans/`, then calls a built-in tool named `ExitPlanMode` whose input carries the full plan as markdown; that call is the exit ramp, and it is gated, which is what makes plan mode usable in a product.
+
+In a headless app the [permission callback](#can-use-tool) intercepts `ExitPlanMode`, captures `tool_input["plan"]`, and denies the call with a receipt-shaped message ("your plan was captured; stop and wait"). The turn ends cleanly, the plan renders as a card, and implementing is a plain follow-up message on the same session, run under whatever permission posture you normally use. The mental model from the series: the contractor's written estimate before any demolition. Same contractor, same tools; the difference is that nothing gets knocked down while you're still deciding.
+
 ## Hooks
 
 Hooks are the SDK's fixed interception points: async functions of yours, called at named moments of the agent loop. The ones that matter first: `PreToolUse` (before a tool call, may veto it), `PostToolUse` and `PostToolUseFailure` (after the outcome, with the result or the error), and `UserPromptSubmit` (when a prompt arrives, may append context the model reads). Others fire around lifecycle moments: `Stop`, `SubagentStart`/`SubagentStop`, `PreCompact`.
@@ -108,6 +114,12 @@ The pattern worth stealing: production apps **append rather than replace**. Thou
 By default the SDK yields whole messages: you hear nothing while the model writes a paragraph, then receive the finished `AssistantMessage`. Setting `include_partial_messages=True` adds `StreamEvent` objects between them, carrying the raw token-by-token stream from the underlying API: `content_block_delta` events whose `text_delta` payloads are the individual word-fragments as they're generated.
 
 The layering is the thing to understand: partial events *add* granularity, they don't replace the messages. You still receive the complete `AssistantMessage` afterward, so a translator can render deltas live and use the full message as the authoritative record. Part 2 wires exactly that.
+
+## Extended thinking
+
+Extended thinking gives the model a scratchpad: reasoning tokens it writes before (and between) its visible answer and tool calls. The SDK controls it with `thinking={"type": "enabled", "budget_tokens": N}` or `{"type": "disabled"}`; newer models also support an adaptive mode where the model decides when to think. In the stream, thinking arrives as `ThinkingBlock` content on the full message and, under [partial messages](#partial-messages), as `thinking_delta` events whose text lives in `delta["thinking"]`, a different key than text deltas use.
+
+Two practical rules. First, thinking is billed as output tokens, and it isn't small: the same question measured in Part 10 cost about 3x with thinking on, so products expose it as a switch rather than a default. Second, the scratchpad is reasoning, not testimony: it can wander, backtrack, and paraphrase instructions, so render it faint and collapsed for humans and never parse it in code. Its best production use is watching whether the system prompt you wrote actually participates in decisions.
 
 ## SSE
 
