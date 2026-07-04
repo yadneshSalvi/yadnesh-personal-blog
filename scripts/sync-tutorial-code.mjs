@@ -25,7 +25,7 @@ const SERIES = [
 
 // Only vendor text files a post might display.
 const ALLOWED_FILES = new Set(["Dockerfile", ".dockerignore", ".gitignore", ".env.example", ".env.local.example", "requirements.txt"]);
-const ALLOWED_EXTS = new Set([".py", ".ts", ".tsx", ".css", ".toml", ".json", ".md", ".txt", ".html"]);
+const ALLOWED_EXTS = new Set([".py", ".ts", ".tsx", ".css", ".toml", ".json", ".md", ".txt", ".html", ".yaml", ".yml"]);
 const SKIP_DIRS = new Set(["node_modules", ".venv", ".next", ".git", "__pycache__", "public"]);
 const SKIP_FILES = new Set(["package-lock.json", "next-env.d.ts", "tsconfig.tsbuildinfo"]);
 

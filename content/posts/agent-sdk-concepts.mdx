@@ -5,7 +5,7 @@ image: "/images/series/agent-sdk/concepts-cover-light.svg"
 imageDark: "/images/series/agent-sdk/concepts-cover-dark.svg"
 imageAlt: "A cover in the series style reading 'Concepts, in plain words', with a large section-sign numeral and the Anthropic, FastAPI, and Next.js logos."
 createdAt: "2026-07-03T00:00:00.000Z"
-updatedAt: "2026-08-01T00:00:00.000Z"
+updatedAt: "2026-08-08T00:00:00.000Z"
 tags: ["claude-agent-sdk", "reference"]
 series: "claude-agent-sdk-fastapi-nextjs"
 kind: "reference"
@@ -142,6 +142,18 @@ The `sandbox` option (beta) wraps the `Bash` tool in an operating-system sandbox
 Two behaviors are worth knowing before you ship it. `autoAllowBashIfSandboxed` defaults to *true*, which lets sandboxed Bash skip your [approval callback](#can-use-tool) on the theory that the walls make it safe; a product that wants walls *and* judgment sets it false. And when sandboxed Bash reaches for a host that isn't allow-listed, the SDK raises a `SandboxNetworkAccess` request through `can_use_tool`, carrying `{"host": "..."}`, so a network escape becomes an ordinary approval card with no new client code; deny it and the connection fails inside the tool result as a proxy error (`curl: (56) CONNECT tunnel failed, response 403`), which a model may misread as the host being down.
 
 Two boundaries matter. The sandbox contains the Bash *tool*, not your whole process, and it does not contain external [MCP servers](#mcp), which run outside the wall (the division of labor: walls contain the code the agent runs, approval cards govern the tools it calls). And it is beta and platform-specific, so macOS and Linux don't fail identically; verify on the OS you deploy to. Production agent hosts layer containers or microVMs underneath, so a sandbox escape lands in a throwaway box rather than on the machine. It is a strong rung on the safety ladder (prompt, approvals, hooks, sandbox), not a standalone guarantee.
+
+## Structured outputs
+
+Structured outputs make a run's result machine-checkable. Pass `output_format={"type": "json_schema", "schema": ...}` on `ClaudeAgentOptions`, and the agent works free-form as always (files, tools, charts, a prose reply) but ends the turn by emitting an object that matches your schema. It arrives on `ResultMessage.structured_output` as a dict and on `ResultMessage.result` as the same JSON stringified. The cleanest source for the schema is a Pydantic model's `model_json_schema()`, so the contract lives in one place; validate the result back with `model_validate` at your server's edge, so a broken contract fails loudly at the boundary instead of quietly downstream.
+
+Mechanically, the engine collects the object through a final tool call named `StructuredOutput` whose input *is* the object; a UI translator usually special-cases that name so it renders as a result rather than a stray tool badge. Field `description`s are prompt, not documentation: the model reads them while filling the form, so "plain digits, no currency symbols" is an instruction it follows. This is how you give an agent's answer a surface other *code* can consume, and it is the same mechanism an [LLM judge](#evals) uses to return a structured verdict.
+
+## Evals
+
+An eval suite is how you turn "seems fine in the demo" into a pass rate that moves when you change a prompt. Three pieces. **Cases**: questions with known-correct expected facts, which requires deterministic data (a fixed database, a seeded generator) so ground truth is a fact, not a drifting snapshot. **A runner**: it puts the *real* agent through each case with the same options the app ships, usually concurrently behind a semaphore and budget-capped per attempt (with a robot standing in for the human at the approval gate), and multiple attempts per case because a stochastic model needs a distribution, not one coin flip. **A judge**: an LLM-as-judge call that reads the answer against the expected facts and returns a pass/fail verdict, itself a [structured output](#structured-outputs) so its result is machine-readable.
+
+Three disciplines keep a judge honest: judge with a *different, cheaper* model (or at least a different instance with a comparison-only prompt and no tools) so it can't share the analyst's blind spot; judge *facts, not style*, so it rewards correct numbers over confident prose; and remember it grades against your expected facts, so the whole thing is only as trustworthy as your deterministic ground truth. Evals are the safety net for prompt engineering: they answer "did this change help or hurt?" with a number instead of a vibe. Production harnesses layer suites and cases as database rows, per-attempt timeouts and heartbeats, stored judge transcripts, and trend lines across runs onto this same core.
 
 ## SSE
 

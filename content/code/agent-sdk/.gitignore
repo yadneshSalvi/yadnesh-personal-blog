@@ -26,3 +26,6 @@ audit.jsonl
 
 # The Part 9 event log (runtime data; the schema lives in app/eventlog.py)
 events.db
+
+# Eval-suite results (runtime data, Part 13; one JSON per suite run)
+evals/runs/

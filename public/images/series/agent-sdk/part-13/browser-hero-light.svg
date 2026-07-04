@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="1154" viewBox="0 0 1120 1154" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="1154" fill="#fafaf9"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#f3f1ec"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#e2ded4" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#d6d1c5"/><circle cx="56" cy="28" r="7" fill="#d6d1c5"/><circle cx="82" cy="28" r="7" fill="#d6d1c5"/>
+  <rect x="320" y="13" width="480" height="30" rx="15" fill="#ffffff" stroke="#e2ded4"/>
+  <text x="560" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#5b554c" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#e7e5e4" stroke-width="1"/>
+  <circle cx="28" cy="79" r="5" fill="#b3441a"/>
+  <text x="42" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Beanline Analyst</text>
+  <text x="1096" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a8a29e" text-anchor="end">session cost $0.0710</text>
+  <line x1="220" y1="102" x2="220" y2="1154" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="14" y="116" width="192" height="36" rx="9" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="110" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#57534e" text-anchor="middle">+ New analysis</text>
+  <rect x="10" y="166" width="200" height="44" rx="9" fill="#f5f5f4"/>
+  <text x="20" y="185" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1c1917">Compare Q2 2026 revenue with…</text>
+  <text x="20" y="201" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#a8a29e">now</text>
+  
+  <rect x="451" y="130" width="369" height="62" rx="18" fill="#1c1917"/>
+  <text x="468" y="155" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#fafaf9">How did Q2 2026 revenue compare with Q1,</text>
+  <text x="468" y="177" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#fafaf9">overall and per store? Chart the comparison.</text>
+  
+  <text x="244" y="225" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#1c1917">I'll query the database to compare Q1 and Q2 2026</text>
+  <text x="244" y="249" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#1c1917">revenue overall and by store.</text>
+  <rect x="244" y="268" width="560" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="259" y="292" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="280" y="292" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Querying the beanline database</text>
+  <text x="766" y="291" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">MCP__BEANLINE__QUERY_DATABASE</text>
+  <path d="M 778 284 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.8"/>
+  <rect x="244" y="314" width="560" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="259" y="338" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="280" y="338" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Querying the beanline database</text>
+  <text x="766" y="337" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">MCP__BEANLINE__QUERY_DATABASE</text>
+  <path d="M 778 330 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.8"/>
+  <rect x="244" y="360" width="560" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="259" y="384" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="280" y="384" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Charting the comparison</text>
+  <text x="766" y="383" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">BASH</text>
+  <path d="M 778 376 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.8"/>
+  <rect x="244" y="404" width="560" height="34" rx="10" fill="#f5f5f4" stroke="#e7e5e4" stroke-width="1"/>
+  <text x="258" y="426" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="278" y="426" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Approved</text>
+  <text x="788" y="426" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">BASH</text>
+  <rect x="244" y="446" width="560" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="259" y="470" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="280" y="470" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Loading the house report format</text>
+  <text x="766" y="469" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">SKILL</text>
+  <path d="M 778 462 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.8"/>
+  <rect x="244" y="492" width="560" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="259" y="516" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="280" y="516" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Writing report.md</text>
+  <text x="766" y="515" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">WRITE</text>
+  <path d="M 778 508 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.8"/>
+  <rect x="244" y="536" width="560" height="34" rx="10" fill="#f5f5f4" stroke="#e7e5e4" stroke-width="1"/>
+  <text x="258" y="558" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="278" y="558" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Approved</text>
+  <text x="788" y="558" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">WRITE</text>
+  
+  <text x="244" y="601" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Q2 revenue grew 11.3% to $650,207.40 from Q1's</text>
+  <text x="244" y="625" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">$584,102.80. Downtown led all stores at $159,286.40</text>
+  <text x="244" y="649" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">in Q2, while Riverside saw the strongest growth at</text>
+  <text x="244" y="673" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">+43.5%. Harborview was the only store to decline.</text>
+  <rect x="244" y="692" width="560" height="274" rx="10" fill="#fafaf9" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="260" y="716" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#a8a29e">SUMMARY</text>
+  <text x="260" y="738" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#1c1917">Q2 2026 revenue grew 11.3% to $650,207.40 from Q1's</text>
+  <text x="260" y="758" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#1c1917">$584,102.80, with Riverside and Old Town leading growth.</text>
+  <text x="260" y="782" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Q1 2026 total revenue</text>
+  <text x="788" y="782" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1c1917" text-anchor="end">584,102.8 <tspan fill="#a8a29e">USD</tspan></text>
+  <text x="260" y="804" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Q2 2026 total revenue</text>
+  <text x="788" y="804" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1c1917" text-anchor="end">650,207.4 <tspan fill="#a8a29e">USD</tspan></text>
+  <text x="260" y="826" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Quarter-over-quarter growth</text>
+  <text x="788" y="826" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1c1917" text-anchor="end">11.3 <tspan fill="#a8a29e">%</tspan></text>
+  <text x="260" y="848" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Downtown Q2 revenue (highest store)</text>
+  <text x="788" y="848" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1c1917" text-anchor="end">159,286.4 <tspan fill="#a8a29e">USD</tspan></text>
+  <text x="260" y="870" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Riverside growth Q2 vs Q1 (highest)</text>
+  <text x="788" y="870" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1c1917" text-anchor="end">43.5 <tspan fill="#a8a29e">%</tspan></text>
+  <line x1="260" y1="886" x2="788" y2="886" stroke="#e7e5e4" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="260" y="900" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-style="italic" fill="#a8a29e">caveat: Riverside and Old Town growth (43.5%, 23.5%) warrants verification</text>
+  <text x="260" y="918" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-style="italic" fill="#a8a29e">caveat: Harborview declined 1.4%, the only store with negative growth</text>
+  <text x="260" y="936" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-style="italic" fill="#a8a29e">caveat: Data spans full quarters with no gaps detected</text>
+  <text x="244" y="990" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a8a29e">$0.0710 · 52s</text>
+  <line x1="220" y1="1018" x2="820" y2="1018" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="244" y="1030" width="99" height="21" rx="6" fill="#f5f5f4" stroke="#e7e5e4"/>
+  <text x="253" y="1044.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c">products.csv</text>
+  <rect x="350" y="1030" width="79" height="21" rx="6" fill="#f5f5f4" stroke="#e7e5e4"/>
+  <text x="359" y="1044.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c">sales.csv</text>
+  <rect x="436" y="1030" width="85" height="21" rx="6" fill="#f5f5f4" stroke="#e7e5e4"/>
+  <text x="445" y="1044.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c">stores.csv</text>
+  <rect x="244" y="1052" width="174" height="24" rx="8" fill="none" stroke="#e7e5e4" stroke-width="1.5"/>
+  <rect x="244" y="1052" width="78" height="24" rx="8" fill="#b3441a"/>
+  <text x="283" y="1068" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#ffffff" text-anchor="middle">ANSWER</text>
+  <text x="370" y="1068" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="middle">PLAN FIRST</text>
+  <rect x="428" y="1052" width="108" height="24" rx="8" fill="none" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="482" y="1068" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="middle">BUDGET $ OFF</text>
+  <rect x="546" y="1052" width="108" height="24" rx="8" fill="none" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="600" y="1068" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="middle">THINKING OFF</text>
+  <rect x="244" y="1096" width="46" height="42" rx="12" fill="none" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="267" y="1123" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#a8a29e" text-anchor="middle">+</text>
+  <rect x="300" y="1096" width="436" height="42" rx="12" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="316" y="1122" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#a8a29e">Ask about your data&#8230;</text>
+  <rect x="746" y="1096" width="74" height="42" rx="12" fill="#b3441a" opacity="0.45"/>
+  <text x="783" y="1122" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  <line x1="820" y1="56" x2="820" y2="1154" stroke="#e7e5e4" stroke-width="1"/>
+  <text x="838" y="129" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#1c1917">Artifacts</text>
+  <text x="1102" y="129" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#a8a29e" text-anchor="end">2 files</text>
+  <line x1="820" y1="144" x2="1120" y2="144" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="836" y="155" width="13" height="12" rx="1.5" fill="none" stroke="#a8a29e" stroke-width="1.4"/>
+  <circle cx="840" cy="159" r="1.4" fill="#a8a29e"/>
+  <path d="M 837.5 165.5 l 3.5 -3.5 l 3 3 l 2.5 -2.5 l 2 2" fill="none" stroke="#a8a29e" stroke-width="1.3"/>
+  <text x="858" y="165.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#1c1917">q1_q2_comparison.png</text>
+  <text x="1102" y="165.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#a8a29e" text-anchor="end">68.5 KB</text>
+  <rect x="821" y="178" width="299" height="34" fill="#f5f5f4"/>
+  <path d="M 837 188 h 7 l 4 4 v 10 h -11 z" fill="none" stroke="#a8a29e" stroke-width="1.4"/>
+  <line x1="839.5" y1="195.5" x2="845.5" y2="195.5" stroke="#a8a29e" stroke-width="1.2"/>
+  <line x1="839.5" y1="198.5" x2="845.5" y2="198.5" stroke="#a8a29e" stroke-width="1.2"/>
+  <text x="858" y="199.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#1c1917">report.md</text>
+  <text x="1102" y="199.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#a8a29e" text-anchor="end">1.3 KB</text>
+  <line x1="820" y1="212" x2="1120" y2="212" stroke="#e7e5e4" stroke-width="1"/>
+  <text x="838" y="242" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#1c1917">Beanline analysis: Q1 vs Q2</text>
+  <text x="838" y="266" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#57534e">TL;DR: Q2 2026 revenue reached</text>
+  <text x="838" y="283" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#57534e">$650,207.40, up 11.3% from Q1's</text>
+  <text x="838" y="300" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#57534e">$584,102.80, driven by Downtown,</text>
+  <text x="838" y="317" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#57534e">Old Town, and Riverside.</text>
+  <text x="838" y="334" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#1c1917">Key numbers</text>
+  <text x="838" y="358" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#57534e">Q1 2026 total | $584,102.80</text>
+  <text x="838" y="375" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#57534e">Q2 2026 total | $650,207.40</text>
+  <text x="838" y="392" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#57534e">QoQ growth | +11.3%</text>
+  <text x="838" y="409" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#57534e">Best store (Q2) | Downtown,</text>
+  <text x="838" y="426" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#57534e">  $159,286.40</text>
+  <text x="838" y="443" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#57534e">Largest growth | Riverside,</text>
+  <text x="838" y="460" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#57534e">  +43.5%</text>
+  <text x="838" y="477" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#57534e">Only decline | Harborview,</text>
+  <text x="838" y="494" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#57534e">  −1.4%</text>
+</svg>

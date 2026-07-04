@@ -1,0 +1,478 @@
+---
+title: "Claude Agent SDK in Production, Part 13: Trust, but Verify: Structured Outputs, Budgets, and Evals"
+subtitle: "The analyst hands back a machine-readable summary instead of a wall of prose, respects a dollar budget it cannot blow past, and passes a real eval suite that turns 'seems fine in the demo' into a pass rate you can watch move when you change a prompt."
+image: "/images/series/agent-sdk/part-13/cover-light.svg"
+imageDark: "/images/series/agent-sdk/part-13/cover-dark.svg"
+createdAt: "2026-08-08T00:00:00.000Z"
+updatedAt: "2026-08-08T00:00:00.000Z"
+tags: ["claude-agent-sdk", "evals", "structured-outputs", "tutorial"]
+series: "claude-agent-sdk-fastapi-nextjs"
+seriesPart: 13
+---
+
+Twelve parts in, your analyst is capable, governed, durable, and contained. It reaches databases and the open web, pauses on approval cards, logs every move, and survives a refresh. And every number it hands you is still one you check by eye. "It looked right in the demo" is where most agent projects quietly stop, and it is not a quality bar you can ship. This part is the answer to the question every production deployment eventually gets asked: *how do you know it's good?* Three mechanisms, escalating in strength. Make the output machine-checkable. Make the cost bounded. Make the quality measurable. By the end, when you change a prompt, a number tells you whether the analyst got better or worse, and you have the receipts.
+
+<Figure
+  src="/images/series/agent-sdk/part-13/fig-evals-light.svg"
+  srcDark="/images/series/agent-sdk/part-13/fig-evals-dark.svg"
+  alt="A diagram titled the driving test, 8 cases times 3 attempts, three real suite runs. At the top, a highlighted box quotes the line under test from ANALYST_PROMPT since Part 6: 'Every number you state must come from a query result or script output. Never do arithmetic in your head.' Below, three columns of pass/fail dots, one per case per attempt. Run 1, rule on: 100 percent, 24 of 24 passed, agent $1.4366, 179 seconds, every dot a green check. Run 2, rule removed: 83 percent, 20 of 24 passed, agent $1.3173, 161 seconds. Three cases have red crosses: portland-share said 38.1 percent when truth is 57.8 percent, fastest-growth said 43.5 percent when truth is 70.6 percent, and per-store-plus-total summed 1,234,710.20 when truth is 1,234,310.20. Run 3, rule restored: 100 percent, 24 of 24, agent $1.3759, 158 seconds, all green again. A note reads: same suite, same data, same judge; the only change between columns is one sentence in the system prompt; every failure in run 2 is arithmetic the model did in its head. A serif line reads: Part 10 called prompt engineering probabilistic, not mechanical: write the rule, measure the rate, keep the receipts. This is the measuring."
+  caption="The whole part in one figure, from three real suite runs. Delete one house rule and the pass rate drops from 100% to 83%, with the exact wrong numbers on record. Restore it and the rate recovers. This is what an eval suite buys you: a number that moves when you touch a prompt."
+  width={1240}
+  height={820}
+/>
+
+That figure is the destination. Every column is a real run of the suite we build in this part, and every red cross is a number the analyst got wrong when I removed a single sentence from its prompt. Let's earn it, starting with the smallest of the three mechanisms and the one everything else rests on.
+
+## The wall of prose problem
+
+Ask the analyst a question and it answers beautifully, for a human. Headline, a table, a paragraph of interpretation. Now imagine another service wants that answer: a dashboard that plots the key metric, a Slack bot that posts the headline, a pipeline that files the caveats. All of them have to *parse English* to get there, and English is exactly the thing that breaks the moment the model phrases things differently. The answer is a wall of prose, and your code can't read walls.
+
+The fix is to ask for a form instead of an essay. Not *instead* of the prose, alongside it: the agent still works free-form, still writes its markdown reply, but the *run* now ends with a structured object that matches a schema you defined. Here is that schema, a plain Pydantic model:
+
+```python filename="backend/app/summary.py" repo="part-13-structured-evals/backend/app/summary.py" lines="18-40"
+class Metric(BaseModel):
+    label: str = Field(description="What this number is, e.g. 'March revenue, Downtown'.")
+    value: float = Field(
+        description="The number itself, from a query result or script output. "
+        "Plain digits: no currency symbols, no thousands separators."
+    )
+    unit: str = Field(description="The unit, e.g. 'USD', '%', 'units'.")
+
+
+class AnalysisSummary(BaseModel):
+    """What every analysis boils down to, as a form instead of an essay."""
+
+    headline: str = Field(description="The finding in one sentence, numbers included.")
+    key_metrics: list[Metric] = Field(
+        description="Every number the answer depends on, one metric each."
+    )
+    caveats: list[str] = Field(
+        description="Data-quality flags, assumptions made, questions not answered. "
+        "Empty list if there are none; never invent one to fill space."
+    )
+    chart_paths: list[str] = Field(
+        description="Workspace-relative paths of chart files created this turn, if any."
+    )
+```
+
+Look at those `description` strings. They are not documentation, they are prompt. [Part 6 taught that a tool description is read by the model](/blog/agent-sdk-6-custom-tools#the-name-is-load-bearing); a schema field description is the same thing, read as the agent fills the form. "Plain digits: no currency symbols" is an instruction, and the agent follows it.
+
+Wiring it into the run is one option on `ClaudeAgentOptions`. You hand the SDK the JSON schema, generated straight from the model so the contract lives in exactly one place:
+
+```python filename="backend/app/runner.py" repo="part-13-structured-evals/backend/app/runner.py" lines="171-179"
+        # Part 13: the contract. The agent still works free-form (tools,
+        # prose, charts), but the RUN now ends with a summary matching
+        # this schema, delivered on ResultMessage.structured_output. The
+        # schema is generated from the Pydantic model, so the contract
+        # lives in exactly one place.
+        output_format={
+            "type": "json_schema",
+            "schema": AnalysisSummary.model_json_schema(),
+        },
+```
+
+Under the hood, the engine collects the summary through a tool call it makes at the end of the turn, named `StructuredOutput`, whose input *is* the object. It arrives two ways at once: on `ResultMessage.structured_output` as a dict, and on `ResultMessage.result` as the same JSON stringified. We only need the dict.
+
+<Callout type="info" title="output_format doesn't muzzle the agent">
+Turning this on does not force the agent to only produce JSON. It reads files, runs Python, draws charts, writes its prose reply, all exactly as before; the structured summary is collected *at the end*, as one final step. You get the essay and the form. The `output_format` option shapes the run's last act, not its whole behavior.
+</Callout>
+
+### The vocabulary's final extension
+
+That summary has to reach the browser, and here the series collects a debt it has carried since Part 2. Our whole frontend speaks one event vocabulary, defined once and only ever extended. The `complete` event, which has carried `usage` and `total_cost_usd` since Part 2, gains one field:
+
+```python filename="backend/app/events.py" repo="part-13-structured-evals/backend/app/events.py" lines="153-169"
+            elif isinstance(message, ResultMessage):
+                event = {
+                    "type": "complete",
+                    "usage": message.usage,
+                    "total_cost_usd": message.total_cost_usd,
+                    "duration_ms": message.duration_ms,
+                }
+                # The vocabulary's last extension. model_validate is the
+                # boundary check: the engine already enforced the schema,
+                # this makes a broken contract fail HERE, loudly, instead
+                # of three services downstream.
+                if message.structured_output is not None:
+                    summary = AnalysisSummary.model_validate(message.structured_output)
+                    event["structured_output"] = summary.model_dump()
+                if message.subtype in STOP_REASONS:
+                    event["stop_reason"] = STOP_REASONS[message.subtype]
+                yield event
+```
+
+`model_validate` is doing quiet, important work. The engine already enforced the schema at generation time, so this rarely fails, but it's the boundary check: if the contract is ever broken, it fails *here*, loudly, at the edge of your server, instead of silently three services downstream. Validate at the boundary and everything past it can trust the shape.
+
+And that `StructuredOutput` tool call the engine makes? It would otherwise render as a meaningless badge in the transcript. So the translator hides it, exactly the way [Part 10 hid the card-backed tools](/blog/agent-sdk-10-interactive#askuserquestion-the-bridge-pays-rent-twice): its story is told by the receipt, not a badge.
+
+```python filename="backend/app/events.py" repo="part-13-structured-evals/backend/app/events.py" lines="57-72"
+# Tool calls whose story is told by a gate-emitted card instead of a badge.
+CARD_BACKED_TOOLS = {"AskUserQuestion", "ExitPlanMode"}
+
+# Part 13: the engine collects the structured summary through a tool call
+# named StructuredOutput whose input IS the summary object. Its story is
+# told by the complete event, so like the card-backed tools it gets no
+# badge; unlike them, nothing pauses, so there's no card either.
+RECEIPT_BACKED_TOOLS = {"StructuredOutput"}
+
+# ResultMessage subtypes worth naming on the wire: the run was cut short
+# by a cap you set, not finished and not crashed. Everything else keeps
+# its existing story (success, or the interrupt flow from Part 9).
+STOP_REASONS = {
+    "error_max_budget_usd": "max_budget",
+    "error_max_turns": "max_turns",
+}
+```
+
+Stop and count what just happened to the event vocabulary, because this is the last time we touch it. Part 2 defined six event types. Since then we have added six more types, one envelope field (the SSE `id:`), and now three optional payload fields, and the parser your frontend runs, the `switch (event.type)` that has [ignored what it doesn't recognize since Part 3](/blog/agent-sdk-3-agent-ui), has never once changed. That was the bet in Part 2: design the envelope, not the message, and you can extend it for a year without a rewrite. Here is the bet paid in full:
+
+<Figure
+  src="/images/series/agent-sdk/part-13/fig-vocabulary-light.svg"
+  srcDark="/images/series/agent-sdk/part-13/fig-vocabulary-dark.svg"
+  alt="A table titled the event vocabulary, defined in Part 2, final form. Twelve rows, each an event type with the part that introduced it and its payload. session_start (Part 2): session_id plus workspace_id from Part 4. text_delta (Part 2): text. tool_use_start (Part 2): tool_id, name, input, plus parent_tool_id from Part 11. tool_result (Part 2): tool_id, content, is_error. complete (Part 2), highlighted: usage, cost, duration, plus structured_output plus stop_reason from Part 13. error (Part 2): message. artifact_update (Part 4): path, kind, size. approval_request and resolved (Part 7): approval_id, tool, input, decision. The SSE id field (Part 9): request_id colon seq, enables replay and Last-Event-ID. thinking_delta (Part 10): text. plan_proposed (Part 10): plan_id, markdown. question_request and resolved (Part 10): question_id, questions, answers. A note reads: six types in Part 2, six more types, one envelope field, and three optional payload fields since; zero changes to any type ever shipped, and the Part 3 parser never needed an update. A serif line reads: eleven parts of features rode one envelope; the vocabulary is finished, the parser never changed."
+  caption="The complete wire format of the product, and the part that added each piece. Twelve event types, one envelope field, three optional fields, built across eleven parts, and the client-side parser from Part 3 never changed once. That's the payoff of designing for extension."
+  width={1240}
+  height={700}
+/>
+
+On the frontend, the summary rides onto the assistant turn and renders as a small card under the prose: the headline, the metrics as a label-and-value ledger, the caveats beneath a dashed line. The TypeScript type mirrors the Pydantic model field for field, because the wire is the contract between them:
+
+```typescript filename="frontend/lib/types.ts" repo="part-13-structured-evals/frontend/lib/types.ts" lines="74-81"
+export type Metric = { label: string; value: number; unit: string };
+
+export type AnalysisSummary = {
+  headline: string;
+  key_metrics: Metric[];
+  caveats: string[];
+  chart_paths: string[];
+};
+```
+
+Here it is in a real run, the Q1-vs-Q2 comparison, with the summary card sitting right under the prose answer, both saying the same numbers in two languages, one for you and one for your code:
+
+<Figure
+  src="/images/series/agent-sdk/part-13/browser-hero-light.svg"
+  srcDark="/images/series/agent-sdk/part-13/browser-hero-dark.svg"
+  alt="The Beanline Analyst answering a Q1-vs-Q2 comparison. The user asked: how did Q2 2026 revenue compare with Q1, overall and per store, chart the comparison. The transcript shows two completed database query badges, a charting Bash badge with an Approved chip, a Skill badge for loading the house report format, and a Write badge for report.md with an Approved chip. The bold prose reply reads: Q2 revenue grew 11.3 percent to 650,207.40 from Q1's 584,102.80; Downtown led all stores at 159,286.40 in Q2, while Riverside saw the strongest growth at plus 43.5 percent; Harborview was the only store to decline. Below the prose sits a summary card labeled SUMMARY. Its headline repeats the finding, then five metric rows: Q1 2026 total revenue 584,102.8 USD, Q2 2026 total revenue 650,207.4 USD, quarter-over-quarter growth 11.3 percent, Downtown Q2 revenue (highest store) 159,286.4 USD, Riverside growth Q2 vs Q1 (highest) 43.5 percent. Under a dashed line, three italic caveats note Riverside and Old Town growth warrants verification, Harborview declined 1.4 percent, and data spans full quarters with no gaps. The receipt reads $0.0710, 52 seconds. On the right an artifacts panel shows q1_q2_comparison.png and report.md, with report.md previewed."
+  caption="The form under the essay, from a real run ($0.0710, 52s). Every value in the summary card was pulled straight from ResultMessage.structured_output and validated with model_validate before it reached the browser. The prose is for you; the card is what a dashboard would read."
+  width={1120}
+  height={1154}
+/>
+
+## The prepaid meter
+
+The cost ritual has run since Part 1: print `total_cost_usd` after every turn so cost is a number you watch, not a surprise you get. Watching is good. It is also passive. A runaway analysis, a question that sends the agent down forty tool calls of assumptions, spends the money first and shows you the receipt after. Watching graduates to enforcing here, with one more option:
+
+```python filename="backend/app/runner.py" repo="part-13-structured-evals/backend/app/runner.py" lines="180-185"
+        # Part 13: the prepaid meter. None means unmetered (the default);
+        # a number is a hard stop enforced by the engine, not a request.
+        # The run that crosses the line ends with subtype
+        # error_max_budget_usd and no final answer, so treat this as a
+        # circuit breaker for runaways, not a precision instrument.
+        max_budget_usd=budget_usd,
+```
+
+Think of it as a prepaid meter. You load two cents; when the run has spent two cents, the power cuts. It rides in from the request, one new field on the `ChatRequest` the app has grown part by part:
+
+```python filename="backend/app/main.py" repo="part-13-structured-evals/backend/app/main.py" lines="61-69"
+class ChatRequest(BaseModel):
+    message: str
+    workspace_id: str | None = None
+    session_id: str | None = None  # the memory switch: absent = fresh start
+    mode: Literal["ask", "plan"] = "ask"  # plan = propose before touching anything
+    thinking: bool = False  # extended thinking: a visible, billed scratchpad
+    # Part 13: the prepaid meter, per request. None = unmetered. gt=0
+    # because a zero budget is a run that can't start, which is Stop.
+    budget_usd: float | None = Field(default=None, gt=0, le=5.0)
+```
+
+Now give a hard question a genuinely stingy budget and watch it fail gracefully. I asked for a full performance report, every store, every product, every month, on a two-cent cap. Here is exactly what happened on the wire:
+
+<Figure
+  src="/images/series/agent-sdk/part-13/term-budget.svg"
+  alt="A dark terminal titled a run hits its budget. A comment reads: max_budget_usd equals 0.02 on a full-report ask, watch the engine pull the plug. The agent makes a database query for month, store, product; then narrates 'The result was capped. Let me get aggregated summaries instead.'; makes a second query for month, store, SUM units; then in accent color narrates 'I'm approaching my budget limit. Let me get per-product summaries and create the full analysis.' annotated: the engine warned the model. It makes a third query for product, SUM units. Then a ResultMessage arrives with subtype error_max_budget_usd in red, is_error True, result None annotated no final answer, and total_cost_usd $0.0258 annotated the cap was $0.02, a breaker not a wall. The final wire line shows the complete event carrying stop_reason max_budget and total_cost_usd 0.0258."
+  caption="The two-cent budget, hit. The run stops with subtype error_max_budget_usd, result None, and a cost of $0.0258 against a $0.02 cap. Note the overshoot: it's a circuit breaker, not a precision instrument. You pay for the API round that crossed the line."
+  width={1080}
+  height={465}
+/>
+
+Two things in that trace are worth their own sentence. First, the overshoot: the cap was two cents, the run cost $0.0258. `max_budget_usd` is a circuit breaker, not a laser. It checks between API rounds, so you pay for the round that crossed the line, and the first round of an agent turn (the fat system prompt, the cache creation) is the most expensive one. On a leaner spike run I measured the overshoot at a single cent ($0.0207 against a two-cent cap). Budget for the breaker tripping a little late. Second, and lovely: the model *narrated the approaching limit*. "I'm approaching my budget limit." The engine tells the agent about the meter, so it spends its last cents trying to wrap up rather than getting cut off mid-thought.
+
+A stopped run still needs a story on the wire, and the `complete` event carries it in that `stop_reason` field you saw added earlier. In the UI, the receipt reads `budget exhausted` instead of a normal cost line, and any tool badge still spinning when the plug was pulled gets settled so the turn reads as finished, not frozen:
+
+<Figure
+  src="/images/series/agent-sdk/part-13/browser-budget-light.svg"
+  srcDark="/images/series/agent-sdk/part-13/browser-budget-dark.svg"
+  alt="The Beanline Analyst hitting a budget. The footer shows a BUDGET $ 0.02 chip highlighted in the accent color, next to the ANSWER and PLAN FIRST mode buttons. The user asked: give me a full performance report on Beanline, per-store and per-product revenue and units for every month, growth rates, a chart for each store, and a written report. The analyst says it'll create a comprehensive report with monthly breakdowns, makes a database query, then says 'The result was capped. Let me get aggregated summaries instead.', makes a second query, then says 'I'm approaching my budget limit. Let me get per-product summaries and create the full analysis.', makes a third query. The receipt reads: budget exhausted, $0.0258, 10 seconds. A faint note reads: the engine stopped the run; the receipt still arrived on the same parcel."
+  caption="The budget stop in the product, from a real run ($0.0258 against the $0.02 cap in the footer chip). 'budget exhausted' replaces the usual cost line, and the receipt still lands on the same complete event, because a stopped run is a finished run with a different ending."
+  width={1120}
+  height={760}
+/>
+
+<Callout type="info" title="A budget is a floor for safety, not a substitute for monitoring">
+`max_budget_usd` protects you from a single runaway turn. It does nothing about a thousand reasonable turns that add up to a surprise, or a slow creep in average cost as prompts grow. It's a per-request circuit breaker, and it belongs *under* real monitoring (aggregate spend, cost-per-turn trends, alerts), not in place of it. Pair it with `max_turns` for a second, cheaper cutoff that trips on loop count instead of dollars.
+</Callout>
+
+## The driving test
+
+Here's the scenario that makes all of this matter. Back in [Part 6 we added a house rule](/blog/agent-sdk-6-custom-tools#two-new-house-rules-one-of-them-earned-the-hard-way): "never do arithmetic in your head." In [Part 10 we rewrote another rule three times](/blog/agent-sdk-10-interactive#three-drafts-of-one-house-rule). Every one of those was a change to the prompt, and every time the honest question was: did that make the analyst *better*, or did it just make the one example I tried look better? Vibes cannot answer that. You need a driving test: not a feeling, a pass rate.
+
+An eval suite is three pieces. A set of cases with known-correct answers. A runner that puts the real agent through each one. And a judge that grades what comes back. Let's build all three, tutorial-scale but real, and the whole thing works only because [the Beanline data is deterministic](/blog/agent-sdk-1-first-agent#give-it-a-workspace): the generator builds the same database every time, so "the right answer" is a fact I verified with SQL, not a snapshot that drifts.
+
+The cases are a YAML file. Each is a question plus the facts a correct answer must contain, and two of them are built around the analyst's known weak spots:
+
+```yaml filename="backend/evals/cases.yaml" repo="part-13-structured-evals/backend/evals/cases.yaml" lines="40-51"
+- id: portland-share
+  question: >
+    What percentage of total company revenue in the first half of 2026
+    came from the Portland stores? Name the stores you counted as
+    Portland.
+  expected:
+    - >
+      The Portland stores are Downtown (S01), Airport (S02), and
+      Old Town (S06).
+    - >
+      The share is 57.8% (Portland 713,237.80 of 1,234,310.20 total;
+      anything from 57 to 58 percent passes, anything outside fails).
+```
+
+That `portland-share` case is not academic. Across building this series I logged the analyst confidently botching exactly this kind of share-of-total question four separate times: 63% against a true 57.8%, 63% against a true 59.0%, 38% against a true 48.9%. A percentage is arithmetic the model is tempted to eyeball, and eyeballing is where it slips. The other planted case, `per-store-plus-total`, is the six-number sum that tempts it to add in its head, plus [the duplicate row baked into the sample data](/blog/agent-sdk-11-subagents-skills#the-review-that-pays-for-the-part) since the beginning. The cases are designed around the failures, not the successes.
+
+The runner puts the *real* agent through each case. Same `build_options` the app ships, same prompt, same tools, same sandbox. The only substitution is a robot at the approval gate, because the suite runs unattended on a throwaway desk it's allowed to burn down:
+
+```python filename="backend/evals/run.py" repo="part-13-structured-evals/backend/evals/run.py" lines="43-47"
+async def robot_approver(tool_name, tool_input, context):
+    """The suite's stand-in for your Approve click. It can say yes to
+    everything because eval cases are known questions on deterministic
+    data, in throwaway workspaces, with the sandbox still on."""
+    return PermissionResultAllow()
+```
+
+Each attempt is one fresh workspace, one real run, one graded verdict, and note the two safety rails: the per-attempt `max_budget_usd` (the same option from earlier, doing double duty so a misbehaving prompt can't turn a suite run into a bill) and a semaphore so attempts run concurrently without launching thirty agents at once:
+
+```python filename="backend/evals/run.py" repo="part-13-structured-evals/backend/evals/run.py" lines="61-85"
+async def run_attempt(case: dict, semaphore: asyncio.Semaphore) -> Attempt:
+    """One case, one fresh desk, one real agent run, one graded verdict."""
+    async with semaphore:
+        workspace = workspace_path(create_workspace())
+        client = ClaudeSDKClient(
+            options=build_options(
+                workspace, None, robot_approver, budget_usd=ATTEMPT_BUDGET_USD
+            )
+        )
+        prose: list[str] = []
+        summary, cost, stop = None, 0.0, "unknown"
+        started = time.monotonic()
+        try:
+            await client.connect()
+            await client.query(case["question"])
+            async for message in client.receive_response():
+                # Main-agent text only: a subagent's words carry
+                # parent_tool_use_id, and the judge grades the answer
+                # the user would have seen.
+                if isinstance(message, AssistantMessage) and not message.parent_tool_use_id:
+                    prose += [b.text for b in message.content if isinstance(b, TextBlock)]
+                elif isinstance(message, ResultMessage):
+                    summary = message.structured_output
+                    cost = message.total_cost_usd or 0.0
+                    stop = message.subtype
+```
+
+### The judge eats its own dog food
+
+How do you grade a free-form answer against a list of expected facts? A number and its rounding, a percentage and its tolerance, a fact that might be in the prose *or* the summary card? Exact string matching is hopeless. This is the job LLM-as-judge exists for: a second model call that reads the answer and the ground truth and returns a verdict. And the verdict is itself a *structured output*, using the exact mechanism we built at the top of this part. The evals eat their own dog food; a judge that returned prose would need a judge of its own.
+
+```python filename="backend/evals/judge.py" repo="part-13-structured-evals/backend/evals/judge.py" lines="20-41"
+JUDGE_PROMPT = """You grade an AI data analyst's answer against known-correct facts.
+
+Pass the answer only if EVERY expected fact is present and numerically
+correct, in the prose or in the structured summary. Formatting never
+matters: $51,319.60 and 51319.6 and "about $51.3K" all match 51,319.60,
+and rounding to one decimal place is fine. A wrong number, a missing
+fact, or a contradiction fails. Where an expected fact states its own
+tolerance, apply exactly that tolerance.
+
+Judge facts, not style. Extra detail, ordering, tone, length, and
+chart choices are all irrelevant. You are checking arithmetic against
+ground truth, not reviewing prose."""
+
+
+class Verdict(BaseModel):
+    """The grade, as a form. `failures` is the part you'll actually read."""
+
+    passed: bool = Field(description="True only if every expected fact checks out.")
+    failures: list[str] = Field(
+        description="One entry per expected fact that is missing or wrong, "
+        "quoting what the answer said instead. Empty when passed."
+    )
+```
+
+The judge call gives the model no tools at all: it compares text, it doesn't need hands. It gets the question, the expected facts, the analyst's prose, and the analyst's summary, and returns the `Verdict`, validated the same way every structured output in this part is validated:
+
+```python filename="backend/evals/judge.py" repo="part-13-structured-evals/backend/evals/judge.py" lines="53-63"
+    options = ClaudeAgentOptions(
+        tools=[],  # the judge compares text; it gets no hands on purpose
+        model=JUDGE_MODEL,
+        system_prompt=JUDGE_PROMPT,
+        output_format={"type": "json_schema", "schema": Verdict.model_json_schema()},
+    )
+    async for message in query(prompt=prompt, options=options):
+        if isinstance(message, ResultMessage):
+            verdict = Verdict.model_validate(message.structured_output)
+            return verdict, message.total_cost_usd or 0.0
+    raise RuntimeError("The judge never returned a verdict.")
+```
+
+<Callout type="warning" title="Three rules that keep an LLM judge honest">
+An LLM judge is a real tool with real failure modes, and three disciplines keep it trustworthy. **Judge with a different, cheaper model** than the one you're grading, or at minimum a different *instance* with a different prompt and no tools, so the grader can't share the analyst's blind spot (our judge is Haiku grading Haiku, but a fresh judge with a comparison-only prompt, which is the independence that matters here; upgrade the judge model and measure the difference before you trust it). **Judge facts, not style**, or you'll reward confident prose over correct numbers. And **you need deterministic data**, which is the whole reason [the Beanline generator](/blog/agent-sdk-1-first-agent#give-it-a-workspace) has paid rent all series: without a fixed ground truth, there is nothing to judge against.
+</Callout>
+
+Run it, and you get a pass-rate table. My first honest suite run scored 6 of 7, and the one failure was real: on the duplicate-row case, the analyst reported the deduplicated March total as $206,815.80 when the right answer is $206,728.30, and the judge caught it and quoted the mistake. That is the suite working: an eval you build finds a bug you'd otherwise ship.
+
+<Callout type="info" title="The suite's first job is grading its own cases">
+Two of my early "failures" were the *cases* being wrong, not the analyst. One expected a store list the question never asked for; another wanted the name "Riverside" when "S04" is the same store. Both were me writing an unfair test. Budget a couple of iterations to calibrate a new suite: run it, read every failure, and fix the ones that are the test's fault before you trust the number. A suite you haven't debugged is measuring your cases, not your agent.
+</Callout>
+
+## The regression, on purpose
+
+Now the payoff, and the reason this whole part exists. I have a suite that gives me a number. Let me use it to answer the question I couldn't answer before: does the "never do arithmetic in your head" rule actually matter, or is it superstition?
+
+Science needs a control, so here's the protocol: run the 8-case suite three times over, at three attempts per case (24 attempts total). First with the rule in place. Then I delete the rule, one sentence, and run the identical suite. Then I restore it and run once more. Same data, same judge, same everything except one line of the prompt. These are all real runs; the numbers are from `evals/runs/`.
+
+**Run 1, rule in place: 24 out of 24. A clean 100%.** Every case, every attempt, green. Agent spend $1.4366, 179 seconds wall.
+
+Then I removed exactly this line from the system prompt:
+
+```text
+Every number you state must come from a query result or script output.
+Never do arithmetic in your head, not even totals.
+```
+
+**Run 2, rule removed: 20 out of 24. 83%.** Four attempts failed, and every single failure is arithmetic the model did in its head instead of in SQL. The `portland-share` case came back **38.1%** against the true 57.8%, the same class of error I'd logged three times before, now reproduced on command. The `fastest-growth` case reported **43.5%** growth instead of 70.6%, because the model used quarterly numbers where the question said monthly. And `per-store-plus-total` failed twice out of three attempts, hand-summing the six stores to **$1,234,710.20** and **$1,234,710.30** when the real total is $1,234,310.20. Off by four hundred dollars, twice, in different directions, exactly the way head-arithmetic goes wrong.
+
+Then I put the one line back.
+
+**Run 3, rule restored: 24 out of 24. Back to 100%.** Agent spend $1.3759.
+
+That is the figure at the top of this part, and it is the entire argument for evals in three columns. Without the suite, "never do arithmetic in your head" is a belief. With it, it's a measured 17-point swing in accuracy, with the exact wrong numbers on record. When you change a prompt now, you don't argue about whether it helped. You run the suite and read the number. [Part 10 called prompt engineering probabilistic, not mechanical](/blog/agent-sdk-10-interactive#three-drafts-of-one-house-rule): write the rule, measure the rate, keep the receipts. This is the measuring, and it is the safety net under every prompt change you'll ever make.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 4-panel comic strip, panels in a single row separated by thin vertical black dividers, about an AI data analyst taking a driving test graded by a tiny judge in a powdered wig. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny formal necktie. The judge is a tiny stern clone-like robot examiner wearing a white powdered wig (like an old British courtroom judge) holding a clipboard. Panel 1: Yad hands the nervous laptop-analyst a test sheet titled "DRIVING TEST"; Yad says "8 QUESTIONS. GOOD LUCK." Panel 2: the laptop-analyst drives a tiny car between traffic cones; the tiny powdered-wig judge sits in the passenger seat marking a clipboard, unimpressed. Panel 3: the judge holds up the clipboard showing a big "83%"; one traffic cone is knocked over; the judge says "STILL DOING MATH IN YOUR HEAD." Panel 4: Yad pins a small rule sign on the wall reading "NO HEAD MATH"; the judge stamps a paper "100% PASS"; the laptop-analyst proudly holds it up like a driver's license. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-13/comic-drivingtest.png"
+  alt="Comic in four panels. Panel one: Yad, a bearded developer with headphones, hands a nervous laptop analyst with a necktie a test sheet titled DRIVING TEST, saying: 8 questions, good luck. Panel two: the laptop analyst drives a tiny blue car between traffic cones while a tiny stern judge in a white powdered wig sits beside it marking a clipboard, and one cone is knocked over. Panel three: the powdered-wig judge holds up a clipboard reading 83 percent and says: still doing math in your head, while the laptop looks sheepish. Panel four: Yad pins a small sign reading NO HEAD MATH on the wall, the judge stamps a paper 100 percent PASS, and the laptop proudly holds it up like a driver's license."
+  caption="The eval suite as a driving test, and the powdered-wig judge marking every number against ground truth. Knock over a cone (do math in your head) and the score drops. Add the rule back and it's a clean pass. The joke is the whole part: a pass rate, not a vibe."
+  width={1536}
+  height={1024}
+/>
+
+## What production adds
+
+What we built is the honest core of an eval harness, and it is genuinely useful, but a production system layers more furniture on the same skeleton, and it's worth naming so you can read that code when you meet it. Cases and suites become database rows, not a YAML file, so you can track them over time. Each case runs as multiple *attempts* with the pass rate stored per attempt, because a stochastic model needs a distribution, not a single coin flip. The runner grows per-attempt timeouts and heartbeats so a hung agent doesn't wedge the whole suite. The judge's full transcript gets stored, not just its verdict, so a disputed grade can be audited. And the results feed a trend line across runs, so "did this week's prompt changes help?" is a chart, not a memory. The reference app this series is modeled on runs exactly this shape at scale. You now understand its core well enough to read the rest.
+
+{/* [ANECDOTE slot (WRITING-STYLE §6): a true first-person story about a change that looked fine in a quick manual test but a test suite (or the lack of one) caught, or would have caught, a regression it introduced; the moment a pass rate moved and settled an argument that vibes couldn't. 3 beats, 5 sentences max. Lands here.] */}
+
+## The cost ritual
+
+All real runs from building this part, on `claude-haiku-4-5`. The eval suite is the new heavyweight line, and it's worth seeing what a driving test costs to sit:
+
+| Run | Result | Cost |
+|---|---|---|
+| Structured summary: the March top-store question | summary exact, validated | $0.0888 · 10s |
+| The Q1-vs-Q2 hero run (chart + report + summary) | all numbers SQL-exact | $0.0710 · 52s |
+| Budget stop, $0.02 cap on a full-report ask | error_max_budget_usd, graceful | $0.0258 · 10s |
+| Eval suite, 8 cases × 3 attempts, rule in place | 24/24 (100%) | agent $1.4366 · judge $0.1154 · 179s |
+| Eval suite, same, grounding rule removed | 20/24 (83%) | agent $1.3173 · judge $0.1257 · 161s |
+| Eval suite, same, rule restored | 24/24 (100%) | agent $1.3759 · judge $0.1141 · 158s |
+
+Two things stand out. The budget overshoot is real and small: $0.0258 against a two-cent cap. And a full suite run costs about a dollar-fifty in agent spend plus a dime for the judge, which is the actual price of the confidence in that top figure. That is cheap for the ability to answer "did this prompt change help?" with a number instead of a shrug. The judge is a tenth of the bill precisely because it's a cheap model doing a narrow, tool-free job, which is the whole design.
+
+<DemoVideo
+  src="/videos/agent-sdk/part-13-demo.mp4"
+  poster="/videos/agent-sdk/part-13-poster.jpg"
+  caption="A real run, recorded: the March top-store question returns a prose answer AND a structured summary card ($0.0895, both numbers SQL-exact), then the same analyst on a two-cent budget hits its cap on a full-report ask and stops gracefully with 'budget exhausted' on the receipt. The form and the meter, on camera."
+  label="Screen recording of Part 13: a question returning a machine-readable summary card under the prose answer, then a full-report request stopped by a two-cent budget with a graceful 'budget exhausted' receipt"
+/>
+
+<Recap
+  part={13}
+  items={[
+    "Structured outputs turn a wall of prose into a machine-readable form: output_format with a json_schema from a Pydantic AnalysisSummary makes the run end with a validated object on ResultMessage.structured_output. The agent still works free-form; only the last act is the contract.",
+    "The complete event gained structured_output and stop_reason: the event vocabulary's final extension. Six types in Part 2, six more plus one envelope field plus three optional payload fields since, and the Part 3 parser never changed once.",
+    "max_budget_usd is a per-request circuit breaker: a run that crosses the line stops with subtype error_max_budget_usd, result None, and a slight overshoot (you pay for the round that tripped it). The cost ritual graduates from watching to enforcing.",
+    "An eval suite is cases with known answers, a runner against the REAL agent (concurrent, budget-capped per attempt), and an LLM-as-judge returning a structured verdict (structured outputs eating their own dog food). Judge facts not style, with a cheaper model, on deterministic data.",
+    "Evals are the safety net for prompt engineering: removing the 'never do arithmetic in your head' rule dropped a real suite from 24/24 to 20/24 with the exact wrong numbers on record, and restoring it recovered 100%. A pass rate, not a vibe.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "You set output_format to a json_schema on ClaudeAgentOptions. What does the agent do during the run?",
+      options: [
+        "It stops using tools and only emits JSON matching the schema",
+        "It works free-form as always (files, Python, charts, a prose reply), and the run ends with a structured object matching the schema on ResultMessage.structured_output",
+        "It refuses any question that can't be answered as structured data",
+        "It returns the JSON instead of streaming, so token-level streaming is disabled",
+      ],
+      answer: 1,
+      explain: "output_format shapes the run's final act, not its whole behavior. The agent still reads files, runs code, and writes prose; the engine collects the structured summary at the end (via a StructuredOutput tool call) and delivers it on ResultMessage.structured_output, with the same JSON also on ResultMessage.result.",
+    },
+    {
+      q: "A run with max_budget_usd=0.02 stops with subtype error_max_budget_usd at a cost of $0.0258. Is the overshoot a bug?",
+      options: [
+        "Yes, the budget should be a hard ceiling to the cent",
+        "No: max_budget_usd is a circuit breaker checked between API rounds, so you pay for the round that crossed the line, and the first (cache-creating) round is the priciest; budget for a small overshoot",
+        "Yes, it means the sandbox leaked a second request",
+        "No, but only because subscription billing is approximate",
+      ],
+      answer: 1,
+      explain: "The budget is enforced between rounds, not mid-round, so the run pays for the API call that tripped it. Treat max_budget_usd as a runaway breaker, not a precision meter, and pair it with max_turns for a second cheap cutoff.",
+    },
+    {
+      q: "Why is the LLM judge given tools=[] and a prompt that says 'judge facts, not style'?",
+      options: [
+        "To make the judge cheaper by disabling tool-calling overhead only",
+        "Because a judge with tools would re-run the analysis; the empty toolbox and fact-only prompt keep it comparing the answer against ground truth, not doing its own work or rewarding good prose over correct numbers",
+        "Because judges aren't allowed to read files for security reasons",
+        "So the judge and the analyst share the same context",
+      ],
+      answer: 1,
+      explain: "The judge's job is comparison, not analysis: it reads the answer, the expected facts, and grades. Tools would tempt it to redo the work (and share the analyst's blind spots); the fact-only instruction stops it from rewarding confident, well-written wrong answers.",
+    },
+    {
+      q: "Removing 'never do arithmetic in your head' dropped the suite from 24/24 to 20/24. What kind of cases failed?",
+      options: [
+        "Random cases, showing the suite is too noisy to trust",
+        "Cases requiring computed numbers (a share-of-total percentage, a growth rate, a six-store sum) where the model did the math in its head and got it wrong, exactly the failure the rule prevents",
+        "Only the duplicate-row case, because the data changed",
+        "Cases that hit the per-attempt budget cap",
+      ],
+      answer: 1,
+      explain: "Every failure was arithmetic the model eyeballed instead of computing in SQL: portland-share came back 38.1% vs a true 57.8%, fastest-growth 43.5% vs 70.6%, and per-store-plus-total mis-summed to $1,234,710 vs $1,234,310. The suite turned a belief about the rule into a measured 17-point swing.",
+    },
+    {
+      q: "The complete event now carries structured_output and stop_reason. How many times has the client-side event parser had to change across the series to absorb new event types and fields?",
+      options: [
+        "Once per new event type, so about a dozen times",
+        "Never: the Part 3 parser switches on event.type and ignores what it doesn't recognize, so every new type and optional field since Part 2 rode the same envelope with zero parser changes",
+        "Twice: once for approvals in Part 7 and once for structured output here",
+        "Every part, which is why the vocabulary is finally frozen",
+      ],
+      answer: 1,
+      explain: "That was the Part 2 bet: design the envelope, not the message. Twelve event types, one envelope field, and three optional payload fields were added across eleven parts, and the switch-on-type parser never needed an update. The vocabulary is finished and the parser is untouched.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 13: structured outputs, budgets, and an eval suite"
+```
+
+Your analyst is now provably good, on your terms: it hands back machine-checkable summaries, it can't blow a budget, and when you change a prompt a pass rate tells you whether you helped or hurt. It is, by every measure this series set out to build, production-grade software. There is exactly one thing left, and it's the most physical lesson in either series. Everything you've built runs on your laptop. The SDK spawns a subprocess, keeps state on disk, and holds streams open for minutes, and every one of those breaks the moment you try to put it on the serverless platforms most tutorials end on. Next, the last part: we put the whole thing on a real server, a Hetzner VM with HTTPS that survives a reboot, and we do it by actually deploying it.
+
+The complete, tested code for this part lives in [`part-13-structured-evals`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/tree/main/part-13-structured-evals) in the [companion repo](https://github.com/yadneshSalvi/claude-agent-sdk-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.

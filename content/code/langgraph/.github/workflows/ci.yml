@@ -1,0 +1,128 @@
+name: CI
+
+# Keeps every part honest without real API keys: backends must install and
+# boot (model clients are constructed with fake keys; no LLM call is made),
+# frontends must compile, and Part 8's Docker image must build and serve.
+# The full real-API + browser e2e pass stays a local, pre-publish ritual.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  OPENAI_API_KEY: sk-fake-ci-key-never-used-for-calls
+  TAVILY_API_KEY: tvly-fake-ci-key-never-used-for-calls
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        part:
+          - part-01-setup
+          - part-02-fastapi-basics
+          - part-03-first-graph
+          - part-04-nextjs-frontend
+          - part-05-streaming
+          - part-06-tools
+          - part-07-memory
+          - part-08-deploy
+    defaults:
+      run:
+        working-directory: ${{ matrix.part }}/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: ${{ matrix.part }}/backend/requirements.txt
+      - name: Install pinned dependencies
+        run: pip install -r requirements.txt
+
+      - name: Boot the server and probe / and /docs
+        run: |
+          if [ "${{ matrix.part }}" = "part-01-setup" ]; then APP="main:app"; else APP="app.main:app"; fi
+          uvicorn "$APP" --port 8000 &
+          for i in $(seq 1 20); do curl -sf http://localhost:8000/ > /dev/null && break; sleep 1; done
+          curl -sf http://localhost:8000/ | grep -q '"status":"ok"'
+          curl -sf -o /dev/null http://localhost:8000/docs
+
+      - name: "Part 2: echo reply and 422 on a typo'd field"
+        if: matrix.part == 'part-02-fastapi-basics'
+        run: |
+          curl -sf -X POST http://localhost:8000/chat -H 'Content-Type: application/json' \
+            -d '{"message": "hello"}' | grep -q 'you said: hello'
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8000/chat \
+            -H 'Content-Type: application/json' -d '{"mesage": "hello"}')
+          test "$CODE" = "422"
+
+      - name: "Parts 6+: calculator computes and rejects abuse"
+        if: contains(fromJSON('["part-06-tools","part-07-memory","part-08-deploy"]'), matrix.part)
+        run: |
+          python - <<'EOF'
+          from app.tools import calculator
+          assert calculator.invoke({"expression": "23 * 17 + 5"}) == "396"
+          try:
+              calculator.invoke({"expression": "__import__('os').system('echo pwned')"})
+              raise SystemExit("SECURITY: abuse expression was not rejected")
+          except ValueError:
+              print("abuse rejected with ValueError, as designed")
+          EOF
+
+      - name: "Parts 7+: thread read-back endpoint answers for an empty thread"
+        if: contains(fromJSON('["part-07-memory","part-08-deploy"]'), matrix.part)
+        run: |
+          BODY=$(curl -sf http://localhost:8000/threads/ci-empty-thread/messages)
+          test "$BODY" = "[]"
+
+  frontend:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # parts 02/03 ship the identical untouched scaffold as part 01
+        part:
+          - part-01-setup
+          - part-04-nextjs-frontend
+          - part-05-streaming
+          - part-06-tools
+          - part-07-memory
+          - part-08-deploy
+    defaults:
+      run:
+        working-directory: ${{ matrix.part }}/frontend
+    env:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ matrix.part }}/frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the Part 8 image
+        run: docker build -t langgraph-chatbot-ci part-08-deploy/backend
+      - name: Boot the container, probe health and runtime CORS
+        run: |
+          docker run -d --rm --name p8 -p 8080:8080 \
+            -e OPENAI_API_KEY="$OPENAI_API_KEY" \
+            -e TAVILY_API_KEY="$TAVILY_API_KEY" \
+            -e FRONTEND_ORIGIN=https://example.vercel.app \
+            langgraph-chatbot-ci
+          for i in $(seq 1 20); do curl -sf http://localhost:8080/ > /dev/null && break; sleep 1; done
+          curl -sf http://localhost:8080/ | grep -q '"status":"ok"'
+          curl -si -X OPTIONS http://localhost:8080/chat \
+            -H 'Origin: https://example.vercel.app' \
+            -H 'Access-Control-Request-Method: POST' \
+            | grep -qi 'access-control-allow-origin: https://example.vercel.app'
+          docker stop p8

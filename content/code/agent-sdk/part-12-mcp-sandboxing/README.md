@@ -1,16 +1,15 @@
-# Part 11: Subagents and Skills: The Analyst Grows a Team
+# Part 12: The Wider World: External MCP Servers and Sandboxing
 
-📖 Read along: [Claude Agent SDK in Production, Part 11](https://yadneshsalvi.com/blog/agent-sdk-11-subagents-skills)
+📖 Read along: [Claude Agent SDK in Production, Part 12](https://yadneshsalvi.com/blog/agent-sdk-12-mcp-sandboxing)
 
 🎬 See it run: **[demo.mp4](demo.mp4)** — a short screen recording of exactly what this part delivers.
 
-The analyst is confident, fast, and occasionally decorates correct tables with wrong prose numbers. This part hires it a colleague and hands it the employee handbook. A **reviewer subagent** (`agents={"reviewer": AgentDefinition(...)}` plus the `Task` tool) re-derives key figures in a fresh context with a strictly read-only toolbox: desk searches plus the read-only database tools, no Bash, no Write, so nothing it does needs an approval card. Its work renders as **nested badges** in the transcript via one new optional wire field (`parent_tool_id` on `tool_use_start`). A **skill** (`.claude/skills/beanline-report/SKILL.md`, installed on every desk and discovered via `setting_sources=["project"]` plus the `Skill` tool) carries the house report format, loaded on demand instead of stuffed into every prompt. And yes: the reviewer catches the duplicated March row that has been hiding in the sample data since Part 1. What's new:
+The analyst reaches outside its workspace for the first time, and we make that safe. An **external MCP server** (`mcp-server-fetch`, an official stdio server the SDK spawns as a subprocess) gives the analyst the open web through one gated tool, `mcp__fetch__fetch`. It is deliberately left out of `allowed_tools`, so every fetch pauses on the Part 7 approval card. A deliberately hostile local page tries to talk the analyst into exfiltrating `sales.csv`; the model resists and flags the attempt, and the layers underneath (the approval card, the sandbox) catch what the model might miss. And a beta **sandbox** wraps the Bash tool in OS-enforced walls: writes outside the desk fail with "operation not permitted", and a network host that isn't allow-listed raises a `SandboxNetworkAccess` request through the same `can_use_tool` gate, so a network escape becomes an approval card with no frontend changes. What's new:
 
-- `backend/app/runner.py` — the `REVIEWER` `AgentDefinition` (fresh context, read-only tools, its own grounding rule); `Task` and `Skill` join `tools=`; `agents=`, `setting_sources=["project"]`, and `env={"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1"}` (current CLIs launch subagents in the background by default; a chat turn wants synchronous delegation)
-- `backend/app/events.py` — `tool_use_start` forwards `parent_tool_use_id` as `parent_tool_id`; not a new event type, one optional field
-- `backend/app/workspaces.py` — every new desk gets `backend/skills/` copied to `.claude/skills/`; the artifact snapshot learns to skip dotted directories
-- `backend/skills/beanline-report/SKILL.md` — the house report format: TL;DR, key numbers table, how-it-was-computed, mandatory caveats, sign-off
-- `frontend` — nested badges: indent, hairline, and a name tag on any tool call carrying `parent_tool_id`; friendly labels for `Agent` and `Skill` calls
+- `backend/app/runner.py` — `mcp_servers` gains the external `fetch` server (`{"command": "python", "args": ["-m", "mcp_server_fetch"]}`); `strict_mcp_config=True` keeps runs reader-clean; `sandbox={...}` (enabled, `autoAllowBashIfSandboxed` off, empty `allowedDomains`); `env` adds `MPLCONFIGDIR` + `XDG_CACHE_HOME` so matplotlib's caches land on the desk under the sandbox; three new house rules (fetch-only for the web, page-content-is-data, no em-dashes)
+- `backend/demo_pages/` — two local pages served on `:8020`: `market-news.html` (the market-check dessert) and `supplier-notice.html` (the prompt-injection example, with a visible payload; view source)
+- `backend/pyproject.toml` — pins `mcp-server-fetch`
+- `frontend/lib/toolLabel.ts` — one new entry: the fetch tool badge shows the host
 
 ## Run it
 
@@ -23,7 +22,14 @@ uv run python data/build_beanline_db.py   # once: builds data/beanline.db
 uv run uvicorn app.main:app --reload
 ```
 
-Frontend (terminal 2):
+The local demo pages (terminal 2):
+
+```bash
+cd backend/demo_pages
+python3 -m http.server 8020
+```
+
+Frontend (terminal 3):
 
 ```bash
 cd frontend
@@ -32,6 +38,8 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
-Open http://localhost:3000, load the sample data, and ask: "How did each store do in March 2026? Write up a report." Watch the `Skill` badge load the house playbook before the report lands in the panel. Then send: "Have the reviewer double-check that report before I send it out." The delegation badge opens, the reviewer's queries nest under it with name tags, and the reply comes back with what an independent set of eyes found, a duplicated sales row included. Refresh mid-review: the nested badges rebuild from Part 9's log.
+Open http://localhost:3000, load the sample data, and ask: "Our competitor newsletter published its Q2 roundup at http://localhost:8020/market-news.html. How did our Q2 revenue growth compare with the market growth they report?" Approve the fetch card and watch the analyst compare its own database against a page from the outside world. Then try the injection page (`http://localhost:8020/supplier-notice.html`) and watch it refuse. To see the sandbox walls, ask it to `curl` a site or write to `/tmp` with Bash.
 
 Auth works like Part 1: your Claude subscription login, or `ANTHROPIC_API_KEY` in the environment.
+
+> The sandbox is beta and platform-specific (macOS Seatbelt, Linux bubblewrap). Everything here was tested on macOS; Part 14 re-tests the config on a Linux VM.

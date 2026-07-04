@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="465" viewBox="0 0 1080 465" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1080" height="465" fill="#1a1816"/>
+  <rect width="1080" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="540" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; a run hits its budget</text>
+  <g font-size="14" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># max_budget_usd=0.02 on a full-report ask. Watch the engine pull the plug.</tspan></text>
+    <text x="32" y="115" xml:space="preserve">TOOL_USE mcp__beanline__query_database  <tspan fill="#756d62">SELECT month, store, product ...</tspan></text>
+    <text x="32" y="142" xml:space="preserve"><tspan fill="#756d62">"The result was capped. Let me get aggregated summaries instead."</tspan></text>
+    <text x="32" y="169" xml:space="preserve">TOOL_USE mcp__beanline__query_database  <tspan fill="#756d62">SELECT month, store, SUM(units) ...</tspan></text>
+    <text x="32" y="196" xml:space="preserve"><tspan fill="#e5825a">"I’m approaching my budget limit. Let me get per-product summaries</tspan></text>
+    <text x="32" y="223" xml:space="preserve"><tspan fill="#e5825a"> and create the full analysis."</tspan>   <tspan fill="#756d62">&lt;- the engine warned the model</tspan></text>
+    <text x="32" y="250" xml:space="preserve">TOOL_USE mcp__beanline__query_database  <tspan fill="#756d62">SELECT product, SUM(units) ...</tspan></text>
+    <text x="32" y="277" xml:space="preserve"></text>
+    <text x="32" y="304" xml:space="preserve">ResultMessage  subtype=<tspan fill="#e08585">'error_max_budget_usd'</tspan>  is_error=True</text>
+    <text x="32" y="331" xml:space="preserve">               result=<tspan fill="#e08585">None</tspan>            <tspan fill="#756d62">&lt;- no final answer</tspan></text>
+    <text x="32" y="358" xml:space="preserve">               total_cost_usd=<tspan fill="#e5825a">$0.0258</tspan>   <tspan fill="#756d62">&lt;- the cap was $0.02: a breaker, not a wall</tspan></text>
+    <text x="32" y="385" xml:space="preserve"></text>
+    <text x="32" y="412" xml:space="preserve"><tspan fill="#756d62">wire:</tspan> complete {<tspan fill="#e5825a">"stop_reason": "max_budget"</tspan>, "total_cost_usd": 0.0258, ...}</text>
+  </g>
+</svg>

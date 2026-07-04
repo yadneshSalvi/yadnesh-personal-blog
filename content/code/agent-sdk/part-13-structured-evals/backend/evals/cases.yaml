@@ -1,0 +1,100 @@
+# The driving test: seven questions with known-correct answers, every
+# expected fact below verified against beanline.db by hand-written SQL
+# before it was allowed in this file. The suite only works because the
+# data is deterministic: the generator script builds the same database
+# every time, so these numbers are facts, not snapshots.
+#
+# Case design notes:
+# - portland-share exists because share-of-total questions are this
+#   analyst's measured weak spot: three logged incidents of a confident
+#   wrong percentage (63% vs a true 57.8%, 63% vs 59.0%, 38% vs 48.9%).
+# - duplicate-row exists because the sample data ships one planted flaw
+#   (the doubled 2026-03-01 Airport row) exactly so quality checks have
+#   something real to catch.
+
+- id: march-top-store
+  question: >
+    Which store had the highest revenue in March 2026, and by how much
+    did it beat the runner-up?
+  expected:
+    - The top store is Downtown (S01) with March revenue 51,319.60.
+    - The runner-up is Airport (S02) with 43,425.90.
+    - The gap is 7,893.70.
+
+- id: duplicate-row
+  question: >
+    Are there any exact duplicate rows in the sales table? If so, name
+    them, and give March 2026 total revenue both as stored and with
+    duplicates removed.
+  expected:
+    - >
+      Exactly one duplicated row: 2026-03-01, store S02, product P10,
+      7 units, 87.50, appearing twice. Naming the store as either
+      "S02" or "Airport" counts: they are the same store.
+    - March 2026 total as stored is 206,815.80.
+    - March 2026 total with the duplicate removed is 206,728.30.
+
+# A case-design lesson, preserved: the first draft of this case expected
+# the store list but the question never asked for it, and a correct
+# answer failed on completeness. Expect only what the question demands.
+- id: portland-share
+  question: >
+    What percentage of total company revenue in the first half of 2026
+    came from the Portland stores? Name the stores you counted as
+    Portland.
+  expected:
+    - >
+      The Portland stores are Downtown (S01), Airport (S02), and
+      Old Town (S06).
+    - >
+      The share is 57.8% (Portland 713,237.80 of 1,234,310.20 total;
+      anything from 57 to 58 percent passes, anything outside fails).
+
+- id: fastest-growth
+  question: >
+    Which store grew revenue fastest between January and June 2026,
+    and by what percentage?
+  expected:
+    - >
+      Riverside (S04) grew fastest, from 19,659.70 in January to
+      33,532.30 in June. Naming it as either "Riverside" or "S04"
+      counts: they are the same store.
+    - The growth is about 70.6% (70 to 71 percent passes).
+
+- id: q1-vs-q2
+  question: >
+    Compare company revenue in Q1 2026 against Q2 2026. What was the
+    quarter-over-quarter growth rate?
+  expected:
+    - Q1 revenue is 584,102.80 and Q2 revenue is 650,207.40.
+    - Growth is about 11.3% (11 to 12 percent passes).
+
+- id: best-month
+  question: >
+    Which calendar month of 2026 had the highest company-wide revenue,
+    and how much was it?
+  expected:
+    - May 2026 was the best month, with 226,624.60.
+
+- id: top-product
+  question: >
+    Which product earned the most revenue across the first half of
+    2026, and how much?
+  expected:
+    - Latte earned the most, with 280,379.20.
+
+# The shape behind Part 6's grounding rule: a per-store table PLUS the
+# company total. The natural query groups by store; the total then
+# tempts the model into adding six numbers in its head. This case is
+# the suite's canary for exactly that habit.
+- id: per-store-plus-total
+  question: >
+    List each store's total revenue for the first half of 2026, and
+    give the company-wide total.
+  expected:
+    - >
+      Per store (name or id both count): Downtown (S01) 302,705.90,
+      Airport (S02) 245,729.80, Harborview (S05) 193,629.30,
+      University (S03) 172,127.30, Old Town (S06) 164,802.10,
+      Riverside (S04) 155,315.80.
+    - The company-wide total is exactly 1,234,310.20.
