@@ -69,6 +69,11 @@ export default function TOC({
     let observer: MutationObserver | null = null;
     let cleanupScrollListeners = () => {};
     const timeouts: number[] = [];
+    // Auto-scroll to the URL hash only until it first lands (headings can
+    // render late, hence the retry passes) and on real hashchange events.
+    // Rebuilds fire on ANY DOM mutation (a zoom dialog opening, a toast),
+    // and re-scrolling then would yank the reader back to the hash target.
+    let hashScrolled = false;
 
     const scrollToHash = () => {
       const hash = window.location.hash.slice(1);
@@ -80,7 +85,10 @@ export default function TOC({
         targetId = hash;
       }
       const target = document.getElementById(targetId);
-      target?.scrollIntoView();
+      if (target) {
+        target.scrollIntoView();
+        hashScrolled = true;
+      }
     };
 
     const rebuild = () => {
@@ -119,7 +127,7 @@ export default function TOC({
       };
 
       updateActive();
-      animationFrame = requestAnimationFrame(scrollToHash);
+      if (!hashScrolled) animationFrame = requestAnimationFrame(scrollToHash);
       window.addEventListener("scroll", onScroll, { passive: true });
       window.addEventListener("resize", onScroll);
       window.addEventListener("hashchange", scrollToHash);
