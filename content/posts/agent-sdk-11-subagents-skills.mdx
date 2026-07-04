@@ -1,0 +1,482 @@
+---
+title: "Claude Agent SDK in Production, Part 11: Subagents and Skills: The Analyst Grows a Team"
+subtitle: "A reviewer subagent re-derives the numbers in a fresh context and catches what the analyst missed, nested badges show the colleague working, and a SKILL.md hands out the house report format on demand instead of on every prompt."
+image: "/images/series/agent-sdk/part-11/cover-light.svg"
+imageDark: "/images/series/agent-sdk/part-11/cover-dark.svg"
+createdAt: "2026-07-25T00:00:00.000Z"
+updatedAt: "2026-07-25T00:00:00.000Z"
+tags: ["claude-agent-sdk", "subagents", "skills", "tutorial"]
+series: "claude-agent-sdk-fastapi-nextjs"
+seriesPart: 11
+---
+
+While recording Part 7's demo video, I threw away a take because the analyst volunteered, on camera, that the top two stores brought in "63% of total company revenue". The tables around that sentence were correct to the penny. The 63% was invented; the true share was 57.8%. [Part 6 had already caught this species twice](/blog/agent-sdk-6-custom-tools#two-new-house-rules-one-of-them-earned-the-hard-way): perfect SQL-backed tables, decorated with hand-summed totals that were wrong. And this morning, while building this very part, it happened again, twice in two runs: "Portland stores account for 63% of total company revenue" (true value: 59.0%), and "38% above the chain average" (true value: 48.9%). The grounding rule helps. The eval suite in Part 13 will measure it. But you already know how real teams solve this, because no bank ships a report the analyst graded themselves: **someone else checks the numbers**. Today the analyst gets that someone: a reviewer subagent with fresh eyes and a strictly read-only toolbox, plus a skill that carries the house report format. And a certain duplicated March row, planted in the sample data since Part 1, finally meets its match.
+
+<Figure
+  src="/images/series/agent-sdk/part-11/browser-hero-light.svg"
+  srcDark="/images/series/agent-sdk/part-11/browser-hero-dark.svg"
+  alt="The Beanline Analyst after a review turn. The user message says: have the reviewer double-check that report before I send it out. A delegation badge reads: delegating to the reviewer, verify March 2026 store performance. Nested under it, badges tagged REVIEWER show the reviewer reading report.md, reading the beanline schema, and querying the database, with a note about fourteen more queries. The reply lists two issues found: a duplicate sales record from 2026-03-01 at the Airport store worth 87.50 dollars, and a math error where Portland's actual market share is 59.0 percent, not 63. A Write badge with an Approved chip follows, and the bold reply says the report was fixed. The artifacts panel previews the corrected caveats in report.md. The receipt reads 6.30 cents and 62 seconds."
+  caption="The end of this part, from a real run: an independent set of eyes re-derives the report's every number, catches the wrong 63% AND a duplicated database row, and the analyst fixes its own report. $0.0630 for the whole review. Every figure verified against SQL."
+  width={1120}
+  height={962}
+/>
+
+That screenshot is one message: *"Have the reviewer double-check that report before I send it out."* Everything indented under the delegation badge is a second agent working in a context the first one never touched. This part builds that colleague, wires its activity into the transcript as nested badges, and then hands the analyst the other half of teamwork: the employee handbook, as a skill it reads when the job calls for it.
+
+## Why "double-check your work" doesn't work
+
+The cheap fix looks obvious: add "always double-check your numbers" to the system prompt. Here's why that mostly buys you a more confident wrong answer. When the analyst re-checks its own work, the check runs *inside the same context* as the mistake: the conversation history, the reasoning that produced the number, the number itself sitting right there looking plausible. The model re-reads its own working and agrees with it. Ask a person to re-grade their own exam and you get the same effect; the literature calls it anchoring, and you don't fix it with a sterner prompt.
+
+A subagent fixes it structurally. The SDK can spawn a second agent, in a **fresh context**, that receives exactly one thing: the brief inside the delegation call. Not the conversation. Not the analyst's reasoning. Not the system prompt the analyst runs on. If the analyst's number is wrong, the reviewer cannot inherit the path that led there, because it never saw it. Fresh context is not a limitation of subagents; it is the entire point. Link for the concept: [subagents](/blog/agent-sdk-concepts#subagents).
+
+{/* [ANECDOTE slot (WRITING-STYLE §6): a true first-person story about a second pair of eyes catching a number before it shipped (a reviewer on a report, a colleague re-running an analysis, an auditor finding a duplicate entry), 3 beats, 5 sentences max. Lands here. */}
+
+## The roster: one AgentDefinition
+
+A subagent is defined, not summoned: you describe the colleague on `ClaudeAgentOptions` and the main agent decides when to call them. Two pieces make delegation exist at all. First, the roster:
+
+```python filename="backend/app/runner.py" repo="part-11-subagents-skills/backend/app/runner.py" lines="56-61,79-84"
+REVIEWER = AgentDefinition(
+    description=(
+        "A meticulous numbers reviewer. Delegate to it to independently "
+        "re-derive key figures and check data quality before numbers go "
+        "to the user."
+    ),
+    tools=[
+        "Read", "Glob", "Grep",
+        "mcp__beanline__query_database", "mcp__beanline__get_schema",
+    ],
+    model="haiku",
+)
+```
+
+Read the `tools=` list slowly, because it's a security decision disguised as a config line. The reviewer gets the desk's search tools and the two [read-only database tools from Part 6](/blog/agent-sdk-6-custom-tools#your-first-tool), and that's all. No Bash, no Write. It cannot change a byte on disk, which means nothing it does can ever need a Part 7 approval card, and there's nothing to approve because there's nothing it could break. (Yes, an `AgentDefinition` can carry MCP tool names, verified live; and yes, I tried a Bash-armed reviewer first: its shell commands routed into the same `can_use_tool` gate as anyone's, seventeen approval cards in one review. Each colleague gets the toolbox their job needs, and a checker's job needs read-only.)
+
+The `description` is doing quiet work too. It's [Part 6's lesson](/blog/agent-sdk-6-custom-tools#your-first-tool) again, one level up: tool descriptions are prompts, and a subagent's description is what the *main* agent reads when deciding whether to delegate. Ours says what the reviewer is for and when to use it. One house rule in `ANALYST_PROMPT` completes the wiring, the same when-not-how split as every tool we've shipped:
+
+```python filename="backend/app/runner.py" repo="part-11-subagents-skills/backend/app/runner.py" lines="47-49"
+- When the user asks you to double-check, verify, or review numbers, delegate
+  to the reviewer subagent instead of re-checking your own work, then report
+  what it found, discrepancies and data-quality flags included."""
+```
+
+Second piece: the delegation tool itself. Subagents ride a built-in tool named `Task`, and like everything since Part 1, it only exists if `tools=` says so:
+
+```python filename="backend/app/runner.py" repo="part-11-subagents-skills/backend/app/runner.py" lines="98-119"
+    tools = ["Read", "Glob", "Grep", "Bash", "Write", "AskUserQuestion", "Task", "Skill"]
+    if mode == "plan":
+        tools.append("ExitPlanMode")
+    return ClaudeAgentOptions(
+        cwd=str(workspace),
+        tools=tools,
+        # The team roster: every key here becomes a subagent_type the main
+        # agent can delegate to. The CLI launches subagents in the
+        # background by default on current versions; the env line restores
+        # synchronous delegation, which is what a chat turn wants.
+        agents={"reviewer": REVIEWER},
+        env={"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1"},
+        # "project" scopes discovery to the workspace, and the server is
+        # the only writer of workspaces: the skill on the desk is the one
+        # we installed there. This stays OFF until a part needs it; magic
+        # you didn't opt into is how reader machines and yours diverge.
+        setting_sources=["project"],
+        mcp_servers={"beanline": beanline_server},
+        allowed_tools=[
+            "Read", "Glob", "Grep", "Skill",
+            "mcp__beanline__query_database", "mcp__beanline__get_schema",
+        ],
+```
+
+`agents={"reviewer": REVIEWER}` makes every dict key a `subagent_type` the model can name. `Skill` and `setting_sources` are the second half of this part; ignore them for a few minutes. The line that needs its own section is the `env=` one, because without it, this part doesn't work the way you'd expect.
+
+## The trap: subagents run in the background by default
+
+On current CLI versions, delegation is asynchronous out of the box. The main agent calls the `Task` tool, and instead of waiting, it gets a result back *immediately*: "Async agent launched successfully." The subagent keeps working in the background; the main turn wraps up and ends. I captured it live, without the env line:
+
+<Figure
+  src="/images/series/agent-sdk/part-11/term-async.svg"
+  alt="A dark terminal comparing two delegation runs. Without the env line: at 6.2 seconds a ToolUseBlock named Agent fires, a task_started system message follows, and the tool result immediately reads Async agent launched successfully with an agent id. At 7.9 seconds the reviewer's own Glob call interleaves with a task_progress message. At 8.4 seconds the main turn's ResultMessage arrives at 2.99 cents, annotated: the main turn is over, the reviewer is still running, nobody will read its report. With the env variable CLAUDE_CODE_DISABLE_BACKGROUND_TASKS set to 1: the Agent call at 4.6 seconds is followed by the reviewer's parented tool calls, and at 31 seconds the tool result is the reviewer's full verification report including the duplicate row, annotated: the main agent resumes with it in hand, then answers."
+  caption="The same delegation, twice, real runs. Async by default: the 'result' is a launch confirmation, and the main turn ends at 8.4s while the reviewer is mid-audit. With the env line: the Agent call blocks until the reviewer reports back."
+  width={1040}
+  height={648}
+/>
+
+Background agents are a real production pattern: Claude Code's own UI launches subagents this way, tracks them with `task_started` and `task_progress` system messages, and lets you check in on them later (that `agentId` in the result is the handle). For a long-running research assistant, that's exactly what you want. For a chat product where this turn's *answer* depends on the review, it's a trap: the analyst would tell you "I've delegated the task to the reviewer" and end the turn, receipt and all, with the report arriving into a void. One environment variable restores synchronous delegation, `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1`, passed through the options' `env=` so it applies to the SDK's subprocess and nobody's shell profile. That's the honest state of this surface in 0.2.110: the default serves the CLI's interactive UI, the env line serves an embedded product, and you should know both exist.
+
+<Callout type="warning" title="Verify this one on your version">
+Background-by-default is CLI behavior, not SDK API contract, and it has already changed once. If your delegation runs end suspiciously early with a "launched successfully" tool result, this is why. The spike script in the companion repo reproduces both modes in one file.
+</Callout>
+
+## Watching the colleague work
+
+Delegation now works; next, make it visible, because a badge-less sixty-second silence while a subagent audits your numbers reads as a hang. The SDK already tells us everything: while a subagent works, every one of its messages carries `parent_tool_use_id`, the id of the delegation call that spawned it. The main agent's messages carry `None` there. One measured surprise made the frontend's life dramatically calmer: on this CLI, **subagent output produces no `StreamEvent` deltas at all**. Its prose never streams into the main reply; its activity arrives only as complete messages, parent id attached. So the translator forwards exactly one new fact:
+
+```python filename="backend/app/events.py" repo="part-11-subagents-skills/backend/app/events.py" lines="100-117"
+            elif isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, ToolUseBlock):
+                        if block.name in CARD_BACKED_TOOLS:
+                            hidden.add(block.id)  # the gate already emitted the card
+                            continue
+                        event = {
+                            "type": "tool_use_start",
+                            "tool_id": block.id,
+                            "tool_name": block.name,
+                            "tool_input": block.input,
+                        }
+                        # Part 11: a subagent's messages carry the id of the
+                        # delegation call that spawned them. Forward it and
+                        # the UI can nest the colleague's work under it.
+                        if message.parent_tool_use_id:
+                            event["parent_tool_id"] = message.parent_tool_use_id
+                        yield event
+```
+
+Count the vocabulary changes: zero new event types. `tool_use_start` gains one *optional* field, `parent_tool_id`, and a Part 3 client that has never heard of it keeps working untouched. Nine parts of only-ever-extending, still holding. On the client, the reducer looks up the parent to learn the colleague's name (the delegation call's own input carries `subagent_type`, so no lookup table anywhere):
+
+```typescript filename="frontend/app/page.tsx" repo="part-11-subagents-skills/frontend/app/page.tsx" lines="76-98"
+  if (event.type === "tool_use_start") {
+    // Part 11: a parented call belongs to a subagent. Find the delegation
+    // call it hangs off and read the roster name from its input, so the
+    // nested badge can be labeled without any new lookup table.
+    const parent = event.parent_tool_id
+      ? blocks.find((b) => b.type === "tool_use" && b.id === event.parent_tool_id)
+      : undefined;
+    return [
+      ...blocks,
+      {
+        type: "tool_use",
+        id: event.tool_id,
+        name: event.tool_name,
+        input: event.tool_input,
+        done: false,
+        parentId: event.parent_tool_id,
+        agentName:
+          parent?.type === "tool_use"
+            ? String(parent.input.subagent_type ?? "subagent")
+            : undefined,
+      },
+    ];
+  }
+```
+
+and the badge itself learns an indent, a hairline, and a name tag. Not a redesign; the same `ToolBadge`, shifted right:
+
+```typescript filename="frontend/components/ToolBadge.tsx" repo="part-11-subagents-skills/frontend/components/ToolBadge.tsx" lines="38-59"
+export function ToolBadge({ block }: { block: ToolBlock }) {
+  const [open, setOpen] = useState(false);
+  return (
+    // Part 11: a subagent's call is the same badge, indented under the
+    // delegation call with a hairline and a name tag. Nesting is one
+    // level deep by design; the roster has no sub-subagents.
+    <div
+      className={`my-1.5 max-w-xl overflow-hidden rounded-lg border border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900 ${
+        block.parentId ? "ml-7 border-l-2 border-l-stone-300 dark:border-l-stone-600" : ""
+      }`}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center gap-2.5 px-3 py-2 text-left hover:bg-stone-50 dark:hover:bg-stone-800/60"
+      >
+        <StatusIcon block={block} />
+        {block.agentName && (
+          <span className="shrink-0 rounded bg-stone-100 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+            {block.agentName}
+          </span>
+        )}
+```
+
+Run it and the transcript does something it has never done in ten parts: it shows two agents at once.
+
+<Figure
+  src="/images/series/agent-sdk/part-11/browser-review-light.svg"
+  srcDark="/images/series/agent-sdk/part-11/browser-review-dark.svg"
+  alt="The Beanline Analyst mid-run. The user asked for March 2026 total revenue with the reviewer double-checking the number. A completed database query badge is followed by a spinning delegation badge reading: delegating to the reviewer, verify March 2026 total revenue. Nested under it with reviewer name tags, a completed schema read, a completed database query, and a spinning database query. The working timer reads 14 seconds and the composer shows a Stop button."
+  caption="Mid-review, mirrored from the recorded demo run: the delegation badge spins for the whole review while the reviewer's own calls land nested under it, name-tagged. The spinner on the parent is honest: the analyst really is waiting for the report."
+  width={1120}
+  height={746}
+/>
+
+Three notes for the record, all verified. The delegation call arrives in the stream as a `ToolUseBlock` named `Agent` (the toolbox lists `Task`; the block says `Agent`; our `toolLabel` handles both). Part 8's hooks see every one of the reviewer's calls, so your audit log covers new hires automatically, no registration changes. And because these are ordinary `tool_use_start` events riding [Part 9's log](/blog/agent-sdk-9-durable-streams#the-flight-recorder), nested badges are born durable: refresh mid-review and the replay rebuilds the whole hierarchy, parent lookup and all. Measured in this part's e2e: 57 milliseconds from reload to nested badges back on screen. One honest limit: the [Part 5 history endpoint](/blog/agent-sdk-5-sessions) replays old conversations from the main session's diary, which stores the delegation call and its final report but not the nested calls; those live in the subagent's own transcript (the SDK ships `get_subagent_messages` if you ever want the full archaeology).
+
+## The review that pays for the part
+
+Now the run this series has been setting up since Part 1. The Beanline sample data has always contained one planted flaw: the row `2026-03-01,S02,P10` appears twice, identical to the byte, $87.50 each time. Ten parts of analyses have sailed past it, because nobody asked "is this data clean?" and the analyst doesn't volunteer suspicion. Watch what an independent checker does with the March total:
+
+1. The analyst queries the database: **$206,815.80**. Correct, for the data as it stands.
+2. It delegates: `Agent {subagent_type: "reviewer", description: "Verify March 2026 total revenue", prompt: "The analyst reports $206,815.80 for March 2026. Re-derive it…"}`. The brief is all the reviewer gets.
+3. The reviewer re-derives the total with its own SQL, then runs the checks nobody asked for: row counts, date coverage, negative values, and an exact-duplicate query (`GROUP BY` every column, `HAVING COUNT(*) > 1`). One row comes back.
+4. Its report lands as the delegation call's tool result: total confirmed, **duplicate found**, with the corrected figure: $206,728.30 if the double-counted row is removed.
+5. The analyst relays both, and flags that someone should decide whether that's a data-entry error or a real repeated sale. Receipt: $0.0365, 31 seconds, 8 reviewer tool calls.
+
+That last step matters: the reviewer doesn't fix anything, because it *can't*, by toolbox. It reports; the analyst (or you) decides. And the hero screenshot at the top of this page is the same machinery pointed at a whole report: the reviewer read `report.md` off the desk, re-derived all six store rows exactly, caught the invented 63% (its report, verbatim: *"Portland market concentration claim: INCORRECT... $122,027.60 out of $206,815.80 total = 59.0%, not 63%"*), caught the duplicate and its per-store impact (Airport drops to 10,511 units and $43,338.40 without it), and the analyst rewrote its own report with a card-approved Write. The cold open's failure class, caught by structure instead of vigilance.
+
+The tool result carries one more gift. The CLI appends a receipt trailer to every delegation result, straight from the real run: `<usage>subagent_tokens: 5558  tool_uses: 8  duration_ms: 23635</usage>`. Your per-review accounting, free.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 4-panel comic strip, panels in a single row separated by thin vertical black dividers, about an AI analyst whose work gets checked by a tiny reviewer clone with fresh eyes. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny formal necktie. The reviewer is a much smaller identical laptop wearing a yellow hard hat and carrying a clipboard. Panel 1: the laptop-analyst proudly presents a big presentation board reading "MARCH: $206,815.80"; Yad, arms crossed, asks "SURE?". Panel 2: the laptop-analyst gestures grandly as the tiny hard-hatted reviewer laptop marches in carrying a huge magnifying glass; the analyst says "FRESH EYES!". Panel 3: the tiny reviewer stands on a mountain of paper receipts, holding up two identical receipts side by side, and hands over a sticky note reading "MARCH IS IN HERE TWICE". Panel 4: the analyst, deflated with drooping screen and a single sweat drop, says "...RECALCULATING." while Yad pats the tiny reviewer's hard hat and the reviewer says "SAME RECEIPT. TWICE." Clean readable hand-lettered speech bubbles and labels, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-11/comic-reviewer.png"
+  alt="Comic in four panels. Panel one: a laptop analyst with a necktie presents a board reading March: 206,815 dollars and 80 cents, while Yad, a bearded developer with headphones, asks: sure? Panel two: the analyst welcomes a tiny laptop clone in a yellow hard hat carrying a giant magnifying glass and says: fresh eyes. Panel three: the tiny reviewer stands on a mountain of receipts holding two identical receipts, both reading total 124.53, and presents a sticky note saying March is in here twice. Panel four: the analyst, deflated with a sweat drop, says recalculating, while Yad pats the reviewer's hard hat and the reviewer says: same receipt, twice."
+  caption="Ten parts of analyses walked past that receipt. The colleague who never saw the working found it in eight tool calls."
+  width={1536}
+  height={1024}
+/>
+
+## Fresh context cuts both ways
+
+Here's the wrinkle most subagent tutorials skip, and it cost me a real run to learn. My first working reviewer found the duplicate and helpfully offered the corrected total, $206,728.30. Right number. Then I checked *how* it got there: no query computed it. The reviewer had subtracted $87.50 **in its head**, in prose, the exact method our analyst has been banned from using [since Part 6](/blog/agent-sdk-6-custom-tools#two-new-house-rules-one-of-them-earned-the-hard-way). Of course it did. The grounding rule lives in `ANALYST_PROMPT`, and the reviewer has never read `ANALYST_PROMPT`. **Fresh context means fresh ignorance of your house rules.** The isolation that prevents anchoring also strips every lesson the main prompt has accumulated; whatever still matters, you restate in the `AgentDefinition`'s own prompt. Ours now carries the full checklist, its own grounding rule included:
+
+```python filename="backend/app/runner.py" repo="part-11-subagents-skills/backend/app/runner.py" lines="62-78"
+    prompt="""You are the Beanline reviewer. You will be given numbers and the
+question they answer. Every review has two mandatory parts:
+
+1. Numbers: re-derive each figure with your own database queries. Do not
+   assume the analyst's approach was right; write your own SQL.
+2. Data quality: run the checks nobody asked for, on the relevant range.
+   Always include an exact-duplicate check (GROUP BY every column, HAVING
+   COUNT(*) > 1). Look for gaps and suspicious values too, and cross-check
+   the desk's CSV files with the search tools where they cover the same
+   ground.
+
+Report back briefly, in two sections (Numbers, Data quality): each figure
+confirmed or corrected, each flag with the query or file evidence for it.
+A review that only re-runs the analyst's query is not a review. Every
+number in your report must come from a query result, corrected figures
+included: never do arithmetic in your head. You share that rule with the
+analyst you are checking.""",
+```
+
+That prompt is also three measured drafts, same texture as [Part 10's house rule](/blog/agent-sdk-10-interactive#three-drafts-of-one-house-rule). Draft one ("re-derive the numbers, report discrepancies") produced a review that ran one confirming query and declared victory: $0.0511 spent re-deriving the analyst's own arithmetic, no duplicate check, no catch. The mandatory two-section structure with a named duplicate query is what made the catch reliable, and the closing sentence is what made the reviewer's own numbers query-backed; in the very next run it computed a per-store sum with a `SELECT 51319.6 + 43425.9 + …` rather than in prose, which is both slightly ridiculous and exactly right. A reviewer is an agent too. It needs the same engineering as the agent it checks.
+
+<Callout type="info" title="What a review costs, honestly">
+Same question, measured back to back: "total revenue for March 2026" alone cost $0.0095 in 4 seconds; with the reviewer double-checking, $0.0365 in 31 seconds. Roughly 4x the money and 7x the wall clock, because a review is a second agent doing real work, plus [every turn's tokens ride on the last](/blog/agent-sdk-concepts#cost-and-tokens). That's why delegation is a house rule triggered by "double-check" and "verify", not a default on every question. Reviews are for numbers that are about to matter.
+</Callout>
+
+## Skills: the handbook nobody recites
+
+The reviewer fixes *who checks*. The second half of this part fixes *how work gets formatted*, and it starts from a smell you've watched grow for seven parts: `ANALYST_PROMPT`. Chart rules, report rules, grounding rules, asking rules, reviewing rules. Every rule rides on **every** request, billed every turn, whether the turn writes a report or answers "which store sold the most lattes". Push that trend three more parts and the system prompt becomes an employee who recites the entire handbook every morning.
+
+The SDK's answer is a [skill](/blog/agent-sdk-concepts#skills): a markdown playbook that lives on disk, announces itself with one description line, and gets read **on demand**, only when the model decides the job calls for it. Here is the whole house report format, one file:
+
+```markdown filename="backend/skills/beanline-report/SKILL.md" repo="part-11-subagents-skills/backend/skills/beanline-report/SKILL.md"
+---
+name: beanline-report
+description: The Beanline house format for written reports. Load this before writing report.md or any findings document for the user.
+---
+
+# The Beanline house report format
+
+Every report.md follows this structure, in this order:
+
+1. Title line: `# Beanline analysis: <topic in a few words>`
+2. `**TL;DR:**` one bold sentence carrying the single most important number.
+3. `## Key numbers`: a markdown table of metric and value. Format currency
+   as $1,234.56: dollar sign, thousands separators, two decimals.
+4. `## How this was computed`: one bullet per data source, naming the tool
+   (database query or file) and the operation, so a colleague could redo it.
+5. `## Caveats`: always present. List the data-quality issues you noticed
+   (duplicate rows, gaps, outliers). Write "None found" only if you
+   actually checked for them.
+6. Last line, exactly: `Prepared by the Beanline analyst.`
+
+Chart conventions: PNG at dpi=150, headline-style titles, labeled axes
+with units, no gridlines, one chart per file.
+```
+
+The SDK discovers project skills at `<cwd>/.claude/skills/<name>/SKILL.md`, and our cwd is the workspace, so the server installs the handbook on every new desk:
+
+```python filename="backend/app/workspaces.py" repo="part-11-subagents-skills/backend/app/workspaces.py" lines="18-36"
+# Part 11: the skills every desk starts with. The folder ships with the
+# backend; create_workspace() copies it to where the SDK looks for
+# project skills: <cwd>/.claude/skills/<name>/SKILL.md.
+SKILLS_SOURCE = Path("skills")
+
+
+def create_workspace() -> str:
+    """Mint a new desk. The id is the server's choice, never the client's.
+
+    Part 11: every new desk gets the house skills installed under
+    .claude/skills/. The workspace is the agent's project directory, so
+    project-scoped discovery (setting_sources=["project"]) finds them.
+    """
+    workspace_id = uuid.uuid4().hex
+    workspace = WORKSPACES_ROOT / workspace_id
+    workspace.mkdir(parents=True)
+    if SKILLS_SOURCE.is_dir():
+        shutil.copytree(SKILLS_SOURCE, workspace / ".claude" / "skills")
+    return workspace_id
+```
+
+Enabling discovery is the two options you already saw in `build_options`: `setting_sources=["project"]` (the switch this series has deliberately kept off since Part 1, now scoped to a folder only the server writes) and `Skill` in `tools=` plus `allowed_tools` (reading instructions is not a mutation; no card). One small housekeeping note rides along: the artifact watcher's snapshot now skips dotted directories, or the installed SKILL.md would appear in the panel as something the agent produced.
+
+<Callout type="warning" title="The skills= option, and why we don't use it">
+The SDK also has a newer, more direct-looking option: `skills=["beanline-report"]`. On 0.2.110 it did not surface workspace skills at all in my testing: init reported no new skills and no Skill tool call ever fired, while the `setting_sources` route worked on the first try. Fast-moving surface, same advice as the background-tasks trap: this part teaches the combination verified against the pinned version, and names the one that didn't work so you recognize the failure.
+</Callout>
+
+One more measured honesty before the payoff. With the skill installed and discoverable, my first report request produced... no skill load at all. The model went straight to `Write`; the handbook sat on the shelf. Init data showed `beanline-report` right there in the discovered skills. Discovery is not motivation: a busy model treats a one-line skill description like you treat documentation, which is to say, optimistically. The fix is the same when-vs-how split as the database tool and the reviewer: one line in `ANALYST_PROMPT` ("Before writing report.md, load the beanline-report skill with the Skill tool and follow the house format it describes, exactly"), and from then on every report run opens with a `Skill` badge before the `Write`. The prompt says when. The skill says how, in as much detail as the job needs, billed only when a report is actually being written.
+
+<Figure
+  src="/images/series/agent-sdk/part-11/fig-skill-light.svg"
+  srcDark="/images/series/agent-sdk/part-11/fig-skill-dark.svg"
+  alt="Two report sheets side by side, both from real runs. Left, the Part 10 prompt alone at 3.58 cents: a plain March 2026 store performance report with a headline, a table, and two paragraphs, annotated that nothing says what was checked or who signed it, and that its claim of 38 percent above the chain average is wrong, the real figure being 48.9 percent. Right, with the beanline-report skill on the desk at 2.77 cents: a branded report titled Beanline analysis, with an accented TL;DR line, Key numbers section, How this was computed section, mandatory Caveats section, and the sign-off line Prepared by the Beanline analyst, each section labeled in the margin. A note under the right sheet points out the caveat still says 63 percent while the true share is 59.0, which is the reviewer's job. A serif line reads: a skill is knowledge you'd otherwise stuff into every prompt."
+  caption="The same question, twice, report.md verbatim from both runs. The skill bought structure: TL;DR, methodology, mandatory caveats, sign-off. It did not buy arithmetic: the right sheet's caveat still volunteers a wrong 63%. Structure is the skill's job; numbers are the reviewer's."
+  width={1240}
+  height={700}
+/>
+
+Look at the right sheet's caveat one more time, because the two halves of this part just shook hands. The skill made the analyst *volunteer* a market-concentration caveat, in perfect house format, with a hand-summed percentage that's wrong by four points. Format discipline and numerical discipline are different failure modes, and the hero screenshot at the top of this page is the reviewer catching this exact sheet's error. A skill without a reviewer writes beautiful wrong reports; a reviewer without a skill corrects scruffy ones. Hire both.
+
+<Callout type="info" title="Skills vs RAG, in two sentences">
+Retrieval fetches *information* the model couldn't know: your documents, your data, searched at request time. A skill delivers *procedure* you already wrote down: how this house does a thing, loaded whole when that thing is being done. If it changes per query it's retrieval; if it changes when the style guide changes, it's a skill.
+</Callout>
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 3 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels in a single row separated by thin vertical black dividers, about knowledge on demand instead of reciting every rule all the time. The AI analyst is a cute anthropomorphic laptop with little arms and legs wearing a tiny formal necktie. Panel 1: the laptop-analyst staggers under a huge heavy sandwich board covered edge to edge in dense tiny rule text, the board titled "ALL THE RULES, ALL THE TIME"; Yad watches, wincing. Panel 2: Yad places a small tidy bookshelf labeled "SKILLS" next to the analyst's desk, holding up one slim booklet; Yad says "READ THE RIGHT PAGE WHEN YOU NEED IT." Panel 3: the analyst types happily at its desk with a single thin booklet propped open labeled "REPORT FORMAT", the sandwich board sticking out of a trash can behind it; the analyst says "MUCH LIGHTER." Clean readable hand-lettered speech bubbles and labels, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/agent-sdk/part-11/comic-handbook.png"
+  alt="Comic in three panels. Panel one: a laptop analyst with a necktie staggers under a huge sandwich board densely covered in tiny rules, titled all the rules, all the time, while Yad, a bearded developer with headphones, winces. Panel two: Yad sets up a small bookshelf labeled skills and holds up a slim booklet titled report format, saying: read the right page when you need it. Panel three: the analyst types happily with the thin report format booklet open on its desk and the sandwich board discarded in a trash can, saying: much lighter."
+  caption="The system prompt is what the analyst recites every morning. A skill is the page it looks up when the job actually calls for it."
+  width={1536}
+  height={1024}
+/>
+
+## The delegation, drawn once
+
+Everything in this part, on one sheet, with the real run's numbers:
+
+<Figure
+  src="/images/series/agent-sdk/part-11/fig-team-light.svg"
+  srcDark="/images/series/agent-sdk/part-11/fig-team-dark.svg"
+  alt="Delegation anatomy diagram. Left box, the analyst's context: the claude_code preset plus ten parts' worth of house rules, the whole conversation, and every number it already computed and believes, with a note that asking this context to double-check its own work produces anchoring, and a tally of measured wrong percentages from Parts 6, 7, and today. Right box, the reviewer's fresh context: only the AgentDefinition prompt and the delegation brief, with a read-only toolbox of Read, Glob, Grep, and the two beanline database tools, no Bash, no Write. Between them, the Agent tool call carrying subagent type, description, and prompt, leading to a fresh session booting with only the brief. Below, what rides the stream: assistant and user messages stamped with parent_tool_use_id, forwarded as parent_tool_id so the UI nests badges. At the bottom, what comes back: the reviewer's report as the tool result plus a usage trailer reading subagent_tokens 5558, tool_uses 8, duration_ms 23635. A serif line reads: you cannot anchor a colleague who never saw your working."
+  caption="The whole mechanism: a brief goes in, parented messages ride the stream, a report and a receipt come back. The premium on the same question, measured: $0.0095 alone, $0.0365 reviewed. What the review bought: a duplicated row and a wrong percentage, caught."
+  width={1240}
+  height={950}
+/>
+
+## The graduation table, complete
+
+[Part 8 opened this table](/blog/agent-sdk-8-hooks#when-to-use-which) with five mechanisms and a promise that Part 11 would finish it. Here it is, complete. Seven mechanisms now shape what the analyst does, and choosing the wrong one is still the most common failure in real agent codebases:
+
+| Mechanism | The question it answers | Enforced by | How it fails |
+|---|---|---|---|
+| System prompt | What *should* it do? | The model's goodwill | Persuasion, not enforcement: a determined input talks it out |
+| `tools=` | What *exists* for it? | The SDK, absolutely | Can't be talked around, but it's all-or-nothing per tool |
+| `allowed_tools` | What runs *without asking*? | Name match, before your code | Names, not arguments: `Glob` waved through means every glob |
+| `can_use_tool` | What does a *human* say, now? | Your callback + a Future | Humans sleep, get tired, click Approve on the tenth card |
+| Hooks | What is *always* true, and who saw it? | Your code, first, every call | Only as sharp as your patterns |
+| Subagent | Who does *this job*, with whose context? | A fresh context + its own toolbox | Costs multiply; and a colleague needs its own rules, or it improvises |
+| Skill | What knowledge arrives, and *when*? | On-demand loading, model-initiated | A handbook nobody opens: discovery is not motivation; the prompt still says when |
+
+The new rows answer questions none of the first five could touch. Governance says what the agent may do; a subagent changes *who is doing it and what they know*; a skill changes *what expertise is in the room* for this specific job. Read the table bottom to top when quality disappoints, the same way you read it when something breaks: was the knowledge even loaded (skill)? Did the right specialist do it (subagent)? Was it on the record (hooks)? Was a human asked (callback)? Was it pre-approved (allow list)? Could it exist (tools)? Did we merely hope (prompt)? This table is the series' synthesis, and it's yours now.
+
+## The cost ritual
+
+All real runs from building this part:
+
+| Run | Result | Cost |
+|---|---|---|
+| March total, no review | one query, correct answer | $0.0095 · 4s |
+| March total + reviewer double-check | duplicate row found, corrected total offered | $0.0365 · 31s |
+| First reviewer prompt draft | one confirming query, no duplicate check: not a review | $0.0511 · 11s |
+| The review that first caught the duplicate | 9 read-only queries, dup + corrected total | $0.0347 · 26s |
+| Report with the skill on the desk | full house format, table exact, caveat's 63% wrong | $0.0277 · 13s |
+| Same report question, Part 10 app | plain format, "38% above average" wrong (true 48.9%) | $0.0358 · 20s |
+| "Double-check that report" (the hero) | caught the 63% AND the duplicate, rewrote report.md | $0.0630 · 62s |
+| Async-default spike (main turn only) | "launched successfully", report into the void | $0.0299 · 8s |
+| Fresh-clone e2e, both turns | skill report + review, nested badges back 66ms after reload | $0.0295 + $0.0666 |
+| The recorded demo | duplicate catch on camera, below | $0.0492 · 32s |
+
+Read rows one and two as the price of trust: a nickel for an answer, four nickels for an answer someone independent has re-derived, dissected for duplicates, and signed off on. Row seven is the full workflow at report scale. Whether that premium is worth it depends entirely on what the number is about to be used for, which is why it's a phrase you say ("double-check this") and not a mode you set.
+
+<DemoVideo
+  src="/videos/agent-sdk/part-11-demo.mp4"
+  poster="/videos/agent-sdk/part-11-poster.jpg"
+  caption='A real run, recorded: "What was total revenue for March 2026 across all stores? Have the reviewer double-check the number before you answer." The delegation badge opens, the reviewer&apos;s queries nest under it with name tags, and the reply reports the total, the duplicated row (2026-03-01, S02, P10, $87.50), and the corrected figure, receipt on camera: $0.0492, 32 seconds.'
+  label="Screen recording of Part 11: a reviewer subagent's queries appearing as nested badges under a delegation badge, ending with the duplicate row caught and both totals reported"
+/>
+
+<Recap
+  part={11}
+  items={[
+    "A reviewer subagent via agents={'reviewer': AgentDefinition(...)} plus Task in tools=: the main agent delegates a brief, a fresh context re-derives the numbers, and the report comes back as the delegation call's tool result (with a usage trailer as the receipt).",
+    "Fresh context is the feature and the cost: no anchoring on the analyst's working, and no inheritance of its house rules either; whatever still matters gets restated in the AgentDefinition prompt, grounding rule included.",
+    "The reviewer's toolbox is a security decision: Read/Glob/Grep plus the read-only database tools, no Bash, no Write, so a review can never mutate the desk and never raises a card. Subagent calls still pass hooks and the gate like anyone's.",
+    "Nested badges from one optional field: subagent messages carry parent_tool_use_id, the translator forwards it as parent_tool_id on tool_use_start, and the UI indents and name-tags: zero new event types, durable through Part 9's log (nested badges rebuilt 57ms after a mid-review refresh).",
+    "Skills are on-demand playbooks: SKILL.md installed on every desk, discovered via setting_sources=['project'] plus the Skill tool, nudged by one prompt line saying when; the before/after runs show house structure appearing while the arithmetic mistakes stay for the reviewer. Sync delegation needs env CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1 on current CLIs.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "What makes delegation exist in this app, and what arrives in the stream when it happens?",
+      options: [
+        "agents= alone is enough; the stream shows a Delegate message type",
+        "agents={'reviewer': AgentDefinition(...)} defines the roster AND Task in tools= provides the delegation tool; the call arrives as a ToolUseBlock named Agent whose input carries subagent_type, description, and the brief",
+        "The Skill tool spawns subagents when a skill requests one",
+        "Subagents are always available; no options are needed",
+      ],
+      answer: 1,
+      explain: "Both halves are required: the roster describes who exists, and Task puts delegating in the toolbox (no Task, no delegation). The stream's tool_use block is named Agent even though the toolbox lists Task, a naming quirk worth knowing when you write toolLabel entries.",
+    },
+    {
+      q: "Why can the reviewer catch a number the analyst got wrong, when the analyst re-checking itself usually can't?",
+      options: [
+        "The reviewer runs a bigger model",
+        "The reviewer receives only the delegation brief in a fresh context: it never sees the analyst's reasoning, so it can't anchor on it and must re-derive everything with its own queries",
+        "The reviewer has more tools than the analyst",
+        "The SDK compares both agents' answers automatically",
+      ],
+      answer: 1,
+      explain: "Same model, smaller toolbox. The isolation is the mechanism: self-review runs inside the context that produced the mistake; a subagent's context contains the brief and nothing else. That's also why its prompt must restate any house rules you still want enforced.",
+    },
+    {
+      q: "How do the reviewer's tool calls become nested badges, and what changed in the wire vocabulary?",
+      options: [
+        "A new subagent_activity event type carries them",
+        "The UI polls a subagent transcript endpoint",
+        "Subagent messages carry parent_tool_use_id; the translator forwards it as an OPTIONAL parent_tool_id field on the existing tool_use_start event, and the client indents any badge that has one: zero new event types",
+        "The badges are rendered from the Agent call's final report",
+      ],
+      answer: 2,
+      explain: "One optional field on an existing parcel. Old clients ignore it and keep working; the new client looks up the parent block to learn the subagent's name from the delegation call's own input. And because it rides the Part 9 log, the nesting survives refreshes.",
+    },
+    {
+      q: "You delegate on a current CLI without CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1. What happens?",
+      options: [
+        "The delegation fails with an error",
+        "The Agent call's result arrives immediately as 'Async agent launched successfully', task_started/task_progress messages appear, and the MAIN turn ends while the subagent is still working: fine for a background-agents product, wrong for a chat answer that depends on the review",
+        "Nothing differs; the env var is cosmetic",
+        "The subagent runs but its tool calls skip the hooks",
+      ],
+      answer: 1,
+      explain: "Background-by-default serves the CLI's own interactive UI. Measured live: the main turn's receipt landed at 8.4s while the reviewer was mid-audit, its report addressed to nobody. The env line restores blocking delegation, which is what a turn-based product wants.",
+    },
+    {
+      q: "The skill file is discovered (init lists beanline-report) but reports come out unformatted. What's the most likely cause, per this part's measured runs?",
+      options: [
+        "setting_sources must also include 'user'",
+        "SKILL.md needs to be registered in allowed_tools",
+        "Discovery is not motivation: the model saw the skill's description and didn't reach for it; one system-prompt line saying WHEN to load it made the Skill call fire before every report",
+        "Skills only work in plan mode",
+      ],
+      answer: 2,
+      explain: "The first report run after installing the skill used no skill at all; the handbook sat on the shelf. Same lesson as the database tool in Part 6 and the reviewer rule here: the prompt says when, the skill says how. (And the newer skills= option didn't discover workspace skills at all on 0.2.110; setting_sources=['project'] plus Skill in tools= is the verified combo.)",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 11: subagents and skills - a reviewer with fresh eyes and the house playbook on demand"
+```
+
+The analyst has a team now: a colleague who re-derives its numbers without inheriting its assumptions, and a handbook it reads at exactly the right moment. But every tool on every belt so far was built in this house, by us, in this very series. Real products plug in tools *other people* built, and the MCP ecosystem has thousands of them, one config block away. Which raises the question Part 8's tripwire callout left hanging: a tripwire is not a sandbox, and code you didn't write deserves walls you didn't have to remember to build. Next: the analyst reaches the open internet through an external MCP server, and we put the whole thing in a box the operating system enforces.
+
+The complete, tested code for this part lives in [`part-11-subagents-skills`](https://github.com/yadneshSalvi/claude-agent-sdk-in-production/tree/main/part-11-subagents-skills) in the [companion repo](https://github.com/yadneshSalvi/claude-agent-sdk-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.

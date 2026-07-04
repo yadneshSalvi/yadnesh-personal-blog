@@ -5,7 +5,7 @@ image: "/images/series/agent-sdk/concepts-cover-light.svg"
 imageDark: "/images/series/agent-sdk/concepts-cover-dark.svg"
 imageAlt: "A cover in the series style reading 'Concepts, in plain words', with a large section-sign numeral and the Anthropic, FastAPI, and Next.js logos."
 createdAt: "2026-07-03T00:00:00.000Z"
-updatedAt: "2026-07-18T00:00:00.000Z"
+updatedAt: "2026-07-25T00:00:00.000Z"
 tags: ["claude-agent-sdk", "reference"]
 series: "claude-agent-sdk-fastapi-nextjs"
 kind: "reference"
@@ -120,6 +120,20 @@ The layering is the thing to understand: partial events *add* granularity, they 
 Extended thinking gives the model a scratchpad: reasoning tokens it writes before (and between) its visible answer and tool calls. The SDK controls it with `thinking={"type": "enabled", "budget_tokens": N}` or `{"type": "disabled"}`; newer models also support an adaptive mode where the model decides when to think. In the stream, thinking arrives as `ThinkingBlock` content on the full message and, under [partial messages](#partial-messages), as `thinking_delta` events whose text lives in `delta["thinking"]`, a different key than text deltas use.
 
 Two practical rules. First, thinking is billed as output tokens, and it isn't small: the same question measured in Part 10 cost about 3x with thinking on, so products expose it as a switch rather than a default. Second, the scratchpad is reasoning, not testimony: it can wander, backtrack, and paraphrase instructions, so render it faint and collapsed for humans and never parse it in code. Its best production use is watching whether the system prompt you wrote actually participates in decisions.
+
+## Subagents
+
+A subagent is a second agent the main agent can delegate to: defined on `ClaudeAgentOptions` as `agents={"name": AgentDefinition(description=..., prompt=..., tools=[...], model=...)}`, and reachable only if the `Task` tool is in the toolbox. The main agent calls `Task` with a `subagent_type` (the roster key) and a short brief; a fresh session boots with **only** the `AgentDefinition` prompt and that brief; its final message comes back as the delegation call's tool result, with a `<usage>` trailer reporting the subagent's tokens, tool calls, and duration.
+
+The fresh context is the design's whole value, in both directions. Nothing from the parent conversation leaks in, so a reviewer subagent cannot anchor on the working it's checking; and none of the parent's system prompt arrives either, so any house rule that still matters must be restated in the subagent's own prompt. Each subagent also gets its own toolbox (MCP tool names included), which is a per-colleague security boundary: a checker can be made structurally read-only. While a subagent works, its messages carry `parent_tool_use_id`, the id of the delegation call, which is how a UI can nest its activity; its tool calls still pass hooks and the permission gauntlet like anyone else's.
+
+One behavior to check on your version: current CLIs launch subagents in the background by default (the delegation "result" is a launch confirmation, and the parent turn ends while the subagent runs). Setting `env={"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1"}` restores synchronous delegation, which is what a chat product usually wants.
+
+## Skills
+
+A skill is a markdown playbook the agent loads on demand: a `SKILL.md` file with frontmatter (`name`, plus a one-line `description` that is always visible to the model) and a body that is only read, via the `Skill` tool, when the model decides the job calls for it. That split is the economics: the description costs a line on every turn; the full procedure is billed only on the turns that use it. Knowledge that would otherwise be pasted into every prompt (report formats, style rules, checklists) belongs here.
+
+Project skills live at `<working directory>/.claude/skills/<name>/SKILL.md`. Discovery requires opting into project settings (`setting_sources=["project"]`) and having `Skill` in the toolbox; in a workspace-per-conversation app, the server installs the skill folder on each new desk it creates. Two practical notes from the series' testing: discovery is not motivation (a model can see a skill and never load it; a system-prompt line saying *when* to load it makes usage reliable), and the newer `skills=` option did not surface workspace skills on the pinned version, so the `setting_sources` route is the one this series teaches. Distinct from retrieval: RAG fetches information per query; a skill delivers procedure per task.
 
 ## SSE
 

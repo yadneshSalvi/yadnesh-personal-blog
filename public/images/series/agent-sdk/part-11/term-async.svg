@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="648" viewBox="0 0 1040 648" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="648" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; delegation, with and without the env line</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># WITHOUT the env line: the CLI's default. Delegate and watch.</tspan></text>
+    <text x="32" y="116" xml:space="preserve">[ 6.2s] ToolUseBlock  name='Agent' input={'subagent_type': 'reviewer', …}</text>
+    <text x="32" y="144" xml:space="preserve">[ 6.2s] SystemMessage subtype='<tspan fill="#e5825a">task_started</tspan>'</text>
+    <text x="32" y="172" xml:space="preserve">[ 6.2s] ToolResultBlock '<tspan fill="#e08585">Async agent launched successfully.</tspan></text>
+    <text x="32" y="200" xml:space="preserve">        agentId: a350605a4f411e6a9 (internal ID - do not mention…'</text>
+    <text x="32" y="228" xml:space="preserve">[ 7.9s] ToolUseBlock  name='Glob' <tspan fill="#756d62">&lt;- the reviewer, interleaving</tspan></text>
+    <text x="32" y="256" xml:space="preserve">[ 7.9s] SystemMessage subtype='<tspan fill="#e5825a">task_progress</tspan>'</text>
+    <text x="32" y="284" xml:space="preserve">[ 8.4s] TextBlock     "I've delegated the task to the reviewer agent.</text>
+    <text x="32" y="312" xml:space="preserve">        It's now checking sales.csv…"</text>
+    <text x="32" y="340" xml:space="preserve">[ 8.4s] ResultMessage total_cost_usd=$0.0299  <tspan fill="#e08585">&lt;- the MAIN turn is OVER;</tspan></text>
+    <text x="32" y="368" xml:space="preserve">        <tspan fill="#e08585">the reviewer is still running. Nobody will read its report.</tspan></text>
+    <text x="32" y="396" xml:space="preserve"></text>
+    <text x="32" y="424" xml:space="preserve"><tspan fill="#756d62"># WITH env={'CLAUDE_CODE_DISABLE_BACKGROUND_TASKS': '1'}:</tspan></text>
+    <text x="32" y="452" xml:space="preserve">[ 4.6s] ToolUseBlock  name='Agent' input={'subagent_type': 'reviewer', …}</text>
+    <text x="32" y="480" xml:space="preserve"><tspan fill="#756d62">        … the reviewer's own tool calls, parent_tool_use_id set …</tspan></text>
+    <text x="32" y="508" xml:space="preserve">[31.0s] ToolResultBlock '## Verification Report … Duplicate row detected:</text>
+    <text x="32" y="536" xml:space="preserve">        2026-03-01 | S02 | P10 | 7 units | $87.50 appears twice…'</text>
+    <text x="32" y="564" xml:space="preserve">[31.0s] <tspan fill="#8fb573">&lt;- the Agent call's result IS the reviewer's report;</tspan></text>
+    <text x="32" y="592" xml:space="preserve">        <tspan fill="#8fb573">the main agent resumes with it in hand, then answers.</tspan></text>
+  </g>
+</svg>

@@ -15,6 +15,8 @@ Every folder below is the **complete, runnable project as it exists at the end o
 | 7 | [`part-07-approvals`](part-07-approvals) | Human-in-the-loop approvals: risky tool calls pause on a Future until you click Approve or Deny | [Approvals: The Human in the Loop](https://yadneshsalvi.com/blog/agent-sdk-7-approvals) |
 | 8 | [`part-08-hooks`](part-08-hooks) | Hooks: a PreToolUse tripwire that blocks `rm`, a JSONL audit log of every tool call, and injected desk facts | [Hooks: Guardrails and Audit Trails](https://yadneshsalvi.com/blog/agent-sdk-8-hooks) |
 | 9 | [`part-09-durable-streams`](part-09-durable-streams) | Durable streams: a SQLite event log, replay-then-follow over `EventSource`, refresh-proof runs and approval cards, and a Stop button that actually stops | [Durable Streams: Survive the Refresh](https://yadneshsalvi.com/blog/agent-sdk-9-durable-streams) |
+| 10 | [`part-10-interactive`](part-10-interactive) | Plan mode with a plan card and Implement button, AskUserQuestion as option chips over the Part 7 Future bridge, and an extended-thinking drawer | [Plan Mode, Questions, and Thinking You Can Read](https://yadneshsalvi.com/blog/agent-sdk-10-interactive) |
+| 11 | [`part-11-subagents-skills`](part-11-subagents-skills) | A reviewer subagent with fresh eyes and a read-only toolbox rendered as nested badges, plus a beanline-report skill enforcing the house report format | [Subagents and Skills: The Analyst Grows a Team](https://yadneshsalvi.com/blog/agent-sdk-11-subagents-skills) |
 
 *(The series is in progress — 14 parts across three acts. Folders appear here as parts publish.)*
 

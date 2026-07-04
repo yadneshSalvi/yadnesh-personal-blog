@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="962" viewBox="0 0 1120 962" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="962" fill="#0c0a09"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#211e1a"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#2b2723" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#3a3530"/><circle cx="56" cy="28" r="7" fill="#3a3530"/><circle cx="82" cy="28" r="7" fill="#3a3530"/>
+  <rect x="320" y="13" width="480" height="30" rx="15" fill="#1a1816" stroke="#3a3530"/>
+  <text x="560" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#a49c90" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#292524" stroke-width="1"/>
+  <circle cx="28" cy="79" r="5" fill="#e5825a"/>
+  <text x="42" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">Beanline Analyst</text>
+  <text x="1096" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#78716c" text-anchor="end">session cost $0.0907</text>
+  <line x1="220" y1="102" x2="220" y2="962" stroke="#292524" stroke-width="1"/>
+  <rect x="14" y="116" width="192" height="36" rx="9" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="110" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">+ New analysis</text>
+  <rect x="10" y="166" width="200" height="44" rx="9" fill="#292524"/>
+  <text x="20" y="185" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e7e5e4">How did each store do in March…</text>
+  <text x="20" y="201" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c">1s ago</text>
+  
+  <rect x="520" y="130" width="300" height="62" rx="18" fill="#f5f5f4"/>
+  <text x="537" y="155" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#1c1917">Have the reviewer double-check that</text>
+  <text x="537" y="177" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#1c1917">report before I send it out.</text>
+  <rect x="244" y="208" width="560" height="38" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="259" y="232" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#4ade80">&#x2713;</text>
+  <text x="280" y="232" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Delegating to the reviewer: Verify March 2026 store…</text>
+  <text x="766" y="231" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="end">AGENT</text>
+  <path d="M 778 224 l 5 6 l 5 -6" fill="none" stroke="#78716c" stroke-width="1.8"/>
+  <rect x="272" y="254" width="532" height="38" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <rect x="272" y="254" width="3" height="38" rx="1.5" fill="#57534e"/>
+  <text x="289" y="278" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#4ade80">&#x2713;</text>
+  <rect x="308" y="264" width="67" height="18" rx="4" fill="#292524"/>
+  <text x="341.5" y="277" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" letter-spacing="1" fill="#a8a29e" text-anchor="middle">REVIEWER</text>
+  <text x="385" y="278" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Reading report.md</text>
+  <text x="766" y="277" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" letter-spacing="0.6" fill="#78716c" text-anchor="end">READ</text>
+  <path d="M 778 270 l 5 6 l 5 -6" fill="none" stroke="#78716c" stroke-width="1.8"/>
+  <rect x="272" y="300" width="532" height="38" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <rect x="272" y="300" width="3" height="38" rx="1.5" fill="#57534e"/>
+  <text x="289" y="324" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#4ade80">&#x2713;</text>
+  <rect x="308" y="310" width="67" height="18" rx="4" fill="#292524"/>
+  <text x="341.5" y="323" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" letter-spacing="1" fill="#a8a29e" text-anchor="middle">REVIEWER</text>
+  <text x="385" y="324" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Reading the beanline schema</text>
+  <text x="766" y="323" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" letter-spacing="0.6" fill="#78716c" text-anchor="end">MCP__BEANLINE__GET_SCHEMA</text>
+  <path d="M 778 316 l 5 6 l 5 -6" fill="none" stroke="#78716c" stroke-width="1.8"/>
+  <rect x="272" y="346" width="532" height="38" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <rect x="272" y="346" width="3" height="38" rx="1.5" fill="#57534e"/>
+  <text x="289" y="370" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#4ade80">&#x2713;</text>
+  <rect x="308" y="356" width="67" height="18" rx="4" fill="#292524"/>
+  <text x="341.5" y="369" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" letter-spacing="1" fill="#a8a29e" text-anchor="middle">REVIEWER</text>
+  <text x="385" y="370" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Querying the beanline database</text>
+  <text x="766" y="369" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" letter-spacing="0.6" fill="#78716c" text-anchor="end">MCP__BEANLINE__QUERY_DATABASE</text>
+  <path d="M 778 362 l 5 6 l 5 -6" fill="none" stroke="#78716c" stroke-width="1.8"/>
+  <rect x="272" y="392" width="532" height="38" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <rect x="272" y="392" width="3" height="38" rx="1.5" fill="#57534e"/>
+  <text x="289" y="416" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#4ade80">&#x2713;</text>
+  <rect x="308" y="402" width="67" height="18" rx="4" fill="#292524"/>
+  <text x="341.5" y="415" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" letter-spacing="1" fill="#a8a29e" text-anchor="middle">REVIEWER</text>
+  <text x="385" y="416" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Querying the beanline database</text>
+  <text x="766" y="415" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" letter-spacing="0.6" fill="#78716c" text-anchor="end">MCP__BEANLINE__QUERY_DATABASE</text>
+  <path d="M 778 408 l 5 6 l 5 -6" fill="none" stroke="#78716c" stroke-width="1.8"/>
+  <text x="272" y="450" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">… 14 more reviewer queries: re-derivation, duplicate hunt, gap checks …</text>
+  
+  <text x="244" y="485" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#e7e5e4">The reviewer found two issues:</text>
+  
+  <text x="244" y="517" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#e7e5e4">1. Data quality defect: a duplicate sales record exists in the database</text>
+  <text x="244" y="541" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#e7e5e4">(2026-03-01, Airport, 7 units/$87.50), inflating Airport's totals.</text>
+  <text x="244" y="565" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#e7e5e4">2. Math error in the caveat: Portland's actual market share is 59.0%,</text>
+  <text x="244" y="589" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#e7e5e4">not 63%. I overstated it by 4 percentage points.</text>
+  <rect x="244" y="608" width="560" height="38" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="259" y="632" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#4ade80">&#x2713;</text>
+  <text x="280" y="632" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Writing report.md</text>
+  <text x="766" y="631" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="end">WRITE</text>
+  <path d="M 778 624 l 5 6 l 5 -6" fill="none" stroke="#78716c" stroke-width="1.8"/>
+  <rect x="244" y="654" width="560" height="34" rx="10" fill="#292524" stroke="#292524" stroke-width="1"/>
+  <text x="258" y="676" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#4ade80">&#x2713;</text>
+  <text x="278" y="676" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Approved</text>
+  <text x="788" y="676" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="end">WRITE</text>
+  
+  <text x="244" y="719" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">Fixed: corrected Portland's market share to 59% and surfaced the</text>
+  <text x="244" y="743" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">duplicate record issue in the caveats section. The report is ready</text>
+  <text x="244" y="767" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">to send.</text>
+  <text x="244" y="798" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#78716c">$0.0630 · 62s</text>
+  <line x1="220" y1="826" x2="820" y2="826" stroke="#292524" stroke-width="1"/>
+  <rect x="244" y="838" width="99" height="21" rx="6" fill="#1c1917" stroke="#292524"/>
+  <text x="253" y="852.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a8a29e">products.csv</text>
+  <rect x="350" y="838" width="79" height="21" rx="6" fill="#1c1917" stroke="#292524"/>
+  <text x="359" y="852.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a8a29e">sales.csv</text>
+  <rect x="436" y="838" width="85" height="21" rx="6" fill="#1c1917" stroke="#292524"/>
+  <text x="445" y="852.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a8a29e">stores.csv</text>
+  <rect x="244" y="860" width="174" height="24" rx="8" fill="none" stroke="#292524" stroke-width="1.5"/>
+  <rect x="244" y="860" width="78" height="24" rx="8" fill="#e5825a"/>
+  <text x="283" y="876" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#ffffff" text-anchor="middle">ANSWER</text>
+  <text x="370" y="876" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="middle">PLAN FIRST</text>
+  <rect x="428" y="860" width="108" height="24" rx="8" fill="none" stroke="#292524" stroke-width="1.5"/>
+  <text x="482" y="876" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="middle">THINKING OFF</text>
+  <rect x="244" y="904" width="46" height="42" rx="12" fill="none" stroke="#292524" stroke-width="1.5"/>
+  <text x="267" y="931" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#78716c" text-anchor="middle">+</text>
+  <rect x="300" y="904" width="436" height="42" rx="12" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="316" y="930" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#78716c">Ask about your data&#8230;</text>
+  <rect x="746" y="904" width="74" height="42" rx="12" fill="#e5825a" opacity="0.45"/>
+  <text x="783" y="930" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  <line x1="820" y1="56" x2="820" y2="962" stroke="#292524" stroke-width="1"/>
+  <text x="838" y="129" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#e7e5e4">Artifacts</text>
+  <text x="1102" y="129" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c" text-anchor="end">1 file</text>
+  <line x1="820" y1="144" x2="1120" y2="144" stroke="#292524" stroke-width="1"/>
+  <rect x="821" y="144" width="299" height="34" fill="#292524"/>
+  <path d="M 837 154 h 7 l 4 4 v 10 h -11 z" fill="none" stroke="#78716c" stroke-width="1.4"/>
+  <line x1="839.5" y1="161.5" x2="845.5" y2="161.5" stroke="#78716c" stroke-width="1.2"/>
+  <line x1="839.5" y1="164.5" x2="845.5" y2="164.5" stroke="#78716c" stroke-width="1.2"/>
+  <text x="858" y="165.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#e7e5e4">report.md</text>
+  <text x="1102" y="165.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end">1.2 KB</text>
+  <line x1="820" y1="178" x2="1120" y2="178" stroke="#292524" stroke-width="1"/>
+  <text x="838" y="208" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#e7e5e4">Caveats</text>
+  <text x="838" y="232" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#e5825a">Portland stores (3 of 6) account for 59%</text>
+  <text x="838" y="249" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#e5825a">of total company revenue in March,</text>
+  <text x="838" y="266" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#d6d3d1">concentrated in one market</text>
+  <text x="838" y="283" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#e5825a">One duplicate sales record (2026-03-01,</text>
+  <text x="838" y="300" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#e5825a">Airport, 7 units/$87.50) found in the raw</text>
+  <text x="838" y="317" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#e5825a">data; these figures include it.</text>
+  <text x="838" y="334" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#e5825a">Recommend deduplication in the source</text>
+  <text x="838" y="351" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#e5825a">table before next report.</text>
+  <text x="838" y="368" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#d6d3d1">No day-to-day variance shown; spike or</text>
+  <text x="838" y="385" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#d6d3d1">drop detection would require daily</text>
+  <text x="838" y="402" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#d6d3d1">granularity</text>
+  <text x="838" y="419" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#d6d3d1"></text>
+  <text x="838" y="436" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11"  fill="#d6d3d1">Prepared by the Beanline analyst.</text>
+</svg>
