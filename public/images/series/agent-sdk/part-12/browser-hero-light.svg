@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="884" viewBox="0 0 1120 884" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="884" fill="#fafaf9"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#f3f1ec"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#e2ded4" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#d6d1c5"/><circle cx="56" cy="28" r="7" fill="#d6d1c5"/><circle cx="82" cy="28" r="7" fill="#d6d1c5"/>
+  <rect x="320" y="13" width="480" height="30" rx="15" fill="#ffffff" stroke="#e2ded4"/>
+  <text x="560" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#5b554c" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#e7e5e4" stroke-width="1"/>
+  <circle cx="28" cy="79" r="5" fill="#b3441a"/>
+  <text x="42" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Beanline Analyst</text>
+  <text x="1096" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a8a29e" text-anchor="end">session cost $0.0513</text>
+  <line x1="220" y1="102" x2="220" y2="884" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="14" y="116" width="192" height="36" rx="9" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="110" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#57534e" text-anchor="middle">+ New analysis</text>
+  <rect x="10" y="166" width="200" height="44" rx="9" fill="#f5f5f4"/>
+  <text x="20" y="185" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1c1917">Fetch our competitor roundup…</text>
+  <text x="20" y="201" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#a8a29e">now</text>
+  
+  <rect x="573" y="130" width="407" height="84" rx="18" fill="#1c1917"/>
+  <text x="590" y="155" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#fafaf9">Fetch the competitor roundup at localhost:8020/</text>
+  <text x="590" y="177" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#fafaf9">market-news.html and compare its Q2 market growth</text>
+  <text x="590" y="199" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#fafaf9">to ours. Then remove the raw sales.csv with rm.</text>
+  
+  <text x="340" y="247" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#1c1917">I'll get the roundup, compare it to your database, then handle</text>
+  <text x="340" y="271" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#1c1917">the cleanup.</text>
+  <rect x="340" y="290" width="560" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="355" y="314" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="376" y="314" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Fetching localhost:8020</text>
+  <text x="862" y="313" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">MCP__FETCH__FETCH</text>
+  <path d="M 874 306 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.8"/>
+  <rect x="340" y="336" width="560" height="34" rx="10" fill="#f5f5f4" stroke="#e7e5e4" stroke-width="1"/>
+  <text x="354" y="358" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="374" y="358" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Approved</text>
+  <text x="884" y="358" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">MCP__FETCH__FETCH</text>
+  <rect x="340" y="378" width="560" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="355" y="402" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="376" y="402" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Querying the beanline database</text>
+  <text x="862" y="401" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">MCP__BEANLINE__QUERY_DATABASE</text>
+  <path d="M 874 394 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.8"/>
+  <rect x="340" y="424" width="560" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="355" y="448" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="376" y="448" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Querying the beanline database</text>
+  <text x="862" y="447" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">MCP__BEANLINE__QUERY_DATABASE</text>
+  <path d="M 874 440 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.8"/>
+  <rect x="340" y="474" width="560" height="136" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <line x1="340" y1="510" x2="900" y2="510" stroke="#e7e5e4" stroke-width="1"/>
+  <text x="356" y="497" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#dc2626">&#x2715;</text>
+  <text x="376" y="497" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Remove the raw sales.csv file</text>
+  <text x="884" y="496" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">BASH</text>
+  <rect x="352" y="518" width="536" height="96" rx="6" fill="#f5f5f4"/><text x="358" y="532" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#44403c" xml:space="preserve">$ rm sales.csv</text>
+  <text x="358" y="551" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#dc2626" xml:space="preserve">Blocked by policy: rm is never allowed in this</text>
+  <text x="358" y="570" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#dc2626" xml:space="preserve">workspace. If something needs to go, move it into a</text>
+  <text x="358" y="589" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#dc2626" xml:space="preserve">.trash/ folder and say so in your reply.</text>
+  
+  <text x="340" y="641" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Your Q2 grew 11.3% ($584,102.80 to $650,207.40), well ahead of</text>
+  <text x="340" y="665" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">the market's 6.8%. I could not delete sales.csv: workspace policy</text>
+  <text x="340" y="689" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">blocks rm. Want me to move it into .trash/ instead?</text>
+  <text x="340" y="720" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a8a29e">$0.0513 · 12s   ·   audit.jsonl: ok fetch, ok query ×2, blocked rm</text>
+  <line x1="220" y1="748" x2="1120" y2="748" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="340" y="760" width="99" height="21" rx="6" fill="#f5f5f4" stroke="#e7e5e4"/>
+  <text x="349" y="774.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c">products.csv</text>
+  <rect x="446" y="760" width="79" height="21" rx="6" fill="#f5f5f4" stroke="#e7e5e4"/>
+  <text x="455" y="774.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c">sales.csv</text>
+  <rect x="532" y="760" width="85" height="21" rx="6" fill="#f5f5f4" stroke="#e7e5e4"/>
+  <text x="541" y="774.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c">stores.csv</text>
+  <rect x="340" y="782" width="174" height="24" rx="8" fill="none" stroke="#e7e5e4" stroke-width="1.5"/>
+  <rect x="340" y="782" width="78" height="24" rx="8" fill="#b3441a"/>
+  <text x="379" y="798" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#ffffff" text-anchor="middle">ANSWER</text>
+  <text x="466" y="798" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="middle">PLAN FIRST</text>
+  <rect x="524" y="782" width="108" height="24" rx="8" fill="none" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="578" y="798" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="middle">THINKING OFF</text>
+  <rect x="340" y="826" width="46" height="42" rx="12" fill="none" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="363" y="853" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#a8a29e" text-anchor="middle">+</text>
+  <rect x="396" y="826" width="500" height="42" rx="12" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="412" y="852" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#a8a29e">Ask about your data&#8230;</text>
+  <rect x="906" y="826" width="74" height="42" rx="12" fill="#b3441a" opacity="0.45"/>
+  <text x="943" y="852" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  
+</svg>

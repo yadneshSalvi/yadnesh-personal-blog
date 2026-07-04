@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="465" viewBox="0 0 1080 465" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1080" height="465" fill="#1a1816"/>
+  <rect width="1080" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="540" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; what the sandbox does to Bash</text>
+  <g font-size="14" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># The filesystem wall. Three writes, one turn.</tspan></text>
+    <text x="32" y="115" xml:space="preserve">TOOL_USE Bash  echo wall-test &gt; /tmp/probe.txt</text>
+    <text x="32" y="142" xml:space="preserve">TOOL_RESULT is_error=<tspan fill="#e08585">True</tspan>  <tspan fill="#e08585">operation not permitted: /tmp/probe.txt</tspan></text>
+    <text x="32" y="169" xml:space="preserve">TOOL_USE Bash  echo wall-test &gt; $HOME/probe.txt</text>
+    <text x="32" y="196" xml:space="preserve">TOOL_RESULT is_error=<tspan fill="#e08585">True</tspan>  <tspan fill="#e08585">operation not permitted: /Users/…/probe.txt</tspan></text>
+    <text x="32" y="223" xml:space="preserve">TOOL_USE Bash  echo wall-test &gt; inside.txt</text>
+    <text x="32" y="250" xml:space="preserve">TOOL_RESULT is_error=<tspan fill="#8fb573">False</tspan>  <tspan fill="#8fb573">wall-test</tspan>   <tspan fill="#756d62">&lt;- the desk is writable</tspan></text>
+    <text x="32" y="277" xml:space="preserve"></text>
+    <text x="32" y="304" xml:space="preserve"><tspan fill="#756d62"># The network wall. A curl to a host that isn't allow-listed.</tspan></text>
+    <text x="32" y="331" xml:space="preserve">TOOL_USE Bash  curl -sS https://www.wikipedia.org -w '%{http_code}'</text>
+    <text x="32" y="358" xml:space="preserve">GATE  <tspan fill="#e5825a">SandboxNetworkAccess</tspan>  {'host': 'www.wikipedia.org'}  <tspan fill="#756d62">&lt;- a card</tspan></text>
+    <text x="32" y="385" xml:space="preserve">  &#8627; ALLOW  <tspan fill="#8fb573">-&gt; 200</tspan>    the proxy lets the connection through</text>
+    <text x="32" y="412" xml:space="preserve">  &#8627; DENY   <tspan fill="#e08585">-&gt; curl (56) CONNECT tunnel failed, response 403</tspan></text>
+  </g>
+</svg>

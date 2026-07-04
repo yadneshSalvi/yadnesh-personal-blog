@@ -5,7 +5,7 @@ image: "/images/series/agent-sdk/concepts-cover-light.svg"
 imageDark: "/images/series/agent-sdk/concepts-cover-dark.svg"
 imageAlt: "A cover in the series style reading 'Concepts, in plain words', with a large section-sign numeral and the Anthropic, FastAPI, and Next.js logos."
 createdAt: "2026-07-03T00:00:00.000Z"
-updatedAt: "2026-07-25T00:00:00.000Z"
+updatedAt: "2026-08-01T00:00:00.000Z"
 tags: ["claude-agent-sdk", "reference"]
 series: "claude-agent-sdk-fastapi-nextjs"
 kind: "reference"
@@ -134,6 +134,14 @@ One behavior to check on your version: current CLIs launch subagents in the back
 A skill is a markdown playbook the agent loads on demand: a `SKILL.md` file with frontmatter (`name`, plus a one-line `description` that is always visible to the model) and a body that is only read, via the `Skill` tool, when the model decides the job calls for it. That split is the economics: the description costs a line on every turn; the full procedure is billed only on the turns that use it. Knowledge that would otherwise be pasted into every prompt (report formats, style rules, checklists) belongs here.
 
 Project skills live at `<working directory>/.claude/skills/<name>/SKILL.md`. Discovery requires opting into project settings (`setting_sources=["project"]`) and having `Skill` in the toolbox; in a workspace-per-conversation app, the server installs the skill folder on each new desk it creates. Two practical notes from the series' testing: discovery is not motivation (a model can see a skill and never load it; a system-prompt line saying *when* to load it makes usage reliable), and the newer `skills=` option did not surface workspace skills on the pinned version, so the `setting_sources` route is the one this series teaches. Distinct from retrieval: RAG fetches information per query; a skill delivers procedure per task.
+
+## Sandboxing
+
+The `sandbox` option (beta) wraps the `Bash` tool in an operating-system sandbox: macOS Seatbelt or Linux bubblewrap, chosen by where you run. Enabled with `sandbox={"enabled": True, ...}`, it confines the filesystem (writes outside the working directory fail with "operation not permitted", enforced by the kernel, not a prompt) and the network (`network.allowedDomains` is an allow-list of hosts a sandboxed process may reach; empty means none). Unlike a [hook](#hooks), which is a policy you can outsmart with a cleverer spelling, a wall is physics: there is no prompt-shaped way around a kernel denial. This is the containment a hook-based tripwire explicitly cannot give you.
+
+Two behaviors are worth knowing before you ship it. `autoAllowBashIfSandboxed` defaults to *true*, which lets sandboxed Bash skip your [approval callback](#can-use-tool) on the theory that the walls make it safe; a product that wants walls *and* judgment sets it false. And when sandboxed Bash reaches for a host that isn't allow-listed, the SDK raises a `SandboxNetworkAccess` request through `can_use_tool`, carrying `{"host": "..."}`, so a network escape becomes an ordinary approval card with no new client code; deny it and the connection fails inside the tool result as a proxy error (`curl: (56) CONNECT tunnel failed, response 403`), which a model may misread as the host being down.
+
+Two boundaries matter. The sandbox contains the Bash *tool*, not your whole process, and it does not contain external [MCP servers](#mcp), which run outside the wall (the division of labor: walls contain the code the agent runs, approval cards govern the tools it calls). And it is beta and platform-specific, so macOS and Linux don't fail identically; verify on the OS you deploy to. Production agent hosts layer containers or microVMs underneath, so a sandbox escape lands in a throwaway box rather than on the machine. It is a strong rung on the safety ladder (prompt, approvals, hooks, sandbox), not a standalone guarantee.
 
 ## SSE
 

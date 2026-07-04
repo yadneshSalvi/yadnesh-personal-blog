@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="689" viewBox="0 0 1120 689" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="689" fill="#0c0a09"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#211e1a"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#2b2723" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#3a3530"/><circle cx="56" cy="28" r="7" fill="#3a3530"/><circle cx="82" cy="28" r="7" fill="#3a3530"/>
+  <rect x="320" y="13" width="480" height="30" rx="15" fill="#1a1816" stroke="#3a3530"/>
+  <text x="560" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#a49c90" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#292524" stroke-width="1"/>
+  <circle cx="28" cy="79" r="5" fill="#e5825a"/>
+  <text x="42" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">Beanline Analyst</text>
+  <line x1="220" y1="102" x2="220" y2="689" stroke="#292524" stroke-width="1"/>
+  <rect x="14" y="116" width="192" height="36" rx="9" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="110" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">+ New analysis</text>
+  <text x="20" y="186" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#78716c">No conversations yet.</text>
+  
+  <rect x="588" y="130" width="392" height="84" rx="18" fill="#f5f5f4"/>
+  <text x="605" y="155" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#1c1917">Check whether wikipedia.org is reachable:</text>
+  <text x="605" y="177" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#1c1917">curl -sS https://www.wikipedia.org -o /dev/null</text>
+  <text x="605" y="199" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#1c1917">-w '%{http_code}'.</text>
+  
+  <text x="340" y="247" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15"  fill="#e7e5e4">I'll run that curl command for you.</text>
+  <rect x="340" y="266" width="560" height="34" rx="10" fill="#292524" stroke="#292524" stroke-width="1"/>
+  <text x="354" y="288" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#4ade80">&#x2713;</text>
+  <text x="374" y="288" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1">Approved</text>
+  <text x="884" y="288" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="end">BASH</text>
+  <rect x="340" y="310" width="560" height="161" rx="10" fill="#1c1917" stroke="#e5825a" stroke-width="2" stroke-opacity="0.55"/>
+  <line x1="340" y1="346" x2="900" y2="346" stroke="#292524" stroke-width="1"/>
+  <circle cx="358" cy="328" r="4.5" fill="#e5825a"/>
+  <text x="372" y="333" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#e7e5e4">Network access requested</text>
+  <text x="884" y="332" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="end">SANDBOXNETWORKACCESS</text>
+  <rect x="352" y="354" width="536" height="77" rx="6" fill="#292524"/>
+  <text x="358" y="368" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">{</text>
+  <text x="358" y="387" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">  "host": "www.wikipedia.org"</text>
+  <text x="358" y="406" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1" xml:space="preserve">}</text>
+  <rect x="352" y="437" width="88" height="32" rx="9" fill="#e5825a"/>
+  <text x="396" y="458" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Approve</text>
+  <rect x="450" y="437" width="66" height="32" rx="9" fill="none" stroke="#292524" stroke-width="1.5"/>
+  <text x="483" y="458" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#d6d3d1" text-anchor="middle">Deny</text>
+  <text x="368" y="493" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">the sandbox blocks this host by default; the proxy is asking first</text>
+  <circle cx="345" cy="519" r="4.5" fill="#e5825a"/>
+  <text x="358" y="524" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#78716c">Working&#8230; 3s</text>
+  <line x1="220" y1="553" x2="1120" y2="553" stroke="#292524" stroke-width="1"/>
+  <rect x="340" y="565" width="99" height="21" rx="6" fill="#1c1917" stroke="#292524"/>
+  <text x="349" y="579.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a8a29e">products.csv</text>
+  <rect x="446" y="565" width="79" height="21" rx="6" fill="#1c1917" stroke="#292524"/>
+  <text x="455" y="579.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a8a29e">sales.csv</text>
+  <rect x="532" y="565" width="85" height="21" rx="6" fill="#1c1917" stroke="#292524"/>
+  <text x="541" y="579.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a8a29e">stores.csv</text>
+  <rect x="340" y="587" width="174" height="24" rx="8" fill="none" stroke="#292524" stroke-width="1.5"/>
+  <rect x="340" y="587" width="78" height="24" rx="8" fill="#e5825a"/>
+  <text x="379" y="603" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#ffffff" text-anchor="middle">ANSWER</text>
+  <text x="466" y="603" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="middle">PLAN FIRST</text>
+  <rect x="524" y="587" width="108" height="24" rx="8" fill="none" stroke="#292524" stroke-width="1.5"/>
+  <text x="578" y="603" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#78716c" text-anchor="middle">THINKING OFF</text>
+  <rect x="340" y="631" width="46" height="42" rx="12" fill="none" stroke="#292524" stroke-width="1.5"/>
+  <text x="363" y="658" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#78716c" text-anchor="middle">+</text>
+  <rect x="396" y="631" width="500" height="42" rx="12" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="412" y="657" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#78716c">Ask about your data&#8230;</text>
+  <rect x="906" y="631" width="74" height="42" rx="12" fill="none" stroke="#f87171" stroke-width="1.5" stroke-opacity="0.7"/>
+  <text x="943" y="657" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#f87171" text-anchor="middle">Stop</text>
+  
+</svg>
