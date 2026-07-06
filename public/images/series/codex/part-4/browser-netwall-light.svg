@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="940" viewBox="0 0 1280 940" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1280" height="940" fill="#fafaf9"/>
+  <rect x="0" y="0" width="1280" height="56" fill="#f3f1ec"/>
+  <line x1="0" y1="56" x2="1280" y2="56" stroke="#e2ded4" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#d6d1c5"/><circle cx="56" cy="28" r="7" fill="#d6d1c5"/><circle cx="82" cy="28" r="7" fill="#d6d1c5"/>
+  <rect x="400" y="13" width="480" height="30" rx="15" fill="#ffffff" stroke="#e2ded4"/>
+  <text x="640" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#5b554c" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="108" x2="1280" y2="108" stroke="#e7e5e4" stroke-width="1"/>
+  <circle cx="28" cy="82" r="5" fill="#0f6c6c"/>
+  <text x="42" y="87" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Pagewright</text>
+  <text x="150" y="86.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a8a29e">the site builder</text>
+  <rect x="832" y="67" width="130" height="30" rx="8" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="844" y="86.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#57534e">Beanline</text>
+  <path d="M 942 79 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.6"/>
+  <rect x="972" y="67" width="168" height="30" rx="8" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="984" y="86.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#57534e">blank workspace</text>
+  <path d="M 1120 79 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.6"/>
+  <rect x="1152" y="67" width="104" height="30" rx="8" fill="#0f6c6c"/>
+  <text x="1204" y="86.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#ffffff" text-anchor="middle">New project</text>
+  
+  <rect x="70" y="134" width="460" height="76" rx="16" fill="#1c1917"/>
+  <text x="86" y="158" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#fafaf9">The Google Fonts link is a remote dependency. Download the</text>
+  <text x="86" y="178" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#fafaf9">Playfair Display woff2 files with curl into fonts/ and self-host</text>
+  <text x="86" y="198" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#fafaf9">them.</text>
+  <circle cx="34" cy="235" r="2.8" fill="#e7e5e4"/>
+  <text x="45" y="239" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.5" fill="#a8a29e">THINKING</text>
+  <path d="M 120 232.5 l 4 4.5 l 4 -4.5" fill="none" stroke="#a8a29e" stroke-width="1.5"/>
+  
+  <text x="30" y="269" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">I have the font usage in hand. I'm fetching Google Fonts' CSS now</text>
+  <text x="30" y="290" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">so I can download the exact woff2 files that match the weights this</text>
+  <text x="30" y="311" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">page uses.</text>
+  <rect x="30" y="331" width="500" height="108" rx="9" fill="#ffffff" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="43" y="352.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#dc2626">&#x2715;</text>
+  <text x="62" y="352.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Creating folder css2?family=Playfair+Display:wght@400;5…</text>
+  <text x="434" y="352" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#dc2626" text-anchor="end">exit 6</text>
+  <text x="496" y="352" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">COMMAND</text>
+  <path d="M 506 345 l 4.5 5.5 l 4.5 -5.5" fill="none" stroke="#a8a29e" stroke-width="1.7"/>
+  <line x1="30" y1="365" x2="530" y2="365" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="40" y="375" width="480" height="54" rx="7" fill="#f5f5f4"/>
+  <text x="52" y="393" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#44403c" xml:space="preserve">mkdir -p fonts &amp;&amp; curl -L 'https://fonts.googleapis.com/</text>
+  <text x="52" y="411" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#44403c" xml:space="preserve">css2?family=Playfair+Display:wght@400;500;600;700&amp;display=swap'</text>
+  
+  <text x="30" y="468" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">The direct curl fetch is blocked by DNS here, so I'm checking</text>
+  <text x="30" y="489" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">whether the font already exists on disk in a local cache or system</text>
+  <text x="30" y="510" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">font directory.</text>
+  <rect x="30" y="526" width="500" height="34" rx="9" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="43" y="547.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#15803d">&#x2713;</text>
+  <text x="62" y="547.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Listing files</text>
+  
+  <text x="496" y="547" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">COMMAND</text>
+  <path d="M 506 540 l 4.5 5.5 l 4.5 -5.5" fill="none" stroke="#a8a29e" stroke-width="1.7"/>
+  
+  <rect x="30" y="568" width="500" height="34" rx="9" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="43" y="589.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#15803d">&#x2713;</text>
+  <text x="62" y="589.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Running: fc-match "Playfair Display" -f "%{file}\n"</text>
+  
+  <text x="496" y="589" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">COMMAND</text>
+  <path d="M 506 582 l 4.5 5.5 l 4.5 -5.5" fill="none" stroke="#a8a29e" stroke-width="1.7"/>
+  
+  <rect x="30" y="610" width="500" height="34" rx="9" fill="#ffffff" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="43" y="631.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#dc2626">&#x2715;</text>
+  <text x="62" y="631.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Running: fc-list | rg -i 'Playfair'</text>
+  <text x="434" y="631" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#dc2626" text-anchor="end">exit 1</text>
+  <text x="496" y="631" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">COMMAND</text>
+  <path d="M 506 624 l 4.5 5.5 l 4.5 -5.5" fill="none" stroke="#a8a29e" stroke-width="1.7"/>
+  
+  
+  <text x="30" y="673" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">Blocked by the sandbox: curl to fonts.googleapis.com failed with</text>
+  <text x="30" y="694" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">DNS resolution, and I couldn't find any Playfair Display font</text>
+  <text x="30" y="715" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">binaries already cached locally to copy into fonts/. I did not</text>
+  <text x="30" y="736" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">fabricate font files. The fastest ways to finish this cleanly:</text>
+  
+  <circle cx="37" cy="762" r="2.2" fill="#1c1917"/>
+  <text x="49" y="766.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">Enable network access for this workspace and I'll download them.</text>
+  <circle cx="37" cy="784" r="2.2" fill="#1c1917"/>
+  <text x="49" y="788.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">Drop the woff2 files into fonts/ and I'll wire the @font-face rules.</text>
+  <circle cx="37" cy="806" r="2.2" fill="#1c1917"/>
+  <text x="49" y="810.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">I can point the HTML at fonts/ now; the binaries come later.</text>
+  <text x="30" y="843" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">1,513,687 tokens · 277s</text>
+  <line x1="0" y1="876" x2="560" y2="876" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="30" y="890" width="424" height="36" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="44" y="913" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#a8a29e">Describe the site you want&#8230;</text>
+  <rect x="464" y="890" width="66" height="36" rx="10" fill="#0f6c6c" opacity="0.45"/>
+  <text x="497" y="913" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  <line x1="560" y1="108" x2="560" y2="940" stroke="#e7e5e4" stroke-width="1.5"/>
+  
+  <rect x="560" y="148" width="720" height="584" fill="#f5f5f4"/>
+  <rect x="576" y="162" width="688" height="556" rx="14" fill="#faf6f0"/>
+  <circle cx="616" cy="200" r="13" fill="none" stroke="#b3441a" stroke-width="2.5"/>
+  <path d="M 616 189 C 610 195, 622 205, 616 211" fill="none" stroke="#b3441a" stroke-width="2"/>
+  <text x="638" y="206" font-family="Georgia, 'Times New Roman', serif" font-size="19" font-weight="700" fill="#2b2b2b">Beanline</text>
+  <text x="604" y="254" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" letter-spacing="3" fill="rgba(43,43,43,0.72)">SPECIALTY COFFEE, SIX STORES, ESTABLISHED 2019</text>
+  <text x="604" y="300" font-family="Georgia, 'Times New Roman', serif" font-size="40" fill="#2b2b2b">Slow coffee</text>
+  <text x="604" y="346" font-family="Georgia, 'Times New Roman', serif" font-size="40" fill="#2b2b2b">for fast mornings</text>
+  <text x="604" y="382" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="rgba(43,43,43,0.72)">Beanline makes coffee, taken seriously. Warm service, careful brewing,</text>
+  <text x="604" y="402" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="rgba(43,43,43,0.72)">and a counter built for people who want the day to start with attention.</text>
+  <rect x="604" y="424" width="132" height="38" rx="19" fill="#b3441a"/>
+  <text x="670" y="448" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Find your store</text>
+  <line x1="560" y1="732" x2="1280" y2="732" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="560" y="732" width="720" height="208" fill="#fafaf9"/>
+  <line x1="560" y1="732" x2="1280" y2="732" stroke="#e7e5e4" stroke-width="1"/>
+  <text x="580" y="756" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#a8a29e">FILES</text>
+  <text x="1260" y="756" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a8a29e" text-anchor="end">5</text>
+  <text x="580" y="778" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">brief/</text>
+  <text x="594" y="798" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">assets/</text>
+  <text x="608" y="818" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">copy.md</text>
+  <text x="1260" y="818" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#a8a29e" text-anchor="end">619 B</text>
+  <text x="608" y="838" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">logo.svg</text>
+  <text x="1260" y="838" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#a8a29e" text-anchor="end">417 B</text>
+  <text x="594" y="858" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">brief.md</text>
+  <text x="1260" y="858" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#a8a29e" text-anchor="end">1004 B</text>
+  <text x="580" y="878" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1c1917">index.html</text>
+  <text x="1260" y="878" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#a8a29e" text-anchor="end">11.1 kB</text>
+  <text x="580" y="898" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1c1917">logo.svg</text>
+  <text x="1260" y="898" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#a8a29e" text-anchor="end">417 B</text>
+  <line x1="560" y1="148" x2="1280" y2="148" stroke="#e7e5e4" stroke-width="1"/>
+  <text x="580" y="132.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">/preview/26b630f1/</text>
+  <rect x="1132" y="116" width="62" height="24" rx="7" fill="none" stroke="#e7e5e4" stroke-width="1.4"/>
+  
+  <text x="1144" y="132" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#57534e">Reload</text>
+  <rect x="1204" y="116" width="52" height="24" rx="7" fill="none" stroke="#e7e5e4" stroke-width="1.4"/>
+  
+  <text x="1216" y="132" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#57534e">Diff</text>
+</svg>

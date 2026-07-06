@@ -1,0 +1,465 @@
+---
+title: "Codex App Server in Production, Part 4: Workspaces, the Live Preview, and the Diff Drawer"
+subtitle: "Every client gets its own desk, the site assembles itself behind glass as patches land, and the turn's changes become before/after photos in a slide-over drawer. The screenshot this series was sold on."
+image: "/images/series/codex/part-4/cover-light.svg"
+imageDark: "/images/series/codex/part-4/cover-dark.svg"
+createdAt: "2026-07-07T00:00:00.000Z"
+updatedAt: "2026-07-07T00:00:00.000Z"
+tags: ["codex", "openai", "fastapi", "nextjs", "tutorial"]
+series: "codex-app-server-fastapi-nextjs"
+seriesPart: 4
+---
+
+Fifty-one seconds. That's what sits between typing "Read brief/brief.md and build the site it describes" into the chat and the receipt line under the agent's answer: 110,990 tokens. In between, the right half of the screen did something no part of this series has done yet. It flickered. "Nothing to preview yet" became a cream-colored coffee site with a rust call-to-action button, mid-turn, while the agent was still talking, because the file it had been writing landed on disk and the iframe watching that folder reloaded itself. Then one click on a button labeled **Diff**, and a drawer slid over the preview holding the entire turn's work as a unified diff: 413 added lines, green from top to bottom.
+
+This is the part the series was pitched on. Everything Codex-shaped that makes this engine different, `fileChange` items, `turn/diff/updated`, an agent whose work product is *files*, stops being terminal output today and becomes the product: a per-project workspace, a live preview, a file tree with change badges, and a diff drawer.
+
+<Figure
+  src="/images/series/codex/part-4/browser-hero-light.svg"
+  srcDark="/images/series/codex/part-4/browser-hero-dark.svg"
+  alt="Pagewright at the end of a real build, in three panes. Left, the chat: thinking toggles, a FILES badge reading Creating index.html, Creating logo.svg, two green command badges for a sed readback and git status, prose describing the built one-page Beanline site, and a receipt of 110,990 tokens in 51 seconds. Center, the live preview of the Beanline site: a coffee-bean logo, a kicker reading SPECIALTY COFFEE, SIX STORES, ESTABLISHED 2019, the serif headline Slow coffee for fast mornings, and a rust Find your store button, partially covered by the drawer. Bottom, a file tree listing the seeded brief files dimmed plus index.html and logo.svg. Right, the open diff drawer titled THIS TURN'S DIFF showing diff dash dash git a/index.html b/index.html, new file mode, the hunk header at 0,0 plus 1,413, and a column of green added lines defining the site's CSS variables."
+  caption="The end of this part, drawn from a real 51-second run. Chat on the left, the live preview and file tree on the right, the turn's diff one click away. Every number, badge, and diff line is from the real build."
+  width={1280}
+  height={920}
+/>
+
+The chat column is [Part 3](/blog/codex-3-builder-ui) unchanged, and that's the point: this part barely touches what exists. The backend grows one small module and three event types; the envelope's existing rows stay byte-identical; Part 2's `curl` keeps working against today's backend without knowing anything changed. What's new is a place for the agent to work (a workspace per project), a window into that place (the preview), and a receipt for what it did there (the drawer). One desk, one pane of glass, one stack of before/after photos.
+
+If you're jumping in here: [Part 2](/blog/codex-2-fastapi-bridge) built the `CodexClient` and the SSE envelope, [Part 3](/blog/codex-3-builder-ui) built the chat UI these screenshots are wearing, and the sibling series taught the same isolation lesson with uploads and artifacts in [Agent SDK Part 4](/blog/agent-sdk-4-workspaces-artifacts). The rhyme is deliberate, but the punchline differs: over there, the workspace held things the agent *made along the way*. Here, the workspace **is** the product. The client isn't buying the chat; they're buying the folder.
+
+## One desk per client
+
+Until now, every thread has worked in one shared `site/` folder. That was fine when Pagewright had one conversation and one site, and it stops being fine the moment a second client walks in. Ask the agent to build a wine bar on the same desk where it built a coffee chain and you get a wine bar with espresso stains: leftover files, a half-overwritten `index.html`, two brands in one stylesheet. Agents don't clean desks. You give them clean desks.
+
+So Part 4's first move is boring and load-bearing: a project is a folder, `projects/{id}/site/`, plus one entry in a flat `projects.json` registry. No database. The registry holds an id, a name, and a timestamp, and it earns its place the moment you restart the backend and every project is still there:
+
+```python filename="backend/app/projects.py" repo="part-04-live-preview/backend/app/projects.py" lines="43-49,52-61"
+def create_project(name: str | None = None, brief: str | None = None) -> dict:
+    if brief and brief not in available_briefs():
+        raise ValueError(f"unknown brief: {brief!r}")
+    project_id = uuid.uuid4().hex[:8]
+    site = site_dir(project_id)
+    site.mkdir(parents=True)
+    if brief:
+        shutil.copytree(BRIEFS / brief, site / "brief")
+    entry = {
+        "id": project_id,
+        "name": name or (brief.replace("-", " ").title() if brief else "Untitled site"),
+        "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }
+    entries = load_registry()
+    entries.append(entry)
+    save_registry(entries)
+    return entry
+```
+
+(Ignore the `brief` parameter for one section; it's the star of the next one.) The endpoint wrapping this is four lines of FastAPI, and `GET /projects` returns the registry so the frontend's project switcher never invents state. The interesting change is where the thread points. When a message arrives for a project, the turn runs with that project's folder as its working directory:
+
+```python filename="backend/app/main.py" repo="part-04-live-preview/backend/app/main.py" lines="88-96"
+async def run_turn(project_id: str, message: str):
+    workspace = projects.site_dir(project_id).resolve()
+    thread = await client.request("thread/start", {
+        "cwd": str(workspace),
+        "sandbox": "workspace-write",
+        "approvalPolicy": "never",
+        "model": MODEL,
+    })
+    thread_id = thread["thread"]["id"]
+```
+
+`cwd` has been in every `thread/start` since [Part 1](/blog/codex-1-first-thread), quietly pointing at one shared folder. Now it's the router. The agent's relative paths, its `index.html` and `ls` and `cp`, all resolve inside the right client's desk, and the [workspace-write sandbox](/blog/codex-concepts#sandbox-policies) draws its walls around that same folder: this project's files are writable, the neighbor project's files are not even part of the conversation. Isolation here isn't a policy you wrote; it's a working directory plus a kernel that means it. And `session_start` now carries `project_id` alongside `session_id`, so the frontend knows which desk a stream belongs to.
+
+Checkpoint: you have projects that survive restarts, each with an empty desk. Time to put the client's paperwork on it.
+
+## The brief bank
+
+Testing a website builder with "build me a site, you know, something nice" produces exactly the sites you'd expect. Real builds start from a *brief*: what the client does, which sections they want, brand colors, the logo file, the copy. So the companion repo ships a `briefs/` folder at its root, a small bank of fictional clients, each one a `brief.md` plus an `assets/` folder with a logo and a copy deck. The first client:
+
+```markdown filename="briefs/beanline/brief.md" repo="briefs/beanline/brief.md" lines="1-15"
+# Client brief: Beanline
+
+**Client:** Beanline, a specialty coffee chain (six stores, established 2019).
+
+**What we want:** a one-page marketing site. Warm, editorial, unhurried. We sell
+attention to detail, not caffeine.
+
+**Sections:**
+
+1. Hero: the name, the line "Slow coffee for fast mornings", and one clear
+   call-to-action button ("Find your store").
+2. Menu highlights: our four signature drinks (see `assets/copy.md` for names,
+   descriptions, and prices).
+3. Our stores: six locations, listed with neighborhood names (also in the copy
+   file). No map needed.
+```
+
+Yes, that Beanline. Readers of the sibling series spent thirteen parts watching an analyst answer questions about a coffee chain's sales data; the chain finally commissioned a website. The bank has two more clients, Paper Crane (a letterpress studio) and Harbor &amp; Vine (a dockside wine bar), and every brief ends with the same hard rules: single `index.html`, inline CSS, **no external resources of any kind**. That last rule sounds fussy. Hold it in mind; the break-it section is going to lean on it hard.
+
+The `shutil.copytree` you skipped past in `create_project` is the whole seeding mechanism: pick a brief at project creation and it's copied into the workspace under `brief/`, assets and all. No prompt engineering, no special "context injection" API. The brief is *files on the desk*, and the agent reads it the way it reads anything else, because reading files is the one thing this engine never needs to be taught. The prompt that opened this part, "Read brief/brief.md and build the site it describes", is nine words because the other nine hundred are sitting in the folder.
+
+<Callout type="info" title="Where uploads would slot in">
+A production builder would let clients upload their own logo and copy. That's multipart plumbing, MIME sniffing, size caps, and filename hygiene, and it's exactly the chapter the sibling series already wrote: [Agent SDK Part 4](/blog/agent-sdk-4-workspaces-artifacts) builds the upload endpoints from zero, burglary test included. Pagewright pre-seeds briefs instead to keep this part about the preview and the diff. If you want uploads, that post is the recipe and this `site/` folder is where the files land.
+</Callout>
+
+## Serving the site through the glass
+
+The agent can now build a site on the right desk, and you still can't see it without opening Finder. Two pieces fix that: the backend serves each workspace over HTTP, and the frontend embeds it in an iframe. Both pieces are small; both have one decision worth slowing down for.
+
+Serving first. FastAPI ships `StaticFiles` for exactly this, and each project gets a mount:
+
+```python filename="backend/app/main.py" repo="part-04-live-preview/backend/app/main.py" lines="27-29,32-41"
+def mount_preview(app: FastAPI, project_id: str) -> None:
+    # One StaticFiles mount per project; html=True makes / serve
+    # index.html. Sandboxing the untrusted HTML is the iframe's job
+    app.mount(f"/preview/{project_id}",
+              StaticFiles(directory=projects.site_dir(project_id), html=True))
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    for entry in projects.load_registry():
+        mount_preview(app, entry["id"])
+    await client.start()
+    yield
+```
+
+Existing projects mount at startup, new projects mount in the `POST /projects` handler, and `html=True` makes `/preview/{id}/` serve `index.html` the way a real web host would. No copy step, no build step: the URL serves the folder the agent writes into, which is why the preview can be *live* rather than published.
+
+Now the iframe, and the decision that matters. The HTML in that folder was written by a language model following a client brief. You didn't review it. It can contain any `<script>` tag the model felt like writing, and you're about to render it inside your own app's origin. Treat it like what it is, untrusted code, and let the browser say so:
+
+```tsx filename="frontend/components/PreviewPane.tsx" repo="part-04-live-preview/frontend/components/PreviewPane.tsx" lines="34-42"
+  return (
+    <iframe
+      key={`${projectId}:${version}`}
+      src={`${API_BASE}/preview/${projectId}/?v=${version}`}
+      sandbox="allow-scripts"
+      title="Site preview"
+      className="h-full w-full border-0 bg-white"
+    />
+  );
+```
+
+<Callout type="warning" title="sandbox='allow-scripts', and deliberately not allow-same-origin">
+The iframe `sandbox` attribute strips the embedded page of its powers, and each token grants one back. `allow-scripts` lets the generated site run its own JavaScript, which a site legitimately needs. What we never grant is `allow-same-origin`: without it the browser puts the page in a null origin, so its scripts can't read our cookies or storage, can't reach into the parent DOM, and can't impersonate the app that embeds it. Grant both tokens together on same-origin content and the sandbox largely cancels itself out, which is the classic mistake this callout exists to prevent. The generated site keeps its interactivity; your app keeps its identity.
+</Callout>
+
+The engine that builds the sites is contained by an OS sandbox ([Part 1's](/blog/codex-1-first-thread) scissors, pre-sheathed). The sites it builds are contained by the browser's. Two sandboxes, two different threat models, same philosophy: containment beats trust.
+
+<Callout type="info" title="Why Pagewright builds static sites only">
+Plain HTML, CSS, and vanilla JavaScript, no framework, no npm, no build step. Three reasons, in priority order. Instant preview: the file the agent writes is the file the iframe loads, with zero seconds of compilation between them. Sandbox-friendly: `npm install` wants the network, and the workspace-write sandbox has none (foreshadowing). Deterministic: when Part 11 starts grading builds with an eval harness, "does index.html exist and do its links resolve" is checkable without running anybody's toolchain. A production builder would eventually add a build step and pay all three costs knowingly; a *teaching* product declines, and says so.
+</Callout>
+
+## file_change: the tree learns to watch
+
+The plumbing exists; now the UI needs to know *when* to look. Codex tells you. Every patch the agent applies arrives on the wire as a `fileChange` item, and you've been watching them since Part 1's stream anatomy: a started/completed lifecycle carrying a list of `{path, kind}` changes, where `kind` is add, update, or delete. Part 3 rendered these as a one-line FILES chip and moved on. Today they grow up.
+
+One wrinkle first. The protocol reports each changed path as an **absolute path**, `/Users/you/.../projects/26b630f1/site/index.html`, which is true, useless, and mildly embarrassing to show a user. The frontend thinks in desks, not filesystems, so the backend translates before the wire, adding a dedicated event to the envelope:
+
+```python filename="backend/app/events.py" repo="part-04-live-preview/backend/app/events.py" lines="33-46"
+def file_change_event(item: dict, status: str, workspace: Path) -> dict:
+    """The dedicated file_change event: workspace-relative paths, one
+    edge per item lifecycle. item_start/item_done still flow for the
+    generic badges; this is what the file tree and preview consume."""
+    files = []
+    for change in item.get("changes", []):
+        path = change.get("path", "")
+        try:
+            path = Path(path).relative_to(workspace).as_posix()
+        except ValueError:
+            pass  # outside the workspace: keep it absolute and visible
+        files.append({"path": path, "kind": change.get("kind", {}).get("type", "")})
+    return {"type": "file_change", "item_id": item.get("id", ""),
+            "files": files, "status": status}
+```
+
+The `except ValueError` branch is a tiny piece of honesty insurance: a path outside the workspace *should* be impossible under this sandbox, and if the impossible happens you want it absolute, ugly, and visible in the UI, not silently relativized into innocence.
+
+On the frontend, a `FilesPane` under the preview lists the workspace from `GET /projects/{id}/files` and refreshes whenever a `file_change` lands. Each path the turn touched wears a badge, added, updated, or deleted, colored the way every diff tool since the beginning of time has colored them; deleted files linger as struck-through ghosts so the deletion itself stays visible; the seeded `brief/` files render dimmed, the client's paperwork rather than the agent's work. The details are `map` and `flexbox` (the [part folder](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-04-live-preview) has all of it); the concept fits in a sentence: the tree is a *view* over the desk, and `file_change` is its doorbell.
+
+<Figure
+  src="/images/series/codex/part-4/browser-files-light.svg"
+  srcDark="/images/series/codex/part-4/browser-files-dark.svg"
+  alt="Pagewright after the Beanline build with the diff drawer closed. The chat shows the build prompt bubble, a Listing files badge, two sed readback badges for the brief and copy deck, the agent's plan, and the FILES badge. The right pane shows the full Beanline preview with logo, kicker, serif headline Slow coffee for fast mornings, body copy, and a rust Find your store button. Below it the file tree lists brief slash assets with copy.md at 619 bytes and logo.svg at 417 bytes dimmed, brief.md at 1004 bytes dimmed, then index.html at 9.1 kilobytes and logo.svg at 417 bytes, each wearing a green added badge."
+  caption="The desk, fully visible. Seeded brief files render dimmed with real sizes; the two files the agent created wear their added badges. The Diff button's dot is lit and waiting."
+  width={1280}
+  height={880}
+/>
+
+Now the honest note, and it's a spike discovery you should tattoo somewhere: **agents change files without telling you.** A `fileChange` item is emitted when the agent goes through its patch tooling. But watch the real Beanline trace and you'll find this, mid-turn:
+
+```text
+/bin/zsh -lc 'cp brief/assets/logo.svg ./logo.svg && ls -1'
+```
+
+A plain shell command that copies a file into the workspace. It arrives as a `commandExecution` item, so there is no `fileChange`, no `file_change` parcel, no doorbell. Any UI that trusts `file_change` alone will show a tree missing a file that provably exists. The fix is cheap and unglamorous, a catch-all sweep when the turn ends:
+
+```tsx filename="frontend/app/page.tsx" repo="part-04-live-preview/frontend/app/page.tsx" lines="215-221"
+          setWorking(false); // the receipt is in; don't keep offering Stop
+          setStartedAt(null);
+          gotReceipt = true;
+          // Commands (cp, rm) change the workspace without fileChange
+          // items; one refresh at the end catches whatever they did.
+          loadFiles(activeId);
+          setPreviewVersion((v) => v + 1);
+```
+
+Events for immediacy, a sweep for truth. You'll meet this pattern again in every agent UI you ever build: the stream tells you *what the agent said it did*, and the filesystem is the only witness to *what actually happened*.
+
+## preview_refresh: the site assembles itself
+
+You know this dance. Editor on the left, browser on the right, save, alt-tab, refresh, squint, alt-tab back. Every web developer's left hand learned cmd-R before it learned chords. The entire hot-reload industry exists because that dance is misery, and Pagewright's users shouldn't need to know it ever existed. When the agent writes a file, the preview should react. No Reload button faith required.
+
+The backend already knows the moment: a `fileChange` item completing *is* "the patch is on disk". So right where the translator forwards that item, the stream grows a nudge:
+
+```python filename="backend/app/main.py" repo="part-04-live-preview/backend/app/main.py" lines="126-131"
+            if event["type"] in ("item_start", "item_done") and event["kind"] == "fileChange":
+                item = note["params"].get("item", {})
+                status = "started" if event["type"] == "item_start" else "done"
+                yield sse(file_change_event(item, status, workspace))
+                if status == "done":
+                    yield sse({"type": "preview_refresh", "project_id": project_id})
+```
+
+And the frontend's entire handling of it is one line, `setPreviewVersion((v) => v + 1)`, because of two attributes you already saw on the iframe. The `?v=${version}` query defeats the browser's cache (same URL twice might serve stale bytes; `?v=3` is a different URL from `?v=2`), and `key={projectId + version}` makes React replace the iframe node outright, the bluntest and most reliable reload there is. The counter bumps, the iframe remounts, the site is current. Cache-busting by counting: primitive, bulletproof.
+
+Run the Beanline build with this wired and you get the moment this part is named for. The chat is narrating, badges are settling, and around the two-thirds mark the gray "Nothing to preview yet" pane blinks into a finished coffee-shop hero, logo and headline and menu, while the agent is still typing its summary. Type a sentence, watch a website assemble itself behind glass. It lands every time, on developers and non-developers alike, and it costs one envelope event and an integer.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 2 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels side by side separated by thin vertical black dividers, about an AI builder assembling a scale-model coffee-shop storefront behind a glass wall while the human watches it happen live. A friendly little robot builder in a hard hat works behind a large glass wall; in the glass there is a small service hatch at counter height. Panel 1: Yad leans to the hatch and speaks into it, speech bubble: "A COZY COFFEE SHOP, PLEASE."; behind the glass the robot stands beside an empty miniature building lot on a workbench. Panel 2: no dialogue; behind the glass the miniature storefront is half-built and visibly assembling, tiny walls rising, the robot lowering a small sign that reads "BEANLINE" onto the model with a tiny crane; Yad presses his face and both hands against the glass, delighted, coffee mug forgotten on the floor. Panel 3: the robot slides two photographs through the hatch toward Yad, one labeled "BEFORE" showing the empty lot and one labeled "AFTER" showing the finished storefront, both clipped to a folder stamped "DIFF"; Yad holds them up happily and says in a speech bubble: "FRAME THEM." Clean readable hand-lettered speech bubbles and labels, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/codex/part-4/comic-diff-photos.png"
+  alt="Comic in three panels. Panel one: Yad, a bearded developer with headphones, leans into a service hatch in a glass wall and asks A COZY COFFEE SHOP, PLEASE while a small robot builder in a hard hat stands beside an empty miniature building lot; a sign behind reads AI BUILDER AT WORK. Panel two: behind the glass the miniature Beanline storefront is half built, a tiny crane lowering its sign, while Yad presses his face and hands to the glass in delight. Panel three: the robot slides two photographs through the hatch, one labeled BEFORE showing the empty lot and one labeled AFTER showing the finished storefront, clipped to a folder stamped DIFF, and Yad says FRAME THEM."
+  caption="The whole part in three panels: describe through the hatch, watch it assemble behind the glass, and get the before/after photos on the way out."
+  width={1536}
+  height={1024}
+/>
+
+## The diff drawer: before and after photos of the job site
+
+The file tree tells you *which* files changed. A user deciding whether to trust a build wants the next question: changed *how*? Codex answers with a notification this series has been saving since Part 1 left it unwrapped: `turn/diff/updated`.
+
+Its semantics are worth stating precisely, because they make the client trivial. After each file change, the engine emits the turn's **aggregate** diff, git-style, **cumulative from the start of the turn, re-sent in full every time**. Not increments you must splice together. The whole picture, again and again: in the real Beanline trace it fired five times, each a complete 12,056-character diff. So the frontend stores exactly one string, replaces it on every `diff_updated`, and re-renders. No merging, no bookkeeping, no drift.
+
+The backend's translation is two lines plus a spike-earned honesty comment (the schema names the field `diff`; we accept a camelCase spelling defensively, the same both-spellings paranoia the output-delta field taught us in Part 3). But the paths need work, and this one cost a real debugging session. The first time I opened the drawer, every file header read like this:
+
+```text
+diff --git a/part-04-live-preview/backend/projects/26b630f1/site/index.html
+         b/part-04-live-preview/backend/projects/26b630f1/site/index.html
+```
+
+The engine names files **relative to the enclosing git repository**, not to the workspace. It found the companion repo's `.git` several directories up and helpfully described the change from there, leaking my machine's folder layout into what should read as the client's site. Not wrong, git-correct even, but the wire's contract since `file_change` is *workspace-relative paths*, and one contract means one mental model. So the backend strips the prefix before the envelope:
+
+```python filename="backend/app/events.py" repo="part-04-live-preview/backend/app/events.py" lines="49,54-58"
+def relativize_diff(diff: str, workspace: Path) -> str:
+    for parent in (workspace, *workspace.parents):
+        if (parent / ".git").exists():
+            prefix = workspace.relative_to(parent).as_posix() + "/"
+            return diff.replace("a/" + prefix, "a/").replace("b/" + prefix, "b/")
+    return diff
+```
+
+It walks up from the workspace looking for `.git` exactly the way git does, and if there's no repo above (a reader running from a bare folder), the diff was already clean and passes through untouched. After the fix, the drawer reads `a/index.html`, which is what the user's mental model deserves.
+
+Rendering a unified diff sounds like a job for a dependency, and for once the honest answer is: it isn't. A unified diff is lines with a one-character prefix. The entire renderer is a classifier that maps each line to a style, and it fits in a screen:
+
+```tsx filename="frontend/components/DiffDrawer.tsx" repo="part-04-live-preview/frontend/components/DiffDrawer.tsx" lines="8-19"
+function lineClass(line: string): string {
+  if (line.startsWith("diff --git"))
+    return "mt-3 border-y border-stone-200 bg-stone-100 py-1 font-semibold text-stone-700 first:mt-0 dark:border-stone-800 dark:bg-stone-800/80 dark:text-stone-200";
+  if (/^(--- |\+\+\+ |index |new file|deleted file|similarity |rename )/.test(line))
+    return "text-stone-400 dark:text-stone-500";
+  if (line.startsWith("@@")) return "bg-accent/10 py-0.5 text-accent";
+  if (line.startsWith("+"))
+    return "bg-green-50 text-green-800 dark:bg-green-950/40 dark:text-green-300";
+  if (line.startsWith("-"))
+    return "bg-red-50 text-red-800 dark:bg-red-950/40 dark:text-red-300";
+  return "text-stone-600 dark:text-stone-400";
+}
+```
+
+File headers become section dividers, hunk markers get the accent tint, `+` and `-` get their eternal green and red, metadata fades back. The drawer itself slides over the preview from the right, a `translate-x` transition and a close button; the Diff button in the toolbar grows a small accent dot when a diff exists, the quietest possible "there's something to see here". Sixty lines, zero dependencies, and in Part 7 this exact renderer gets reused inside approval cards, where "inspect the patch before it's applied" becomes a safety feature instead of a viewing pleasure. Before/after photos of the job site, slid across the counter.
+
+One quiet asymmetry to file away: that `cp` command from the file-tree section doesn't appear in the drawer either. The aggregate diff tracks the agent's patch tooling, same as `fileChange` items, so the catch-all sweep is the tree's safety net while the drawer stays scoped to *the turn's authored changes*. Two views, two honest scopes.
+
+Here's the full Part 4 wire story in one trace, from the real 44-second curl run:
+
+<Figure
+  src="/images/series/codex/part-4/term-diff-stream.svg"
+  alt="Terminal capture of curl streaming the Part 4 events for a real Beanline build. session_start now carries project_id 26b630f1. After commands read the brief, an item_start opens a fileChange item, a file_change parcel lists index.html with kind add and status started, another closes it with status done, preview_refresh follows with a comment that the iframe reloads here, and diff_updated carries the unified diff, noted as 12,056 characters re-sent in full five times this turn. A comment marks the logo landing by shell as a commandExecution item with cp brief/assets/logo.svg, with no file_change parcel. The final complete event shows duration 44055 milliseconds and 115,757 total tokens."
+  caption="The three new parcels riding Part 2's belt, from the real 976-parcel Beanline run. Note what is missing: the cp command changes the desk with no file_change parcel, which is why the catch-all sweep exists."
+  width={1040}
+  height={704}
+/>
+
+And the same story as a map, protocol to envelope to pixels:
+
+<Figure
+  src="/images/series/codex/part-4/fig-event-flow-light.svg"
+  srcDark="/images/series/codex/part-4/fig-event-flow-dark.svg"
+  alt="Three-lane diagram mapping protocol notifications through envelope events to UI behavior, with real payloads. Lane one: item started and completed notifications for a fileChange item with absolute paths become file_change events with workspace-relative paths plus a preview_refresh, driving file tree badges and an iframe reload with an incremented cache-buster. Lane two: turn diff updated, the turn's aggregate unified diff with git-repo-relative paths, becomes diff_updated with the prefix stripped, re-rendering the diff drawer and lighting the Diff button's dot. Lane three: turn completed becomes the complete event with usage, and because shell side effects like cp emit no fileChange item, the UI runs a catch-all sweep refreshing the tree and bumping the cache-buster once. A footer notes the vocabulary grows by three event types and changes nothing that exists."
+  caption="Three signals, three features. The envelope grows by three types and no existing consumer changes: Part 2's curl and Part 3's badges both keep working against today's backend."
+  width={1240}
+  height={780}
+/>
+
+That's the whole architecture of this part. One figure back, notice the shape of the workspace itself:
+
+<Figure
+  src="/images/series/codex/part-4/fig-workspace-anatomy-light.svg"
+  srcDark="/images/series/codex/part-4/fig-workspace-anatomy-dark.svg"
+  alt="Diagram of the Part 4 workspace layout. A folder tree shows backend/projects containing projects.json labeled as the registry, then a project folder 2de013ce containing site, highlighted as the workspace and one job site, holding the seeded brief folder with brief.md and assets/logo.svg, plus the agent's index.html and logo.svg, and a second project folder labeled another client, another desk. Two cards on the right are labeled as doors: door one, the engine writes, thread/start with cwd pointing at the site folder under a workspace-write sandbox; door two, the browser reads, an app.mount call serving the same folder at /preview/2de013ce with StaticFiles. A footer notes the engine writes through cwd, the browser reads through the mount, and Part 5 adds the third door: the thread that reopens."
+  caption="One folder, two doors. The engine writes through cwd; the browser reads through the StaticFiles mount. Everything in this part hangs off that one path."
+  width={1240}
+  height={660}
+/>
+
+## Break it on purpose: the wall you can't see from here
+
+Time for this part's deliberate failure, and it's a two-act play, because the first attempt to hit the wall taught me the wall is somewhere else than I thought.
+
+The Beanline brief bans external resources. Ignore the client's wishes on purpose and ask for the most ordinary external thing on the web:
+
+> Use the Google Font Playfair Display for the headings.
+
+I expected the sandbox's no-network rule to make a scene. Instead: fifteen seconds, 88,427 tokens, done. The agent added a `<link href="https://fonts.googleapis.com/css2?family=Playfair+Display...">` to the `<head>`, applied the family to the headings, and reported success. Refresh the preview and the headings *are* Playfair Display, elegant serifs and all. No wall. Nothing even slowed down.
+
+Look at where the network request actually happens, though. Writing that `<link>` tag is a *file edit*; the sandbox watched the agent type a URL into a text file, which requires no network at all. The fetch happens later, from **your browser**, when the iframe renders the page, and your browser is not in anybody's sandbox. The [sandbox](/blog/codex-concepts#sandboxing) guards *the agent's own process tree*: what the agent may execute, write, and fetch. It has nothing to say about what documents the agent authors, or what the reader of those documents will fetch afterward. A jailed copywriter can still write "call this phone number" on a piece of paper.
+
+So push the request to where the sandbox actually lives. Make the *agent* need the network:
+
+> The Google Fonts link is a remote dependency. Download the Playfair Display woff2 files with curl into fonts/ and self-host them.
+
+Now the agent must fetch bytes itself, and the play begins. It makes a `fonts/` directory and reaches for the CSS:
+
+```text
+mkdir -p fonts && curl -L 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap'
+```
+
+`exit 6`: curl's code for "could not resolve host". Under workspace-write the sandbox has no network, and that includes DNS; the machine next door might as well not exist. That's the wall, kernel-enforced, invisible until the process itself needs to cross it.
+
+What happened next is the most instructive four and a half minutes in this series so far, and I did not stage a second of it. The agent did not give up, did not hallucinate success, and did not fabricate a font file. It went looking for Playfair Display *somewhere it could legally reach*, and its search radius was startling: `fc-match` and `fc-list` against the system font registry, `find` sweeps across `~/Library` caches, browser cache greps for `fonts.gstatic.com` blobs, a DNS probe at a public resolver (also blocked, `dig` exit 10), and finally, memorably, it discovered Playfair Display *metadata* in my pnpm store and spent a dozen commands drilling through content-addressed hashes hoping the actual `woff2` binaries were cached there. They weren't. Thirty-seven commands, 1,513,687 tokens, 277 seconds.
+
+<Figure
+  src="/images/series/codex/part-4/browser-netwall-light.svg"
+  srcDark="/images/series/codex/part-4/browser-netwall-dark.svg"
+  alt="Pagewright during the self-hosted fonts run. The user asks to download the Playfair Display woff2 files with curl into fonts/ and self-host them. The agent's prose says it is fetching Google Fonts CSS to download the exact woff2 files. A failed command badge with a red border shows exit 6, expanded to reveal mkdir -p fonts and a curl call to fonts.googleapis.com. The agent explains the curl fetch is blocked by DNS and that it is checking local caches and system font directories, followed by a Listing files badge, an fc-match badge, and a failed fc-list badge with exit 1. The final message reads Blocked by the sandbox: curl to fonts.googleapis.com failed with DNS resolution, and I couldn't find any Playfair Display font binaries cached locally to copy into fonts/. I did not fabricate font files. Three bullet options follow: enable network access, drop the woff2 files into fonts/ manually, or point the HTML at fonts/ now with binaries to come later. The receipt reads 1,513,687 tokens in 277 seconds. The preview on the right still shows the unchanged Beanline site."
+  caption="The wall, hit honestly. curl exit 6 is DNS refusing to exist inside the sandbox; the preview on the right never changed because the agent refused to fake font files it could not fetch. The receipt is the price of a very thorough search."
+  width={1280}
+  height={940}
+/>
+
+Its closing message is the kind you want from a colleague: blocked by the sandbox, here's exactly what failed, I did not fabricate binaries, and here are three ways forward: enable network for this workspace, hand me the files, or I can wire up `fonts/` paths now and you add the binaries later. Honest refusal with options beats confident fabrication every single time, and you got it from a sandbox plus a decent model, not from a prompt begging it to be truthful.
+
+Two lessons to keep, one teaser to bank. Lesson one: the sandbox draws its line around the *agent's* capabilities, not around the artifacts it writes; know which side of the line a request lives on before you promise a customer "it can't touch the network". Lesson two, hiding in that disk sweep: the agent read caches all over my home directory, far outside the workspace, and the sandbox never objected, because **workspace-write confines writes and network, not reads**. It could read my pnpm store; it could not write one byte outside the desk or resolve one hostname. If that asymmetry raises your eyebrow, good. [Part 6](/blog/codex-concepts#sandbox-policies) is where the dials live, including the read side and the switch that would have let that curl succeed. And 1.5 million tokens of rummaging is the meter ritual's sharpest data point yet: a blocked capability doesn't only cost the failure, it costs everything the agent tries *around* the failure.
+
+## The payoff, end to end
+
+Boot both halves (backend from `backend/`, frontend from `frontend/`):
+
+```bash
+# terminal 1
+uv run uvicorn app.main:app --reload
+# terminal 2
+npm run dev
+```
+
+Open `localhost:3000`, pick the `beanline` brief, click **New project**, and send the nine-word prompt. Watch the tree fill, the preview flip, the drawer's dot light up. Today's ledger, every row a real run through this exact code:
+
+| Run | What you watch | Meter |
+|---|---|---|
+| Beanline build (the hero) | brief read, site built, preview flips mid-turn, drawer full of green | 110,990 tokens · 51s |
+| Beanline build (curl trace) | 976 parcels: file_change, preview_refresh, 5x diff_updated, the cp with no parcel | 115,757 tokens · 44s |
+| Google Fonts via link | no wall: the reader's browser fetches it, not the sandbox | 88,427 tokens · 15s |
+| Self-host the woff2 files | curl exit 6, the great disk sweep, honest refusal with three options | 1,513,687 tokens · 277s |
+
+Same habit as always: the receipt under each turn is the last `thread/tokenUsage/updated` of the run, surfaced through `complete`. Note the spread. Three builds land within a factor of 1.3 of each other; the blocked-capability run costs thirteen times the hero build. Constraints are a token budget line item. [Part 8](/blog/codex-concepts#token-usage) turns this receipt into a live gauge.
+
+<DemoVideo
+  src="/videos/codex/part-4-demo.mp4"
+  poster="/videos/codex/part-4-poster.jpg"
+  caption="A real run, recorded live against gpt-5.4-mini (the mid-build stretch plays timelapsed): a beanline-seeded project is created, the nine-word prompt goes in, badges and thinking stream, the preview flips from empty to a finished coffee site mid-turn, and the diff drawer opens on 561 added lines and a 174,079-token receipt."
+  label="Screen recording of Part 4: creating a brief-seeded project, a live agent build with the preview refreshing itself, the file tree updating, and the diff drawer opening on the finished Beanline site"
+/>
+
+<Recap
+  part={4}
+  items={[
+    "One desk per client: projects/{id}/site/ workspaces with a flat projects.json registry, thread cwd pointed at the desk, and client briefs seeded in as plain files the agent reads like any others.",
+    "A live preview with two layers of containment: each workspace served by a StaticFiles mount at /preview/{id}/, rendered in an iframe with sandbox='allow-scripts' and deliberately without allow-same-origin.",
+    "A file tree that watches the desk: file_change events with workspace-relative paths drive add/update/delete badges, and a catch-all sweep on complete catches what shell commands change without emitting any item.",
+    "A living preview and a diff drawer from two signals: preview_refresh cache-busts the iframe as each patch lands, and turn/diff/updated's cumulative git-style diff renders in a 60-line hand-rolled drawer, paths relativized from git-repo-relative to workspace-relative.",
+    "The network wall, understood precisely: the sandbox guards the agent's own fetches (curl exit 6, DNS included), not what the reader's browser loads from authored HTML, and workspace-write confines writes and network but not reads. Part 6 holds the dials.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "The preview iframe uses sandbox=\"allow-scripts\" and deliberately omits allow-same-origin. What does that omission buy?",
+      options: [
+        "It makes the iframe reload faster because no origin checks run",
+        "The generated site runs in a null origin: its scripts execute but can't touch Pagewright's cookies, storage, or DOM",
+        "It blocks the generated site from running any JavaScript at all",
+        "It prevents the agent from writing script tags into index.html",
+      ],
+      answer: 1,
+      explain: "allow-scripts lets the untrusted generated site be interactive; withholding allow-same-origin strips it of our origin's identity. Granting both on same-origin content largely cancels the sandbox, which is exactly the trap the design avoids.",
+    },
+    {
+      q: "Mid-turn, the agent runs cp brief/assets/logo.svg ./logo.svg. What does the protocol emit, and how does the UI stay truthful?",
+      options: [
+        "A fileChange item like any other edit; the tree updates from file_change",
+        "A commandExecution item only, so no file_change parcel; the UI refetches the tree and bumps the preview once on complete",
+        "Nothing at all; shell commands are invisible on the wire",
+        "A diff_updated event, since the aggregate diff tracks every workspace change",
+      ],
+      answer: 1,
+      explain: "File changes made through shell commands emit no fileChange item and don't appear in the aggregate diff either. The catch-all sweep on complete exists precisely because the filesystem is the only witness to what commands did.",
+    },
+    {
+      q: "How does turn/diff/updated deliver the turn's diff, and what does that mean for the frontend?",
+      options: [
+        "Incremental hunks the client must splice together in order",
+        "One diff per file, keyed by path, merged client-side",
+        "The turn's aggregate diff, cumulative and re-sent in full each time, so the client stores one string and re-renders",
+        "A binary patch the backend must apply to reconstruct the text",
+      ],
+      answer: 2,
+      explain: "The real Beanline run sent the complete 12,056-character diff five times. Re-sent-in-full means the drawer needs zero bookkeeping: replace one string, re-render, done.",
+    },
+    {
+      q: "The raw diff from the engine named files like a/part-04-live-preview/backend/projects/26b630f1/site/index.html. Why?",
+      options: [
+        "The paths are relative to the enclosing git repository the engine found above the workspace, not to the workspace itself",
+        "A bug in the pinned CLI that later versions fix",
+        "The sandbox rewrites paths to absolute form for auditability",
+        "The workspace folder was created with the wrong permissions",
+      ],
+      answer: 0,
+      explain: "turn/diff/updated is git-flavored: the engine walks up to the nearest .git and describes changes from there. The backend's relativize_diff strips the workspace prefix so the wire keeps one contract: workspace-relative paths, same as file_change.",
+    },
+    {
+      q: "Asking for a Google Fonts link sailed through the no-network sandbox, but downloading the woff2 files hit a wall. Why the difference?",
+      options: [
+        "Google Fonts allowlists the sandbox's IP range for CSS but not for font binaries",
+        "The link run used cached DNS from an earlier turn",
+        "Writing a link tag is a file edit; the fetch happens later in the reader's browser, outside the sandbox. curl needs the agent's own network, which workspace-write blocks, DNS included",
+        "woff2 files are binary, and the sandbox blocks binary downloads specifically",
+      ],
+      answer: 2,
+      explain: "The sandbox guards the agent's process tree, not the documents it authors. A jailed copywriter can still write a phone number on paper. The wall only appears when the agent itself must cross the network: curl exit 6, could not resolve host.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 4: one desk per client, a live preview, and the diff drawer"
+```
+
+There's a crack in today's foundation, and you may have already felt it: switch projects and the chat goes blank, because every message still starts a brand-new thread. The desk remembers everything; the conversation remembers nothing. Restart the backend and even the sidebar's names are all the flat file knows. The engine has been quietly archiving every one of these threads since Part 1, and in [Part 5](/blog/codex-5-threads) Pagewright finally learns to use that archive: resume a project's conversation across restarts, list and name threads, and fork one site into two competing drafts. Close the tab and the project's gone? Not for much longer. Next: projects that persist.
+
+The complete, tested code for this part lives in [`part-04-live-preview`](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-04-live-preview) in the [companion repo](https://github.com/yadneshSalvi/codex-app-server-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's lines highlighted.

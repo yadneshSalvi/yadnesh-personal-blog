@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="780" viewBox="0 0 1120 780">
+  <rect width="1120" height="780" fill="#0c0a09"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#211e1a"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#2b2723" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#3a3530"/><circle cx="56" cy="28" r="7" fill="#3a3530"/><circle cx="82" cy="28" r="7" fill="#3a3530"/>
+  <rect x="320" y="13" width="480" height="30" rx="15" fill="#1a1816" stroke="#3a3530"/>
+  <text x="560" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#a49c90" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#292524" stroke-width="1"/>
+  <circle cx="24" cy="79" r="5" fill="#4fb8b3"/>
+  <text x="38" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">Pagewright</text>
+  <text x="150" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">the site builder</text>
+  <line x1="200" y1="102" x2="200" y2="780" stroke="#292524" stroke-width="1"/><rect x="8" y="114" width="184" height="64" rx="8" fill="#4fb8b3" opacity="0.07"/>
+  <rect x="8" y="114" width="184" height="64" rx="8" fill="none" stroke="#4fb8b3" stroke-opacity="0.4"/><text x="18" y="133" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#4fb8b3">Paper Crane</text>
+  <text x="18" y="149" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c">Build a tiny one-page site for Paper C…</text>
+  <text x="18" y="167" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" fill="#78716c">just now</text><rect x="152" y="155" width="34" height="16" rx="3.5" fill="none" stroke="#292524"/>
+  <text x="169" y="166.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" fill="#d6d3d1" text-anchor="middle">Fork</text><text x="18" y="205" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#e7e5e4">Paper Crane (fork)</text>
+  <text x="18" y="221" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c">Build a tiny one-page site for Paper C…</text>
+  <text x="18" y="239" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" fill="#78716c">8m ago</text><line x1="0" y1="696" x2="200" y2="696" stroke="#292524" stroke-width="1"/>
+  <rect x="12" y="706" width="176" height="26" rx="7" fill="#1c1917" stroke="#292524"/>
+  <text x="22" y="723" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#d6d3d1">blank workspace</text>
+  <path d="M 170 717 l 4.5 5 l 4.5 -5" fill="none" stroke="#78716c" stroke-width="1.4"/>
+  <rect x="12" y="740" width="176" height="28" rx="7" fill="#4fb8b3"/>
+  <text x="100" y="758" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#ffffff" text-anchor="middle">New project</text>
+  <rect x="264" y="122" width="312" height="24" rx="12" fill="#2a2008" stroke="#78591b"/>
+  <text x="420" y="138" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#fcd34d" text-anchor="middle">History could not be restored. Files are intact.</text>
+  <rect x="363" y="162" width="261" height="52" rx="14" fill="#f5f5f4"/>
+  <text x="378" y="184" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1c1917">What accent color did we settle on?</text>
+  <text x="378" y="203" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1c1917">One short sentence.</text>
+  <circle cx="220" cy="235" r="2.5" fill="#78716c"/>
+  <text x="230" y="239" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" letter-spacing="1.5" fill="#78716c">THINKING</text>
+  <path d="M 304 233 l 4 4.5 l 4 -4.5" fill="none" stroke="#78716c" stroke-width="1.3"/>
+  
+  <text x="216" y="267" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">I'm checking the design source in the repo for the</text>
+  <text x="216" y="288" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">agreed accent color, then I'll answer in one sentence.</text>
+  <rect x="216" y="305" width="388" height="34" rx="8" fill="#1c1917" stroke="#292524"/>
+  <text x="230" y="326.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#4ade80">&#x2713;</text>
+  <text x="246" y="326.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e7e5e4">Listing files</text>
+  <text x="520" y="326" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" letter-spacing="1" fill="#78716c">COMMAND</text>
+  <path d="M 588 320 l 4 4.5 l 4 -4.5" fill="none" stroke="#78716c" stroke-width="1.3"/>
+  <rect x="216" y="347" width="388" height="34" rx="8" fill="#1c1917" stroke="#292524"/>
+  <text x="230" y="368.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#4ade80">&#x2713;</text>
+  <text x="246" y="368.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e7e5e4">Running: "sed -n '1,40p' brief/brief.md"</text>
+  <text x="520" y="368" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" letter-spacing="1" fill="#78716c">COMMAND</text>
+  <path d="M 588 362 l 4 4.5 l 4 -4.5" fill="none" stroke="#78716c" stroke-width="1.3"/>
+  
+  <text x="216" y="405" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">We settled on ink blue, </text>
+  <rect x="369" y="393" width="57" height="17" rx="4" fill="#292524"/>
+  <text x="373" y="405" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1">#26428B</text>
+  <text x="429" y="405" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">.</text>
+  <text x="216" y="430" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">46,480 tokens · 9s</text>
+  <line x1="200" y1="718" x2="640" y2="718" stroke="#292524" stroke-width="1"/>
+  <rect x="216" y="730" width="336" height="36" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="229" y="753" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#78716c">Describe the site you want&#8230;</text>
+  <rect x="562" y="730" width="62" height="36" rx="10" fill="#4fb8b3" opacity="0.45"/>
+  <text x="593" y="753" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  <line x1="640" y1="102" x2="640" y2="780" stroke="#292524" stroke-width="1"/>
+  <text x="656" y="124" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#78716c">/preview/145d5abf/</text>
+  <rect x="1002" y="108" width="56" height="22" rx="6" fill="none" stroke="#292524"/>
+  <text x="1030" y="123" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#d6d3d1" text-anchor="middle">Reload</text>
+  <rect x="1064" y="108" width="40" height="22" rx="6" fill="none" stroke="#292524" opacity="0.55"/>
+  <text x="1084" y="123" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c" text-anchor="middle" opacity="0.8">Diff</text>
+  <line x1="640" y1="136" x2="1120" y2="136" stroke="#292524" stroke-width="1"/>
+  <!-- the rendered site keeps its own colors in both themes, like a real iframe -->
+  <rect x="641" y="137" width="479" height="515" fill="#fcfbf8"/>
+  <g transform="translate(676,194) scale(0.55)" fill="none" stroke="#1D326A" stroke-width="3" stroke-linejoin="round">
+    <path d="M16 56 L 40 24 L 52 44 L 64 30 L 58 58 Z"/><line x1="40" y1="24" x2="46" y2="12"/></g>
+  <text x="720" y="218" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" letter-spacing="3" fill="#1D326A">PAPER CRANE</text>
+  <text x="676" y="264" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="2.5" fill="#1D326A">STATIONERY STUDIO AND LETTERPRESS WORKSHOP</text>
+  <text x="676" y="314" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="44" font-weight="800" letter-spacing="-1" fill="#1f2430">Paper Crane</text>
+  <text x="676" y="344" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#5f6678">Paper, pressed properly.</text>
+  <rect x="676" y="364" width="132" height="34" rx="17" fill="#1D326A"/>
+  <text x="742" y="386" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Visit the studio</text>
+  <rect x="824" y="364" width="150" height="34" rx="17" fill="none" stroke="#1D326A"/>
+  <text x="899" y="386" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#1D326A" text-anchor="middle">See what we make</text>
+  <line x1="676" y1="630" x2="1084" y2="630" stroke="#1f2430" stroke-opacity="0.12"/>
+  <!-- the files pane (app UI, themed) -->
+  <line x1="640" y1="652" x2="1120" y2="652" stroke="#292524" stroke-width="1"/>
+  <rect x="641" y="653" width="479" height="127" fill="#1c1917" opacity="0.35"/>
+  <text x="656" y="676" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#78716c">FILES</text>
+  <text x="1104" y="676" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c" text-anchor="end">3</text>
+  <text x="656" y="698" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">brief/assets/logo.svg</text>
+  <text x="1104" y="698" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end">451 B</text>
+  <text x="656" y="718" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">brief/brief.md</text>
+  <text x="1104" y="718" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end">929 B</text>
+  <text x="656" y="738" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#e7e5e4">index.html</text>
+  <text x="1104" y="738" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end">9.7 kB</text>
+</svg>

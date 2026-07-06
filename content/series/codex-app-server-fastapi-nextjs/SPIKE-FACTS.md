@@ -101,6 +101,27 @@ Order observed: `thread/started` → `thread/status/changed (active)` →
   blocks writes+network, NOT reads: Part 6 teaser), refused to fabricate
   binaries, and reported the block honestly with three ways forward.
 
+## Part-6-build findings (verified live)
+
+- There is NO clean sandbox-block signal in the protocol. Three behaviors:
+  (1) blocked network is the only case with item telemetry: commandExecution
+  completes status:"failed", exitCode 6, aggregatedOutput "curl: (6) Could not
+  resolve host: ..."; (2) natural blocked writes never happen: the model
+  checks writableRoots and declines up front (no failed item at all);
+  (3) FORCED blocked writes run via the unifiedExec interaction path and emit
+  ZERO commandExecution items on the wire; the kernel refusal ("zsh:1:
+  operation not permitted: ...") appears only in agent narration. A refused
+  read-only apply_patch likewise emits no item. CommandExecutionStatus enum:
+  inProgress|completed|failed|declined (nothing sandbox-specific).
+- workspaceWrite `excludeSlashTmp` defaults OFF: under trusted mode the agent
+  staged an npm tarball in /private/tmp legally. Worth a callout.
+- `thread/tokenUsage/updated.tokenUsage.total` is THREAD-CUMULATIVE (1.09M
+  after several turns); per-turn displays must use `.last` (Part 8 gauge).
+- Trusted-mode fonts payoff is real: Google CSS offered TTF only, so the agent
+  pulled the @fontsource/playfair-display npm tarball and extracted woff2s
+  into fonts/, wired @font-face. Blocked (standard) → curl exit 6 + a
+  readable-disk font sweep before an honest refusal.
+
 ## Item shapes (from item/started + item/completed)
 
 - `userMessage`: `{content: [{type: "text", text, text_elements}]}`.
@@ -158,7 +179,21 @@ Order observed: `thread/started` → `thread/status/changed (active)` →
   shape still to be captured when Part 5 is built).
 - `thread/list {}` → `{data: [thread meta incl. preview], nextCursor,
   backwardsCursor}`.
-- `thread/name/set`, `thread/archive` untested in spike; exercise in Part 5.
+- Part-5-build findings (live, 0.142.4): resume on a deleted rollout AND on a
+  never-existed well-formed uuid both give `-32600` "no rollout found for
+  thread id <id>"; malformed id gives `-32600` "invalid session id: ...".
+  Everything is -32600, so the code alone doesn't discriminate cause.
+  `thread/read` on the same thread says "thread not loaded: <id>" instead.
+- `thread/name/set` params `{threadId, name}` (field is `name`, empty response;
+  name visible in thread/list afterward).
+- `thread/read {threadId, includeTurns: true}` → `{thread: {..., name,
+  turns: [{id, status, items}]}}`; reads UNLOADED threads straight from the
+  rollout (no resume needed). userMessage content `[{type:"text",text}]`;
+  agentMessage has `text` + `phase`.
+- `thread/fork` accepts a `cwd` override (fork points at a new workspace);
+  `forkedFromId` is populated on thread/read of the fork but null in
+  thread/list entries.
+- `thread/archive` still unexercised.
 
 ## Structured output
 

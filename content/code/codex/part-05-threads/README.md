@@ -1,14 +1,17 @@
-# Part 4: Workspaces, the live preview, and the diff drawer
+# Part 5: Threads that persist — projects, resume, and fork
 
-The end state of [Part 4 of the series](https://yadnesh.dev/blog/codex-4-live-preview):
-Pagewright's hero feature set. Every project gets its own workspace, the
-thread's `cwd` points at it, and the site the agent builds renders in a live
-iframe preview that refreshes as every patch lands — next to a file tree with
-add/update/delete badges and a diff drawer showing the turn's aggregate
-unified diff.
+The end state of [Part 5 of the series](https://yadnesh.dev/blog/codex-5-threads):
+Pagewright's projects grow memory. Every project keeps ONE thread for its
+whole life — the first message starts it, every later message resumes it,
+and the conversation survives backend restarts because the engine's rollout
+archive (`CODEX_HOME/sessions`) is the persistence layer; projects.json
+stores nothing but the bookmark. A projects sidebar lists every job folder
+with its auto-title, reopening a project replays its conversation, and
+**Fork** photocopies a project — `thread/fork` for the conversation,
+`cp -r` for the workspace — into two drafts that diverge side by side.
 
-📖 Read along: [Part 4: Workspaces, the live preview, and the diff drawer](https://yadnesh.dev/blog/codex-4-live-preview)
-🎬 See it run: **[demo.mp4](demo.mp4)** — a client brief becomes a website while you watch.
+📖 Read along: [Part 5: Threads that persist](https://yadnesh.dev/blog/codex-5-threads)
+🎬 See it run: **[demo.mp4](demo.mp4)** — one site forked into two drafts, both remembering the same conversation.
 
 ## Run it
 
@@ -28,71 +31,71 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
-Open http://localhost:3000, pick a brief (try `beanline`), click **New
-project**, and send:
+Open http://localhost:3000, create a project from a brief, chat once, then:
 
-> Read brief/brief.md and build the site it describes
+- **restart the backend** and send a follow-up — the agent still remembers
+  the conversation (`thread/resume` reopens the job folder at the bookmark);
+- click **Fork** on the project — a second sidebar entry appears with the
+  same site and the same memory, and the two drafts diverge from there.
 
-The preview on the right refreshes as files land; the file tree fills in
-underneath; the **Diff** button opens the turn's unified diff.
+## What changed since Part 4
 
-## What changed since Part 3
-
-- `backend/app/projects.py` (new) — per-project workspaces: one folder per
-  project under `backend/projects/{id}/site/`, a flat `projects.json`
-  registry (id, name, created_at — thread ids arrive in Part 5), and brief
-  seeding: creating a project can copy one of the repo's `briefs/` folders
-  into the workspace under `brief/`.
-- `backend/app/events.py` — one new translation and one new helper, nothing
-  existing touched: `turn/diff/updated` → `diff_updated` (the turn's
-  aggregate git-style unified diff), and `file_change_event()`, which turns a
-  fileChange item into a dedicated `file_change` event with
-  **workspace-relative** paths (the protocol sends absolute ones).
-- `backend/app/main.py` — `POST /projects`, `GET /projects`,
-  `GET /projects/{id}/files` (the workspace listing; seeded brief files are
-  included but flagged), and `POST /projects/{id}/chat` replacing Part 3's
-  `/chat` — same stream, but the thread's `cwd` is that project's site
-  folder and `session_start` now carries `project_id`. Each workspace is
-  served at `/preview/{project_id}/` via a `StaticFiles` mount (`html=True`,
-  so `/` serves `index.html`). After each completed fileChange item the
-  stream also emits `preview_refresh`.
-- `frontend/app/page.tsx` — the two-pane layout: the Part 3 chat on the
-  left, the workspace on the right (preview on top, file tree below, diff
-  drawer sliding over both), plus the project switcher in the header.
-- `frontend/components/ProjectBar.tsx` — project select + brief dropdown +
-  New project.
-- `frontend/components/PreviewPane.tsx` — the sandboxed iframe
-  (`sandbox="allow-scripts"`, **no** `allow-same-origin`: the generated HTML
-  is untrusted and runs in a null origin), cache-busted with `?v=N` on every
-  `preview_refresh`.
-- `frontend/components/FilesPane.tsx` — the workspace tree from
-  `GET /files`, refreshed on `file_change`, with added/updated/deleted
-  badges per event kind; seeded brief files render dimmed.
-- `frontend/components/DiffDrawer.tsx` — the hand-rolled unified-diff
-  renderer (~60 lines, no dependency): file headers, hunk markers, +/- line
-  tinting.
-- `frontend/lib/api.ts` — `API_BASE` in one place now that three components
-  need it.
-- `frontend/lib/types.ts` — three new wire events (`file_change`,
-  `diff_updated`, `preview_refresh`) and the `Project` / `WorkspaceFile`
-  REST shapes.
+- `backend/app/projects.py` — each registry line grows `thread_id` (the
+  bookmark into the rollout archive), `thread_name` (the auto-title),
+  `updated_at`, and — on forks — `forked_from_id`. New helpers:
+  `get_project` / `update_project` / `touch`, plus `fork_workspace`
+  (the `cp -r` half of forking) and `register_fork`.
+- `backend/app/main.py` — the heart of the part:
+  - `ensure_thread()` — messages to a project with a `thread_id` call
+    `thread/resume` first; only a project without one gets `thread/start`
+    (Part 4's fresh-thread-per-message behavior is gone). If resume fails
+    (rollout deleted — the error is a typed JSON-RPC `-32600`
+    `"no rollout found for thread id …"`), fall back to a fresh thread,
+    persist the new id, and emit `thread_reset`: the history is gone, the
+    site files are not. The workspace is truth.
+  - `finish_turn()` — after a project's FIRST completed turn, the thread is
+    auto-titled from the first message via `thread/name/set {threadId, name}`.
+  - `GET /projects/{id}/history` — the conversation replayed from the
+    rollout via `thread/read {threadId, includeTurns: true}` (no engine
+    load, no turn), mapped to plain `[{role, text}]`.
+  - `POST /projects/{id}/fork` — `thread/fork {threadId, cwd}` + workspace
+    copy; the response carries both new ids. Forking copies the
+    conversation, **not** the files — the workspace is ours to copy.
+  - `GET /threads` — a debug proxy for `thread/list`, protocol-native
+    listing. The sidebar reads projects.json instead: one flat file, no
+    protocol call per render.
+- `backend/app/codex_client.py` — `CodexError` now carries the JSON-RPC
+  error `code`; the resume fallback keys on a typed error, not string
+  matching.
+- `backend/app/events.py` — one new event in the vocabulary
+  (`thread_reset`) and `history_from_turns()`, the thread/read → history
+  mapper (each userMessage + each turn's final agentMessage; everything
+  else already left its mark on the workspace).
+- `frontend/components/ProjectsSidebar.tsx` (new, replacing
+  `ProjectBar.tsx`) — the left rail: every project with its name,
+  auto-title, and relative time; active highlight; a per-row **Fork**
+  button; the brief picker + New project at the bottom.
+- `frontend/app/page.tsx` — opening a project hydrates its conversation
+  from `GET /history`; `thread_reset` renders a quiet inline notice
+  ("History could not be restored. Files are intact."); a completed turn
+  re-pulls the registry so the sidebar learns the auto-title; Fork adds
+  the new project and switches to it.
+- `frontend/lib/types.ts` — `thread_reset` on the wire; `Project` grows
+  the thread fields; `HistoryMessage`; a `notice` chat-message role.
 
 ## The wire, extended
 
-Part 2's envelope grows three event types and changes none:
+Part 2's envelope grows one event type and changes none:
 
 | `type` | From | Payload |
 |---|---|---|
-| `file_change` | `item/started` + `item/completed` of fileChange items | `item_id`, `files: [{path (workspace-relative), kind}]`, `status: started\|done` |
-| `diff_updated` | `turn/diff/updated` | `unified_diff` (git-style, cumulative for the turn) |
-| `preview_refresh` | emitted after each completed fileChange | `project_id` |
-
-`session_start` additionally carries `project_id`. `item_start`/`item_done`
-still flow for fileChange items too, so Part 3's badges keep working.
+| `thread_reset` | a failed `thread/resume` at the top of a turn | `message` |
 
 ## Break it on purpose
 
-Ask for a Google Fonts `<link>`. The default `workspace-write` sandbox has
-**no network**, so the agent can't verify or fetch anything external — watch
-the reasoning drawer as it notices the constraint and falls back to system
-fonts. Part 6 gives you the switch.
+Stop the backend, delete the project's rollout file under
+`CODEX_HOME/sessions/YYYY/MM/DD/rollout-*-<thread_id>.jsonl`, restart, and
+send a message. `thread/resume` fails with the typed error above, the
+backend falls back to `thread/start`, and the UI shows the notice — while
+the preview keeps serving the site, untouched. Chat history and site files
+have different owners: the engine owns one, your workspace the other.

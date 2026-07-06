@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="508" viewBox="0 0 1040 508" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="508" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; resuming a thread whose rollout is gone</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># the project's saved thread, after its rollout file was deleted:</tspan></text>
+    <text x="32" y="116" xml:space="preserve"><tspan fill="#756d62">→</tspan> {"id": 2, "method": <tspan fill="#e5825a">"thread/resume"</tspan>, "params": {"threadId": "019f38ce-b1cc-77f2-…"}}</text>
+    <text x="32" y="144" xml:space="preserve"><tspan fill="#756d62">←</tspan> {"id": 2, "error": {"code": <tspan fill="#d97676">-32600</tspan>,</text>
+    <text x="32" y="172" xml:space="preserve">        "message": <tspan fill="#d97676">"no rollout found for thread id 019f38ce-b1cc-77f2-…"</tspan>}}</text>
+    <text x="32" y="200" xml:space="preserve"></text>
+    <text x="32" y="228" xml:space="preserve"><tspan fill="#756d62"># a well-formed thread id that never existed anywhere:</tspan></text>
+    <text x="32" y="256" xml:space="preserve"><tspan fill="#756d62">→</tspan> {"id": 3, "method": <tspan fill="#e5825a">"thread/resume"</tspan>, "params": {"threadId": "11111111-2222-7333-…"}}</text>
+    <text x="32" y="284" xml:space="preserve"><tspan fill="#756d62">←</tspan> {"id": 3, "error": {"code": <tspan fill="#d97676">-32600</tspan>,</text>
+    <text x="32" y="312" xml:space="preserve">        "message": <tspan fill="#d97676">"no rollout found for thread id 11111111-2222-7333-…"</tspan>}}</text>
+    <text x="32" y="340" xml:space="preserve"><tspan fill="#756d62"># same code, same wording. deleted and never-existed are indistinguishable.</tspan></text>
+    <text x="32" y="368" xml:space="preserve"></text>
+    <text x="32" y="396" xml:space="preserve"><tspan fill="#756d62"># thread/read on the same missing thread wears different words:</tspan></text>
+    <text x="32" y="424" xml:space="preserve"><tspan fill="#756d62">→</tspan> {"id": 4, "method": <tspan fill="#e5825a">"thread/read"</tspan>, "params": {"threadId": "019f38ce-…", "includeTurns": true}}</text>
+    <text x="32" y="452" xml:space="preserve"><tspan fill="#756d62">←</tspan> {"id": 4, "error": {"code": <tspan fill="#d97676">-32600</tspan>, "message": <tspan fill="#d97676">"thread not loaded: 019f38ce-…"</tspan>}}</text>
+  </g>
+</svg>

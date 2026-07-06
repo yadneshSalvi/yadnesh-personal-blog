@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="700" viewBox="0 0 1240 700" role="img">
+  <rect width="1240" height="700" fill="#faf9f6"/>
+  <text x="48" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#8f887a">FORK &#183; TWO PHOTOCOPIES, TWO OWNERS</text>
+  <line x1="48" y1="66" x2="1192" y2="66" stroke="#e7e3d9" stroke-width="1.5"/>
+
+  <!-- the original project -->
+  <rect x="420" y="92" width="400" height="96" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="620" y="120" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#1f1c19" text-anchor="middle">PROJECT 145d5abf · Paper Crane</text>
+  <text x="620" y="144" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="middle">conversation: thread 019f38ce-b1cc-…</text>
+  <text x="620" y="164" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="middle">workspace: projects/145d5abf/site/</text>
+
+  <!-- two halves -->
+  <path d="M 520 188 C 460 230, 380 260, 330 292" fill="none" stroke="#8f887a" stroke-width="1.5"/>
+  <path d="M 720 188 C 780 230, 860 260, 910 292" fill="none" stroke="#8f887a" stroke-width="1.5"/>
+
+  <rect x="80" y="292" width="500" height="128" rx="12" fill="#f6e7df" stroke="#dcb09a" stroke-width="1.5"/>
+  <text x="100" y="320" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#b3441a" text-anchor="start">THE ENGINE'S HALF</text>
+  <text x="100" y="346" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">thread/fork {threadId, cwd: …/10c9bab1/site}</text>
+  <text x="100" y="370" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">copies the conversation into a NEW rollout;</text>
+  <text x="100" y="388" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">the fork answers questions it was never asked</text>
+  <text x="100" y="408" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">thread/read shows forkedFromId · thread/list shows null</text>
+
+  <rect x="660" y="292" width="500" height="128" rx="12" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="680" y="320" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#b3441a" text-anchor="start">OUR HALF</text>
+  <text x="680" y="346" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">shutil.copytree(site_dir(src), site_dir(new))</text>
+  <text x="680" y="370" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">the workspace: fork copies the conversation,</text>
+  <text x="680" y="388" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">NOT the files. The job site is ours to photocopy,</text>
+  <text x="680" y="408" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">and cwd points the forked thread at the copy</text>
+
+  <!-- the two drafts -->
+  <path d="M 330 420 C 380 452, 430 470, 470 486" fill="none" stroke="#8f887a" stroke-width="1.5"/>
+  <path d="M 910 420 C 860 452, 810 470, 770 486" fill="none" stroke="#8f887a" stroke-width="1.5"/>
+
+  <rect x="180" y="486" width="400" height="120" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <rect x="200" y="506" width="16" height="16" rx="4" fill="#1D326A"/>
+  <text x="226" y="519" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1f1c19" text-anchor="start">DRAFT A · the original, ink blue</text>
+  <text x="200" y="546" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">--ink: #1D326A</text>
+  <text x="200" y="570" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">md5 337f4416…  →  337f4416…</text>
+  <text x="200" y="590" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">(untouched by the fork's turn)</text>
+
+  <rect x="660" y="486" width="400" height="120" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <rect x="680" y="506" width="16" height="16" rx="4" fill="#1F4D2F"/>
+  <text x="706" y="519" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1f1c19" text-anchor="start">DRAFT B · the fork, forest green</text>
+  <text x="680" y="546" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">--ink: #1F4D2F</text>
+  <text x="680" y="570" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">md5 337f4416…  →  d12bebce…</text>
+  <text x="680" y="590" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">(one 10.5s turn later)</text>
+
+  <text x="620" y="656" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#8f887a" text-anchor="middle">byte-identical at the moment of the fork; two work orders later, two different sites</text>
+</svg>

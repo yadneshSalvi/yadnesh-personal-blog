@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="920" viewBox="0 0 1280 920" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1280" height="920" fill="#fafaf9"/>
+  <rect x="0" y="0" width="1280" height="56" fill="#f3f1ec"/>
+  <line x1="0" y1="56" x2="1280" y2="56" stroke="#e2ded4" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#d6d1c5"/><circle cx="56" cy="28" r="7" fill="#d6d1c5"/><circle cx="82" cy="28" r="7" fill="#d6d1c5"/>
+  <rect x="400" y="13" width="480" height="30" rx="15" fill="#ffffff" stroke="#e2ded4"/>
+  <text x="640" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#5b554c" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="108" x2="1280" y2="108" stroke="#e7e5e4" stroke-width="1"/>
+  <circle cx="28" cy="82" r="5" fill="#0f6c6c"/>
+  <text x="42" y="87" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Pagewright</text>
+  <text x="150" y="86.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a8a29e">the site builder</text>
+  <rect x="832" y="67" width="130" height="30" rx="8" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="844" y="86.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#57534e">Beanline</text>
+  <path d="M 942 79 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.6"/>
+  <rect x="972" y="67" width="168" height="30" rx="8" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="984" y="86.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#57534e">beanline brief</text>
+  <path d="M 1120 79 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.6"/>
+  <rect x="1152" y="67" width="104" height="30" rx="8" fill="#0f6c6c"/>
+  <text x="1204" y="86.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#ffffff" text-anchor="middle">New project</text>
+  
+  <circle cx="34" cy="143" r="2.8" fill="#e7e5e4"/>
+  <text x="45" y="147" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.5" fill="#a8a29e">THINKING</text>
+  <path d="M 120 140.5 l 4 4.5 l 4 -4.5" fill="none" stroke="#a8a29e" stroke-width="1.5"/>
+  
+  <text x="30" y="177" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">I've got the page structure. I'm creating index.html now with a</text>
+  <text x="30" y="198" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">self-contained layout, then I'll copy the logo SVG into the same</text>
+  <text x="30" y="219" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">directory so the hero and footer can reference it locally.</text>
+  <rect x="30" y="239" width="500" height="34" rx="9" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="43" y="260.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#15803d">&#x2713;</text>
+  <text x="62" y="260.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Creating index.html, Creating logo.svg</text>
+  
+  <text x="496" y="260" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">FILES</text>
+  <path d="M 506 253 l 4.5 5.5 l 4.5 -5.5" fill="none" stroke="#a8a29e" stroke-width="1.7"/>
+  
+  <circle cx="34" cy="296" r="2.8" fill="#e7e5e4"/>
+  <text x="45" y="300" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.5" fill="#a8a29e">THINKING</text>
+  <path d="M 120 293.5 l 4 4.5 l 4 -4.5" fill="none" stroke="#a8a29e" stroke-width="1.5"/>
+  <rect x="30" y="317" width="500" height="34" rx="9" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="43" y="338.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#15803d">&#x2713;</text>
+  <text x="62" y="338.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Running: "sed -n '1,260p' index.html"</text>
+  
+  <text x="496" y="338" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">COMMAND</text>
+  <path d="M 506 331 l 4.5 5.5 l 4.5 -5.5" fill="none" stroke="#a8a29e" stroke-width="1.7"/>
+  
+  <rect x="30" y="359" width="500" height="34" rx="9" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="43" y="380.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#15803d">&#x2713;</text>
+  <text x="62" y="380.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Running git status</text>
+  
+  <text x="496" y="380" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">COMMAND</text>
+  <path d="M 506 373 l 4.5 5.5 l 4.5 -5.5" fill="none" stroke="#a8a29e" stroke-width="1.7"/>
+  
+  <circle cx="34" cy="416" r="2.8" fill="#e7e5e4"/>
+  <text x="45" y="420" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.5" fill="#a8a29e">THINKING</text>
+  <path d="M 120 413.5 l 4 4.5 l 4 -4.5" fill="none" stroke="#a8a29e" stroke-width="1.5"/>
+  
+  <text x="30" y="450" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">Built the one-page Beanline site as a single index.html with inline</text>
+  <text x="30" y="471" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">CSS, semantic sections, and the requested warm editorial styling.</text>
+  <text x="30" y="492" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">I also copied the logo next to it as logo.svg so the hero and footer</text>
+  <text x="30" y="513" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">use a local asset.</text>
+  <text x="30" y="542" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">110,990 tokens · 51s</text>
+  <line x1="0" y1="856" x2="560" y2="856" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="30" y="870" width="424" height="36" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="44" y="893" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#a8a29e">Describe the site you want&#8230;</text>
+  <rect x="464" y="870" width="66" height="36" rx="10" fill="#0f6c6c" opacity="0.45"/>
+  <text x="497" y="893" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  <line x1="560" y1="108" x2="560" y2="920" stroke="#e7e5e4" stroke-width="1.5"/>
+  
+  <rect x="560" y="148" width="720" height="564" fill="#f5f5f4"/>
+  <rect x="576" y="162" width="688" height="536" rx="14" fill="#faf6f0"/>
+  <circle cx="616" cy="200" r="13" fill="none" stroke="#b3441a" stroke-width="2.5"/>
+  <path d="M 616 189 C 610 195, 622 205, 616 211" fill="none" stroke="#b3441a" stroke-width="2"/>
+  <text x="638" y="206" font-family="Georgia, 'Times New Roman', serif" font-size="19" font-weight="700" fill="#2b2b2b">Beanline</text>
+  <text x="604" y="254" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" letter-spacing="3" fill="rgba(43,43,43,0.72)">SPECIALTY COFFEE, SIX STORES, ESTABLISHED 2019</text>
+  <text x="604" y="300" font-family="Georgia, 'Times New Roman', serif" font-size="40" fill="#2b2b2b">Slow coffee</text>
+  <text x="604" y="346" font-family="Georgia, 'Times New Roman', serif" font-size="40" fill="#2b2b2b">for fast mornings</text>
+  <text x="604" y="382" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="rgba(43,43,43,0.72)">Beanline makes coffee, taken seriously. Warm service, careful brewing,</text>
+  <text x="604" y="402" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="rgba(43,43,43,0.72)">and a counter built for people who want the day to start with attention.</text>
+  <rect x="604" y="424" width="132" height="38" rx="19" fill="#b3441a"/>
+  <text x="670" y="448" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Find your store</text>
+  <line x1="560" y1="712" x2="1280" y2="712" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="560" y="712" width="720" height="208" fill="#fafaf9"/>
+  <line x1="560" y1="712" x2="1280" y2="712" stroke="#e7e5e4" stroke-width="1"/>
+  <text x="580" y="736" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#a8a29e">FILES</text>
+  <text x="830" y="736" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a8a29e" text-anchor="end">5</text>
+  <text x="580" y="758" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">brief/</text>
+  <text x="594" y="778" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">assets/</text>
+  <text x="608" y="798" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">copy.md</text>
+  <text x="608" y="818" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">logo.svg</text>
+  <text x="594" y="838" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">brief.md</text>
+  <text x="580" y="858" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1c1917">index.html</text>
+  <text x="580" y="878" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1c1917">logo.svg</text>
+  <line x1="560" y1="148" x2="1280" y2="148" stroke="#e7e5e4" stroke-width="1"/>
+  <text x="580" y="132.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">/preview/2de013ce/</text>
+  <rect x="1132" y="116" width="62" height="24" rx="7" fill="none" stroke="#e7e5e4" stroke-width="1.4"/>
+  
+  <text x="1144" y="132" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#57534e">Reload</text>
+  <rect x="1204" y="116" width="52" height="24" rx="7" fill="none" stroke="#e7e5e4" stroke-width="1.4"/>
+  <circle cx="1218" cy="128" r="2.5" fill="#0f6c6c"/>
+  <text x="1227" y="132" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#57534e">Diff</text>
+  <rect x="850" y="108" width="430" height="812" fill="#ffffff"/>
+  <line x1="850" y1="108" x2="850" y2="920" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="868" y="132" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#a8a29e">THIS TURN'S DIFF</text>
+  <text x="1260" y="133" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#a8a29e" text-anchor="end">&#x2715;</text>
+  <line x1="850" y1="146" x2="1280" y2="146" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="851" y="158" width="429" height="18.5" fill="#f5f5f4"/>
+  <text x="868" y="171.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" font-weight="700" fill="#44403c" xml:space="preserve">diff --git a/index.html b/index.html</text>
+  <text x="868" y="190" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#a8a29e" xml:space="preserve">new file mode 100644</text>
+  <text x="868" y="208.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#a8a29e" xml:space="preserve">index 0000000..d059cfe</text>
+  <text x="868" y="227" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#a8a29e" xml:space="preserve">--- /dev/null</text>
+  <text x="868" y="245.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#a8a29e" xml:space="preserve">+++ b/index.html</text>
+  <rect x="851" y="250.5" width="429" height="18.5" fill="rgba(15,108,108,0.10)"/>
+  <text x="868" y="264" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#0f6c6c" xml:space="preserve">@@ -0,0 +1,413 @@</text>
+  <rect x="851" y="269" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="282.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+&lt;!DOCTYPE html&gt;</text>
+  <rect x="851" y="287.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="301" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+&lt;html lang="en"&gt;</text>
+  <rect x="851" y="306" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="319.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+&lt;head&gt;</text>
+  <rect x="851" y="324.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="338" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+  &lt;meta charset="UTF-8" /&gt;</text>
+  <rect x="851" y="343" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="356.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+  &lt;meta name="viewport" content="width=device-width</text>
+  <rect x="851" y="361.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="375" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+  &lt;title&gt;Beanline&lt;/title&gt;</text>
+  <rect x="851" y="380" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="393.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+  &lt;style&gt;</text>
+  <rect x="851" y="398.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="412" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+    :root {</text>
+  <rect x="851" y="417" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="430.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+      --rust: #b3441a;</text>
+  <rect x="851" y="435.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="449" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+      --cream: #faf6f0;</text>
+  <rect x="851" y="454" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="467.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+      --ink: #2b2b2b;</text>
+  <rect x="851" y="472.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="486" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+      --muted: rgba(43, 43, 43, 0.72);</text>
+  <rect x="851" y="491" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="504.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+      --line: rgba(179, 68, 26, 0.18);</text>
+  <rect x="851" y="509.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="523" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+      --shadow: 0 22px 50px rgba(43, 43, 43, 0.08);</text>
+  <rect x="851" y="528" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="541.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+    }</text>
+  <rect x="851" y="546.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="560" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+</text>
+  <rect x="851" y="565" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="578.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+    * {</text>
+  <rect x="851" y="583.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="597" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+      box-sizing: border-box;</text>
+  <rect x="851" y="602" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="615.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+    }</text>
+  <rect x="851" y="620.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="634" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+</text>
+  <rect x="851" y="639" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="652.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+    html {</text>
+  <rect x="851" y="657.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="671" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+      scroll-behavior: smooth;</text>
+  <rect x="851" y="676" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="689.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+    }</text>
+  <rect x="851" y="694.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="708" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+</text>
+  <rect x="851" y="713" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="726.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+    body {</text>
+  <rect x="851" y="731.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="745" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+      margin: 0;</text>
+  <rect x="851" y="750" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="763.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+      font-family: system-ui, -apple-system,</text>
+  <rect x="851" y="768.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="782" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+        BlinkMacSystemFont, "Segoe UI", sans-serif;</text>
+  <rect x="851" y="787" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="800.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+      color: var(--ink);</text>
+  <rect x="851" y="805.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="819" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+      background:</text>
+  <rect x="851" y="824" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="837.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+        radial-gradient(circle at top left,</text>
+  <rect x="851" y="842.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="856" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+          rgba(179, 68, 26, 0.1), transparent 28%),</text>
+  <rect x="851" y="861" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="874.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+        var(--cream);</text>
+  <rect x="851" y="879.5" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="893" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+      line-height: 1.5;</text>
+  <rect x="851" y="898" width="429" height="18.5" fill="#f0fdf4"/>
+  <text x="868" y="911.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11"  fill="#166534" xml:space="preserve">+    }</text>
+</svg>

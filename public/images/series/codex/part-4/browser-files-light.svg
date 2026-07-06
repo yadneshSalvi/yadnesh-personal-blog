@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="880" viewBox="0 0 1280 880" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1280" height="880" fill="#fafaf9"/>
+  <rect x="0" y="0" width="1280" height="56" fill="#f3f1ec"/>
+  <line x1="0" y1="56" x2="1280" y2="56" stroke="#e2ded4" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#d6d1c5"/><circle cx="56" cy="28" r="7" fill="#d6d1c5"/><circle cx="82" cy="28" r="7" fill="#d6d1c5"/>
+  <rect x="400" y="13" width="480" height="30" rx="15" fill="#ffffff" stroke="#e2ded4"/>
+  <text x="640" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#5b554c" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="108" x2="1280" y2="108" stroke="#e7e5e4" stroke-width="1"/>
+  <circle cx="28" cy="82" r="5" fill="#0f6c6c"/>
+  <text x="42" y="87" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Pagewright</text>
+  <text x="150" y="86.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a8a29e">the site builder</text>
+  <rect x="832" y="67" width="130" height="30" rx="8" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="844" y="86.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#57534e">Beanline</text>
+  <path d="M 942 79 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.6"/>
+  <rect x="972" y="67" width="168" height="30" rx="8" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="984" y="86.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#57534e">beanline brief</text>
+  <path d="M 1120 79 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.6"/>
+  <rect x="1152" y="67" width="104" height="30" rx="8" fill="#0f6c6c"/>
+  <text x="1204" y="86.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#ffffff" text-anchor="middle">New project</text>
+  
+  <rect x="84" y="134" width="446" height="76" rx="16" fill="#1c1917"/>
+  <text x="100" y="158" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#fafaf9">Read brief/brief.md and build the site it describes, single</text>
+  <text x="100" y="178" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#fafaf9">index.html, inline CSS, use brief/assets/logo.svg by copying</text>
+  <text x="100" y="198" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#fafaf9">it next to index.html</text>
+  <circle cx="34" cy="235" r="2.8" fill="#e7e5e4"/>
+  <text x="45" y="239" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.5" fill="#a8a29e">THINKING</text>
+  <path d="M 120 232.5 l 4 4.5 l 4 -4.5" fill="none" stroke="#a8a29e" stroke-width="1.5"/>
+  <rect x="30" y="254" width="500" height="34" rx="9" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="43" y="275.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#15803d">&#x2713;</text>
+  <text x="62" y="275.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Listing files</text>
+  
+  <text x="496" y="275" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">COMMAND</text>
+  <path d="M 506 268 l 4.5 5.5 l 4.5 -5.5" fill="none" stroke="#a8a29e" stroke-width="1.7"/>
+  
+  <rect x="30" y="296" width="500" height="34" rx="9" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="43" y="317.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#15803d">&#x2713;</text>
+  <text x="62" y="317.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Running: "sed -n '1,220p' brief/brief.md"</text>
+  
+  <text x="496" y="317" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">COMMAND</text>
+  <path d="M 506 310 l 4.5 5.5 l 4.5 -5.5" fill="none" stroke="#a8a29e" stroke-width="1.7"/>
+  
+  <rect x="30" y="338" width="500" height="34" rx="9" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="43" y="359.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#15803d">&#x2713;</text>
+  <text x="62" y="359.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Running: "sed -n '1,220p' brief/assets/copy.md"</text>
+  
+  <text x="496" y="359" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">COMMAND</text>
+  <path d="M 506 352 l 4.5 5.5 l 4.5 -5.5" fill="none" stroke="#a8a29e" stroke-width="1.7"/>
+  
+  
+  <text x="30" y="401" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">The brief is straightforward: one static page, no external</text>
+  <text x="30" y="422" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">dependencies, with a warm editorial palette and the provided copy.</text>
+  <text x="30" y="443" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">I'm checking whether an index.html already exists, then I'll create</text>
+  <text x="30" y="464" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1c1917">the page and place a local copy of the logo alongside it.</text>
+  <rect x="30" y="484" width="500" height="34" rx="9" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="43" y="505.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#15803d">&#x2713;</text>
+  <text x="62" y="505.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57534e">Creating index.html, Creating logo.svg</text>
+  
+  <text x="496" y="505" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">FILES</text>
+  <path d="M 506 498 l 4.5 5.5 l 4.5 -5.5" fill="none" stroke="#a8a29e" stroke-width="1.7"/>
+  
+  <text x="30" y="543" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">110,990 tokens · 51s</text>
+  <line x1="0" y1="816" x2="560" y2="816" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="30" y="830" width="424" height="36" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="44" y="853" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#a8a29e">Describe the site you want&#8230;</text>
+  <rect x="464" y="830" width="66" height="36" rx="10" fill="#0f6c6c" opacity="0.45"/>
+  <text x="497" y="853" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  <line x1="560" y1="108" x2="560" y2="880" stroke="#e7e5e4" stroke-width="1.5"/>
+  
+  <rect x="560" y="148" width="720" height="524" fill="#f5f5f4"/>
+  <rect x="576" y="162" width="688" height="496" rx="14" fill="#faf6f0"/>
+  <circle cx="616" cy="200" r="13" fill="none" stroke="#b3441a" stroke-width="2.5"/>
+  <path d="M 616 189 C 610 195, 622 205, 616 211" fill="none" stroke="#b3441a" stroke-width="2"/>
+  <text x="638" y="206" font-family="Georgia, 'Times New Roman', serif" font-size="19" font-weight="700" fill="#2b2b2b">Beanline</text>
+  <text x="604" y="254" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" letter-spacing="3" fill="rgba(43,43,43,0.72)">SPECIALTY COFFEE, SIX STORES, ESTABLISHED 2019</text>
+  <text x="604" y="300" font-family="Georgia, 'Times New Roman', serif" font-size="40" fill="#2b2b2b">Slow coffee</text>
+  <text x="604" y="346" font-family="Georgia, 'Times New Roman', serif" font-size="40" fill="#2b2b2b">for fast mornings</text>
+  <text x="604" y="382" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="rgba(43,43,43,0.72)">Beanline makes coffee, taken seriously. Warm service, careful brewing,</text>
+  <text x="604" y="402" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="rgba(43,43,43,0.72)">and a counter built for people who want the day to start with attention.</text>
+  <rect x="604" y="424" width="132" height="38" rx="19" fill="#b3441a"/>
+  <text x="670" y="448" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Find your store</text>
+  <line x1="560" y1="672" x2="1280" y2="672" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="560" y="672" width="720" height="208" fill="#fafaf9"/>
+  <line x1="560" y1="672" x2="1280" y2="672" stroke="#e7e5e4" stroke-width="1"/>
+  <text x="580" y="696" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#a8a29e">FILES</text>
+  <text x="1260" y="696" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a8a29e" text-anchor="end">5</text>
+  <text x="580" y="718" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">brief/</text>
+  <text x="594" y="738" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">assets/</text>
+  <text x="608" y="758" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">copy.md</text>
+  <text x="1260" y="758" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#a8a29e" text-anchor="end">619 B</text>
+  <text x="608" y="778" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">logo.svg</text>
+  <text x="1260" y="778" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#a8a29e" text-anchor="end">417 B</text>
+  <text x="594" y="798" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">brief.md</text>
+  <text x="1260" y="798" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#a8a29e" text-anchor="end">1004 B</text>
+  <text x="580" y="818" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1c1917">index.html</text>
+  <rect x="1124" y="807" width="48" height="15" rx="3" fill="#dcfce7"/>
+  <text x="1148" y="818" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#166534" text-anchor="middle">added</text>
+  <text x="1260" y="818" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#a8a29e" text-anchor="end">9.1 kB</text>
+  <text x="580" y="838" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1c1917">logo.svg</text>
+  <rect x="1124" y="827" width="48" height="15" rx="3" fill="#dcfce7"/>
+  <text x="1148" y="838" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#166534" text-anchor="middle">added</text>
+  <text x="1260" y="838" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#a8a29e" text-anchor="end">417 B</text>
+  <line x1="560" y1="148" x2="1280" y2="148" stroke="#e7e5e4" stroke-width="1"/>
+  <text x="580" y="132.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a8a29e">/preview/2de013ce/</text>
+  <rect x="1132" y="116" width="62" height="24" rx="7" fill="none" stroke="#e7e5e4" stroke-width="1.4"/>
+  
+  <text x="1144" y="132" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#57534e">Reload</text>
+  <rect x="1204" y="116" width="52" height="24" rx="7" fill="none" stroke="#e7e5e4" stroke-width="1.4"/>
+  <circle cx="1218" cy="128" r="2.5" fill="#0f6c6c"/>
+  <text x="1227" y="132" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#57534e">Diff</text>
+</svg>

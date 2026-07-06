@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="564" viewBox="0 0 1040 564" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="564" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; thread/read replays the archive, no resume needed</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62">→</tspan> {"id": 2, "method": <tspan fill="#e5825a">"thread/read"</tspan>,</text>
+    <text x="32" y="116" xml:space="preserve">        "params": {"threadId": "019f38ce-b1cc-77f2-…", "includeTurns": <tspan fill="#6fa8dc">true</tspan>}}</text>
+    <text x="32" y="144" xml:space="preserve"><tspan fill="#756d62">←</tspan> {"id": 2, "result": {"thread": {</text>
+    <text x="32" y="172" xml:space="preserve">      "id": "019f38ce-b1cc-77f2-…",</text>
+    <text x="32" y="200" xml:space="preserve">      "name": <tspan fill="#8fb573">"Build a tiny one-page site for Paper Crane from"</tspan>,  <tspan fill="#756d62"># the auto-title</tspan></text>
+    <text x="32" y="228" xml:space="preserve">      "path": "…/sessions/2026/07/07/rollout-….jsonl",</text>
+    <text x="32" y="256" xml:space="preserve">      "turns": [{"id": "019f38ce-b254-…", "status": "completed", "items": [</text>
+    <text x="32" y="284" xml:space="preserve">        {"type": <tspan fill="#6fa8dc">"userMessage"</tspan>, "content": [{"type": "text",</text>
+    <text x="32" y="312" xml:space="preserve">         "text": "Build a tiny one-page site for Paper Crane from the brief …"}]},</text>
+    <text x="32" y="340" xml:space="preserve">        {"type": <tspan fill="#6fa8dc">"reasoning"</tspan>, …},</text>
+    <text x="32" y="368" xml:space="preserve">        {"type": <tspan fill="#6fa8dc">"agentMessage"</tspan>, "phase": <tspan fill="#e5825a">"commentary"</tspan>, "text": "I’m reading the brief …"},</text>
+    <text x="32" y="396" xml:space="preserve">        <tspan fill="#756d62">… 16 items in this turn: 6 agentMessages, 5 reasoning stretches, 2 fileChanges …</tspan></text>
+    <text x="32" y="424" xml:space="preserve">        {"type": <tspan fill="#6fa8dc">"agentMessage"</tspan>, "phase": <tspan fill="#8fb573">"final_answer"</tspan>, "text": "Built the one-page …"}</text>
+    <text x="32" y="452" xml:space="preserve">      ]}, …]}}}</text>
+    <text x="32" y="480" xml:space="preserve"></text>
+    <text x="32" y="508" xml:space="preserve"><tspan fill="#756d62"># this thread was NOT loaded in the engine: read serves straight from the rollout file</tspan></text>
+  </g>
+</svg>

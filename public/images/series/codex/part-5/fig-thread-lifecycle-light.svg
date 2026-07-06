@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="730" viewBox="0 0 1240 730" role="img">
+  <rect width="1240" height="730" fill="#faf9f6"/>
+  <text x="48" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#8f887a">ONE THREAD PER PROJECT &#183; WHAT ensure_thread() DOES BEFORE EVERY TURN</text>
+  <line x1="48" y1="66" x2="1192" y2="66" stroke="#e7e3d9" stroke-width="1.5"/>
+
+  <!-- incoming message -->
+  <rect x="220" y="92" width="420" height="44" rx="10" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="430" y="120" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#5b554c" text-anchor="middle">POST /projects/145d5abf/chat &#183; "make the hero warmer"</text>
+  <line x1="430" y1="136" x2="430" y2="168" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 430 168 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 430 168)"/>
+
+  <!-- the bookmark check -->
+  <rect x="260" y="168" width="340" height="46" rx="10" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="430" y="197" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" fill="#1f1c19" text-anchor="middle">registry line has a thread_id?</text>
+
+  <!-- no branch (first message) -->
+  <line x1="260" y1="191" x2="138" y2="191" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 138 191 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(90 138 191)"/>
+  <text x="196" y="181" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#8f887a" text-anchor="middle">no: first message</text>
+  <rect x="28" y="240" width="200" height="64" rx="10" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="128" y="266" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" fill="#b3441a" text-anchor="middle">thread/start</text>
+  <text x="128" y="288" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c" text-anchor="middle">{cwd, sandbox, model}</text>
+  <line x1="128" y1="191" x2="128" y2="240" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 128 240 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 128 240)"/>
+  <line x1="128" y1="304" x2="128" y2="344" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 128 344 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 128 344)"/>
+  <rect x="28" y="344" width="200" height="56" rx="10" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="128" y="368" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="middle">save the new id</text>
+  <text x="128" y="386" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="middle">in projects.json</text>
+
+  <!-- yes branch: resume -->
+  <line x1="430" y1="214" x2="430" y2="246" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 430 246 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 430 246)"/>
+  <text x="442" y="236" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#8f887a" text-anchor="start">yes</text>
+  <rect x="260" y="246" width="340" height="64" rx="10" fill="#f6e7df" stroke="#dcb09a" stroke-width="1.5"/>
+  <text x="430" y="273" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#b3441a" text-anchor="middle">thread/resume</text>
+  <text x="430" y="294" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="middle">{"threadId": "019f38ce-b1cc-…"}</text>
+
+  <!-- resume ok -->
+  <line x1="430" y1="310" x2="430" y2="352" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 430 352 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 430 352)"/>
+  <text x="442" y="338" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#3f6212" text-anchor="start">ok: the job folder reopens at the bookmark</text>
+  <rect x="260" y="352" width="340" height="46" rx="10" fill="#f2f7e8" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="430" y="381" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#3f6212" text-anchor="middle">memory intact, across backend restarts</text>
+
+  <!-- resume failed -->
+  <line x1="600" y1="278" x2="800" y2="278" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 800 278 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(-90 800 278)"/>
+  <text x="612" y="264" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#b91c1c" text-anchor="start">-32600 "no rollout found …"</text>
+  <rect x="800" y="246" width="300" height="64" rx="10" fill="#fbeaea" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="950" y="273" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#b91c1c" text-anchor="middle">the bookmark dangles</text>
+  <text x="950" y="293" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#5b554c" text-anchor="middle">rollout deleted, or CODEX_HOME moved</text>
+  <line x1="950" y1="310" x2="950" y2="344" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 950 344 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 950 344)"/>
+  <rect x="800" y="344" width="300" height="82" rx="10" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="950" y="369" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#b3441a" text-anchor="middle">thread/start (fresh)</text>
+  <text x="950" y="389" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c" text-anchor="middle">save the new id · same cwd</text>
+  <text x="950" y="409" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c" text-anchor="middle">emit {"type": "thread_reset"} on the wire</text>
+
+  <!-- all roads to turn/start -->
+  <line x1="128" y1="400" x2="128" y2="470" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 128 470 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 128 470)"/>
+  <line x1="430" y1="398" x2="430" y2="470" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 430 470 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 430 470)"/>
+  <line x1="950" y1="426" x2="950" y2="470" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 950 470 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 950 470)"/>
+  <line x1="128" y1="470" x2="950" y2="470" stroke="#8f887a" stroke-width="1.5"/>
+  <line x1="555" y1="470" x2="555" y2="502" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 555 502 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 555 502)"/>
+  <rect x="385" y="502" width="340" height="46" rx="10" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="555" y="531" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="middle">turn/start {"threadId", input, summary}</text>
+
+  <!-- the archive, feeding resume -->
+  <g>
+    <rect x="820" y="92" width="372" height="118" rx="10" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+    <text x="838" y="118" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#8f887a" text-anchor="start">THE ROLLOUT ARCHIVE</text>
+    <text x="838" y="142" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">$CODEX_HOME/sessions/2026/07/07/</text>
+    <text x="838" y="162" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#b3441a" text-anchor="start">rollout-…-019f38ce-b1cc-….jsonl</text>
+    <text x="838" y="188" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">written by the engine, survives restarts;</text>
+    <text x="838" y="202" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">the only state our backend adds is the bookmark</text>
+  </g>
+  <path d="M 820 155 C 730 175, 670 215, 608 254" fill="none" stroke="#8f887a" stroke-width="1.2" stroke-dasharray="4 4"/>
+
+  <!-- the wire -->
+  <rect x="48" y="590" width="1144" height="88" rx="10" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="68" y="618" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">ON THE WIRE, WHEN THE FALLBACK FIRES (one new event type, nothing else changes):</text>
+  <text x="68" y="646" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">data: {"type": "thread_reset", "message": "chat history could not be</text>
+  <text x="114" y="666" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">restored; the site files are intact"}</text>
+</svg>

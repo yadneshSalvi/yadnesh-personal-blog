@@ -1,0 +1,412 @@
+---
+title: "Codex App Server in Production, Part 5: Threads That Persist: Projects, Resume, and Fork"
+subtitle: "Restart the backend and the conversation survives, because the engine never stopped writing it down. Projects grow memory, an auto-title, a sidebar, and a Fork button that gives one site two futures. Act I closes."
+image: "/images/series/codex/part-5/cover-light.svg"
+imageDark: "/images/series/codex/part-5/cover-dark.svg"
+createdAt: "2026-07-07T00:00:00.000Z"
+updatedAt: "2026-07-07T00:00:00.000Z"
+tags: ["codex", "openai", "fastapi", "nextjs", "tutorial"]
+series: "codex-app-server-fastapi-nextjs"
+seriesPart: 5
+---
+
+Here's a real exchange from the app you'll have by the end of this page. Turn one built a site for Paper Crane, a letterpress studio, with an ink-blue accent. Turn two: "Make the accent color darker. Keep everything else exactly the same," and the diff that came back changed exactly one line, `--ink: #26428B` to `#1D326A`. Then I killed the backend. Started it again. Asked: **"And what was it before we darkened it?"** Four seconds later: *"Before that, it was `#26428B`."* The server that answered had been alive for under a minute and stores no conversations anywhere. Its entire contribution to that feat is an eight-character bookmark in a flat JSON file.
+
+Everything else was already on disk, written by the engine, since Part 1.
+
+<Figure
+  src="/images/series/codex/part-5/browser-fork-light.svg"
+  srcDark="/images/series/codex/part-5/browser-fork-dark.svg"
+  alt="Pagewright with a projects sidebar on the left listing Paper Crane and an active Paper Crane fork, each titled Build a tiny one-page site for Paper C. The fork's chat shows inherited history: a question about the accent color before darkening, answered with hex 26428B, then a request to change the accent to deep forest green, a completed sed command badge, and the reply that the accent is now 1F4D2F everywhere it was hardcoded. On the right, the fork's live preview renders the Paper Crane page in forest green while the original project stays ink blue."
+  caption="The end of this part, drawn from the real run. The fork is answering questions from a conversation it was never part of, and its copy of the site has gone green while the original stays blue."
+  width={1120}
+  height={780}
+/>
+
+That screenshot is the whole part in one frame: a **projects sidebar** listing every job folder with an auto-title, a conversation that was **replayed from the engine's archive** rather than stored by us, and a **fork** that inherited both the site and the memory before diverging. The engine does almost all of it. Our backend contributes about a hundred lines, and most of them are bookkeeping.
+
+## Part 4's polite amnesia
+
+[Part 4](/blog/codex-4-live-preview) closed by naming the crack in its own foundation: **every message still starts a brand-new thread.** Each `POST /chat` called `thread/start`, ran one turn, and let the thread id fall on the floor. The desk remembers everything; the conversation remembers nothing.
+
+What's worth adding to that confession is *why you barely noticed for two whole parts*, because it's this series' version of a lesson the [sibling series](/blog/agent-sdk-5-sessions) also had to learn. A builder agent *reads its job site before working*. Ask for "a warmer hero" and the agent opens `index.html`, sees what's there, and edits it. The workspace was carrying the conversation's *output*, so most follow-ups landed fine without any memory at all. The files were doing the remembering.
+
+But files only remember what's written in them. "What did we settle on?", "why did you pick that font?", "undo the thing from two messages ago": the moment a follow-up refers to the *conversation* instead of the *files*, a fresh thread has nothing to say. Worse, you paid for the difference on every single message: a new thread means the agent re-explores the workspace from scratch, listing and re-reading files it had already read the message before. Amnesia isn't only wrong; it's expensive.
+
+## The archive pays rent
+
+The fix costs almost nothing, because of something you saw in [Part 1 and were told to leave alone](/blog/codex-1-first-thread#the-archive-the-engine-keeps): every thread the engine has ever opened is already persisted as a [rollout file](/blog/codex-concepts#rollouts), one JSONL per thread, filed by date under `~/.codex/sessions`. The engine writes it as the turn happens, whether or not anyone plans to come back. Conversation persistence has existed in Pagewright since your first script; we've been throwing away the *key*, not the data.
+
+So Part 5's entire storage design is: stop throwing away the key. A project's registry line grows two fields:
+
+```python filename="backend/app/projects.py" repo="part-05-threads/backend/app/projects.py" lines="81-95"
+    now = _now()
+    entry = {
+        "id": project_id,
+        "name": name or (brief.replace("-", " ").title() if brief else "Untitled site"),
+        "created_at": now,
+        "updated_at": now,
+        # The job folder arrives with the first message; until then the
+        # project is a workspace waiting for its conversation.
+        "thread_id": None,
+        "thread_name": None,
+    }
+    entries = load_registry()
+    entries.append(entry)
+    save_registry(entries)
+    return entry
+```
+
+`thread_id` is the bookmark into the engine's archive; it's also the third door into a workspace that Part 4's layout diagram promised, after the engine's `cwd` and the browser's preview mount. `thread_name` will hold an auto-title shortly. That's the complete inventory of new state: **no messages table, no transcript store, no database.** The engine owns the conversation; we own one pointer to it. (SQLite does arrive in this series, but for a different job, in Part 9, and this discipline of not adding infrastructure before its part is inherited from the sibling series.)
+
+<Callout type="info" title="CODEX_HOME: where the archive lives">
+Everything the engine persists, auth, config, and the sessions archive, lives under one directory: `~/.codex` by default, relocatable by setting the `CODEX_HOME` environment variable. That's how a server deployment (Part 13) will keep engine state on a volume it controls, and it's why "the rollout is gone" is a real production failure mode rather than a contrived one: move `CODEX_HOME`, and every bookmark in your registry dangles at once. We're about to handle exactly that.
+</Callout>
+
+## Resume first, start as the fallback
+
+One function decides every project's fate, and it runs before every turn. Inside `ensure_thread()`:
+
+```python filename="backend/app/main.py" repo="part-05-threads/backend/app/main.py" lines="156-173"
+    thread_id = entry.get("thread_id")
+    if thread_id:
+        try:
+            await client.request("thread/resume", {"threadId": thread_id})
+            return thread_id, False
+        except CodexError:
+            # The rollout is gone (deleted, or CODEX_HOME moved). The
+            # workspace is truth: same files, new conversation.
+            pass
+    started = await client.request("thread/start", {
+        "cwd": str(workspace),
+        "sandbox": "workspace-write",
+        "approvalPolicy": "never",
+        "model": MODEL,
+    })
+    new_id = started["thread"]["id"]
+    projects.update_project(entry["id"], thread_id=new_id)
+    return new_id, thread_id is not None
+```
+
+Read it as three lanes. A project with a saved `thread_id` gets `thread/resume`: the engine reloads the rollout, and the next turn arrives with the whole conversation already in its head. A project without one (first message ever) gets `thread/start`, and the id is saved. And if resume *fails*, the project falls back to a fresh thread in the same workspace, with the second return value, `reset`, set to `True` so the stream can tell the user the truth. That flag is the subject of the next section.
+
+<Figure
+  src="/images/series/codex/part-5/fig-thread-lifecycle-light.svg"
+  srcDark="/images/series/codex/part-5/fig-thread-lifecycle-dark.svg"
+  alt="Flow diagram of ensure_thread. A message arrives for project 145d5abf and hits the question: does the registry line have a thread_id? No means first message: thread/start with cwd, sandbox, and model, then save the new id in projects.json. Yes means thread/resume with the saved threadId. On success, memory is intact across backend restarts. On error minus 32600 no rollout found, the bookmark dangles: a fresh thread/start with the same cwd, the new id is saved, and a thread_reset event is emitted on the wire. All three lanes end at turn/start. A side panel shows the rollout archive under CODEX_HOME sessions feeding thread/resume, noting the only state the backend adds is the bookmark."
+  caption="Every lane ends at turn/start. The registry keeps one bookmark per project; the engine's archive does all the actual remembering."
+  width={1240}
+  height={730}
+/>
+
+The chat stream barely changes. `run_turn` calls `ensure_thread` instead of `thread/start`, and gains one conditional parcel:
+
+```python filename="backend/app/main.py" repo="part-05-threads/backend/app/main.py" lines="191-209"
+async def run_turn(project_id: str, message: str):
+    entry = projects.get_project(project_id)
+    workspace = projects.site_dir(project_id).resolve()
+    thread_id, reset = await ensure_thread(entry, workspace)
+    queue = client.queue_for(thread_id)
+    await client.request("turn/start", {
+        "threadId": thread_id,
+        "input": [{"type": "text", "text": message}],
+        # Without this the model reasons silently and the drawer stays
+        # empty. Part 10 turns summary (and effort) into user-facing dials.
+        "summary": "detailed",
+    })
+
+    yield sse({"type": "session_start", "session_id": thread_id,
+               "project_id": project_id})
+    if reset:
+        yield sse({"type": "thread_reset",
+                   "message": "chat history could not be restored; "
+                              "the site files are intact"})
+```
+
+`thread_reset` is the [event vocabulary's](/blog/codex-2-fastapi-bridge#designing-the-envelope) only addition this part: eleven event types existed before this page, twelve after, and every client built since Part 2 keeps working because unknown labels fall through parsers untouched. That promise has now survived three straight parts of growth.
+
+Now the demo from the opening, with its receipts. Build the site from the seeded brief (49.7 seconds, a 410-line `index.html`). Send "Make the accent color darker. Keep everything else exactly the same," and watch the diff drawer report a **one-line diff**: the agent knew the site because the thread remembered building it, so it went straight to the `--ink` token instead of re-exploring. Then stop uvicorn, start it again, and ask about the old color. The new backend process resumes the same thread from the archive and answers `#26428B` from turns it wasn't alive for. The engine's process boundary and your product's memory boundary are now different things, and that difference is the whole reason this part exists.
+
+## Break it on purpose: shred the bookmark
+
+Every dangling-pointer bug you'll ever ship starts as a happy path that assumed its target exists. Our registry now points at a file in the engine's archive, so the honest move is to delete the file and watch what the protocol actually does. Stop the backend, find the project's rollout under `$CODEX_HOME/sessions/2026/07/07/`, delete it, restart, and send a message. Here's the raw exchange, captured over stdio:
+
+<Figure
+  src="/images/series/codex/part-5/term-missing-rollout.svg"
+  alt="A dark terminal showing three JSON-RPC exchanges. Resuming thread 019f38ce whose rollout file was deleted returns error code minus 32600 with message: no rollout found for thread id 019f38ce. Resuming a well-formed thread id that never existed, all ones and twos, returns the identical error code and wording. A comment notes deleted and never-existed are indistinguishable. Finally thread/read on the same missing thread returns minus 32600 with different words: thread not loaded."
+  caption="The wall, met on purpose. A typed error code, the same -32600 for a deleted rollout and a never-existed id, and a differently worded refusal from thread/read."
+  width={1040}
+  height={508}
+/>
+
+Three observations, in rising order of importance. First, it's a **typed error**, the same numbered-notes discipline from [Part 1's handshake wall](/blog/codex-1-first-thread#break-it-on-purpose-skipping-the-handshake): the reply quotes our id and carries `code: -32600`, which is why `CodexError` grew a `code` field this part and why the fallback in `ensure_thread` catches an exception instead of string-matching prose. Second, a **deleted** rollout and a thread id that **never existed** produce the identical code and identical wording. Our code cannot tell corruption from fabrication, so the fallback treats both the same way: fresh thread, honest notice. It would be nicer to distinguish them; the protocol, as of this pin, doesn't let us, and pretending otherwise would be writing fiction. Third, `thread/read` refuses with *different* words ("thread not loaded"), a small asymmetry worth knowing before you build error handling on either method.
+
+The user, meanwhile, sees this:
+
+<Figure
+  src="/images/series/codex/part-5/browser-reset-light.svg"
+  srcDark="/images/series/codex/part-5/browser-reset-dark.svg"
+  alt="Pagewright after the rollout was deleted. At the top of the chat a small amber pill reads: History could not be restored. Files are intact. Below it the user asks what accent color did we settle on, one short sentence. The agent's thinking line says it is checking the design source in the repo for the agreed accent color, followed by two completed command badges, listing files and reading brief.md with sed. The answer says: We settled on ink blue, hex 26428B, with a receipt of 46,480 tokens in 9 seconds. On the right the live preview still renders the Paper Crane site, unchanged, in the darker ink blue."
+  caption="The amber notice from the real run. Note the preview: the site never blinked, because the workspace was never in danger. And note the answer, because it is wrong in an instructive way."
+  width={1120}
+  height={780}
+/>
+
+The amber pill is the `thread_reset` parcel, rendered as a quiet inline notice rather than a scary modal, slotted in front of the message that triggered it:
+
+```tsx filename="frontend/app/page.tsx" repo="part-05-threads/frontend/app/page.tsx" lines="281-285"
+          setMessages((all) => [
+            ...all.slice(0, -2),
+            { role: "notice", text: "History could not be restored. Files are intact." },
+            ...all.slice(-2),
+          ]);
+```
+
+Now look closely at what the agent did next, because this run taught me something I hadn't planned to teach. Asked the same accent question that the resumed thread had answered perfectly, the fresh thread went and *investigated the workspace*: listed files, read the brief, and answered "We settled on ink blue, `#26428B`." That is the brief's original brand color. It is **not** what we settled on; the lost conversation had darkened it to `#1D326A`, and the current `index.html` even says so. The agent reconstructed a plausible answer from the paperwork and got it confidently wrong.
+
+"The workspace is truth" has been this series' comfort blanket since Part 1, and it held: the site files survived, the preview never flickered, nothing of the *product* was lost. But the workspace is truth about **files**, not about **decisions**. Conversations accumulate agreements that never get written into any file, and when the thread dies, those die with it. That's the honest shape of this failure mode, it's why the notice says "files are intact" rather than "nothing was lost", and it's quietly one of the best arguments in the series for a habit Part 12 will formalize: important decisions belong in files the agent reads, not only in chat scrollback.
+
+## A title the engine keeps
+
+Projects need names better than "Untitled site", and nobody wants to type one. After a project's first completed turn, the backend cuts the first message down to 48 characters at a word boundary and files it with the engine:
+
+```python filename="backend/app/main.py" repo="part-05-threads/backend/app/main.py" lines="176-188"
+async def finish_turn(project_id: str, thread_id: str, message: str) -> None:
+    """The bookkeeping after a completed turn: auto-title the thread the
+    first time, and stamp the registry's updated_at."""
+    entry = projects.get_project(project_id)
+    if entry and entry.get("thread_name") is None:
+        name = title_from(message)
+        try:
+            await client.request("thread/name/set",
+                                 {"threadId": thread_id, "name": name})
+            projects.update_project(project_id, thread_name=name)
+        except CodexError:
+            pass  # a failed rename must never break the turn
+    projects.touch(project_id)
+```
+
+`thread/name/set` takes `{threadId, name}`, returns an empty result, and from then on the name travels with the thread itself: it comes back in `thread/list` and `thread/read`, engine-side, no matter who asks. Our test project's title landed as **"Build a tiny one-page site for Paper Crane from"**, which is exactly what a 48-character word-boundary cut of the first message looks like. Mechanical, cheap, good enough; the polished move (asking the model for a title) costs a model call, and this series spends those deliberately. Note the `except CodexError: pass`: a rename is decoration, and decoration must never take down a turn that already succeeded.
+
+The sidebar itself is the `ProjectsSidebar` component you can see in every screenshot on this page: one row per registry line showing `name`, the auto-title underneath, a relative timestamp, and a per-row Fork button. It renders from `GET /projects`, which returns the flat file as-is. No protocol call happens when the sidebar renders, which is worth a short pause, because the protocol *does* offer one.
+
+<Callout type="info" title="thread/list exists, and the sidebar deliberately doesn't use it">
+The engine will happily enumerate its whole archive: `thread/list {}` returns every thread with its name and metadata, and the part's backend exposes it at `GET /threads` as a debug endpoint so you can see the protocol-native view. But Pagewright's sidebar needs *projects*, each pairing a thread with a workspace folder the engine knows nothing about, and that pairing lives only in our registry. The engine's list also includes every thread from every experiment you've run against this `CODEX_HOME`, not only Pagewright's. Same lesson the sibling series learned when an unscoped session listing returned its author's entire machine history: the engine's archive is the engine's world; your product's index is yours.
+</Callout>
+
+## Reopening a project without waking the engine
+
+Click a sidebar row and its conversation reappears. The interesting part is where it comes from: not from a transcript we stored (we stored none), but from the rollout, via the third thread verb of this part. `thread/read` takes `{threadId, includeTurns: true}` and replays the archive:
+
+<Figure
+  src="/images/series/codex/part-5/term-thread-read.svg"
+  alt="A dark terminal showing a thread/read request with includeTurns true and its response: the thread object with its id, the auto-title name Build a tiny one-page site for Paper Crane from, the rollout path, and a turns array. The first turn's items include a userMessage with the build request, a reasoning item, an agentMessage with phase commentary, a note that the turn held 16 items including 6 agentMessages and 2 fileChanges, and a final agentMessage with phase final_answer. A closing comment notes the thread was not loaded in the engine: read serves straight from the rollout file."
+  caption="A real thread/read against a thread the engine had never loaded in this process. Everything Part 1 watched stream past live is in here, at rest: items, phases, the auto-title."
+  width={1040}
+  height={564}
+/>
+
+The detail that makes the `/history` endpoint cheap: **`thread/read` serves unloaded threads straight from the rollout file.** No `thread/resume`, no engine state, no model anywhere near it. Reading history is a disk read wearing a JSON-RPC envelope, which is exactly what you want wired to a click that users will spam. (`thread/resume` is for *continuing* a conversation; `thread/read` is for *looking at* one. Different verbs because different costs.)
+
+The endpoint guards its edges, reads, and hands the turns to a mapper:
+
+```python filename="backend/app/main.py" repo="part-05-threads/backend/app/main.py" lines="107-114"
+    entry = projects.get_project(project_id)
+    if entry is None:
+        raise HTTPException(status_code=404, detail="no such project")
+    if not entry.get("thread_id"):
+        return {"history": []}
+    try:
+        result = await client.request(
+            "thread/read", {"threadId": entry["thread_id"], "includeTurns": True})
+```
+
+The `except CodexError` branch below it (in the full file) returns an empty history: a dangling bookmark means the project has no past to show, and the chat endpoint will repair the bookmark on the next message anyway. The happy path ends with `history_from_turns(result["thread"].get("turns", []))`, and that mapper is a policy decision disguised as a loop. Inside `history_from_turns()`:
+
+```python filename="backend/app/events.py" repo="part-05-threads/backend/app/events.py" lines="67-82"
+    history = []
+    for turn in turns:
+        final = None
+        for item in turn.get("items", []):
+            if item.get("type") == "userMessage":
+                text = "".join(c.get("text", "") for c in item.get("content", [])
+                               if c.get("type") == "text")
+                if text:
+                    history.append({"role": "user", "text": text})
+            elif item.get("type") == "agentMessage":
+                # Later agentMessages supersede earlier commentary; the
+                # last one standing is the turn's final answer.
+                final = item.get("text") or final
+        if final:
+            history.append({"role": "assistant", "text": final})
+    return history
+```
+
+The policy: each `userMessage`, plus each turn's **final** `agentMessage`, and nothing else. The "final" part matters because, as that terminal capture shows, a working turn narrates as it goes: our 50-second build turn contained *six* agentMessage items, five of them mid-work commentary (`"phase": "commentary"`) and only the last one the answer (`"phase": "final_answer"`). Keeping the last one standing per turn is what makes replayed history read like a conversation instead of a transcript of someone talking to themselves.
+
+What about the commands, the reasoning, the file changes? Skipped, deliberately, and this is a place where this series and its sibling make *opposite* choices for good reasons. The [sibling's analyst](/blog/agent-sdk-5-sessions) replays every tool call as a badge, because for a data analyst the tool calls *are* the work product ("which query produced this number?"). For a site builder, the work product is sitting in the right-hand pane: every command and patch already left its mark on the workspace, the preview renders it, and the file tree lists it. History here answers "what did we say?", and the workspace answers "what did we do?". The frontend's `loadHistory` maps each row into the Part 3 block model as a plain text block (`frontend/app/page.tsx`, wired into `selectProject`), so a replayed conversation renders through the exact components that render a live one.
+
+One thing you give up, and the dessert screenshot admits it if you look: replayed turns show no token receipts. The receipt was a property of the *stream* you watched live; the archive keeps what was said. If that ever stings, the numbers are in the rollout's `tokenUsage` records waiting for a later part to want them.
+
+## Fork: two drafts of one site
+
+Somewhere on your disk right now is a folder holding `site-final`, `site-final-2`, and `site-final-REALLY-final`, each copied at a moment when you didn't trust the next edit. Every one of us versions by fear when the tool doesn't offer a better verb. This part's last feature is that better verb, and the protocol supplies its hard half for free.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 2 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels side by side separated by thin vertical black dividers, about photocopying a half-finished blueprint and both copies continuing to draw themselves. Panel 1: a workshop wall of labeled job folders on shelves behind Yad; Yad feeds one large rolled blueprint of a small house into an office photocopier; a friendly little robot builder watches; the blueprint is clearly HALF-DRAWN, right side incomplete; label on the folder reads "PAPER CRANE". Panel 2: TWO identical blueprints lie side by side on two drafting tables, and BOTH are drawing themselves: tiny pen lines continuing on each one without anyone touching them; the left blueprint's lines are turning BLUE, the right blueprint's lines are turning GREEN; Yad and the robot lean in, amazed; Yad says: "THEY KEPT GOING." Panel 3: two finished miniature house models sit side by side on a table, one blue and one green, identical except for color; Yad stands between them, hands on his head, agonized; he says: "I CAN'T PICK." The robot shrugs happily. Clean readable hand-lettered speech bubbles and labels, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/codex/part-5/comic-photocopy.png"
+  alt="Comic in three panels. Panel one: Yad, a bearded developer with headphones, feeds a half-drawn blueprint from a job folder labeled PAPER CRANE into an office photocopier while a small robot builder watches, with a wall of labeled job folders behind them. Panel two: two identical blueprints sit on two drafting tables and both keep drawing themselves, pens moving with nobody touching them, one turning blue and one turning green; Yad, amazed, says THEY KEPT GOING. Panel three: two finished miniature houses stand side by side, identical except one is blue and one is green, and Yad clutches his head saying I CAN'T PICK while the robot shrugs happily."
+  caption="thread/fork in one office appliance: photocopy a half-finished blueprint and both copies keep drawing themselves. Choosing between the results remains your problem."
+  width={1536}
+  height={1024}
+/>
+
+A project is two things, so forking is two copies with two different owners:
+
+```python filename="backend/app/main.py" repo="part-05-threads/backend/app/main.py" lines="130-139"
+    new_id = projects.fork_workspace(project_id)
+    workspace = projects.site_dir(new_id).resolve()
+    # thread/fork copies the conversation into a new thread; cwd points it
+    # at the copied workspace so both drafts keep drawing themselves.
+    forked = await client.request("thread/fork", {
+        "threadId": src["thread_id"], "cwd": str(workspace)})
+    entry = projects.register_fork(src, new_id, forked["thread"]["id"],
+                                   forked["thread"].get("forkedFromId") or src["thread_id"])
+    mount_preview(app, new_id)
+    return entry
+```
+
+`thread/fork` is the engine's half: it copies the **conversation** into a new thread with its own id and its own rollout, history intact. The `cwd` override in the same request is the hinge between the halves: it points the forked thread at a *new* workspace, the one `fork_workspace()` made one line earlier with `shutil.copytree`. Because here is the fact this feature turns on:
+
+<Callout type="warning" title="Forking copies the conversation. It does NOT copy the workspace.">
+The engine owns threads, so `thread/fork` photocopies the thread. It has no idea your product organizes work into per-project folders; the workspace is your artifact, so copying it is your job, and the `cwd` override exists precisely so the copied conversation can point at the copied job site. Forget the `copytree` and you get the spooky version: two conversations that both believe they own the same folder, editing each other's site. The two-owners split is the entire design of this endpoint: engine copies memory, we copy files, `cwd` marries them.
+</Callout>
+
+I verified both halves the paranoid way. At the moment of the fork, the original's `index.html` and the fork's were **md5-identical** (`337f4416…` both). Then I asked the fork a question only the inherited memory could answer, what the accent was before we darkened it, and it answered `#26428B` from a conversation it never had. Then one work order to the fork, "Change the accent color to a deep forest green everywhere it appears. Nothing else," and 10.5 seconds later the checksums told the story: the fork's file now hashes `d12bebce…` with `--ink: #1F4D2F`, and the original still hashes `337f4416…`, still ink blue. Same past, two futures. The client who wants to see it in blue *and* green gets two live previews, side by side in the sidebar, and you never risked the draft you already liked.
+
+<Figure
+  src="/images/series/codex/part-5/fig-fork-light.svg"
+  srcDark="/images/series/codex/part-5/fig-fork-dark.svg"
+  alt="Diagram of forking project 145d5abf, Paper Crane. The project splits into two halves. The engine's half: thread/fork with threadId and a cwd override copies the conversation into a new rollout, so the fork answers questions it was never asked; thread/read shows forkedFromId while thread/list shows null. Our half: shutil.copytree copies the workspace, because fork copies the conversation, not the files. Below, two draft cards: Draft A, the original, ink blue 1D326A, md5 337f4416 before and after, untouched by the fork's turn. Draft B, the fork, forest green 1F4D2F, md5 337f4416 before and d12bebce after one 10.5 second turn. A caption reads: byte-identical at the moment of the fork; two work orders later, two different sites."
+  caption="Two photocopies, two owners. The md5s are from the real run: identical at fork time, divergent one turn later, and the original never moved."
+  width={1240}
+  height={700}
+/>
+
+Two protocol footnotes from the live captures, so they don't surprise you. The fork's lineage field, `forkedFromId`, comes back populated when you `thread/read` the fork, but shows `null` in `thread/list` entries at this pin; our registry records `forked_from_id` itself, so the sidebar doesn't depend on either behavior. And lineage is a *copy*, not a link: I later deleted the parent thread's rollout, and the fork kept resuming happily. The photocopy survives the shredding of the original, which is exactly what you want from a photocopy.
+
+<Callout type="info" title="Threads that never touch the archive">
+One more `thread/start` parameter closes the persistence tour: `ephemeral: true` opens a thread that writes **no rollout at all**. No file, no bookmark, nothing to clean up, unresumable by design. Useless for projects, perfect for throwaway work, and it's exactly what Part 11's smoke-eval suite will use to build test sites by the batch without leaving five hundred rollouts in the archive. Filed for later; nothing in Pagewright uses it today.
+</Callout>
+
+## The meter ritual, thread edition
+
+Every row a real run from building this part:
+
+| Run | What happened | Receipt |
+|---|---|---|
+| Build from the seeded brief | 410-line `index.html`, ink blue `#26428B` | 157,210 tokens · 50s |
+| "Make the accent color darker." (resumed) | a one-line diff: `--ink` is now `#1D326A` | 204,329 tokens · 9s |
+| "And what was it before we darkened it?" (after a backend restart) | `#26428B`, answered from resumed memory | 252,767 tokens · 4s |
+| Fork the project | new thread + copied workspace, md5-identical | no model call, instant |
+| "Deep forest green" on the fork | 3 lines changed across `index.html` + `logo.svg` | 331,916 tokens · 11s |
+| Same accent question, after deleting the rollout | amber notice; agent re-read the brief, answered the wrong hex | 46,480 tokens · 9s |
+
+The receipts need one recalibration now that threads persist: the total the UI shows is the **thread's running total**, because [`thread/tokenUsage/updated`](/blog/codex-concepts#token-usage) reports cumulative usage and each turn now extends the same thread. That's why the numbers climb monotonically down the table until the reset run, whose small fresh-thread total is its own lesson. The climb is the price of memory: every resumed turn re-submits the growing conversation as input tokens. Two things keep it sane, and both are visible in the raw captures: caching (the build turn's 151,286 input tokens included 131,200 cached) and the fact that remembered context *eliminates* work; the one-line accent edit at 9 seconds happened because the thread already knew the file it built, where a fresh thread would have re-explored the workspace first. And the fork row is the protocol's gift: inheriting an entire conversation costs zero model tokens, because copying a rollout is a file operation.
+
+## Act I, the curtain
+
+Count what's on the table. A raw protocol conversation with an engine ([Part 1](/blog/codex-1-first-thread)). A real async client behind FastAPI, translating notifications into an event vocabulary that has absorbed three parts of growth without breaking a consumer ([Part 2](/blog/codex-2-fastapi-bridge)). A product UI with live command badges and a reasoning drawer ([Part 3](/blog/codex-3-builder-ui)). Per-project workspaces with a live preview and a diff drawer ([Part 4](/blog/codex-4-live-preview)). And now persistence: projects that remember across restarts, replay their history from the engine's own archive, auto-title themselves, and fork into diverging drafts. **That is a working AI website builder**, and its state architecture fits in one sentence: the engine owns conversations, the filesystem owns sites, and our backend owns one flat file mapping projects to both.
+
+Honesty about the ceiling, same as the sibling series drew at this exact point in its arc. Everything is one machine and one process: the registry is a flat file with no transactions, a second backend would fight over it, and there's no login, so every visitor is the same person. Refresh mid-build and the *stream* dies even though the build doesn't (Part 9 owns that). And the agent still runs with `approvalPolicy: "never"`, inside OS walls you've been trusting since Part 1 without ever seeing them work. Act I built the product; Act II builds the control. It starts where Codex's whole safety story starts, with the sandbox: what the builder may touch, what the kernel refuses on its behalf, and what happens when you run the agent straight into the walls on purpose.
+
+<DemoVideo
+  src="/videos/codex/part-5-demo.mp4"
+  poster="/videos/codex/part-5-poster.jpg"
+  caption='A real run, recorded after a backend restart: the Paper Crane project reopens with its history replayed from the rollout, the follow-up "And what was it before we darkened it?" is answered from resumed memory (#26428B, 4 seconds), and Fork produces a second project with the same site, the same memory, and its own preview.'
+  label="Screen recording of Part 5: a project's history hydrating from the archive, a memory-dependent follow-up answered correctly, and a fork appearing in the projects sidebar with its own live preview"
+/>
+
+<Recap
+  part={5}
+  items={[
+    "One thread per project: ensure_thread() resumes first and starts only as a fallback, so conversations survive across messages and backend restarts, proven by a follow-up answered from a thread the process was never alive for.",
+    "A typed failure path: a deleted rollout surfaces as JSON-RPC -32600 (identical wording for deleted and never-existed ids), and the fallback starts a fresh thread and tells the user the truth with the vocabulary's twelfth event, thread_reset.",
+    "The workspace-is-truth caveat, learned live: files survive a lost thread, but decisions that lived only in conversation are gone, and the agent will confidently re-derive a stale answer from the brief.",
+    "History replay without waking the engine: thread/read serves unloaded threads straight from the rollout, and history_from_turns keeps each userMessage plus each turn's final agentMessage.",
+    "Fork with two owners: thread/fork copies the conversation (with a cwd override), shutil.copytree copies the workspace, verified md5-identical at fork time and divergent one turn later, plus auto-titles via thread/name/set and ephemeral threads banked for Part 11's evals.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "A project already has a thread_id in projects.json. What does the backend do when its user sends a new message?",
+      options: [
+        "Calls thread/start with the saved id so the engine reopens it",
+        "Calls thread/resume with the saved id first, and only falls back to thread/start if resume fails",
+        "Calls thread/read to reload history, then thread/start a new thread with that history",
+        "Sends turn/start directly; threads never need reopening",
+      ],
+      answer: 1,
+      explain: "Resume-first is the whole design: ensure_thread() tries thread/resume, returns the same id on success, and only a CodexError sends it down the fresh-start lane with reset=True.",
+    },
+    {
+      q: "thread/resume fails with -32600 \"no rollout found for thread id …\". What can your code conclude?",
+      options: [
+        "The rollout file was deleted",
+        "The thread id was never valid in the first place",
+        "Only that no rollout exists for that id now: a deleted rollout and a never-existed id produce the identical code and wording",
+        "The engine process crashed and must be restarted",
+      ],
+      answer: 2,
+      explain: "Both cases were captured live and are indistinguishable on the wire. The fallback therefore treats them the same: fresh thread, same workspace, honest thread_reset notice.",
+    },
+    {
+      q: "What does thread/fork copy, and what must Pagewright copy itself?",
+      options: [
+        "It copies the conversation and the workspace; nothing is left to do",
+        "It copies the workspace; the backend must replay the conversation into a new thread",
+        "It copies the conversation into a new thread (cwd can point it at a new folder); the workspace is the product's artifact, copied with shutil.copytree",
+        "It copies nothing; it creates a symlink to the original thread",
+      ],
+      answer: 2,
+      explain: "Two photocopies, two owners. The engine owns threads and copies the memory; the workspace is ours, so the files are ours to copy, and the cwd override marries the fork to the copy.",
+    },
+    {
+      q: "Why does GET /projects/{id}/history use thread/read instead of thread/resume?",
+      options: [
+        "thread/resume can't return past turns",
+        "thread/read serves unloaded threads straight from the rollout file: replaying history is a disk read, with no engine loading and no model involved",
+        "thread/read is the only method that includes userMessage items",
+        "thread/resume would delete the rollout after reading it",
+      ],
+      answer: 1,
+      explain: "Reading and continuing are different verbs with different costs. Resume loads a thread to keep talking; read replays the archive for display, verified against a thread the engine had never loaded in that process.",
+    },
+    {
+      q: "The engine offers thread/list, yet the sidebar renders from projects.json. Why?",
+      options: [
+        "thread/list is too slow to call on every render",
+        "thread/list requires experimentalApi capabilities",
+        "The registry pairs each thread with the workspace folder the engine knows nothing about, and the engine's archive holds every thread in CODEX_HOME, not only Pagewright's",
+        "thread/list omits thread names",
+      ],
+      answer: 2,
+      explain: "A project is a thread PLUS a workspace, and only the registry knows the pairing. The engine's list is also scoped to the whole CODEX_HOME archive; GET /threads stays in the part as a debug window onto that protocol-native view.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 5: threads that persist - projects, resume, and fork"
+```
+
+Act I complete: a trusting builder. It streams, it previews, it remembers, and it forks, and it has run every shell command of the last five parts without once asking permission, protected by walls you've never actually seen refuse anything. Act II puts you in control, starting with what it's allowed to touch: in [Part 6](/blog/codex-6-sandbox), the sandbox gets its dials, and we run the agent straight into the kernel's walls on purpose.
+
+The complete, tested code for this part lives in [`part-05-threads`](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-05-threads) in the [companion repo](https://github.com/yadneshSalvi/codex-app-server-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's lines highlighted.

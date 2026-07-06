@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="660" viewBox="0 0 1240 660">
+  <defs><marker id="arrp4a-dark" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#e5825a"/></marker></defs>
+  <rect width="1240" height="660" fill="#151311"/>
+  <text x="60" y="44" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#756d62">ONE DESK PER CLIENT · THE PART 4 WORKSPACE</text>
+  <rect x="60" y="96" width="470" height="436" rx="14" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="82" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" letter-spacing="2" fill="#756d62">THE DESK</text>
+  <text x="84" y="136" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#ebe7df" xml:space="preserve">backend/projects/</text>
+  <text x="84" y="174" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5"  fill="#ebe7df" xml:space="preserve">├─ projects.json</text>
+  <text x="508" y="174" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-style="italic" fill="#756d62" text-anchor="end">the registry: id, name, created_at</text>
+  <text x="84" y="212" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5"  fill="#ebe7df" xml:space="preserve">├─ 2de013ce/</text>
+  <text x="84" y="250" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#e5825a" xml:space="preserve">│   └─ site/</text>
+  <text x="508" y="250" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-style="italic" fill="#756d62" text-anchor="end">the workspace: one job site</text>
+  <text x="84" y="288" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5"  fill="#ebe7df" xml:space="preserve">│       ├─ brief/</text>
+  <text x="84" y="326" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5"  fill="#a49c90" xml:space="preserve">│       │   ├─ brief.md</text>
+  <text x="508" y="326" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-style="italic" fill="#756d62" text-anchor="end">seeded at creation</text>
+  <text x="84" y="364" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5"  fill="#a49c90" xml:space="preserve">│       │   └─ assets/logo.svg</text>
+  <text x="84" y="402" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5"  fill="#ebe7df" xml:space="preserve">│       ├─ index.html</text>
+  <text x="508" y="402" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-style="italic" fill="#756d62" text-anchor="end">the agent's work</text>
+  <text x="84" y="440" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5"  fill="#ebe7df" xml:space="preserve">│       └─ logo.svg</text>
+  <text x="84" y="478" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5"  fill="#756d62" xml:space="preserve">└─ 26b630f1/ …</text>
+  <text x="508" y="478" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-style="italic" fill="#756d62" text-anchor="end">another client, another desk</text>
+  <rect x="640" y="96" width="540" height="176" rx="14" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="662" y="126" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" letter-spacing="2" fill="#e5825a">DOOR 1 · THE ENGINE WRITES</text>
+  <text x="662" y="152" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15.5" font-weight="700" fill="#ebe7df">The thread's cwd points at the site folder</text>
+  <text x="662" y="176" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#a49c90">Every turn starts a thread whose working directory IS this</text>
+  <text x="662" y="196" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#a49c90">project's workspace. Relative paths land on the right desk.</text>
+  <rect x="662" y="220" width="496" height="34" rx="8" fill="#211e1a" stroke="#2b2723"/>
+  <text x="676" y="242" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#ebe7df">thread/start {"cwd": ".../2de013ce/site", "sandbox": "workspace-write"}</text><rect x="640" y="300" width="540" height="176" rx="14" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="662" y="330" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" letter-spacing="2" fill="#e5825a">DOOR 2 · THE BROWSER READS</text>
+  <text x="662" y="356" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15.5" font-weight="700" fill="#ebe7df">The same folder, served at /preview/{id}/</text>
+  <text x="662" y="380" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#a49c90">A StaticFiles mount hands the folder to the iframe, html=True</text>
+  <text x="662" y="400" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#a49c90">makes / serve index.html. No copy step, no build step.</text>
+  <rect x="662" y="424" width="496" height="34" rx="8" fill="#211e1a" stroke="#2b2723"/>
+  <text x="676" y="446" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#ebe7df">app.mount("/preview/2de013ce", StaticFiles(directory=site, html=True))</text>
+  
+  <path d="M 632 184 C 580 184, 590 245, 536 245" fill="none" stroke="#e5825a" stroke-width="2.2" marker-end="url(#arrp4a-dark)"/>
+  <path d="M 536 259 C 600 269, 570 388, 632 388" fill="none" stroke="#e5825a" stroke-width="2.2" marker-end="url(#arrp4a-dark)" stroke-dasharray="7 5"/>
+  <rect x="60" y="568" width="1120" height="52" rx="10" fill="#2a201a" stroke="#5e463a"/>
+  <text x="82" y="590" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#ebe7df">Same folder, two doors: the engine writes through <tspan font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5">cwd</tspan>, the browser reads through the mount. Switching projects</text>
+  <text x="82" y="610" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#ebe7df">switches everything at once, because everything hangs off one path. Part 5 adds the third door: the thread that reopens.</text>
+</svg>

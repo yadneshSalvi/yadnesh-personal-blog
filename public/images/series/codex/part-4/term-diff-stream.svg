@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="704" viewBox="0 0 1040 704" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="704" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal · the three new parcels, live</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62">$</tspan> curl -N localhost:8000/projects/26b630f1/chat \</text>
+    <text x="32" y="116" xml:space="preserve">    -d '{"message": "Read brief/brief.md and build the site it describes, &#8230;"}'</text>
+    <text x="32" y="144" xml:space="preserve"></text>
+    <text x="32" y="172" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"session_start"</tspan>, "session_id": "019f3899-a43b-&#8230;", "project_id": <tspan fill="#8fb573">"26b630f1"</tspan>}</text>
+    <text x="32" y="200" xml:space="preserve"><tspan fill="#756d62"># &#8230; the agent reads the brief: find, rg, and three sed readbacks &#8230;</tspan></text>
+    <text x="32" y="228" xml:space="preserve"></text>
+    <text x="32" y="256" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"item_start"</tspan>, "item_id": "call_kwKk1J&#8230;", "kind": <tspan fill="#6fa8dc">"fileChange"</tspan>, &#8230;}</text>
+    <text x="32" y="284" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"file_change"</tspan>, "files": [{"path": <tspan fill="#8fb573">"index.html"</tspan>, "kind": <tspan fill="#8fb573">"add"</tspan>}],</text>
+    <text x="32" y="312" xml:space="preserve">       "status": "started"}</text>
+    <text x="32" y="340" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"file_change"</tspan>, "files": [&#8230;], "status": <tspan fill="#8fb573">"done"</tspan>}</text>
+    <text x="32" y="368" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"preview_refresh"</tspan>, "project_id": "26b630f1"}   <tspan fill="#756d62"># the iframe reloads here</tspan></text>
+    <text x="32" y="396" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"diff_updated"</tspan>, "unified_diff": "diff --git a/index.html b/index.html\n</text>
+    <text x="32" y="424" xml:space="preserve">       new file mode 100644\n&#8230;"}          <tspan fill="#756d62"># 12,056 chars, re-sent in full, 5x this turn</tspan></text>
+    <text x="32" y="452" xml:space="preserve"></text>
+    <text x="32" y="480" xml:space="preserve"><tspan fill="#756d62"># the logo lands by shell, not by patch: a command item, NO file_change parcel</tspan></text>
+    <text x="32" y="508" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"item_start"</tspan>, "kind": <tspan fill="#6fa8dc">"commandExecution"</tspan>,</text>
+    <text x="32" y="536" xml:space="preserve">       "detail": {"command": "/bin/zsh -lc 'cp brief/assets/logo.svg ./logo.svg &amp;&amp; ls -1'"}}</text>
+    <text x="32" y="564" xml:space="preserve"></text>
+    <text x="32" y="592" xml:space="preserve"><tspan fill="#756d62"># 976 parcels and 44 seconds after the prompt:</tspan></text>
+    <text x="32" y="620" xml:space="preserve">data: {"type": <tspan fill="#8fb573">"complete"</tspan>, "status": <tspan fill="#8fb573">"completed"</tspan>, "duration_ms": <tspan fill="#e5825a">44055</tspan>,</text>
+    <text x="32" y="648" xml:space="preserve">       "usage": {"totalTokens": <tspan fill="#e5825a">115757</tspan>, "inputTokens": <tspan fill="#e5825a">110006</tspan>, &#8230;}}</text>
+  </g>
+</svg>
