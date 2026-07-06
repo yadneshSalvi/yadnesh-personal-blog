@@ -1,8 +1,9 @@
 """The SSE event vocabulary: one envelope, extended forever, never changed.
 
-Part 2 defined six event types, Part 3 added two. Part 4 adds three more —
-file_change, diff_updated, preview_refresh — and touches nothing that
-exists, so every earlier consumer (curl included) still works.
+Part 2 defined six event types, Part 3 added two, Part 4 three more. Part 5
+adds exactly one — thread_reset, emitted when a project's saved conversation
+could not be restored — and touches nothing that exists, so every earlier
+consumer (curl included) still works.
 """
 
 import json
@@ -56,6 +57,29 @@ def relativize_diff(diff: str, workspace: Path) -> str:
             prefix = workspace.relative_to(parent).as_posix() + "/"
             return diff.replace("a/" + prefix, "a/").replace("b/" + prefix, "b/")
     return diff
+
+
+def history_from_turns(turns: list[dict]) -> list[dict]:
+    """thread/read returns full protocol turns; a reopened chat needs only
+    what was said — each userMessage, and each turn's final agentMessage.
+    Everything else that happened (commands, patches) already left its
+    mark on the workspace, and the workspace is truth."""
+    history = []
+    for turn in turns:
+        final = None
+        for item in turn.get("items", []):
+            if item.get("type") == "userMessage":
+                text = "".join(c.get("text", "") for c in item.get("content", [])
+                               if c.get("type") == "text")
+                if text:
+                    history.append({"role": "user", "text": text})
+            elif item.get("type") == "agentMessage":
+                # Later agentMessages supersede earlier commentary; the
+                # last one standing is the turn's final answer.
+                final = item.get("text") or final
+        if final:
+            history.append({"role": "assistant", "text": final})
+    return history
 
 
 def translate(note: dict) -> dict | None:

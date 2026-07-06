@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="700" viewBox="0 0 1240 700">
+  <rect width="1240" height="700" fill="#faf9f6"/>
+  <text x="60" y="40" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#8f887a">ONE TURN, THREE FORMS &#183; REAL EVENTS FROM THE PULSE RUN, 2026-07-06</text>
+  
+  <text x="64" y="70" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" letter-spacing="2" fill="#8f887a">ON THE WIRE</text>
+  <text x="64" y="90" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#1f1c19">Envelope events, in arrival order</text>
+  
+  <text x="460" y="70" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" letter-spacing="2" fill="#8f887a">IN STATE</text>
+  <text x="460" y="90" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#1f1c19">The block array</text>
+  
+  <text x="856" y="70" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" letter-spacing="2" fill="#8f887a">ON SCREEN</text>
+  <text x="856" y="90" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#1f1c19">The rendered turn</text>
+  <rect x="60" y="96" width="356" height="476" rx="14" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="80" y="130" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" xml:space="preserve">{"type":"item_start",</text>
+  <text x="80" y="156" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#b3441a" xml:space="preserve">  "item_id":"rs_0e4a34b3…",</text>
+  <text x="80" y="182" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" xml:space="preserve">  "kind":"reasoning"}</text>
+  <text x="80" y="208" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" xml:space="preserve">{"type":"reasoning_delta",</text>
+  <text x="80" y="234" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#b3441a" xml:space="preserve">  "item_id":"rs_0e4a34b3…",</text>
+  <text x="80" y="260" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#5b554c" xml:space="preserve">  "text":"**Planning…"}</text>
+  <text x="80" y="286" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" xml:space="preserve">{"type":"text_delta",</text>
+  <text x="80" y="312" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#5b554c" xml:space="preserve">  "text":"I'll run the"}</text>
+  <text x="80" y="338" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" xml:space="preserve">{"type":"item_start",</text>
+  <text x="80" y="364" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#b3441a" xml:space="preserve">  "item_id":"call_oR9buR…",</text>
+  <text x="80" y="390" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" xml:space="preserve">  "kind":"commandExecution"}</text>
+  <text x="80" y="416" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" xml:space="preserve">{"type":"command_output_delta",</text>
+  <text x="80" y="442" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#b3441a" xml:space="preserve">  "item_id":"call_oR9buR…",</text>
+  <text x="80" y="468" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#3f6212" xml:space="preserve">  "chunk":"tick 2\n"}</text>
+  <text x="80" y="494" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" xml:space="preserve">{"type":"item_done",</text>
+  <text x="80" y="520" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#b3441a" xml:space="preserve">  "item_id":"call_oR9buR…",</text>
+  <text x="80" y="546" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#3f6212" xml:space="preserve">  "detail":{"exit_code":0}}</text>
+  <rect x="456" y="96" width="356" height="476" rx="14" fill="none" stroke="#e7e3d9" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="476" y="124" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#8f887a">blocks: [</text><rect x="472" y="140" width="324" height="96" rx="10" fill="#f1efe9" stroke="#dcb09a" stroke-width="1.5"/>
+  <text x="488" y="164" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#b3441a">{type:"item", kind:"reasoning"</text>
+  <text x="488" y="186" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" xml:space="preserve">id: "rs_0e4a34b3…"</text>
+  <text x="488" y="207" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" xml:space="preserve">reasoning: "**Planning…"</text>
+  <text x="488" y="228" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" xml:space="preserve">done: true}</text><rect x="472" y="250" width="324" height="74" rx="10" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="488" y="274" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#1f1c19">{type:"text"</text>
+  <text x="488" y="296" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" xml:space="preserve">text: "I'll run the 5-second</text>
+  <text x="488" y="317" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" xml:space="preserve">shell loop first…"}</text><rect x="472" y="338" width="324" height="118" rx="10" fill="#f1efe9" stroke="#dcb09a" stroke-width="1.5"/>
+  <text x="488" y="362" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#b3441a">{type:"item", kind:"commandExecution"</text>
+  <text x="488" y="384" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" xml:space="preserve">id: "call_oR9buR…"</text>
+  <text x="488" y="405" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" xml:space="preserve">output: "tick 2\ntick 3\n…"</text>
+  <text x="488" y="426" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" xml:space="preserve">detail: {exit_code: 0},</text>
+  <text x="488" y="447" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" xml:space="preserve">done: true}</text>
+  <text x="476" y="486" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#8f887a">]</text>
+  <text x="476" y="524" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5b554c">Deltas find their block by id,</text>
+  <text x="476" y="544" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5b554c">never by position: two items</text>
+  <text x="476" y="564" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5b554c">can be live at once.</text>
+  <rect x="852" y="96" width="356" height="476" rx="14" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <circle cx="876" cy="130" r="3" fill="#e7e3d9"/>
+  <text x="888" y="134" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" letter-spacing="1.5" fill="#8f887a">THINKING</text>
+  <path d="M 964 127 l 4 5 l 4 -5" fill="none" stroke="#8f887a" stroke-width="1.5"/>
+  <text x="872" y="168" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1f1c19">I'll run the 5-second shell loop first</text>
+  <text x="872" y="189" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1f1c19">so you can see the live output…</text>
+  <rect x="872" y="208" width="316" height="118" rx="10" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="884" y="232" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#3f6212">&#x2713;</text>
+  <text x="902" y="232" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c">Running: for i in 1 2 3 4 5; do…</text>
+  <text x="1176" y="231" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1" fill="#8f887a" text-anchor="end">COMMAND</text>
+  <line x1="872" y1="244" x2="1188" y2="244" stroke="#e7e3d9"/>
+  <rect x="882" y="254" width="296" height="60" rx="6" fill="#f5f5f4"/>
+  <text x="894" y="272" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c">tick 2</text>
+  <text x="894" y="290" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c">tick 3</text>
+  <text x="894" y="308" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c">tick 4</text>
+  <text x="872" y="358" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1f1c19">The loop completed. I'm creating</text>
+  <text x="872" y="379" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1f1c19">pulse.html now…</text>
+  <text x="872" y="426" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#8f887a">60,233 tokens · 13s</text>
+  <text x="872" y="500" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5b554c">One component per block kind:</text>
+  <text x="872" y="520" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5b554c">text, reasoning drawer, command</text>
+  <text x="872" y="540" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5b554c">badge, files badge.</text>
+  <path d="M 426 334 h 22 m -7 -7 l 7 7 l -7 7" fill="none" stroke="#b3441a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 822 334 h 22 m -7 -7 l 7 7 l -7 7" fill="none" stroke="#b3441a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="60" y="616" width="1120" height="48" rx="10" fill="#f6e7df" stroke="#dcb09a"/>
+  <text x="80" y="646" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f1c19">The middle column mirrors the protocol's own noun: an assistant turn is a sequence of <tspan font-weight="700">items</tspan>. The from-zero derivation of this model lives in Agent SDK Part 3.</text>
+</svg>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="620" viewBox="0 0 1040 620" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="620" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; the engine dies mid-turn</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62">$</tspan> curl -N localhost:8000/chat -H 'content-type: application/json' \</text>
+    <text x="32" y="116" xml:space="preserve">    -d '{"message": "Add a contact section with opening hours to the Beanline site."}'</text>
+    <text x="32" y="144" xml:space="preserve"></text>
+    <text x="32" y="172" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"session_start"</tspan>, "session_id": "019f389f-71a0-73b1-bdd2-82790d5c8d42"}</text>
+    <text x="32" y="200" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"item_start"</tspan>, "item_id": "call_ZDdECt&#8230;", "kind": <tspan fill="#6fa8dc">"commandExecution"</tspan>,</text>
+    <text x="32" y="228" xml:space="preserve">       "detail": {"command": "/bin/zsh -lc 'pwd &amp;&amp; rg --files .'"}}</text>
+    <text x="32" y="256" xml:space="preserve"><tspan fill="#756d62"># &#8230; ten healthy seconds of parcels &#8230;</tspan></text>
+    <text x="32" y="284" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"item_done"</tspan>,  "item_id": "call_GEfLwC&#8230;", "kind": <tspan fill="#6fa8dc">"commandExecution"</tspan>,</text>
+    <text x="32" y="312" xml:space="preserve">       "detail": {"command": "/bin/zsh -lc \"sed -n '521,820p' index.html\""}}</text>
+    <text x="32" y="340" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"item_start"</tspan>, "item_id": "rs_003266&#8230;", "kind": <tspan fill="#6fa8dc">"reasoning"</tspan>, "detail": {}}</text>
+    <text x="32" y="368" xml:space="preserve"></text>
+    <text x="32" y="396" xml:space="preserve"><tspan fill="#756d62"># (second terminal)</tspan></text>
+    <text x="32" y="424" xml:space="preserve"><tspan fill="#756d62">$</tspan> pkill -f <tspan fill="#d97676">"codex app-server"</tspan></text>
+    <text x="32" y="452" xml:space="preserve"></text>
+    <text x="32" y="480" xml:space="preserve"><tspan fill="#756d62"># &#8230;and nothing. no error parcel, no complete, no closed connection.</tspan></text>
+    <text x="32" y="508" xml:space="preserve"><tspan fill="#756d62"># the last parcel is an opened reasoning item: the engine died thinking,</tspan></text>
+    <text x="32" y="536" xml:space="preserve"><tspan fill="#756d62"># and from this side of the wire that looks exactly like the engine</tspan></text>
+    <text x="32" y="564" xml:space="preserve"><tspan fill="#756d62"># thinking. sit with that. Part 9 earns its keep right here.</tspan></text>
+  </g>
+</svg>

@@ -17,7 +17,7 @@ from pydantic import BaseModel
 
 from app import projects
 from app.codex_client import CodexClient, CodexError
-from app.events import file_change_event, sse, translate
+from app.events import file_change_event, relativize_diff, sse, translate
 
 MODEL = "gpt-5.4-mini"
 
@@ -117,6 +117,8 @@ async def run_turn(project_id: str, message: str):
                 continue
             if event["type"] == "complete":
                 event["usage"] = usage
+            if event["type"] == "diff_updated":
+                event["unified_diff"] = relativize_diff(event["unified_diff"], workspace)
             yield sse(event)
             # fileChange items get a second, dedicated event with
             # workspace-relative paths — and, once the patch has landed,

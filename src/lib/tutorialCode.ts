@@ -20,6 +20,10 @@ export const TUTORIAL_REPOS: Record<string, { github: string; localDir: string }
     github: "https://github.com/yadneshSalvi/claude-agent-sdk-in-production",
     localDir: path.join(process.cwd(), "content/code/agent-sdk"),
   },
+  codex: {
+    github: "https://github.com/yadneshSalvi/codex-app-server-in-production",
+    localDir: path.join(process.cwd(), "content/code/codex"),
+  },
 };
 
 const DEFAULT_REPO = "langgraph";

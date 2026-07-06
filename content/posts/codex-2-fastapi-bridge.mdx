@@ -1,0 +1,529 @@
+---
+title: "Codex App Server in Production, Part 2: The FastAPI Bridge and the Event Vocabulary"
+subtitle: "Part 1's throwaway script grows into a real async client, the engine goes behind a URL, and its work streams as six kinds of labeled parcels. The next eleven parts only ever add labels."
+image: "/images/series/codex/part-2/cover-light.svg"
+imageDark: "/images/series/codex/part-2/cover-dark.svg"
+createdAt: "2026-07-06T00:00:00.000Z"
+updatedAt: "2026-07-06T00:00:00.000Z"
+tags: ["codex", "openai", "fastapi", "sse", "tutorial"]
+series: "codex-app-server-fastapi-nextjs"
+seriesPart: 2
+---
+
+One HTTP POST. One sentence about a coffee shop. **419 server-sent events** fall out: a `session_start`, 379 fragments of prose, nineteen items opening and closing (seven stretches of reasoning, four shell commands, two file edits, six messages), and a receipt reading `159,680 tokens, 54.9 seconds`. By the end of this page you'll watch that stream live in your terminal with `curl -N`, coming from your own FastAPI server. But the stream is the demo, not the product. The product is two designs that the next eleven parts will stand on without ever rewriting: a client class worth studying line by line, and a vocabulary with exactly six words in it. This is the most load-bearing page in the series, so it moves slowly where it matters.
+
+<Figure
+  src="/images/series/codex/part-2/term-dessert.svg"
+  alt="A dark terminal showing the end state of this part, compressed. A curl -N command posts a Beanline site request to localhost:8000/chat, and labeled SSE parcels stream back: session_start with a real session id, an item_start for a reasoning item, a text_delta carrying the word checking, an item_start for a fileChange adding site/index.html, and, after a comment noting 419 parcels and 54.9 seconds, a green complete parcel carrying usage with 159,680 total tokens."
+  caption="The destination, compressed to eight parcels. A real run from tonight; the rest of this page is the two files between the engine and this terminal."
+  width={1040}
+  height={396}
+/>
+
+## Why a server at all
+
+Part 1's script speaks fluent JSON-RPC, and it has three fatal properties: it runs on your machine, as your Codex login, with your filesystem. Nobody else can use it, and a browser must never be able to. A web page can't spawn subprocesses, shouldn't hold credentials, and has no business anywhere near the folder an agent writes to. Every AI product solves this the same way: the engine lives behind an HTTP endpoint on a machine you control, and clients talk to the endpoint. FastAPI is our front door. If FastAPI itself is new to you, [LangGraph Part 2](/blog/langgraph-2-fastapi-basics) teaches it from zero, and [LangGraph Part 5](/blog/langgraph-5-streaming) does the same for SSE; this part assumes both and spends its pages on what's genuinely new here: putting a *bidirectional* agent protocol behind a one-way wire.
+
+## From script to client class
+
+Part 1 ended with a confession: the toy `request()` method reads lines until its reply appears and **throws away every notification that arrives in between**. For two requests in a straight line, fine. For a server, fatal, three times over. Requests and notifications interleave freely once turns run long. Two browser tabs mean two threads speaking over one stdio pipe, and their notifications must not get mixed. And somewhere in Act II, the engine starts sending *us* requests (approvals, in Part 7), which a read-until-my-reply loop would swallow whole.
+
+So Part 2 opens with the real thing. Restructure the backend into a package and add the web dependencies:
+
+```bash
+cd backend
+mkdir app && touch app/__init__.py
+uv add fastapi==0.136.3 "uvicorn[standard]==0.49.0"
+```
+
+Then the first of three files, `app/codex_client.py`. Its state is six moving parts, and the whole class is those six parts cooperating:
+
+```python filename="backend/app/codex_client.py" repo="part-02-fastapi-bridge/backend/app/codex_client.py" lines="10-29"
+import asyncio
+import json
+from collections import deque
+
+MAX_LINE_BYTES = 8 * 1024 * 1024
+
+
+class CodexError(Exception):
+    """A JSON-RPC error reply, or a dead engine."""
+
+
+class CodexClient:
+    def __init__(self) -> None:
+        self.proc = None
+        self._next_id = 0
+        self._pending: dict[int, asyncio.Future] = {}
+        self._queues: dict[str, asyncio.Queue] = {}
+        self._server_handlers: dict[str, callable] = {}
+        self._stderr_tail: deque[str] = deque(maxlen=40)
+        self._write_lock = asyncio.Lock()
+```
+
+Read the six as a mailroom. `_next_id` is the numbering stamp for outgoing notes. `_pending` is a wall of mailboxes, one per note we've sent and not yet heard back about. `_queues` is a row of pigeonholes, one per thread, where unnumbered notes get sorted. `_server_handlers` is a desk that's currently unstaffed; we're building it anyway, and there's a section below on why. `_stderr_tail` keeps the engine's last forty lines of stderr, which sounds paranoid until the day it's the only witness. And `_write_lock` guarantees one writer at a time, because two coroutines interleaving bytes into one stdin would corrupt the line framing that the whole protocol sits on. `MAX_LINE_BYTES` raises asyncio's default 64 KB line limit: a single notification can carry a whole file diff, and 64 KB of HTML is not a big page.
+
+Starting the client is spawning the engine plus two background readers, then the handshake you already know:
+
+```python filename="backend/app/codex_client.py" repo="part-02-fastapi-bridge/backend/app/codex_client.py" lines="31-45"
+    async def start(self) -> None:
+        self.proc = await asyncio.create_subprocess_exec(
+            "codex", "app-server",
+            stdin=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            limit=MAX_LINE_BYTES,
+        )
+        asyncio.create_task(self._read_stdout())
+        asyncio.create_task(self._read_stderr())
+        await self.request("initialize", {
+            "clientInfo": {"name": "pagewright", "title": "Pagewright", "version": "0.2"},
+            "capabilities": {},
+        })
+        await self._send({"jsonrpc": "2.0", "method": "initialized", "params": {}})
+```
+
+Same spawn as Part 1 with two upgrades: stderr is now piped instead of ignored, and reading is no longer something `request()` does inline. Two long-lived tasks own the pipes, full stop. Everything else in the class communicates with them through the six data structures.
+
+Here's the sending half, and the pattern at its heart carries Parts 7, 10, and 11:
+
+```python filename="backend/app/codex_client.py" repo="part-02-fastapi-bridge/backend/app/codex_client.py" lines="55-75"
+    async def request(self, method: str, params: dict, timeout: float = 60) -> dict:
+        self._next_id += 1
+        rid = self._next_id
+        fut = asyncio.get_running_loop().create_future()
+        self._pending[rid] = fut
+        await self._send({"jsonrpc": "2.0", "id": rid, "method": method, "params": params})
+        try:
+            msg = await asyncio.wait_for(fut, timeout)
+        finally:
+            self._pending.pop(rid, None)
+        if "error" in msg:
+            raise CodexError(msg["error"].get("message", str(msg["error"])))
+        return msg["result"]
+
+    async def _send(self, obj: dict) -> None:
+        async with self._write_lock:
+            self.proc.stdin.write((json.dumps(obj) + "\n").encode())
+            await self.proc.stdin.drain()
+
+    async def _respond(self, rid, result: dict) -> None:
+        await self._send({"jsonrpc": "2.0", "id": rid, "result": result})
+```
+
+`request()` no longer reads anything. It stamps a number, hangs an empty `Future` on the mailbox wall under that number, drops the note through the door, and goes to sleep on the future. When the reply eventually arrives, whoever finds it (the reader task, next fence) puts it in the right mailbox, and `request()` wakes up holding the answer. The `finally` guarantees the mailbox comes off the wall even on a timeout, and an `"error"` reply becomes a typed `CodexError`, keeping Part 1's discipline: errors are values, not mysteries. Note `_respond` too, three quiet lines for sending a *reply* rather than a request. Nothing calls it from our code yet. It exists because JSON-RPC is symmetrical, and the engine is allowed to ask us questions.
+
+<Callout type="info" title="Futures as mailboxes, the one-paragraph version">
+An `asyncio.Future` is an empty box one coroutine waits on until another fills it. That's the entire trick that lets one reader serve many concurrent requests, and it's about to become this series' favorite tool: in Part 7 an approval becomes a future the whole *product* waits on while a human decides. The [concepts page](/blog/codex-concepts#futures-and-events) keeps the short version; for the same pattern built from zero, with diagrams, see the sibling series' [Part 7](/blog/agent-sdk-7-approvals).
+</Callout>
+
+## The reader task: one loop, three destinations
+
+Everything the engine will ever say arrives through this one loop. It's the busiest twenty lines in Pagewright:
+
+```python filename="backend/app/codex_client.py" repo="part-02-fastapi-bridge/backend/app/codex_client.py" lines="77-96"
+    async def _read_stdout(self) -> None:
+        while True:
+            line = await self.proc.stdout.readline()
+            if not line:
+                self._fail_pending("codex app-server exited: " + " | ".join(self._stderr_tail))
+                return
+            try:
+                msg = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if "id" in msg and ("result" in msg or "error" in msg):
+                fut = self._pending.get(msg["id"])
+                if fut and not fut.done():
+                    fut.set_result(msg)
+            elif "id" in msg and "method" in msg:
+                asyncio.create_task(self._dispatch_server_request(msg))
+            elif "method" in msg:
+                thread_id = (msg.get("params") or {}).get("threadId")
+                if thread_id:
+                    await self.queue_for(thread_id).put(msg)
+```
+
+The three-way switch is Part 1's Rosetta stone compiled into code, with one new case. An id plus a `result` or `error` is a **response**: find the mailbox, fill it. A `method` with no id is a **notification**: read its `threadId` and drop it in that thread's pigeonhole, so two turns running at once can never contaminate each other's stream. And the case Part 1 never met, an id *and* a `method` together: that's the engine sending **us** a request, expecting a response with that id back through the door. The grammar allowed it all along; we've only ever seen the polite half of the conversation.
+
+The pigeonholes and the unstaffed desk are four lines each:
+
+```python filename="backend/app/codex_client.py" repo="part-02-fastapi-bridge/backend/app/codex_client.py" lines="47-53"
+    def on_server_request(self, method: str, handler) -> None:
+        """Register an async handler for server-initiated requests (Part 7)."""
+        self._server_handlers[method] = handler
+
+    def queue_for(self, thread_id: str) -> asyncio.Queue:
+        """The notification mailbox for one thread."""
+        return self._queues.setdefault(thread_id, asyncio.Queue())
+```
+
+```python filename="backend/app/codex_client.py" repo="part-02-fastapi-bridge/backend/app/codex_client.py" lines="98-103"
+    async def _dispatch_server_request(self, msg: dict) -> None:
+        handler = self._server_handlers.get(msg["method"])
+        if handler is None:
+            await self._respond(msg["id"], {})
+            return
+        await self._respond(msg["id"], await handler(msg.get("params") or {}))
+```
+
+`_server_handlers` is empty and will stay empty for four more parts. So why build the seam now? Because it costs six lines today and a rewrite later. When Part 7 flips the approval policy and the engine starts asking "may I run this command?", the reader task already routes the question, the dispatcher already sends the answer, and the only work left is deciding. The alternative, retrofitting a request handler into a reader loop that never expected one, is the kind of surgery that breaks streams in production. This seam is the single most deliberate design decision in the class; the series will collect the interest in Part 7 and keep collecting it in Parts 10 and 11, when questions and review rides arrive through the same slot. Note the graceful default, too: an unhandled server request gets an empty response instead of silence, because the engine is *blocked waiting* on that id, and a contract you didn't answer is still a contract.
+
+Last, the two smallest methods, which exist for the worst day:
+
+```python filename="backend/app/codex_client.py" repo="part-02-fastapi-bridge/backend/app/codex_client.py" lines="105-115"
+    async def _read_stderr(self) -> None:
+        while True:
+            line = await self.proc.stderr.readline()
+            if not line:
+                return
+            self._stderr_tail.append(line.decode(errors="replace").strip())
+
+    def _fail_pending(self, reason: str) -> None:
+        for fut in self._pending.values():
+            if not fut.done():
+                fut.set_exception(CodexError(reason))
+```
+
+The stderr reader files the engine's complaints into the ring buffer, forty lines deep, oldest evicted first. It's not idle chatter in there: botch one line of `config.toml` and the engine logs a precise `ERROR codex_app_server: Invalid configuration ... string values must be quoted` to stderr while your stdout stream stays innocent. And `_fail_pending` is the reader task's dying act: when `readline()` returns empty, the engine is gone, so every request still waiting on the mailbox wall gets an exception carrying those last words, *immediately*. Without it, a dead engine looks exactly like a slow engine for sixty seconds per pending request. With it, the crash report quotes the corpse. You'll see precisely when this fires, and when it can't, before this page ends.
+
+Checkpoint. Right now you have: a client that can hold one engine process and any number of conversations with it, with nothing to talk to it yet. Two files to go.
+
+## One process, many threads
+
+Notice what `CodexClient` is *not*: per-request. Pagewright will run exactly one `codex app-server` process per backend, spawned at startup, shared by every thread and every user. That's not thrift; it's how every official Codex surface works. The engine is built to multiplex: threads are cheap entries in its state, notifications carry `threadId` precisely so clients can demultiplex, and the rollout archive from Part 1 lives per-engine-home, not per-process. Spawning a fresh engine per HTTP request would pay process startup on every message, scatter your sessions across dying processes, and still not isolate anything the sandbox doesn't already isolate better.
+
+<Callout type="warning" title="When the engine pushes back: -32001">
+One engine process does have limits, and the protocol names the moment you hit them: error code `-32001`, server overloaded. It's a typed, retryable signal, the JSON-RPC equivalent of HTTP 503, and the correct response is backoff and retry, not a second engine per request. Our `request()` surfaces it as a `CodexError` today; a production queue-and-retry belongs at the endpoint layer, and Part 13's production posture returns to it.
+</Callout>
+
+## Designing the envelope
+
+Now the design section this part is named for. The browser needs to see the agent work. The agent's work arrives as app-server notifications. And we are **not** forwarding those notifications to the browser, even though it would cost zero code today. Method names like `item/agentMessage/delta` are the engine's interface, versioned by OpenAI on OpenAI's schedule, marked experimental besides. Every pixel of frontend coupled to them is a pixel that breaks when the protocol moves. So we mint our own vocabulary: every event is one JSON object with a `type` field, framed as a [server-sent event](/blog/codex-concepts#sse). Labeled parcels, one conveyor. Six labels today:
+
+| `type` | Payload | Meaning |
+|---|---|---|
+| `session_start` | `session_id` | The turn began; here's the thread id |
+| `text_delta` | `text` | A piece of the agent's prose, in order |
+| `item_start` | `item_id`, `kind`, `detail` | A unit of work opened: a command, an edit, a thought |
+| `item_done` | `item_id`, `kind`, `detail` | That unit settled |
+| `complete` | `status`, `usage`, `duration_ms` | The receipt; the turn is over |
+| `error` | `message` | Something broke, delivered as data |
+
+Two properties make this table worth a section of prose. First, **nothing in it says Codex**. No method names, no `threadId` versus `session_id` leakage, no JSON-RPC. A client written against these six words is coupled to Pagewright, not to the engine inside it. That's not hypothetical portability: the production app this series is distilled from streams Claude *and* Codex through one contract shaped like this table, and its frontend genuinely cannot tell which engine is answering. Two engines, two protocols, one belt. Second, the parser contract is one sentence: **switch on `type`, ignore types you don't recognize.** The second clause is where the compounding happens. `file_change` joins the belt in Part 4, `approval_request` in Part 7, `plan_update` in Part 10, and the client you write in Part 3 keeps working through all of it, blind to labels it predates, crashing on none of them. We're designing today for parcels we haven't invented yet.
+
+<Figure
+  src="/images/series/codex/part-2/fig-envelope-light.svg"
+  srcDark="/images/series/codex/part-2/fig-envelope-dark.svg"
+  alt="Diagram of the event vocabulary as parcels on one conveyor belt. Six solid parcels labeled session_start, text_delta, item_start, item_done, complete, and error, each tagged PART 2, ride a belt heading toward whoever is listening. Three dashed ghost parcels follow further down the belt: file_change tagged PART 4, approval_request tagged PART 7, and plan_update tagged PART 10. Below, a manifest lists each of the six types with real cargo from the Beanline run, including the complete parcel carrying status completed, duration 54875 milliseconds, and usage. A green footer states the parser contract: switch on type, ignore labels you don't know yet."
+  caption="The vocabulary as freight. Six parcels ship today; the ghosts are already scheduled. The belt, and the parser contract under it, never change."
+  width={1240}
+  height={680}
+/>
+
+If you've ever integrated a vendor's API and had a minor version rename one field out from under you, you know the failure this table prevents. Everybody has one of these scars: the webhook payload that quietly changed shape, the SDK upgrade that turned a string into an object, the Friday deploy that was fine until a dependency's dependency wasn't. The translator we're about to write is the only code in Pagewright that will ever need to care when `codex app-server` changes its notifications, and it's one file. That's the whole argument for the envelope, and it's also why this section came before the code.
+
+<Callout type="info" title="Why not raw protocol passthrough?">
+It's tempting: the notifications are already JSON, the browser already speaks JSON, ship them. But then every client knows the engine's method names, payload shapes, and quirks, and "upgrade the pinned CLI" becomes a frontend project. The envelope inverts the blast radius: protocol changes stop at the translator, product changes stop at the vocabulary, and neither side can see the other move. The frontend should never learn the words `agentMessage` or `threadId`.
+</Callout>
+
+<Callout type="info" title="Why not WebSockets?">
+A fair question here especially, because the app-server protocol genuinely is bidirectional, and Part 7's approvals really will flow upstream. But look at where each direction lives. Engine-to-browser is a firehose: hundreds of events per turn, one way. Browser-to-engine is a trickle: a message here, a decision there. SSE serves the firehose over plain HTTP, with ordinary proxies, auth, and `curl` for debugging; the trickle rides ordinary POSTs, approvals included. WebSockets would buy symmetric plumbing that nothing in this series needs, at the price of a protocol upgrade everywhere. Two-way protocol, one-way wire, on purpose.
+</Callout>
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 2 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 2-panel comic strip, two panels side by side separated by a thin vertical black divider, about turning a chaotic flood of raw JSON notes into a tidy labeled conveyor belt. Panel 1: Yad stands overwhelmed in front of an office wall completely plastered with dozens of chaotic overlapping yellow sticky notes, each note covered in tiny scribbled curly braces and squiggles; more notes are fluttering out of a small square hatch in the wall onto the floor; Yad throws his arms up and shouts: "IT NEVER STOPS!" Panel 2: the same wall, now clean and calm, with one neat horizontal conveyor belt carrying six tidy brown paper parcels, each parcel with one clear white label; the six labels read, in order: "SESSION", "TEXT", "ITEM", "DONE", "COMPLETE", "ERROR"; through the same small hatch above the belt, a friendly little robot arm reaches out tipping a tiny bowler hat; Yad stands relaxed and proud, saying: "SIX LABELS. ONE BELT." Clean readable hand-lettered speech bubbles and parcel labels, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/codex/part-2/comic-parcels.png"
+  alt="Comic in two panels. Panel one: Yad, a bearded developer with headphones, stands with his arms thrown up in front of a wall buried under hundreds of chaotic yellow sticky notes covered in scribbled JSON braces, with more notes pouring out of a small hatch, and shouts: IT NEVER STOPS! Panel two: the same wall is now clean, with a single conveyor belt carrying six brown parcels labeled SESSION, TEXT, ITEM, DONE, COMPLETE, and ERROR, while a small robot in the hatch tips its bowler hat, and Yad says contentedly: SIX LABELS. ONE BELT."
+  caption="The same wall, before and after the vocabulary. The engine's output didn't get smaller; it got labeled."
+  width={1536}
+  height={1024}
+/>
+
+## The translator
+
+New file, `app/events.py`: the one file allowed to speak both languages. First the wire framing and a helper that decides what a parcel carries:
+
+```python filename="backend/app/events.py" repo="part-02-fastapi-bridge/backend/app/events.py" lines="10-27"
+def sse(event: dict) -> str:
+    """One envelope on the wire: data: {...}\n\n"""
+    return f"data: {json.dumps(event)}\n\n"
+
+
+def item_detail(item: dict) -> dict:
+    """The few fields of an item worth putting on the wire, by kind."""
+    kind = item.get("type", "unknown")
+    if kind == "commandExecution":
+        return {"command": item.get("command", "")}
+    if kind == "fileChange":
+        return {"files": [
+            {"path": c.get("path", ""), "kind": c.get("kind", {}).get("type", "")}
+            for c in item.get("changes", [])
+        ]}
+    if kind == "agentMessage":
+        return {}
+    return {}
+```
+
+`sse()` is the entire SSE format: a `data: ` prefix and a blank-line delimiter ([LangGraph Part 5](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word) has the from-zero story, including the client bug that blank line causes). `item_detail()` encodes a quieter judgment: the wire narrates work, it doesn't haul cargo. A `commandExecution` item ships its command string, because a UI will print it on a badge. A `fileChange` ships paths and change kinds, not the diffs riding inside the notification, because nothing in Part 3 renders diffs. When Part 4 builds the diff drawer, the detail gets richer; today, restraint.
+
+Then the mapping itself, Part 1's stream anatomy cashed in as a `translate()` function:
+
+```python filename="backend/app/events.py" repo="part-02-fastapi-bridge/backend/app/events.py" lines="30-53"
+def translate(note: dict) -> dict | None:
+    """Map one app-server notification onto the envelope, or drop it."""
+    method, p = note["method"], note.get("params", {})
+    if method == "item/agentMessage/delta":
+        return {"type": "text_delta", "text": p.get("delta", "")}
+    if method == "item/started":
+        item = p.get("item", {})
+        if item.get("type") in ("userMessage",):
+            return None
+        return {"type": "item_start", "item_id": item.get("id", ""),
+                "kind": item.get("type", ""), "detail": item_detail(item)}
+    if method == "item/completed":
+        item = p.get("item", {})
+        if item.get("type") in ("userMessage",):
+            return None
+        return {"type": "item_done", "item_id": item.get("id", ""),
+                "kind": item.get("type", ""), "detail": item_detail(item)}
+    if method == "turn/completed":
+        turn = p.get("turn", {})
+        return {"type": "complete", "status": turn.get("status", ""),
+                "duration_ms": turn.get("durationMs")}
+    if method == "error":
+        return {"type": "error", "message": p.get("message", "unknown error")}
+    return None
+```
+
+Four notification methods in, five parcel types out, and the two `None`s teach as much as the mappings. The engine emits a `userMessage` item echoing what you sent, because rollout files replay whole conversations and the archive needs both sides. The *wire* doesn't: the client typed the message, it already rendered it, and echoing it back would paint every message twice. Dropped. And the final `return None` is the same forward-compatibility contract we imposed on the frontend, pointed the other way: when a future CLI version adds notification methods this translator never heard of, they fall through harmlessly instead of crashing the stream. Both sides of the translator ignore the unknown; that's what lets both sides evolve.
+
+Look also at what `translate()` deliberately isn't: stateful. One notification in, at most one envelope out. Part 1's biggest gotcha, usage living in `thread/tokenUsage/updated` rather than on `turn/completed`, means *someone* has to remember the running totals and staple them to the receipt. That someone is not the translator; a pure function shouldn't hoard state. It's the endpoint, next.
+
+## The agent behind a URL
+
+Third file, `app/main.py`. Setup first, all of it familiar shapes:
+
+```python filename="backend/app/main.py" repo="part-02-fastapi-bridge/backend/app/main.py" lines="19-38"
+MODEL = "gpt-5.4-mini"
+SITE = Path("site")
+
+client = CodexClient()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    SITE.mkdir(exist_ok=True)
+    await client.start()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+The one-process rule becomes two lines of code: `client` is module-level, and `lifespan` starts the engine once, when uvicorn boots, not per request. The CORS block is forward wiring for [Part 3](/blog/codex-3-builder-ui)'s Next.js dev server; no browser calls this today, but the permission slip is signed. Then the turn runner, in two halves. First half, the setup and the opening parcel:
+
+```python filename="backend/app/main.py" repo="part-02-fastapi-bridge/backend/app/main.py" lines="41-57"
+class ChatRequest(BaseModel):
+    message: str
+
+
+async def run_turn(message: str):
+    thread = await client.request("thread/start", {
+        "cwd": str(SITE.resolve()),
+        "sandbox": "workspace-write",
+        "approvalPolicy": "never",
+        "model": MODEL,
+    })
+    thread_id = thread["thread"]["id"]
+    queue = client.queue_for(thread_id)
+    await client.request("turn/start", {
+        "threadId": thread_id,
+        "input": [{"type": "text", "text": message}],
+    })
+```
+
+Part 1's two most consequential lines survive unchanged: `workspace-write` and `approvalPolicy: "never"`, sane together because the sandbox walls are real (the [scissors callout](/blog/codex-1-first-thread#your-first-thread) holds; Part 6 opens the dials). One subtle ordering matters here: `queue_for(thread_id)` runs **before** `turn/start`. Grab the pigeonhole before any mail can arrive, and no notification can slip through in the gap. Each `/chat` call starts a fresh thread for now; carrying a conversation across requests is [Part 5](/blog/codex-5-threads)'s whole subject, and the engine is already archiving everything we'll need for it. Second half, the pump:
+
+```python filename="backend/app/main.py" repo="part-02-fastapi-bridge/backend/app/main.py" lines="59-76"
+    yield sse({"type": "session_start", "session_id": thread_id})
+    usage: dict = {}
+    try:
+        while True:
+            note = await queue.get()
+            if note["method"] == "thread/tokenUsage/updated":
+                usage = note["params"].get("tokenUsage", {}).get("total", {})
+                continue
+            event = translate(note)
+            if event is None:
+                continue
+            if event["type"] == "complete":
+                event["usage"] = usage
+            yield sse(event)
+            if event["type"] in ("complete", "error"):
+                return
+    except CodexError as exc:
+        yield sse({"type": "error", "message": str(exc)})
+```
+
+An async generator: every `yield` is one parcel leaving the building. The loop drains this thread's queue, keeps the latest usage totals to itself, translates everything else, and staples `usage` onto the `complete` parcel as it goes out the door, converting Part 1's "the receipt has no bill on it" gotcha into a wire format that pretends it never happened. No client of ours will ever know usage arrived separately. The `except CodexError` turns a client-layer failure into the sixth parcel type, because past the first byte of a stream, errors have to be data. And the endpoint itself is almost an anticlimax:
+
+```python filename="backend/app/main.py" repo="part-02-fastapi-bridge/backend/app/main.py" lines="79-81"
+@app.post("/chat")
+async def chat(req: ChatRequest):
+    return StreamingResponse(run_turn(req.message), media_type="text/event-stream")
+```
+
+`StreamingResponse` pushes each yielded string out the socket the moment it exists. No buffering, no waiting for the turn to finish. That's the entire web layer of this part: three lines, because the two files above did their jobs.
+
+## Watch it with curl
+
+Boot it from `backend/`:
+
+```bash
+uv run uvicorn app.main:app
+```
+
+And in a second terminal, the payoff. `-N` tells curl not to buffer:
+
+<Figure
+  src="/images/series/codex/part-2/term-curl-stream.svg"
+  alt="A dark terminal running curl -N against localhost:8000/chat with a request to build a single-page site for Beanline. The SSE stream scrolls: a session_start parcel with a real session id, item_start and item_done parcels for a reasoning item, an agentMessage item opening followed by individual text_delta parcels reading I, apostrophe-m, checking, the, existing, a comment noting 379 text_delta parcels in this turn, item_start parcels for a commandExecution running rg dash-dash-files and a fileChange adding site/index.html, and finally the complete parcel with status completed, duration 54875 milliseconds, and usage totals of 159680 total tokens, 151319 input, 129280 cached input, and 8361 output."
+  caption="The real run, trimmed. Every label from the table, live on the belt, ending in a receipt with the bill stapled on. 419 parcels in 54.9 seconds."
+  width={1040}
+  height={928}
+/>
+
+Sit and watch a full run once; it's thirty to sixty seconds of genuine theater. The reasoning items open and close, the prose types itself out a word at a time, `rg --files` and `ls -la` scroll past as the agent cases the empty folder, and then a `fileChange` parcel lands carrying `"kind": "add"` for `index.html`. In my run the agent then did something I didn't ask for and want you to notice: it re-read its own HTML with `sed`, found a real problem, and a *second* `fileChange` came down the belt, `"kind": "update"`, with the agent explaining it had caught a brand-name wrapper marked up as a `span` that should have been a block element. The proofreading habit you watched in Part 1's terminal survived the trip through two files and an HTTP socket, which is the point: nothing about the agent changed today. What changed is that anything, anywhere, can now watch it work.
+
+The meter ritual, from that same `complete` parcel: **151,319 tokens in, 8,361 out, 54.9 seconds**, and 129,280 of those input tokens, 85 percent, were cache hits. Same shape as Part 1: an agent turn is a conversation with itself, every readback rides back through the model, and caching is why the six-figure input number costs cents rather than dollars. The engine still quotes tokens, never currency, so the arithmetic against OpenAI's current price list remains yours to do. What's new is that the numbers now ship to every client on the receipt, which makes cost a UI feature from Part 3 onward instead of a server-side secret.
+
+{/* [ANECDOTE slot, optional upgrade (WRITING-STYLE §6): a true first-person story from Yadnesh about an upstream API/SDK changing shape under an integration (the scar that motivates the envelope), 3 beats, 5 sentences. If provided, it replaces the "vendor renamed a field" paragraph in the envelope section. */}
+
+## Break it on purpose: kill the engine mid-turn
+
+The client walk promised you'd see the crash machinery in action, and an untested failure path is a rumor. So: start a build, and while the parcels are flowing, walk to a second terminal and murder the engine.
+
+<Figure
+  src="/images/series/codex/part-2/term-engine-died.svg"
+  alt="A dark terminal running curl -N against /chat asking to add a contact section to the Beanline site. Parcels flow normally: session_start, a commandExecution item running pwd and rg dash-dash-files, sed readbacks of index.html, then an item_start opening a reasoning item. A second terminal runs pkill -f codex app-server. After that, nothing: comments note there is no error parcel, no complete, no closed connection, that the last parcel is an opened reasoning item, and that from this side of the wire a dead engine looks exactly like a thinking engine."
+  caption="The kill, captured live. Ten healthy seconds of parcels, then pkill, then a silence that promises nothing. The last parcel says the agent started thinking; it never says it stopped."
+  width={1040}
+  height={620}
+/>
+
+Read that capture closely, because what it *doesn't* show is the lesson. No error parcel. No dropped connection. The stream ends on an opened `reasoning` item and then produces nothing, forever, and curl sits there looking precisely the way it looks when the model is taking its time. Here's why, traced through the code you wrote twenty minutes ago. The reader task saw stdout close and ran `_fail_pending`, exactly as designed. But `_fail_pending` fails *pending requests*, and mid-turn there usually are none: `thread/start` and `turn/start` were answered within milliseconds, long ago, and `run_turn` is parked on `queue.get()`, waiting for notifications from a process that no longer exists. Nothing is pending. Nothing fails. The queue never fills again.
+
+So the machinery has a precise jurisdiction, and honesty about it matters more than the demo. `_fail_pending` and the stderr tail protect every moment when a request is in flight: the handshake at boot (an engine that dies on startup fails `initialize` instantly, last words attached, instead of hanging your server for sixty seconds), and, from Part 7 on, every approval future that spends minutes on the mailbox wall while a human decides. What nothing in this part can protect is a turn that's already streaming, because a one-way wire has no heartbeat: **silence and thinking are indistinguishable from the receiving end.** That's not a bug in our client; it's a property of the wire, and it has a proper fix with a name, liveness plus a durable event log, which is [Part 9](/blog/codex-9-durable-streams)'s entire reason to exist. Until then the honest recovery is the blunt one: restart uvicorn (Ctrl-C, `uv run uvicorn app.main:app`), which respawns the engine through `lifespan`, and note what survived: `site/index.html` is still on disk, and the thread's rollout file is still in the archive. The workspace is truth; the stream is narration.
+
+## The pipeline, drawn
+
+Everything this part built, one picture, and the two-worlds split is the thing to internalize:
+
+<Figure
+  src="/images/series/codex/part-2/fig-pipeline-light.svg"
+  srcDark="/images/series/codex/part-2/fig-pipeline-dark.svg"
+  alt="Diagram of the Part 2 pipeline in two halves. Upstairs, labeled JSON-RPC over stdio in both directions: the codex app-server engine box connects through an STDIO door to the CodexClient's internals, with _send() holding the write lock, _read_stdout() as the only reader fanning out to three destinations: the _pending futures dict for replies, the dashed _server_handlers box marked empty until Part 7 for server-initiated requests, and per-thread _queues for notifications, plus a _stderr_tail ring buffer fed by a dashed stderr wire. Downstairs, labeled SSE over HTTP in one direction: run_turn drains one thread's mailbox into the translate function, which feeds StreamingResponse and then curl. A footer records the real run: one session_start, 379 text_delta, 19 item_start plus 19 item_done, one complete, 54.9 seconds, 159,680 tokens."
+  caption="The bridge, whole. Upstairs speaks the engine's language in both directions; downstairs speaks six words, one way. The reader task's three-way fan-out is the load-bearing joint."
+  width={1240}
+  height={900}
+/>
+
+Upstairs is the protocol world: bidirectional, engine-flavored, private. Downstairs is the web world: one-way, six-worded, public. Exactly one component stands on the staircase, `translate()`, and that's the whole architecture of this series in one sentence: when the experimental protocol upstairs changes shape, one file notices; when the product downstairs grows features, the belt grows labels; and neither world can reach around the translator to touch the other. The diagram also shows where every future part plugs in. Part 3 replaces the curl box. Part 4 enriches the translator. Part 7 staffs the dashed desk. Part 9 slides a database between the queue and the wire. The boxes never move again.
+
+<DemoVideo
+  src="/videos/codex/part-2-demo.mp4"
+  poster="/videos/codex/part-2-poster.jpg"
+  caption="The real Part 2 run, replayed at reading speed: one curl -N, 419 parcels, and the complete receipt with live token totals. A live gpt-5.4-mini build, not a mock."
+  label="Screen recording of Part 2: server-sent events streaming from the FastAPI bridge while the agent builds the Beanline site, ending on the complete event with real usage numbers"
+/>
+
+<Recap
+  part={2}
+  items={[
+    "A real async client (`app/codex_client.py`): one engine process, a write lock, a reader task routing three ways (replies to futures, notifications to per-thread queues, server-initiated requests to a handler seam that stays empty until Part 7), and a stderr ring buffer for honest crash reports.",
+    "The event vocabulary: six parcel types on one SSE belt, engine-free by design, with the parser contract (switch on `type`, ignore the unknown) that lets eleven future parts add labels without breaking a client.",
+    "A stateless translator (`app/events.py`) as the only code speaking both languages: userMessage echoes dropped, unknown notifications dropped, protocol changes stopped at one file.",
+    "The agent behind a URL: `POST /chat` runs a sandboxed build turn and streams it live, with usage aggregated from `thread/tokenUsage/updated` and stapled onto the `complete` receipt: 151,319 in / 8,361 out / 54.9s on the real run.",
+    "A failure map you've tested: a dying engine fails every in-flight request instantly with its last words attached, while a mid-stream death is invisible to a one-way wire, which is Part 9's problem to solve and today's problem to know about.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "The reader task receives a line containing both an \"id\" and a \"method\". What is it, and what does the client do?",
+      options: [
+        "A malformed message; the client skips it",
+        "A reply to one of our requests; it goes to the matching future",
+        "A server-initiated request from the engine; it's dispatched to a registered handler, and the engine blocks until we respond with that id",
+        "A notification; it goes to the thread's queue",
+      ],
+      answer: 2,
+      explain: "id + result/error is a reply; method without id is a notification; id + method is the engine asking us something and waiting on our answer. The seam is empty until Part 7, but the routing and the polite empty response exist from day one.",
+    },
+    {
+      q: "You kill codex app-server while a turn is streaming parcels. What does the curl client see?",
+      options: [
+        "An error parcel carrying the engine's last stderr lines",
+        "The connection drops with a network error",
+        "Nothing: the stream goes silent, indistinguishable from a long-thinking agent, because no request was pending when the engine died",
+        "A complete parcel with status \"failed\"",
+      ],
+      answer: 2,
+      explain: "_fail_pending protects requests in flight; mid-turn, run_turn is parked on queue.get() with nothing pending, so nothing fails and nothing arrives. A one-way wire has no heartbeat. Durable streams and liveness are Part 9's subject.",
+    },
+    {
+      q: "Why does the translator drop userMessage items instead of putting them on the belt?",
+      options: [
+        "They can contain sensitive data that shouldn't reach the browser",
+        "The client already has the user's message (it sent it), so echoing it back would render every message twice",
+        "userMessage items are only emitted in the rollout archive, never live",
+        "They're too large to frame as SSE events",
+      ],
+      answer: 1,
+      explain: "The engine echoes your input as an item because the archive needs both sides of the conversation. The wire doesn't: the client typed the message and already rendered it. Same double-render logic protects every client this series builds.",
+    },
+    {
+      q: "The complete parcel carries a usage object, but turn/completed has no usage field. Where does it come from?",
+      options: [
+        "run_turn keeps the latest thread/tokenUsage/updated totals as they stream past and staples them onto the complete envelope",
+        "The translator calls a usage/read method when the turn ends",
+        "It's estimated from the number of text_delta parcels",
+        "FastAPI middleware counts tokens in the response",
+      ],
+      answer: 0,
+      explain: "Part 1's gotcha, designed away: usage arrives only via tokenUsage notifications, several per turn, so the endpoint keeps the running total and the wire format presents a receipt with the bill attached. No client ever needs to know they were separate.",
+    },
+    {
+      q: "In Part 4, file_change parcels start riding the belt. What must change in the Part 3 client for it to keep working until it learns to render them?",
+      options: [
+        "It must upgrade to the same vocabulary version as the server",
+        "Nothing: it switches on type and ignores labels it doesn't recognize, so new parcels pass through harmlessly",
+        "It must catch the JSON parse errors the new events cause",
+        "It must send an Accept header listing the event types it supports",
+      ],
+      answer: 1,
+      explain: "That's the parser contract earning its keep: the vocabulary is additive, so old clients coexist with new labels. The same clause, mirrored server-side as translate()'s final return None, protects us from new engine notifications too.",
+    },
+  ]}
+/>
+
+Commit it, from the `pagewright/` project root, in a terminal that isn't hosting the server:
+
+```bash
+git add .
+git commit -m "part 2: a real client, a FastAPI bridge, and six parcels on one belt"
+```
+
+Your agent now streams its work to anything that can open an HTTP connection, and the only thing that ever connects is curl. In [Part 3](/blog/codex-3-builder-ui) the stream gets a face: a chat UI where the prose types itself, commands become live badges with scrolling output, and the reasoning gets a drawer you can peek into.
+
+Every part of this series has a companion folder in the [`codex-app-server-in-production` repo](https://github.com/yadneshSalvi/codex-app-server-in-production): the complete, tested project exactly as it exists at the end of that part. This part's folder is [`part-02-fastapi-bridge`](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-02-fastapi-bridge). Code blocks with a GitHub icon in the header link straight to the exact file, and "View full file" shows the whole file in place with this section's lines highlighted.

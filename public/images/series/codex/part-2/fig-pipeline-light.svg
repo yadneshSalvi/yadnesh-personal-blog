@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="900" viewBox="0 0 1240 900">
+  <rect width="1240" height="900" fill="#faf9f6"/>
+  <text x="48" y="46" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#8f887a">ONE MESSAGE, END TO END &#183; A TWO-WAY PROTOCOL MAPPED ONTO A ONE-WAY WIRE</text>
+
+  <!-- ===== top half: the protocol world ===== -->
+  <text x="48" y="74" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" letter-spacing="2" fill="#b3441a">UPSTAIRS &#183; JSON-RPC OVER STDIO &#183; BOTH DIRECTIONS</text>
+
+  <!-- the engine -->
+  <rect x="48" y="116" width="230" height="320" rx="14" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="68" y="150" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" letter-spacing="2" fill="#8f887a">THE ENGINE</text>
+  <text x="68" y="182" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="19" font-weight="700" fill="#1f1c19">codex</text>
+  <text x="68" y="206" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="19" font-weight="700" fill="#1f1c19">app-server</text>
+  <text x="68" y="232" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b554c">one subprocess, spawned</text>
+  <text x="68" y="250" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b554c">once, at startup</text>
+  
+  <rect x="68" y="272" width="88" height="30" rx="7" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="112" y="292" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c" text-anchor="middle">agent loop</text>
+  
+  <rect x="168" y="272" width="88" height="30" rx="7" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="212" y="292" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c" text-anchor="middle">sandbox</text>
+  
+  <rect x="68" y="312" width="88" height="30" rx="7" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="112" y="332" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c" text-anchor="middle">threads</text>
+  
+  <rect x="168" y="312" width="88" height="30" rx="7" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="212" y="332" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c" text-anchor="middle">rollouts</text>
+  <text x="68" y="384" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b554c">Part 1 drove it by hand.</text>
+  <text x="68" y="402" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b554c">Today it gets a landlord.</text>
+  <text x="68" y="422" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#8f887a">stderr &#8595; (kept too)</text>
+
+  <!-- the door -->
+  <line x1="320" y1="110" x2="320" y2="442" stroke="#8f887a" stroke-width="2"/>
+  <rect x="317" y="173" width="6" height="18" rx="3" fill="#faf9f6" stroke="#b3441a" stroke-width="1.5"/>
+  <rect x="317" y="311" width="6" height="18" rx="3" fill="#faf9f6" stroke="#8f887a" stroke-width="1.5"/>
+  <text x="320" y="468" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" letter-spacing="2" fill="#8f887a" text-anchor="middle">STDIO</text>
+
+  <!-- CodexClient -->
+  <rect x="362" y="86" width="830" height="374" rx="16" fill="none" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="386" y="118" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" font-weight="700" fill="#1f1c19">CodexClient <tspan font-weight="400" fill="#8f887a">&#183; app/codex_client.py &#183; one instance, lives as long as the server</tspan></text>
+
+  
+  <rect x="390" y="150" width="212" height="64" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="406" y="176" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" font-weight="700" fill="#1f1c19">_send()</text>
+  <text x="406" y="196" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b554c">one writer, one lock</text>
+  
+  <rect x="390" y="288" width="212" height="64" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="406" y="314" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" font-weight="700" fill="#1f1c19">_read_stdout()</text>
+  <text x="406" y="334" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#5b554c">the only reader</text>
+  
+  <rect x="700" y="128" width="216" height="82" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="716" y="154" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" font-weight="700" fill="#1f1c19">_pending</text>
+  <text x="716" y="173" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c">{id &#8594; Future}</text>
+  <text x="716" y="192" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c">each reply wakes its request()</text>
+  
+  <rect x="700" y="236" width="216" height="82" rx="12" fill="#ffffff" stroke="#dcb09a" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="716" y="262" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" font-weight="700" fill="#b3441a">_server_handlers</text>
+  <text x="716" y="281" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c">{}</text>
+  <text x="716" y="300" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c"></text>
+  <text x="716" y="300" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" letter-spacing="1.5" fill="#b3441a">EMPTY UNTIL PART 7</text>
+  
+  <rect x="700" y="344" width="216" height="82" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="716" y="370" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" font-weight="700" fill="#1f1c19">_queues</text>
+  <text x="716" y="389" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c">{threadId &#8594; Queue}</text>
+  <text x="716" y="408" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c">notifications, one mailbox per thread</text>
+  
+  <rect x="968" y="344" width="200" height="82" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="984" y="370" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" font-weight="700" fill="#1f1c19">_stderr_tail</text>
+  <text x="984" y="389" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c">deque(maxlen=40)</text>
+  <text x="984" y="408" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c">the engine's last words</text>
+
+  <!-- wires: send -> door, door -> reader -->
+  <line x1="390" y1="182" x2="335" y2="182" stroke="#b3441a" stroke-width="2"/>
+  <path d="M 324 182 L 334.9570672837477 177.10687456328515 L 334.9570672837477 186.89312543671485 Z" fill="#b3441a"/>
+  <text x="355" y="170" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b3441a" text-anchor="middle">requests</text>
+  <line x1="324" y1="320" x2="379" y2="320" stroke="#8f887a" stroke-width="2"/>
+  <path d="M 390 320 L 379.0429327162523 324.89312543671485 L 379.0429327162523 315.10687456328515 Z" fill="#8f887a"/>
+  <text x="355" y="308" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="middle">every line back</text>
+
+  <!-- reader fan-out -->
+  <line x1="602" y1="306" x2="660" y2="306" stroke="#e7e3d9" stroke-width="1.5"/><line x1="660" y1="306" x2="660" y2="169" stroke="#e7e3d9" stroke-width="1.5"/><line x1="660" y1="169" x2="689" y2="169" stroke="#e7e3d9" stroke-width="1.5"/>
+  <path d="M 700 169 L 689.0429327162523 173.89312543671485 L 689.0429327162523 164.10687456328515 Z" fill="#e7e3d9"/>
+  <text x="688" y="158" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#5b554c" text-anchor="end">"id" + "result"</text>
+  <line x1="602" y1="320" x2="672" y2="320" stroke="#dcb09a" stroke-width="1.5" stroke-dasharray="5 4"/><line x1="672" y1="320" x2="672" y2="277" stroke="#dcb09a" stroke-width="1.5" stroke-dasharray="5 4"/><line x1="672" y1="277" x2="689" y2="277" stroke="#dcb09a" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <path d="M 700 277 L 689.0429327162523 281.89312543671485 L 689.0429327162523 272.10687456328515 Z" fill="#dcb09a"/>
+  <text x="688" y="266" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b3441a" text-anchor="end">"id" + "method"</text>
+  <line x1="602" y1="334" x2="684" y2="334" stroke="#e7e3d9" stroke-width="1.5"/><line x1="684" y1="334" x2="684" y2="385" stroke="#e7e3d9" stroke-width="1.5"/><line x1="684" y1="385" x2="689" y2="385" stroke="#e7e3d9" stroke-width="1.5"/>
+  <path d="M 700 385 L 689.0429327162523 389.89312543671485 L 689.0429327162523 380.10687456328515 Z" fill="#e7e3d9"/>
+  <text x="688" y="374" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#5b554c" text-anchor="end">"method", no "id"</text>
+
+  <!-- stderr wire -->
+  <line x1="163" y1="436" x2="163" y2="520" stroke="#8f887a" stroke-width="1.2" stroke-dasharray="3 4"/><line x1="163" y1="520" x2="1068" y2="520" stroke="#8f887a" stroke-width="1.2" stroke-dasharray="3 4"/><line x1="1068" y1="520" x2="1068" y2="437" stroke="#8f887a" stroke-width="1.2" stroke-dasharray="3 4"/>
+  <path d="M 1068 426 L 1072.8931254367149 436.9570672837477 L 1063.1068745632851 436.9570672837477 Z" fill="#8f887a"/>
+  <text x="620" y="512" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a">stderr, line by line, into the ring buffer</text>
+
+  <!-- ===== the divider ===== -->
+  <line x1="48" y1="556" x2="1192" y2="556" stroke="#e7e3d9" stroke-width="1.5" stroke-dasharray="2 6"/>
+  <text x="48" y="584" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" letter-spacing="2" fill="#b3441a">DOWNSTAIRS &#183; SSE OVER HTTP &#183; ONE DIRECTION, OUTWARD</text>
+
+  <!-- queue exit into the bottom half -->
+  <line x1="760" y1="426" x2="760" y2="608" stroke="#b3441a" stroke-width="2"/><line x1="760" y1="608" x2="173" y2="608" stroke="#b3441a" stroke-width="2"/><line x1="173" y1="608" x2="173" y2="629" stroke="#b3441a" stroke-width="2"/>
+  <path d="M 173 640 L 168.10687456328515 629.0429327162523 L 177.89312543671485 629.0429327162523 Z" fill="#b3441a"/>
+  <text x="340" y="628" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b3441a">run_turn() drains one thread's mailbox, note by note</text>
+
+  <!-- bottom row -->
+  
+  <rect x="48" y="640" width="250" height="104" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="64" y="666" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" font-weight="700" fill="#1f1c19">run_turn()</text>
+  <text x="64" y="685" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c">app/main.py</text>
+  <text x="64" y="704" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c">await queue.get(), forever</text>
+  <rect x="372" y="640" width="274" height="104" rx="12" fill="#f6e7df" stroke="#dcb09a" stroke-width="1.5"/>
+  <text x="388" y="666" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" letter-spacing="2" fill="#b3441a">THE TRANSLATOR</text>
+  <text x="388" y="692" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" font-weight="700" fill="#1f1c19">translate(note)</text>
+  <text x="388" y="714" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c">app/events.py &#183; notification in,</text>
+  <text x="388" y="731" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c">envelope out (or None: dropped)</text>
+  
+  <rect x="720" y="640" width="262" height="104" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="736" y="666" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" font-weight="700" fill="#1f1c19">StreamingResponse</text>
+  <text x="736" y="685" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c">text/event-stream</text>
+  <text x="736" y="704" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c">each parcel pushed the moment it exists</text>
+  <rect x="1056" y="640" width="136" height="104" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="1072" y="670" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" font-weight="700" fill="#1f1c19">curl -N</text>
+  <text x="1072" y="692" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c">today; the</text>
+  <text x="1072" y="709" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c">browser in</text>
+  <text x="1072" y="726" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c">Part 3</text>
+
+  <line x1="298" y1="692" x2="361" y2="692" stroke="#1f1c19" stroke-width="2"/>
+  <path d="M 372 692 L 361.0429327162523 696.8931254367149 L 361.0429327162523 687.1068745632851 Z" fill="#1f1c19"/>
+  <text x="335" y="680" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#5b554c" text-anchor="middle">notification</text>
+  <line x1="646" y1="692" x2="709" y2="692" stroke="#1f1c19" stroke-width="2"/>
+  <path d="M 720 692 L 709.0429327162523 696.8931254367149 L 709.0429327162523 687.1068745632851 Z" fill="#1f1c19"/>
+  <text x="683" y="680" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#5b554c" text-anchor="middle">envelope</text>
+  <line x1="982" y1="692" x2="1045" y2="692" stroke="#1f1c19" stroke-width="2"/>
+  <path d="M 1056 692 L 1045.0429327162524 696.8931254367149 L 1045.0429327162524 687.1068745632851 Z" fill="#1f1c19"/>
+
+  <!-- shipment record from the real run -->
+  <rect x="48" y="788" width="1144" height="58" rx="10" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="68" y="812" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="1.5" fill="#8f887a">THIS RUN, ON THIS EXACT PIPELINE &#183; 2026-07-06</text>
+  <text x="68" y="834" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#5b554c">1 session_start &#183; <tspan fill="#b3441a">379 text_delta</tspan> &#183; 19 item_start + 19 item_done &#183; 1 complete &#183; <tspan fill="#b3441a">54.9s</tspan>, 159,680 tokens</text>
+</svg>

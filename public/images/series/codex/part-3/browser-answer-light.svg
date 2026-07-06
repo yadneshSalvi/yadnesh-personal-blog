@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="874" viewBox="0 0 1120 874" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1120" height="874" fill="#fafaf9"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#f3f1ec"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#e2ded4" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#d6d1c5"/><circle cx="56" cy="28" r="7" fill="#d6d1c5"/><circle cx="82" cy="28" r="7" fill="#d6d1c5"/>
+  <rect x="320" y="13" width="480" height="30" rx="15" fill="#ffffff" stroke="#e2ded4"/>
+  <text x="560" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#5b554c" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#e7e5e4" stroke-width="1"/>
+  <circle cx="28" cy="79" r="5" fill="#0f6c6c"/>
+  <text x="42" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Pagewright</text>
+  <text x="1096" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a8a29e" text-anchor="end">the site builder</text>
+  
+  <rect x="308" y="130" width="612" height="40" rx="18" fill="#1c1917"/>
+  <text x="325" y="156" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#fafaf9">Build a one-page site for a small bakery called Flour &amp; Stone: hero, menu, contact</text>
+  <circle cx="204" cy="198" r="3" fill="#e7e5e4"/>
+  <text x="216" y="202" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" letter-spacing="1.5" fill="#a8a29e">THINKING</text>
+  <path d="M 296 195 l 4.5 5 l 4.5 -5" fill="none" stroke="#a8a29e" stroke-width="1.6"/>
+  <rect x="200" y="220" width="576" height="38" rx="10" fill="#ffffff" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="215" y="244" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#dc2626">&#x2715;</text>
+  <text x="236" y="244" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Checking the working directory</text>
+  <text x="668" y="243" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#dc2626" text-anchor="end">exit 1</text>
+  <text x="738" y="243" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">COMMAND</text>
+  <path d="M 750 236 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.8"/>
+  
+  <rect x="200" y="266" width="576" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="215" y="290" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="236" y="290" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Listing files</text>
+  
+  <text x="738" y="289" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">COMMAND</text>
+  <path d="M 750 282 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.8"/>
+  
+  
+  <text x="200" y="337" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">I confirmed there isn't an existing app scaffold in this directory, so I'm creating a</text>
+  <text x="200" y="361" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">self-contained static site: one index.html plus one stylesheet, with responsive</text>
+  <text x="200" y="385" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">sections and no framework assumptions.</text>
+  <rect x="200" y="406" width="576" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="215" y="430" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="236" y="430" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Creating index.html, Creating styles.css</text>
+  
+  <text x="738" y="429" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">FILES</text>
+  <path d="M 750 422 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.8"/>
+  
+  <circle cx="204" cy="468" r="3" fill="#e7e5e4"/>
+  <text x="216" y="472" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" letter-spacing="1.5" fill="#a8a29e">THINKING</text>
+  <path d="M 296 465 l 4.5 5 l 4.5 -5" fill="none" stroke="#a8a29e" stroke-width="1.6"/>
+  <rect x="200" y="490" width="576" height="38" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="215" y="514" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#15803d">&#x2713;</text>
+  <text x="236" y="514" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#57534e">Running: "sed -n '1,220p' index.html"</text>
+  
+  <text x="738" y="513" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1" fill="#a8a29e" text-anchor="end">COMMAND</text>
+  <path d="M 750 506 l 5 6 l 5 -6" fill="none" stroke="#a8a29e" stroke-width="1.8"/>
+  
+  
+  <text x="200" y="563" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">Built a self-contained one-page bakery site with:</text>
+  
+  <circle cx="208" cy="592" r="2.5" fill="#1c1917"/>
+  <text x="222" y="597" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">a hero section</text>
+  <circle cx="208" cy="618" r="2.5" fill="#1c1917"/>
+  <text x="222" y="623" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">a menu section</text>
+  <circle cx="208" cy="644" r="2.5" fill="#1c1917"/>
+  <text x="222" y="649" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">a contact/visit section</text>
+  <circle cx="208" cy="670" r="2.5" fill="#1c1917"/>
+  <text x="222" y="675" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">responsive styling and a warm editorial visual style</text>
+  
+  <text x="200" y="713" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">Files: index.html and styles.css. If you want, I can next add product photos,</text>
+  <text x="200" y="737" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">a mobile menu, or a more luxe, brand-specific art direction.</text>
+  <text x="200" y="770" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a8a29e">118,240 tokens · 39s</text>
+  <line x1="0" y1="798" x2="1120" y2="798" stroke="#e7e5e4" stroke-width="1"/>
+  <rect x="200" y="816" width="636" height="42" rx="12" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
+  <text x="216" y="842" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#a8a29e">Describe the site you want&#8230;</text>
+  <rect x="846" y="816" width="74" height="42" rx="12" fill="#0f6c6c" opacity="0.45"/>
+  <text x="883" y="842" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+</svg>

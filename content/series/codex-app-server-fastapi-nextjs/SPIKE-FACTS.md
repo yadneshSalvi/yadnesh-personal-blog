@@ -85,6 +85,22 @@ Order observed: `thread/started` → `thread/status/changed (active)` →
   comes only from tokenUsage notifications. No cost-in-USD anywhere: the meter
   ritual quotes tokens (cost math from published prices is ours).
 
+## Part-4-build findings (verified live)
+
+- `turn/diff/updated` paths are GIT-REPO-relative (relative to the enclosing
+  git repo root, e.g. `part-04.../backend/projects/{id}/site/index.html`),
+  NOT workspace-relative. Part 4's backend relativizes them before the wire.
+- Agents sometimes change files via shell commands (`cp logo.svg ...`) which
+  emit NO fileChange item, so no file_change/preview_refresh event. The
+  frontend does a catch-all files+preview refresh on `complete`.
+- The network-off "Google Fonts wall" needs the right framing: asking for a
+  fonts LINK produces no wall (the reader's browser fetches it, not the
+  sandbox). The wall appears when the sandbox itself must fetch: "download
+  the woff2 files with curl" → curl exit 6 (DNS blocked), then the agent
+  swept every READABLE corner of the disk for cached fonts (workspace-write
+  blocks writes+network, NOT reads: Part 6 teaser), refused to fabricate
+  binaries, and reported the block honestly with three ways forward.
+
 ## Item shapes (from item/started + item/completed)
 
 - `userMessage`: `{content: [{type: "text", text, text_elements}]}`.

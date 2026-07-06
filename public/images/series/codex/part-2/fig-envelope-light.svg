@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="680" viewBox="0 0 1240 680">
+  <rect width="1240" height="680" fill="#faf9f6"/>
+  <text x="48" y="46" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#8f887a">ONE BELT &#183; LATER PARTS ADD PARCELS &#183; NOBODY EVER REBUILDS THE BELT</text>
+
+  
+  <rect x="48" y="132" width="118" height="128" rx="9" fill="#ffffff" stroke="#dcb09a" stroke-width="1.5"/>
+  <rect x="94" y="131" width="26" height="10" rx="2" fill="#f6e7df" stroke="#dcb09a" stroke-width="1"/>
+  <text x="107" y="176" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#1f1c19" text-anchor="middle">session_start</text>
+  <text x="107" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#8f887a" text-anchor="middle">session_id</text>
+  <text x="107" y="248" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1.5" fill="#8f887a" text-anchor="middle">PART 2</text>
+  
+  <rect x="176" y="132" width="118" height="128" rx="9" fill="#ffffff" stroke="#dcb09a" stroke-width="1.5"/>
+  <rect x="222" y="131" width="26" height="10" rx="2" fill="#f6e7df" stroke="#dcb09a" stroke-width="1"/>
+  <text x="235" y="176" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#1f1c19" text-anchor="middle">text_delta</text>
+  <text x="235" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#8f887a" text-anchor="middle">text</text>
+  <text x="235" y="248" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1.5" fill="#8f887a" text-anchor="middle">PART 2</text>
+  
+  <rect x="304" y="132" width="118" height="128" rx="9" fill="#ffffff" stroke="#dcb09a" stroke-width="1.5"/>
+  <rect x="350" y="131" width="26" height="10" rx="2" fill="#f6e7df" stroke="#dcb09a" stroke-width="1"/>
+  <text x="363" y="176" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#1f1c19" text-anchor="middle">item_start</text>
+  <text x="363" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#8f887a" text-anchor="middle">item_id &#183; kind</text>
+  <text x="363" y="211" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#8f887a" text-anchor="middle">detail</text>
+  <text x="363" y="248" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1.5" fill="#8f887a" text-anchor="middle">PART 2</text>
+  
+  <rect x="432" y="132" width="118" height="128" rx="9" fill="#ffffff" stroke="#dcb09a" stroke-width="1.5"/>
+  <rect x="478" y="131" width="26" height="10" rx="2" fill="#f6e7df" stroke="#dcb09a" stroke-width="1"/>
+  <text x="491" y="176" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#1f1c19" text-anchor="middle">item_done</text>
+  <text x="491" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#8f887a" text-anchor="middle">item_id &#183; kind</text>
+  <text x="491" y="211" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#8f887a" text-anchor="middle">detail</text>
+  <text x="491" y="248" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1.5" fill="#8f887a" text-anchor="middle">PART 2</text>
+  
+  <rect x="560" y="132" width="118" height="128" rx="9" fill="#ffffff" stroke="#dcb09a" stroke-width="1.5"/>
+  <rect x="606" y="131" width="26" height="10" rx="2" fill="#f6e7df" stroke="#dcb09a" stroke-width="1"/>
+  <text x="619" y="176" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#1f1c19" text-anchor="middle">complete</text>
+  <text x="619" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#8f887a" text-anchor="middle">status &#183; usage</text>
+  <text x="619" y="211" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#8f887a" text-anchor="middle">duration_ms</text>
+  <text x="619" y="248" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1.5" fill="#8f887a" text-anchor="middle">PART 2</text>
+  
+  <rect x="688" y="132" width="118" height="128" rx="9" fill="#ffffff" stroke="#dcb09a" stroke-width="1.5"/>
+  <rect x="734" y="131" width="26" height="10" rx="2" fill="#f6e7df" stroke="#dcb09a" stroke-width="1"/>
+  <text x="747" y="176" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#1f1c19" text-anchor="middle">error</text>
+  <text x="747" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#8f887a" text-anchor="middle">message</text>
+  <text x="747" y="248" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1.5" fill="#8f887a" text-anchor="middle">PART 2</text>
+  
+  <rect x="816" y="132" width="118" height="128" rx="9" fill="none" stroke="#e7e3d9" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <rect x="862" y="131" width="26" height="10" rx="2" fill="#e7e3d9" stroke="#e7e3d9" stroke-width="1"/>
+  <text x="875" y="176" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#8f887a" text-anchor="middle">file_change</text>
+  <text x="875" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#8f887a" text-anchor="middle">files &#183; status</text>
+  <text x="875" y="248" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1.5" fill="#b3441a" text-anchor="middle">PART 4</text>
+  
+  <rect x="944" y="132" width="118" height="128" rx="9" fill="none" stroke="#e7e3d9" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <rect x="990" y="131" width="26" height="10" rx="2" fill="#e7e3d9" stroke="#e7e3d9" stroke-width="1"/>
+  <text x="1003" y="176" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" font-weight="700" fill="#8f887a" text-anchor="middle">approval_request</text>
+  <text x="1003" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#8f887a" text-anchor="middle">command / diff</text>
+  <text x="1003" y="248" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1.5" fill="#b3441a" text-anchor="middle">PART 7</text>
+  
+  <rect x="1072" y="132" width="118" height="128" rx="9" fill="none" stroke="#e7e3d9" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <rect x="1118" y="131" width="26" height="10" rx="2" fill="#e7e3d9" stroke="#e7e3d9" stroke-width="1"/>
+  <text x="1131" y="176" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" fill="#8f887a" text-anchor="middle">plan_update</text>
+  <text x="1131" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#8f887a" text-anchor="middle">steps</text>
+  <text x="1131" y="248" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1.5" fill="#b3441a" text-anchor="middle">PART 10</text>
+
+  <!-- the belt -->
+  <rect x="34" y="260" width="1172" height="14" rx="7" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <circle cx="78" cy="281" r="6" fill="none" stroke="#e7e3d9" stroke-width="1.5"/>
+  <circle cx="166" cy="281" r="6" fill="none" stroke="#e7e3d9" stroke-width="1.5"/>
+  <circle cx="254" cy="281" r="6" fill="none" stroke="#e7e3d9" stroke-width="1.5"/>
+  <circle cx="342" cy="281" r="6" fill="none" stroke="#e7e3d9" stroke-width="1.5"/>
+  <circle cx="430" cy="281" r="6" fill="none" stroke="#e7e3d9" stroke-width="1.5"/>
+  <circle cx="518" cy="281" r="6" fill="none" stroke="#e7e3d9" stroke-width="1.5"/>
+  <circle cx="606" cy="281" r="6" fill="none" stroke="#e7e3d9" stroke-width="1.5"/>
+  <circle cx="694" cy="281" r="6" fill="none" stroke="#e7e3d9" stroke-width="1.5"/>
+  <circle cx="782" cy="281" r="6" fill="none" stroke="#e7e3d9" stroke-width="1.5"/>
+  <circle cx="870" cy="281" r="6" fill="none" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="1192" y="302" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" letter-spacing="2" fill="#8f887a" text-anchor="end">&#8594; TO WHOEVER IS LISTENING</text>
+
+  <!-- the manifest -->
+  <text x="48" y="346" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" letter-spacing="2" fill="#8f887a">THE SIX LABELS OF PART 2, WITH REAL CARGO FROM THE BEANLINE RUN</text>
+  <line x1="48" y1="358" x2="1192" y2="358" stroke="#e7e3d9" stroke-width="1"/>
+  
+  <text x="70" y="380" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#b3441a">session_start</text>
+  <text x="230" y="380" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1f1c19">the turn began; here's the thread id</text>
+  <text x="560" y="380" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c">{"session_id": "019f389a-9927-&#8230;"}</text>
+
+  <text x="70" y="418" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#b3441a">text_delta</text>
+  <text x="230" y="418" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1f1c19">a piece of the prose, in order</text>
+  <text x="560" y="418" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c">{"text": " checking"} &#183; 379 of these in one turn</text>
+
+  <text x="70" y="456" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#b3441a">item_start</text>
+  <text x="230" y="456" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1f1c19">a unit of agent work opened</text>
+  <text x="560" y="456" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c">{"item_id": "call_onv9&#8230;", "kind": "commandExecution", "detail": {&#8230;}}</text>
+
+  <text x="70" y="494" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#b3441a">item_done</text>
+  <text x="230" y="494" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1f1c19">that unit settled, detail attached</text>
+  <text x="560" y="494" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c">kind "fileChange" &#183; {"path": "&#8230;/site/index.html", "kind": "add"}</text>
+
+  <text x="70" y="532" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#b3441a">complete</text>
+  <text x="230" y="532" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1f1c19">the receipt; the turn is over</text>
+  <text x="560" y="532" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c">{"status": "completed", "duration_ms": 54875, "usage": {&#8230;}}</text>
+
+  <text x="70" y="570" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" font-weight="700" fill="#b3441a">error</text>
+  <text x="230" y="570" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#1f1c19">something broke, said as data</text>
+  <text x="560" y="570" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c">{"message": "&#8230;"} &#183; because a 200 stream can't change its status</text>
+
+  <!-- the contract -->
+  <rect x="48" y="610" width="1144" height="40" rx="10" fill="#f2f7e8" stroke="#e7e3d9"/>
+  <text x="620" y="636" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#3f6212" text-anchor="middle">THE PARSER CONTRACT &#183; switch on "type" &#183; ignore labels you don't know yet</text>
+</svg>

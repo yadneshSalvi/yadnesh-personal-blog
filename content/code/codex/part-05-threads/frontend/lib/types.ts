@@ -1,4 +1,4 @@
-// The wire vocabulary from Parts 2–4, as TypeScript sees it. One
+// The wire vocabulary from Parts 2–5, as TypeScript sees it. One
 // discriminated union: switch on `type`, and the compiler knows the
 // payload's shape.
 export type ItemDetail = {
@@ -22,6 +22,7 @@ export type AgentEvent =
     }
   | { type: "diff_updated"; unified_diff: string }
   | { type: "preview_refresh"; project_id: string }
+  | { type: "thread_reset"; message: string }
   | {
       type: "complete";
       status: string;
@@ -30,11 +31,22 @@ export type AgentEvent =
     }
   | { type: "error"; message: string };
 
-// What the REST side of the backend returns: the project registry and
-// one project's workspace listing.
-export type Project = { id: string; name: string; created_at: string };
+// What the REST side of the backend returns: the project registry, one
+// project's workspace listing, and (new in Part 5) the conversation
+// replayed from the rollout.
+export type Project = {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at?: string;
+  thread_id?: string | null;
+  thread_name?: string | null;
+  forked_from_id?: string;
+};
 
 export type WorkspaceFile = { path: string; size: number; seeded: boolean };
+
+export type HistoryMessage = { role: "user" | "assistant"; text: string };
 
 // What the UI renders. An assistant turn is a SEQUENCE OF BLOCKS: prose
 // and items interleaved in the order they happened, mirroring the
@@ -57,6 +69,8 @@ export type Block = TextBlock | ItemBlock;
 
 export type ChatMessage =
   | { role: "user"; text: string }
+  // The quiet inline notice — Part 5 uses it when a thread reset.
+  | { role: "notice"; text: string }
   | {
       role: "assistant";
       blocks: Block[];

@@ -1,7 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { AgentEvent, Block, ChatMessage, Project, WorkspaceFile } from "@/lib/types";
+import type {
+  AgentEvent,
+  Block,
+  ChatMessage,
+  HistoryMessage,
+  Project,
+  WorkspaceFile,
+} from "@/lib/types";
 import { API_BASE } from "@/lib/api";
 import { readSse } from "@/lib/readSse";
 import { Markdown } from "@/components/Markdown";
@@ -9,7 +16,7 @@ import { CommandBadge } from "@/components/CommandBadge";
 import { ReasoningDrawer } from "@/components/ReasoningDrawer";
 import { ItemBadge } from "@/components/ItemBadge";
 import { Toast } from "@/components/Toast";
-import { ProjectBar } from "@/components/ProjectBar";
+import { ProjectsSidebar } from "@/components/ProjectsSidebar";
 import { PreviewPane } from "@/components/PreviewPane";
 import { FilesPane } from "@/components/FilesPane";
 import { DiffDrawer } from "@/components/DiffDrawer";
@@ -116,10 +123,28 @@ export default function Home() {
     }
   }, []);
 
+  // The conversation lives with the thread now: reopening a project
+  // replays it from the rollout via GET /history. Each past turn arrives
+  // as plain text — what was said, not how it streamed.
+  const loadHistory = useCallback(async (id: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/projects/${id}/history`);
+      if (!res.ok) return;
+      const data: { history: HistoryMessage[] } = await res.json();
+      setMessages(
+        data.history.map((m) =>
+          m.role === "user"
+            ? { role: "user", text: m.text }
+            : { role: "assistant", blocks: [{ type: "text", text: m.text }], status: "done" },
+        ),
+      );
+    } catch {
+      // Same deal as loadFiles: the toast comes from send().
+    }
+  }, []);
+
   const selectProject = useCallback(
     (id: string) => {
-      // Chat history lives with the thread, and threads don't persist
-      // until Part 5 — switching projects starts a fresh conversation.
       setActiveId(id);
       setMessages([]);
       setBadges({});
@@ -128,9 +153,21 @@ export default function Home() {
       setFiles([]);
       setPreviewVersion((v) => v + 1);
       loadFiles(id);
+      loadHistory(id);
     },
-    [loadFiles],
+    [loadFiles, loadHistory],
   );
+
+  // Re-pull the registry after events that change it server-side: a
+  // completed first turn (the auto-title landed) or a fork.
+  const refreshProjects = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/projects`);
+      if (res.ok) setProjects((await res.json()).projects);
+    } catch {
+      // Quiet: the sidebar just keeps its last known names.
+    }
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -161,6 +198,21 @@ export default function Home() {
       selectProject(entry.id);
     } catch {
       setToast("Could not create the project. Is the backend running?");
+    }
+  }
+
+  async function forkProject(id: string) {
+    // Both halves get photocopied server-side — thread/fork for the
+    // conversation, cp -r for the workspace — and a new sidebar entry
+    // comes back ready to diverge.
+    try {
+      const res = await fetch(`${API_BASE}/projects/${id}/fork`, { method: "POST" });
+      if (!res.ok) throw new Error(`The server said ${res.status}.`);
+      const entry: Project = await res.json();
+      setProjects((all) => [...all, entry]);
+      selectProject(entry.id);
+    } catch {
+      setToast("Could not fork the project.");
     }
   }
 
@@ -219,6 +271,18 @@ export default function Home() {
           // items; one refresh at the end catches whatever they did.
           loadFiles(activeId);
           setPreviewVersion((v) => v + 1);
+          // The first completed turn auto-titles the thread server-side;
+          // re-pull the registry so the sidebar learns the name.
+          refreshProjects();
+        } else if (event.type === "thread_reset") {
+          // The saved conversation could not be restored; a fresh thread
+          // took its place. Slot a quiet notice in front of the message
+          // that triggered it — the files are fine, only history is gone.
+          setMessages((all) => [
+            ...all.slice(0, -2),
+            { role: "notice", text: "History could not be restored. Files are intact." },
+            ...all.slice(-2),
+          ]);
         } else if (event.type === "error") {
           patchLastTurn({ status: "error" });
           setToast(event.message);
@@ -275,17 +339,20 @@ export default function Home() {
             the site builder
           </span>
         </div>
-        <ProjectBar
+      </header>
+
+      <div className="flex min-h-0 flex-1">
+        {/* The filing wall: every job folder, reopenable and forkable. */}
+        <ProjectsSidebar
           projects={projects}
           briefs={briefs}
           activeId={activeId}
           busy={working}
           onSelect={selectProject}
           onCreate={createProject}
+          onFork={forkProject}
         />
-      </header>
 
-      <div className="flex min-h-0 flex-1">
         {/* The conversation: everything Part 3 built, now one column. */}
         <section className="flex w-[44%] min-w-[360px] max-w-2xl flex-col border-r border-stone-200 dark:border-stone-800">
           <div
@@ -324,8 +391,8 @@ export default function Home() {
                     <>
                       <h2 className="text-lg font-semibold">Open a project</h2>
                       <p className="mt-1.5 max-w-sm text-sm text-stone-500 dark:text-stone-400">
-                        Every project is its own workspace. Create one above — blank, or seeded
-                        with a client brief.
+                        Every project is its own workspace and its own conversation. Create one
+                        in the sidebar — blank, or seeded with a client brief.
                       </p>
                     </>
                   )}
@@ -336,6 +403,12 @@ export default function Home() {
                 message.role === "user" ? (
                   <div key={i} className="mb-5 flex justify-end">
                     <p className="max-w-[85%] rounded-2xl rounded-br-md bg-stone-900 px-4 py-2.5 text-[15px] text-stone-50 dark:bg-stone-100 dark:text-stone-900">
+                      {message.text}
+                    </p>
+                  </div>
+                ) : message.role === "notice" ? (
+                  <div key={i} className="mb-5 flex justify-center">
+                    <p className="rounded-full border border-amber-300 bg-amber-50 px-3.5 py-1 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300">
                       {message.text}
                     </p>
                   </div>

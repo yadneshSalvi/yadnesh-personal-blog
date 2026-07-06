@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="396" viewBox="0 0 1040 396" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="396" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; the end of this page, compressed</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62">$</tspan> curl -N localhost:8000/chat -d '{"message": "Build a single-page site for Beanline, &#8230;"}'</text>
+    <text x="32" y="116" xml:space="preserve"></text>
+    <text x="32" y="144" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"session_start"</tspan>, "session_id": "019f389a-9927-7922-&#8230;"}</text>
+    <text x="32" y="172" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"item_start"</tspan>, "item_id": "rs_0388c9de&#8230;", "kind": <tspan fill="#6fa8dc">"reasoning"</tspan>, "detail": {}}</text>
+    <text x="32" y="200" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"text_delta"</tspan>, "text": " checking"}</text>
+    <text x="32" y="228" xml:space="preserve"><tspan fill="#756d62"># &#8230; the agent thinks, types, runs commands, and edits files, one labeled parcel at a time &#8230;</tspan></text>
+    <text x="32" y="256" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"item_start"</tspan>, "item_id": "call_YTYZ1F&#8230;", "kind": <tspan fill="#6fa8dc">"fileChange"</tspan>,</text>
+    <text x="32" y="284" xml:space="preserve">       "detail": {"files": [{"path": "&#8230;/site/index.html", "kind": <tspan fill="#8fb573">"add"</tspan>}]}}</text>
+    <text x="32" y="312" xml:space="preserve"><tspan fill="#756d62"># 419 parcels and 54.9 seconds later:</tspan></text>
+    <text x="32" y="340" xml:space="preserve">data: {"type": <tspan fill="#8fb573">"complete"</tspan>, "status": <tspan fill="#8fb573">"completed"</tspan>, "usage": {"totalTokens": <tspan fill="#e5825a">159680</tspan>, &#8230;}}</text>
+  </g>
+</svg>

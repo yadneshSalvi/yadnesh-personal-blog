@@ -1,0 +1,645 @@
+---
+title: "Codex App Server in Production, Part 3: The Builder UI"
+subtitle: "Commands become live badges with output scrolling inside them, the model's reasoning gets a drawer, and the answer types itself out. The event vocabulary grows by two, and no client breaks."
+image: "/images/series/codex/part-3/cover-light.svg"
+imageDark: "/images/series/codex/part-3/cover-dark.svg"
+createdAt: "2026-07-06T00:00:00.000Z"
+updatedAt: "2026-07-06T00:00:00.000Z"
+tags: ["codex", "openai", "nextjs", "react", "tutorial"]
+series: "codex-app-server-fastapi-nextjs"
+seriesPart: 3
+---
+
+Five seconds after I typed a prompt into the UI you're about to build, two command badges appeared and both turned red: `exit 1`, then `exit 2`. The agent had guessed there might be an existing app scaffold, probed for one, and the empty folder said no, twice. Then, on camera, it changed its plan: a quiet "the workspace looks sparse, so I'm checking the actual files present" slid into the reasoning drawer, two green badges followed, and a `FILES` chip announced `Creating index.html, Creating styles.css`. Thirty-nine seconds after the prompt, a finished bakery site and a receipt: 118,240 tokens.
+
+Every part of that story used to be JSON scrolling past `curl -N`. Today it becomes a product: a chat page where prose types itself between live badges, where a running shell command shows its stdout scrolling inside the badge like a tiny terminal, and where the model's inner monologue waits politely behind a muted toggle. The glass wall onto the workshop, installed.
+
+<Figure
+  src="/images/series/codex/part-3/browser-answer-light.svg"
+  srcDark="/images/series/codex/part-3/browser-answer-dark.svg"
+  alt="The Pagewright chat UI at the end of a real build. Under a user request for a one-page bakery site, a THINKING toggle sits above a failed command badge reading Checking the working directory with a red cross and exit 1, then a green Listing files badge. Prose explains the agent is creating a self-contained static site, followed by a FILES badge reading Creating index.html, Creating styles.css, another THINKING toggle, a sed readback badge, and a markdown answer listing the hero, menu, and contact sections. The receipt line reads 118,240 tokens and 39 seconds."
+  caption="The end of this part, drawn from a real 39-second run. The red cross is a real exit 1 (rg returns nonzero in an empty folder), the FILES chip is a real fileChange item, and the receipt is the real meter reading."
+  width={1120}
+  height={961}
+/>
+
+The backend barely changes: the [Part 2](/blog/codex-2-fastapi-bridge) vocabulary gains two event types and one field, added without touching the six that exist, and `curl` keeps working unchanged the whole time. That was the promise of designing the envelope before its consumers, and this part is where the design starts paying rent. Chat-UI-from-zero is assumed today ([LangGraph Part 4](/blog/langgraph-4-nextjs-frontend) builds one from an empty folder), and so is the block model's from-zero derivation ([Agent SDK Part 3](/blog/agent-sdk-3-agent-ui), this part's sibling). We start correct and move fast.
+
+## Scaffold, checklist style
+
+From the `pagewright/` project root, next to `backend/`:
+
+```bash
+npx create-next-app@latest frontend --ts --tailwind --eslint --app --no-src-dir --use-npm
+cd frontend
+npm install react-markdown remark-gfm
+```
+
+Two packages beyond the scaffold, because the agent narrates in markdown and nothing else. No component library, no chat SDK, no state manager: house convention, same reasoning as the sibling series, and at this app's size a component library is more furniture than floor.
+
+One config file, pointing at the Part 2 backend:
+
+```bash filename="frontend/.env.local"
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+```
+
+And the same two `globals.css` edits the sibling's scaffold needed: design tokens for both themes (Pagewright's accent is a workshop teal, `#0f6c6c`), and the `body` font swapped from the scaffold's hardcoded Arial to `var(--font-sans)`. Both edits are eleven lines total; grab [`globals.css` from the repo](https://github.com/yadneshSalvi/codex-app-server-in-production/blob/main/part-03-builder-ui/frontend/app/globals.css) and move on.
+
+## Two new parcels on the same belt
+
+Part 2 shipped six event types and a rule: the translator maps protocol notifications onto the envelope, and everything it doesn't recognize gets dropped. Two of the things it currently drops are exactly what a builder UI wants to show. `item/reasoning/summaryTextDelta` carries the model's reasoning summaries, token by token. `item/commandExecution/outputDelta` carries a running command's stdout as it happens. Two new rows in the table, two new mappings in the translator:
+
+```python filename="backend/app/events.py" repo="part-03-builder-ui/backend/app/events.py" lines="38-45"
+    if method == "item/reasoning/summaryTextDelta":
+        return {"type": "reasoning_delta", "item_id": p.get("itemId", ""),
+                "text": p.get("delta", "")}
+    if method == "item/commandExecution/outputDelta":
+        # The schema calls this field `chunk`; CLI 0.142.4 sends `delta`
+        # (plain text, not base64). Accept either spelling.
+        return {"type": "command_output_delta", "item_id": p.get("itemId", ""),
+                "chunk": p.get("delta", p.get("chunk", ""))}
+```
+
+That comment is a small protocol war story. The generated JSON schema names the output field `chunk`; the pinned CLI actually sends `delta`, as plain text. When a protocol is marked experimental, this is what that means in practice: you verify against the running binary, accept both spellings, and pin hard. Both notifications carry an `itemId`, and the translator forwards it. Hold that thought; the whole frontend turns on it.
+
+One more field while we're in the file. Commands report an exit code when they complete, and the UI will want it for styling:
+
+```python filename="backend/app/events.py" repo="part-03-builder-ui/backend/app/events.py" lines="20-22"
+    if kind == "commandExecution":
+        return {"command": item.get("command", ""),
+                "exit_code": item.get("exitCode")}
+```
+
+That's the entire backend change, minus one parameter we're saving for the reasoning drawer's section, because it deserves its little story. Part 2's `curl -N` still works against this backend, byte for byte: the old six event types are untouched, and an old client ignores the two new ones. The vocabulary grows; no client breaks. You'll see the frontend make the same promise from its side shortly.
+
+## The block model, item-shaped
+
+Now the one decision worth slow thinking, and it's a data-model decision, not a visual one: what is an assistant message in this app?
+
+The sibling series earns this answer from scratch, and I'm not going to re-teach it here ([Agent SDK Part 3](/blog/agent-sdk-3-agent-ui) is the from-zero derivation; the LangGraph series arrives at it the hard way, by outgrowing a string). The answer: an assistant turn is a **sequence of blocks**, prose and tool work interleaved in the order they happened, because the order is the story. What's worth a paragraph here is how little deciding Codex leaves you. The protocol already has a noun for "one discrete thing the agent did": the [item](/blog/codex-concepts#items). You watched them in [Part 1's stream anatomy](/blog/codex-1-first-thread#anatomy-of-the-notification-stream): reasoning items, command items, file-change items, each with a started/completed lifecycle and an id. Our block model is that noun, wearing UI clothes:
+
+```ts filename="frontend/lib/types.ts" repo="part-03-builder-ui/frontend/lib/types.ts" lines="30-52"
+export type TextBlock = { type: "text"; text: string };
+
+export type ItemBlock = {
+  type: "item";
+  id: string;
+  kind: string; // reasoning | commandExecution | fileChange | ...
+  detail: ItemDetail;
+  output: string; // command_output_delta accumulates here
+  reasoning: string; // reasoning_delta accumulates here
+  done: boolean;
+};
+
+export type Block = TextBlock | ItemBlock;
+
+export type ChatMessage =
+  | { role: "user"; text: string }
+  | {
+      role: "assistant";
+      blocks: Block[];
+      status: "working" | "done" | "error" | "stopped";
+      totalTokens?: number;
+      durationMs?: number;
+    };
+```
+
+One `ItemBlock` type covers every item kind, with `kind` deciding which component renders it. An `ItemBlock` is born on `item_start` with `done: false`, accumulates deltas while it lives, and settles in place on `item_done`. Note it keeps the item's `id`: that's not bookkeeping, that's load-bearing, and the break-it section exists to prove it.
+
+The wire events get their own union, one variant per row of the Part 2 table plus today's two:
+
+```ts filename="frontend/lib/types.ts" repo="part-03-builder-ui/frontend/lib/types.ts" lines="1-23"
+// The wire vocabulary from Parts 2–3, as TypeScript sees it. One
+// discriminated union: switch on `type`, and the compiler knows the
+// payload's shape.
+export type ItemDetail = {
+  command?: string;
+  exit_code?: number | null;
+  files?: { path: string; kind: string }[];
+};
+
+export type AgentEvent =
+  | { type: "session_start"; session_id: string }
+  | { type: "text_delta"; text: string }
+  | { type: "item_start"; item_id: string; kind: string; detail: ItemDetail }
+  | { type: "item_done"; item_id: string; kind: string; detail: ItemDetail }
+  | { type: "reasoning_delta"; item_id: string; text: string }
+  | { type: "command_output_delta"; item_id: string; chunk: string }
+  | {
+      type: "complete";
+      status: string;
+      duration_ms?: number;
+      usage: Record<string, number>;
+    }
+  | { type: "error"; message: string };
+```
+
+<Figure
+  src="/images/series/codex/part-3/fig-block-model-light.svg"
+  srcDark="/images/series/codex/part-3/fig-block-model-dark.svg"
+  alt="Three-column diagram of one turn in three forms, drawn from the real pulse run. Left column, on the wire: envelope events in arrival order, item_start for a reasoning item, a reasoning_delta, a text_delta, item_start for a commandExecution with id call_oR9buR, a command_output_delta carrying tick 2, and an item_done with exit_code 0, each item_id highlighted. Middle column, in state: the block array holding a reasoning item block, a text block, and a commandExecution item block with accumulated output and done true, with a note that deltas find their block by id, never by position. Right column, on screen: the rendered turn with a THINKING toggle, prose, a completed command badge containing an output pane with tick lines, and the receipt 60,233 tokens in 13 seconds. A footer notes the middle column mirrors the protocol's own noun and points to Agent SDK Part 3 for the from-zero derivation."
+  caption="One turn, three forms, all from the same real run. The middle column is the only decision; the protocol dictated the left one and the right one falls out of a switch statement."
+  width={1240}
+  height={700}
+/>
+
+<Callout type="info" title="agentMessage vs reasoning: what it says vs how it got there">
+Two item kinds carry the model's words, and they are not the same words. An `agentMessage` item is the answer, addressed to your user; its text arrives as `text_delta` and renders as prose. A `reasoning` item is the working-out, a summary of the model's private deliberation; it arrives as `reasoning_delta` and belongs in a drawer, muted and collapsed. Blur them together and the chat reads like someone thinking out loud mid-sentence. The UI keeps the distinction with one `if`: `item_start` for an `agentMessage` adds no badge, because its content already flows through text blocks.
+</Callout>
+
+## Reading the stream, three rules and a shrug
+
+The fetch-and-parse half is settled technology on this blog. [LangGraph Part 5](/blog/langgraph-5-streaming#teach-the-browser-to-read-a-firehose) builds SSE parsing from zero, split-frame bug and all; here it's one tidy async generator, and if you've read the sibling series you've seen this exact file:
+
+```ts filename="frontend/lib/readSse.ts" repo="part-03-builder-ui/frontend/lib/readSse.ts"
+import type { AgentEvent } from "./types";
+
+// Read a fetch Response as a stream of parsed SSE events. Frames are
+// delimited by a blank line (\n\n), and a frame can arrive split across
+// network chunks, so we buffer until each delimiter shows up. LangGraph
+// Part 5 walks through this parsing (and the bug you get without the
+// buffer) from zero; here it's four moves: read, buffer, split, parse.
+export async function* readSse(res: Response): AsyncGenerator<AgentEvent> {
+  const reader = res.body!.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const frames = buffer.split("\n\n");
+    buffer = frames.pop()!;
+    for (const frame of frames) {
+      const line = frame.trim();
+      if (line.startsWith("data: ")) {
+        yield JSON.parse(line.slice(6)) as AgentEvent;
+      }
+    }
+  }
+}
+```
+
+The heart of the part is the function that folds one wire event into the block list. Study this one; everything else in the app is furniture around it:
+
+```tsx filename="frontend/app/page.tsx" repo="part-03-builder-ui/frontend/app/page.tsx" lines="27-42"
+function applyEvent(blocks: Block[], event: AgentEvent): Block[] {
+  if (event.type === "text_delta") {
+    const last = blocks[blocks.length - 1];
+    if (last?.type === "text") {
+      return [...blocks.slice(0, -1), { ...last, text: last.text + event.text }];
+    }
+    return [...blocks, { type: "text", text: event.text }];
+  }
+  if (event.type === "item_start") {
+    // An agentMessage's content arrives as text_delta; no badge for it.
+    if (event.kind === "agentMessage") return blocks;
+    return [
+      ...blocks,
+      { type: "item", id: event.item_id, kind: event.kind, detail: event.detail, output: "", reasoning: "", done: false },
+    ];
+  }
+```
+
+`text_delta` extends the last block if it's text, otherwise starts a fresh one; that's what lets prose resume cleanly after a badge instead of gluing onto the paragraph before it. Position is fine here, because a paragraph's tokens always follow each other. Everything item-shaped plays by a stricter rule:
+
+```tsx filename="frontend/app/page.tsx" repo="part-03-builder-ui/frontend/app/page.tsx" lines="43-62"
+  if (event.type === "item_done") {
+    if (event.kind === "agentMessage") return blocks;
+    return blocks.map((b) =>
+      b.type === "item" && b.id === event.item_id ? { ...b, detail: event.detail, done: true } : b,
+    );
+  }
+  if (event.type === "reasoning_delta") {
+    return blocks.map((b) =>
+      b.type === "item" && b.id === event.item_id ? { ...b, reasoning: b.reasoning + event.text } : b,
+    );
+  }
+  if (event.type === "command_output_delta") {
+    return blocks.map((b) =>
+      b.type === "item" && b.id === event.item_id
+        ? { ...b, output: (b.output + event.chunk).slice(-OUTPUT_CAP) }
+        : b,
+    );
+  }
+  return blocks;
+}
+```
+
+Deltas and completions find their block **by `item_id`, never by position**. The tempting shortcut, "surely it belongs to the newest badge", holds right up until the engine runs two commands at once, and it does: ask for two things in parallel and gpt-5.4-mini happily issues two tool calls in one breath, both items open, both streaming output at the same time. I have the trace to prove it, and the break-it section turns that trace into a crime scene.
+
+And the quiet last line: an event this function doesn't recognize falls through untouched. When Part 4 starts sending `file_change` and `preview_refresh` parcels, this exact build of the client will shrug and keep rendering. Same promise the backend made, kept from the other end of the wire.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 2 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels side by side separated by thin vertical black dividers, about watching an AI builder work live through a glass wall, with its status shown like an airport departures board. A friendly little robot builder works at a workbench behind a large glass wall; above the glass hangs a split-flap airport departures board; a paper ticker tape scrolls overhead printing the robot's inner monologue. Panel 1: Yad stands at the glass wall holding a coffee mug, watching with interest; behind the glass the robot saws a tiny website frame shaped like a browser window; the departures board reads "RUNNING: PWD"; the ticker tape reads "CHECKING THE FILES FIRST". Panel 2: the departures board now reads "EXIT 1" in red letters; the robot scratches its head; Yad leans in close, nose almost on the glass, mug tilting; the ticker tape reads "HMM. EMPTY FOLDER." Panel 3: the departures board reads "DONE" with a green check mark; the robot proudly holds up a tiny finished webpage; the ticker tape reads "PROOFREAD IT TWICE"; Yad, delighted, says in a speech bubble: "BEST AIRPORT EVER." Clean readable hand-lettered board letters, ticker text and one speech bubble, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/codex/part-3/comic-departures-board.png"
+  alt="Comic in three panels. Panel one: Yad, a bearded developer with headphones, watches a small robot builder saw a browser-window frame behind a glass wall; a departures board above reads RUNNING: PWD and a ticker tape reads CHECKING THE FILES FIRST. Panel two: the board flips to EXIT 1 in red, the robot scratches its head under a floating question mark, and Yad leans in so close his coffee tilts; the ticker reads HMM. EMPTY FOLDER. Panel three: the board reads DONE with a green check, the robot holds up a tiny finished webpage, the ticker reads PROOFREAD IT TWICE, and Yad beams: BEST AIRPORT EVER."
+  caption="The glass wall, the departures board, and the ticker tape: command badges, exit codes, and the reasoning drawer, as installed in this part."
+  width={1536}
+  height={1024}
+/>
+
+## The command badge
+
+Each `commandExecution` block renders as a badge: one calm line while collapsed, the whole truth on click. (This component, the drawer, and the page all open with `"use client"`; if that directive is new to you, [LangGraph Part 4](/blog/langgraph-4-nextjs-frontend#teach-the-page-what-a-message-is) meets it properly.) The status icon is the block lifecycle made visible, and this series adds a twist the sibling didn't have: commands come back with an **exit code**, so the badge can tell "finished" from "finished badly" without any AI judgment involved:
+
+```tsx filename="frontend/components/CommandBadge.tsx" repo="part-03-builder-ui/frontend/components/CommandBadge.tsx" lines="7-22"
+function StatusIcon({ block }: { block: ItemBlock }) {
+  if (!block.done) {
+    return (
+      <span className="size-3.5 shrink-0 animate-spin rounded-full border-2 border-stone-300 border-t-accent dark:border-stone-600" />
+    );
+  }
+  if (failed(block)) {
+    return <span className="shrink-0 text-sm leading-none text-red-600 dark:text-red-400">&#x2715;</span>;
+  }
+  return <span className="shrink-0 text-sm leading-none text-green-700 dark:text-green-400">&#x2713;</span>;
+}
+
+function failed(block: ItemBlock): boolean {
+  const code = block.detail.exit_code;
+  return block.done && code !== null && code !== undefined && code !== 0;
+}
+```
+
+Spinner while running, verdict when settled, and `failed()` is careful about the difference between `exit_code: 0` and `exit_code: null`, because a still-running command has the latter. A failed badge also gets a red border and a small `exit 1` chip in the header. You'll see real ones in a moment, and they're not staged: the very first thing my builder did on camera was fail twice.
+
+The label needs help, though. On the wire, a command arrives as the full shell invocation, `/bin/zsh -lc 'ls -la'` on macOS, and a chat column full of `/bin/zsh -lc` reads like a kernel panic. Two small functions fix it. One unwraps the shell:
+
+```ts filename="frontend/lib/commandLabel.ts" repo="part-03-builder-ui/frontend/lib/commandLabel.ts" lines="4-12"
+export function unwrapShell(command: string): string {
+  const match = command.match(/^\S*\/(?:zsh|bash|sh) -lc ([\s\S]*)$/);
+  if (!match) return command;
+  const inner = match[1];
+  if (inner.startsWith("'") && inner.endsWith("'")) {
+    return inner.slice(1, -1).replace(/'\\''/g, "'");
+  }
+  return inner;
+}
+```
+
+And one turns the unwrapped command into a colleague narrating:
+
+```ts filename="frontend/lib/commandLabel.ts" repo="part-03-builder-ui/frontend/lib/commandLabel.ts" lines="14-38"
+// One friendly line per command for the collapsed badge. The default
+// branch matters most: a command this map has never heard of still
+// reads as itself, so nothing in later parts needs edits here.
+export function commandLabel(command: string): string {
+  const cmd = unwrapShell(command);
+  const words = cmd.split(/\s+/);
+  const head = words[0] === "sudo" ? words[1] : words[0];
+  switch (head) {
+    case "ls":
+    case "rg":
+    case "find":
+      return "Listing files";
+    case "cat":
+    case "head":
+    case "tail":
+      return `Reading ${basename(words[words.length - 1])}`;
+    case "mkdir":
+      return `Creating folder ${basename(words[words.length - 1])}`;
+    case "touch":
+      return `Creating ${basename(words[words.length - 1])}`;
+    case "rm":
+      return `Removing ${basename(words[words.length - 1])}`;
+    case "mv":
+    case "cp":
+      return `Moving ${basename(words[1] ?? "")}`;
+```
+
+<Callout type="info" title="The friendly-label map is a UX decision, not a lie">
+`commandLabel` never hides the truth; it defers it. The collapsed badge says "Checking the working directory"; one click shows `pwd && rg --files`, verbatim, in a mono panel. The default branch is the important engineering: a command the map has never heard of renders as itself, truncated, so when Part 12's MCP tools start running unfamiliar things, this file needs zero edits. Friendly when it can be, honest always.
+</Callout>
+
+Here's the badge earning its keep five seconds into the real bakery build. The agent probed for an existing scaffold; the empty folder said no:
+
+<Figure
+  src="/images/series/codex/part-3/browser-midrun-light.svg"
+  srcDark="/images/series/codex/part-3/browser-midrun-dark.svg"
+  alt="Pagewright five seconds into the bakery build. Under the user bubble, an active THINKING toggle and the agent's plan to inspect the app structure first. Below, two failed command badges with red crosses and red borders: Checking the working directory with an exit 1 chip, and a truncated rg search for framework names with an exit 2 chip. A teal dot reads Building, 5 seconds, and the send button has become Stop."
+  caption="Five seconds in, from the real run. Both probes failed honestly (rg exits nonzero when it finds nothing), and the UI says so with a chip instead of hiding it behind a spinner."
+  width={1120}
+  height={716}
+/>
+
+Look at what those two red badges are doing for trust. The agent guessed wrong about the world, the world said no, and the user watched the correction happen in real time: the next thinking line says "the workspace looks sparse, so I'm checking the actual files present", and the badges after it are green. In Part 1 that drama lived in a terminal trace only you could read. Now it's legible to someone who has never heard of JSON-RPC, and it's the difference between a spinner you hope at and a colleague you watch work.
+
+You know this feeling from the other side of it: a deploy pipeline that goes silent for four minutes, no logs, nothing but a pulsing dot, and you start negotiating with it. Every good tool eventually learns the same lesson: show the log. This part is that lesson, applied to an agent.
+
+## Live output, and the flood that never comes
+
+The exit-code chip is nice. This next bit is the Codex-specific delight: `command_output_delta` means a *running* badge can show its stdout scrolling inside it, like a terminal the size of a business card. The badge decides when to volunteer that:
+
+```tsx filename="frontend/components/CommandBadge.tsx" repo="part-03-builder-ui/frontend/components/CommandBadge.tsx" lines="46-58"
+export function CommandBadge({ block }: { block: ItemBlock }) {
+  const [open, setOpen] = useState(false);
+  const command = unwrapShell(block.detail.command ?? "");
+  const isError = failed(block);
+  // Streaming output stays visible without a click; once the command
+  // settles, it tucks behind the expander.
+  const showLive = !block.done && block.output.length > 0;
+  return (
+    <div
+      className={`my-1.5 max-w-xl overflow-hidden rounded-lg border bg-white dark:bg-stone-900 ${
+        isError ? "border-red-300 dark:border-red-900/70" : "border-stone-200 dark:border-stone-800"
+      }`}
+    >
+```
+
+`showLive` is the policy in one line: while output is streaming, show it without asking; the moment the command settles, fold it behind the chevron. A finished command is history, and history goes behind a click. The pane itself is defensive in three directions at once:
+
+```tsx filename="frontend/components/CommandBadge.tsx" repo="part-03-builder-ui/frontend/components/CommandBadge.tsx" lines="24-42"
+// The live terminal inside a badge. max-h + overflow keep a chatty
+// command from flooding the chat, and the pane follows its own tail the
+// way a terminal does.
+function OutputPane({ text, tone }: { text: string; tone?: "error" }) {
+  const ref = useRef<HTMLPreElement>(null);
+  useEffect(() => {
+    ref.current?.scrollTo({ top: ref.current.scrollHeight });
+  }, [text]);
+  return (
+    <pre
+      ref={ref}
+      className={`max-h-40 overflow-auto whitespace-pre-wrap break-all rounded-md bg-stone-100 p-2.5 font-mono text-xs leading-relaxed dark:bg-stone-800/80 ${
+        tone === "error" ? "text-red-700 dark:text-red-400" : "text-stone-700 dark:text-stone-300"
+      }`}
+    >
+      {text}
+    </pre>
+  );
+}
+```
+
+`max-h-40` plus its own scrollbar keeps a chatty command from eating the column, `break-all` stops one long unbroken path from stretching the page, and the effect keeps the pane pinned to its own tail the way a real terminal follows output. The fourth defense lives back in `page.tsx`, where the deltas accumulate:
+
+```tsx filename="frontend/app/page.tsx" repo="part-03-builder-ui/frontend/app/page.tsx" lines="20-22"
+// A flooding command can outrun the reader; keep the tail, which is the
+// part a terminal would be showing anyway.
+const OUTPUT_CAP = 8_000;
+```
+
+The sibling series learned the flooding lesson the embarrassing way, when one raw search payload drowned a chat column mid-demo. Here the guard is installed before the flood: state keeps only the last 8,000 characters of output per command, which is the part a terminal would be showing anyway. `cat` a megabyte of CSS and the UI keeps breathing.
+
+<Callout type="info" title="Why some badges never show live output">
+`item/commandExecution/outputDelta` only fires for commands whose output arrives over time. An instant command like `ls` or `pwd` is born and done between two heartbeats, and its output travels a different road: an `aggregatedOutput` field on the `item/completed` notification, which our envelope doesn't forward yet. That's a deliberate omission, not a gap: quick probes are narration, their results usually re-appear in the agent's own prose, and Part 4's file tree makes the workspace visible anyway. When a later part wants aggregated output on the wire, it will be one more field, added without breaking anything, like everything else in this vocabulary.
+</Callout>
+
+To actually see the live pane, you need a command that takes its time. Ask for one:
+
+> Run a shell loop that prints a line per second for 5 seconds, then create pulse.html with a heading that says The stream is alive
+
+<Figure
+  src="/images/series/codex/part-3/browser-live-output-light.svg"
+  srcDark="/images/series/codex/part-3/browser-live-output-dark.svg"
+  alt="Pagewright mid-turn on the pulse prompt. A running command badge with a spinner shows the shell loop invocation, and inside it an OUTPUT pane lists tick 2, tick 3, and tick 4, still growing. Prose above explains the agent will run the loop first so the live output is visible, prose below says it is waiting for the remaining ticks, and the working row reads Building, 9 seconds."
+  caption="The terminal-in-a-badge, mid-stream on the real pulse run. Each tick line landed one second after the last, delivered by its own command_output_delta parcel."
+  width={1120}
+  height={800}
+/>
+
+That's a shell loop running inside the OS sandbox on your machine, its stdout riding `item/commandExecution/outputDelta` through the translator, over SSE, through `applyEvent`, into a `<pre>` that follows its own tail. Watching `tick 3` land a second after `tick 2` is the moment this stops feeling like a chat app and starts feeling like the glass wall the workshop deserved. It streams!
+
+One housekeeping note: `fileChange` items get a simpler treatment for now. `ItemBadge` renders any item kind the UI has no special component for, and gives file changes a friendly label built from the wire detail:
+
+```tsx filename="frontend/components/ItemBadge.tsx" repo="part-03-builder-ui/frontend/components/ItemBadge.tsx" lines="9-14"
+export function ItemBadge({ block }: { block: ItemBlock }) {
+  const files = block.detail.files ?? [];
+  const label =
+    block.kind === "fileChange" && files.length > 0
+      ? files.map((f) => `${verb(f.kind)} ${basename(f.path)}`).join(", ")
+      : block.kind;
+```
+
+That's where the `FILES · Creating index.html, Creating styles.css` chip in the dessert shot comes from. File changes are the signature output of this engine, and a one-line chip is not their final form: Part 4 gives them a live preview and a diff drawer, and this component quietly steps aside.
+
+## The drawer that stayed empty
+
+Now the feature that produced this part's honest discovery. The reasoning drawer renders `reasoning` items: collapsed by default, muted, one small "Thinking" toggle that expands into the model's summarized working-out. The intern's scratchpad you're allowed to read, as the sibling series put it.
+
+```tsx filename="frontend/components/ReasoningDrawer.tsx" repo="part-03-builder-ui/frontend/components/ReasoningDrawer.tsx" lines="6-24"
+// The intern's scratchpad you're allowed to read: reasoning summaries
+// stream in muted and collapsed, one quiet line unless you ask for more.
+// Part 10 adds the dials (effort, summary detail); here it just fills.
+export function ReasoningDrawer({ block }: { block: ItemBlock }) {
+  const [open, setOpen] = useState(false);
+  if (!block.reasoning && block.done) return null; // nothing was shared
+  return (
+    <div className="my-1.5 max-w-xl">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 text-[12px] text-stone-400 hover:text-stone-500 dark:text-stone-500 dark:hover:text-stone-400"
+      >
+        {!block.done ? (
+          <span className="size-1.5 shrink-0 animate-pulse rounded-full bg-stone-400 dark:bg-stone-500" />
+        ) : (
+          <span className="size-1.5 shrink-0 rounded-full bg-stone-300 dark:bg-stone-600" />
+        )}
+        <span className="font-medium uppercase tracking-wider">Thinking</span>
+```
+
+I built this component, wired `reasoning_delta` through `applyEvent`, ran a build, and clicked the toggle. Empty. Ran another build. Empty again. The `reasoning` items were arriving on schedule, `item_start` and `item_done` in the right order, and not one `summaryTextDelta` between them. Four traces later the pattern was undeniable, and the protocol schema explained it: **reasoning summaries don't stream at all unless the turn asks for them.** At default settings, gpt-5.4-mini reasons silently and ships empty summaries. The fix is one parameter on `turn/start`, back in the backend:
+
+```python filename="backend/app/main.py" repo="part-03-builder-ui/backend/app/main.py" lines="56-62"
+    await client.request("turn/start", {
+        "threadId": thread_id,
+        "input": [{"type": "text", "text": message}],
+        # Without this the model reasons silently and the drawer stays
+        # empty. Part 10 turns summary (and effort) into user-facing dials.
+        "summary": "detailed",
+    })
+```
+
+`summary` is one of two [reasoning dials](/blog/codex-concepts#reasoning-effort) the protocol exposes per turn; the other, `effort`, controls how long the carpenter measures before cutting. Pagewright hardcodes `"detailed"` for now and leaves both dials' UI to Part 10, where a "care level" selector makes them the user's choice and the meter shows what depth costs. With the parameter in place, the drawer fills mid-run:
+
+<Figure
+  src="/images/series/codex/part-3/browser-thinking-light.svg"
+  srcDark="/images/series/codex/part-3/browser-thinking-dark.svg"
+  alt="Pagewright four seconds into the bakery build with the thinking drawer open. Under the THINKING toggle, italic mono text shows the model's real reasoning summary: a bold heading, Modifying code and checking files, then sentences about inspecting the repository, updating the user before diving deeper, and checking files first to understand what changes are needed. Below the drawer, regular prose states the agent's plan, and the working row reads Building, 4 seconds."
+  caption="The drawer, open mid-run with real summary text. Note the register: the drawer is the model talking to itself, the prose below is the model talking to you. Keeping them visually separate is the whole design."
+  width={1120}
+  height={786}
+/>
+
+Worth saying out loud: what streams here is a **summary** of the model's reasoning, produced by the model for exactly this purpose, not a raw chain of thought. That's why the register sounds like someone's tidy lab notebook. It's also why the drawer belongs in the muted corner of the visual hierarchy: useful when you're curious why the agent just did something surprising (like re-checking a folder after two failed probes), ignorable the rest of the time.
+
+## Markdown answers
+
+The agent's final message deserves better than `white-space: pre-wrap`. It writes headings, inline-code filenames, lists, and the occasional table, so text blocks render through `react-markdown` with `remark-gfm`, restyled element by element to look native to the app:
+
+```tsx filename="frontend/components/Markdown.tsx" repo="part-03-builder-ui/frontend/components/Markdown.tsx" lines="1-16"
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+// The agent narrates in markdown: headings, inline-code filenames, and
+// (with remark-gfm) the occasional table. Each element gets app styling
+// here, so answers look native instead of pasted-in.
+export function Markdown({ text }: { text: string }) {
+  return (
+    <div className="space-y-3 text-[15px] leading-relaxed">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          h1: ({ children }) => <h3 className="text-base font-semibold">{children}</h3>,
+          h2: ({ children }) => <h3 className="text-base font-semibold">{children}</h3>,
+          h3: ({ children }) => <h4 className="text-[15px] font-semibold">{children}</h4>,
+          ul: ({ children }) => <ul className="list-disc space-y-1 pl-5">{children}</ul>,
+```
+
+Mechanical; skim the rest in the repo. The page around all these components is the sibling's chat page wearing Pagewright's clothes: the same `send()` loop folding events through `applyEvent`, the same elapsed-seconds working row (relabeled "Building…"), auto-scroll that leaves you alone when you scroll up to study a badge, a Stop button on `AbortController` with the same honest asterisk (you hang up the phone, the server-side turn winds down on its own; the real interrupt is Part 8's `turn/interrupt`), a self-dismissing toast for transport errors, and an empty state whose three sample prompts are wired straight to `send()`. All of it is walked through line by line in [Agent SDK Part 3](/blog/agent-sdk-3-agent-ui); the [part folder](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-03-builder-ui) has this series' version.
+
+<Figure
+  src="/images/series/codex/part-3/browser-empty-light.svg"
+  srcDark="/images/series/codex/part-3/browser-empty-dark.svg"
+  alt="The Pagewright empty state. A teal dot above the heading Describe a website, a subtitle explaining that Pagewright plans it, runs the commands, and writes the files while you watch every step happen, and three sample prompt chips: create hello.html with a big heading, build a one-page bakery site, and list the files in your workspace. The input below reads Describe the site you want, with a disabled Send button."
+  caption="The empty desk. Each chip fires a real turn on click; the first click a user ever makes teaches them what the product is."
+  width={1120}
+  height={620}
+/>
+
+## Break it on purpose: match by position, watch it scramble
+
+Time to prove the `item_id` rule with a wrecking ball. The plausible shortcut looks like this. In `applyEvent`, replace the id lookup for `command_output_delta` and `item_done` with "the newest item block wins":
+
+```tsx
+  // the shortcut: "output must belong to the newest badge"
+  if (event.type === "command_output_delta") {
+    const lastItem = [...blocks].reverse().find((b) => b.type === "item");
+    return blocks.map((b) =>
+      b === lastItem
+        ? { ...b, output: (b.output + event.chunk).slice(-OUTPUT_CAP) }
+        : b,
+    );
+  }
+```
+
+(A throwaway change; don't commit it.) On every turn so far, this works flawlessly, because the engine happened to run one command at a time. Now feed it the prompt built to expose it:
+
+> At the same time, in two separate parallel tool calls, run one command that prints tick N once per second for 5 seconds and another that prints tock N once per second for 5 seconds. Then reply with one sentence.
+
+The model obliges with two tool calls in a single response. On the wire: `item_start` for `call_oR9buR…`, then `item_start` for `call_JCgioQ80…` *before the first one completes*, then five seconds of output deltas interleaving between the two ids. Here's what the shortcut renders:
+
+<Figure
+  src="/images/series/codex/part-3/browser-scrambled-light.svg"
+  srcDark="/images/series/codex/part-3/browser-scrambled-dark.svg"
+  alt="Pagewright after the break-it run with positional matching. Two command badges for the tick loop and the tock loop both still show spinners even though the turn has finished, and the receipt line reads 45,705 tokens and 12 seconds. The first badge has no output at all, while the second badge's OUTPUT pane wrongly contains both tick 2 and tock 2 interleaved. The final answer text says both loops ran in parallel and completed successfully, contradicting the spinners above it."
+  caption="The scramble, from the real broken run. Every delta from both commands landed in the newest badge, and item_done stamped the wrong block twice, so both spinners outlived the receipt. The prose says done; the badges say otherwise; the UI is lying in two directions at once."
+  width={1120}
+  height={776}
+/>
+
+Read the wreckage: the tick command's output is inside the tock command's badge, the tick badge streamed nothing and will spin forever, and because `item_done` also matched "the newest badge", neither block ever settled, so two spinners sit above a receipt that says the turn completed twelve seconds ago. Nothing crashed. No error was thrown. The UI is wrong and confident about it, which is the worst kind of bug to ship in a product whose entire pitch is "watch your agent work".
+
+Restore the id matching, run the same prompt, and the scene turns mundane: two badges, each streaming its own ticks and tocks side by side, each resolving green the moment its own `item_done` arrives. Items are the protocol's unit of truth, ids are how truth stays attached to the right block, and now you've seen the counterfactual. Delete the scratch version.
+
+## Try it end to end
+
+Boot both halves (backend from `backend/`, frontend from `frontend/`):
+
+```bash
+# terminal 1
+uv run uvicorn app.main:app --reload
+# terminal 2
+npm run dev
+```
+
+Open `localhost:3000` and give it the bakery brief. Today's ledger, every row a real run through this UI:
+
+| Run | What you watch | Meter |
+|---|---|---|
+| Flour &amp; Stone bakery build | 7 commands (2 failed probes, honest red), 2 files created, sed proofread | 118,240 tokens · 39s |
+| The pulse loop | tick lines streaming into a running badge, one per second | 60,233 tokens · 13s |
+| Parallel tick and tock, broken client | the scramble above, spinners outliving the receipt | 45,705 tokens · 12s |
+
+The meter ritual, Part 3 edition: the receipt under each finished turn comes from the `complete` event's `usage`, which the backend filled from the last [`thread/tokenUsage/updated`](/blog/codex-concepts#token-usage) notification of the turn. Notice the shape of the numbers: a 39-second build that reads its own files back costs six figures of input tokens, most of them cached replays of the growing conversation, exactly the pattern Part 1's meter section taught. Keep printing it; Part 8 turns this line into a live gauge.
+
+<DemoVideo
+  src="/videos/codex/part-3-demo.mp4"
+  poster="/videos/codex/part-3-poster.jpg"
+  caption="The pulse prompt, recorded live against a real gpt-5.4-mini turn: the prompt typed in, the thinking dot pulsing, tick lines streaming into the running badge one per second, the FILES chip landing, and the drawer opened to read the reasoning behind it all."
+  label="Screen recording of Part 3: the builder UI streaming a real agent turn with a live command badge, reasoning drawer, and token receipt"
+/>
+
+<Recap
+  part={3}
+  items={[
+    "A block model with the protocol's own grain: assistant turns are sequences of text and item blocks, items keyed by item_id, agentMessage folded into prose, and unknown events ignored so the vocabulary can keep growing.",
+    "Two backend additions, zero broken clients: reasoning_delta and command_output_delta joined the envelope (plus exit_code on command detail) while Part 2's curl kept working untouched.",
+    "Command badges that tell the truth: friendly labels over verbatim commands, spinner to green check or red cross with the real exit code, and live stdout scrolling inside a running badge behind a 8,000-character flood guard.",
+    "A reasoning drawer fed by summary: \"detailed\", after discovering the hard way that the engine streams no reasoning summaries at default settings; the effort and summary dials themselves wait for Part 10.",
+    "Proof, not promise, for the keying rule: two genuinely concurrent commands, and the positional shortcut caught on camera scrambling output into the wrong badge and leaving spinners running after the receipt.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "The engine starts two commandExecution items in the same turn and their output deltas interleave. How does the UI route each chunk to the right badge?",
+      options: [
+        "Deltas always belong to the most recently started item",
+        "applyEvent matches command_output_delta to a block by item_id, the id both notifications carry from the protocol",
+        "The backend buffers each command's output until it completes",
+        "React reconciles the panes by their position in the list",
+      ],
+      answer: 1,
+      explain: "Every item notification carries its itemId and the translator forwards it. Matching by id is what makes two concurrent badges stream side by side; the break-it section shows what the positional shortcut does instead.",
+    },
+    {
+      q: "You build the reasoning drawer, run a turn with default settings, and the drawer stays empty. Why?",
+      options: [
+        "The sandbox blocks reasoning summaries unless networkAccess is on",
+        "reasoning items only exist on gpt-5.5, not gpt-5.4-mini",
+        "The engine streams no reasoning summaries unless turn/start asks for them, for example with summary: \"detailed\"",
+        "The drawer only fills after the turn completes",
+      ],
+      answer: 2,
+      explain: "At defaults the model reasons silently: reasoning items open and close with empty summaries and zero deltas. One parameter on turn/start switches the summaries on; Part 10 turns it into a user-facing dial.",
+    },
+    {
+      q: "Why does a quick command like pwd never show a live output pane, while the five-second shell loop does?",
+      options: [
+        "outputDelta only fires for output that arrives over time; instant commands deliver output in aggregatedOutput on item/completed instead",
+        "The UI hides output shorter than one line",
+        "Quick commands run outside the sandbox where output can't be captured",
+        "The flood guard drops output from commands that finish in under a second",
+      ],
+      answer: 0,
+      explain: "Streaming output is for commands that stream. An instant command is born and done between heartbeats, and its output rides a field our envelope deliberately doesn't forward yet: quick probes are narration, and their results reappear in the agent's prose.",
+    },
+    {
+      q: "item_start arrives with kind agentMessage. What does applyEvent do?",
+      options: [
+        "Opens a text badge with a spinner",
+        "Nothing: the agentMessage's content arrives as text_delta events, so a badge would duplicate the prose",
+        "Creates an ItemBlock that later holds the final answer",
+        "Throws, because agentMessage is not in the union",
+      ],
+      answer: 1,
+      explain: "agentMessage items carry the words addressed to the user, and those words already flow through text blocks. The one-line skip in applyEvent is what keeps the answer from appearing twice, once as prose and once as a mystery badge.",
+    },
+    {
+      q: "A build command dumps 500 KB of output. What keeps the chat usable?",
+      options: [
+        "The backend truncates outputDelta parcels to 1 KB each",
+        "react-markdown virtualizes long code blocks",
+        "OUTPUT_CAP keeps only the last 8,000 characters in state, and the pane adds max-h-40, its own scrollbar, and break-all",
+        "The badge collapses automatically when output exceeds a limit",
+      ],
+      answer: 2,
+      explain: "Defense in depth: state keeps the tail (the part a terminal would show), and the pane caps height, scrolls itself, and breaks long tokens. The sibling series learned this after a payload flooded its chat; here the guard ships before the flood.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 3: the builder UI, a glass wall onto the workshop"
+```
+
+The agent builds sites you can't see: they land as files in a folder while the chat shows you badges about them. In [Part 4](/blog/codex-4-live-preview) every project gets its own workspace, the site renders in a live iframe that refreshes as patches land, and `turn/diff/updated`, the gift Part 1 left unwrapped, becomes a diff drawer. Next: the live preview.
+
+The complete, tested code for this part lives in [`part-03-builder-ui`](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-03-builder-ui) in the [companion repo](https://github.com/yadneshSalvi/codex-app-server-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's lines highlighted.
