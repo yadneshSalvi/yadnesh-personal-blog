@@ -1,0 +1,168 @@
+---
+title: "Codex App Server: Concepts"
+subtitle: "The reference page for the Codex App Server series: every recurring idea in the protocol, defined once, linked from wherever it first appears."
+image: "/images/series/codex/concepts-cover-light.svg"
+imageDark: "/images/series/codex/concepts-cover-dark.svg"
+imageAlt: "A cover in the series style reading 'The protocol, in plain words', with a large section-sign numeral and the OpenAI, FastAPI, and Next.js logos."
+createdAt: "2026-07-06T00:00:00.000Z"
+updatedAt: "2026-07-06T00:00:00.000Z"
+tags: ["codex", "reference"]
+series: "codex-app-server-fastapi-nextjs"
+kind: "reference"
+---
+
+How to read this page: don't. Not top to bottom, anyway. It exists so that every part of [Codex App Server in Production](/series/codex-app-server-fastapi-nextjs) can point at an idea with a link instead of a re-explanation. Follow a link in, read one entry, go back to what you were building. Entries are added as the series grows; where an entry describes something a later part will exercise for the first time, it says so.
+
+Two routing notes. This series assumes you can write a FastAPI endpoint and a React component; if you're earlier in the journey than that, [LangGraph from Scratch](/series/langgraph-fastapi-nextjs) teaches those fundamentals from zero. And every protocol fact on this page was verified live against the pinned CLI the series is written on. The protocol is experimental (see [protocol versioning](#protocol-versioning)), so if your output disagrees with an entry, check your version before you check your code.
+
+## App server
+
+Every Codex surface is a client of the same engine. The CLI, the IDE extension, the web app, and the desktop app all talk to one process, `codex app-server`, and OpenAI opened that process to everyone. Think of it as the engine's service hatch: the panels come off, and the socket every official product plugs into is the socket you plug into.
+
+Mechanically, `codex app-server` is a subcommand of the Codex CLI that reads and writes newline-delimited [JSON-RPC](#json-rpc) over stdio. Your backend spawns it once, keeps it alive, and multiplexes many [threads](#threads-and-turns) over the single process, which is exactly how the official surfaces use it. There is no HTTP server and no SDK in the loop unless you add one; this series doesn't.
+
+## JSON-RPC
+
+Numbered notes passed under a door. You slide a note through with a number on it (a **request**); eventually a note comes back quoting your number (the **response**). Notes without a number also slide out, unprompted, and expect nothing back (**notifications**); that's how the agent narrates its work. Every message is a single line of JSON over stdio.
+
+The conversation starts with a mandatory handshake: an `initialize` request, its response, then an `initialized` notification from you. Any method sent before that is rejected with a "Not initialized" error; the protocol has a contract and enforces it. One folklore note: the `"jsonrpc": "2.0"` field is tolerated whether you send it or not; the server accepts both.
+
+The part that makes this protocol interesting: the direction reverses. For [approvals](#approvals) and [structured questions](#request-user-input), the *server* sends *you* a numbered request and blocks until you respond. A client of this protocol is also a server.
+
+## Threads and turns
+
+A **thread** is the job folder for one project: the whole working relationship, kept by the engine. A **turn** is one work order in that folder: you say what you want, the agent works until it's done.
+
+`thread/start` opens the folder. Its params: `cwd` (the workspace the agent works in), `model`, `sandbox` as a mode string (`"read-only"`, `"workspace-write"`, or `"danger-full-access"`; see [sandbox policies](#sandbox-policies)), `approvalPolicy` (see [approval policies](#approval-policies)), `developerInstructions`, and `ephemeral`. The response carries the thread's `id` and its `path`: the [rollout file](#rollouts) where the engine archives everything.
+
+`turn/start` files a work order: `threadId` plus an `input` list of typed parts (`{type: "text", text}`; `image`, `localImage`, and `skill` parts also exist), with per-turn overrides for `model`, `effort` and `summary` (see [reasoning effort](#reasoning-effort)), `outputSchema` (see [output schema](#output-schema)), `approvalPolicy`, `cwd`, and a structured `sandboxPolicy`. The response carries the turn's `id` with status `inProgress`. Keep that id: [steering and interrupting](#steering) both require it.
+
+## Items
+
+Items are the line items on the work order: everything the agent does inside a turn arrives as one. Each begins with an `item/started` notification, may stream deltas while it runs, and settles with `item/completed`. A UI that keys its blocks by `itemId` renders concurrent work correctly for free.
+
+The type zoo: `userMessage`, `agentMessage` (the visible answer), `reasoning`, `commandExecution`, `fileChange`, `mcpToolCall`, `webSearch`, `plan`, `enteredReviewMode`, `exitedReviewMode`, and `contextCompaction`. The deltas you'll consume most: `item/agentMessage/delta` (per-token text), `item/reasoning/summaryTextDelta` (the readable reasoning narration), and `item/commandExecution/outputDelta` (`{threadId, turnId, itemId, chunk}`: live command output).
+
+Two shapes worth knowing cold. A `commandExecution` item carries the full shell string and its `cwd`. A `fileChange` item completes with `changes: [{path, kind, diff}]`, where `path` is absolute and `kind.type` is `add`, `update`, or `delete`; alongside it, `turn/diff/updated` streams the turn's aggregate unified diff after each change. Those two are Codex's signature outputs, and this series builds its whole preview-and-diff UI out of them.
+
+## Rollouts
+
+The workshop keeps a job archive whether or not you ever open the drawer. Every thread's full history is written as JSONL to `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`; the `thread.path` field in the `thread/start` response tells you exactly where. Setting `CODEX_HOME` relocates the whole cabinet (auth, config, sessions, skills), which is how a server deployment keeps the engine's state where you want it.
+
+The archive is what makes persistence protocol-native. `thread/resume` reopens the folder at the bookmark, full memory intact, even across a backend restart. `thread/fork` photocopies the blueprints mid-draft: a new thread with the same history and a `forkedFromId`, after which both copies keep drawing themselves. Note what forking does *not* copy: your workspace files. The history is the engine's; the files are yours to `cp -r`. `thread/read` replays history without loading the engine, `thread/list` powers a sidebar, and `ephemeral: true` threads never touch the archive at all.
+
+## Sandbox policies
+
+The apprentice's wristband: look-only, this-bench-only, or keys to everything. A sandbox policy declares what the agent's commands may touch, and the [operating system enforces it](#sandboxing).
+
+The grades: `readOnly` (look and plan, no writes), `workspaceWrite` (write inside the workspace and any extra `writableRoots`; the series' default), `dangerFullAccess` (no walls; legitimate inside a container you control, never in a hosted product), and `externalSandbox` (you brought your own containment). Under `workspaceWrite`, `networkAccess` is **off by default**: the hardware-store door is bricked over until you opt in.
+
+One shape quirk the docs won't warn you about: `thread/start` takes the sandbox as a plain mode string (`"workspace-write"`), while `turn/start` overrides take the structured object (`{type: "workspaceWrite", writableRoots: [...], networkAccess: false}`). Same dial, two spellings, both verified against the generated schema.
+
+## Sandboxing
+
+A policy is a rule; the sandbox is a wall, and a wall is physics. When a sandboxed command tries to write outside its bench, the kernel refuses: not a prompt the model can argue with, not an application-level check, a `SandboxError` from the operating system itself. On macOS the wall is Seatbelt; on Linux it's Landlock plus seccomp.
+
+Know what containment buys and what it doesn't. It bounds what the agent's *commands* can touch (files outside the workspace, the network when it's off). It does not make the agent's judgment good, keep secrets out of files the agent is allowed to read, or make `dangerFullAccess` safe. Codex's permission model is sandbox-first: containment is the default posture and [approvals](#approvals) are the escape hatch, which is the inverse of the arc in the [sibling series' entry on sandboxing](/blog/agent-sdk-concepts#sandboxing). Part 13 re-verifies the Linux wall on a real production VM, because Landlock needs the kernel's cooperation and "works on my Mac" is not a security story.
+
+## Approval policies
+
+The ask-me dial: when should a human get a say before the agent acts? The enum, confirmed from the generated schema (three published sources disagreed; the schema wins): `untrusted`, `on-failure`, `on-request`, `never`, kebab-case exactly.
+
+What they mean: `untrusted` runs only known-safe commands without asking and asks about everything else; `on-failure` lets the sandbox contain everything and asks only when a command fails and wants to retry with more access; `on-request` lets the model decide when it needs to ask for escalation; `never` never asks. The dial composes with the [sandbox](#sandbox-policies) into a two-axis grid (containment × consent), and that grid is the entire safety story of Act II: Pagewright's trust modes are named cells in it.
+
+## Approvals
+
+The foreman's stamp, with a twist: it's the worker who walks over and asks. When policy says a command or patch needs consent, the server sends your client a [JSON-RPC](#json-rpc) *request* (it has an id, it demands a response) and blocks that item until you answer. `item/commandExecution/requestApproval` carries the `command`, its `cwd`, and more; `item/fileChange/requestApproval` carries the patch itself, which is what makes a diff-in-the-approval-card UI possible.
+
+Each request carries `availableDecisions`: the legal answers for *this* request, so your UI never guesses. You respond with `{"decision": "accept"}` or whatever the list offers (`acceptForSession` for "stop asking about this kind of thing today", `decline`, `cancel`; command approvals can also offer an execpolicy amendment). A `serverRequest/resolved` notification follows. On the backend, a pending approval is a parked [Future](#futures-and-events) waiting for a button click.
+
+One behavior to expect: under `workspaceWrite`, in-workspace file writes are auto-allowed, so file-change approvals won't fire there; they belong to stricter postures and out-of-bounds writes. Part 7 wires all of this into Pagewright.
+
+## Steering
+
+Shouting through the workshop hatch without the hammering stopping. `turn/steer` appends guidance to a *running* turn: params `{threadId, expectedTurnId, input}`. The `expectedTurnId` is required and is a precondition: if it doesn't match the currently active turn, the request fails. That failure is a feature. It's the protocol enforcing the router every client needs anyway: message arrives, active turn matches, steer it; otherwise start a new turn.
+
+`turn/interrupt` is the big red mushroom button: params `{threadId, turnId}`, both required. The stop is cooperative (in-flight work is wound down, not killed mid-syscall), and the turn ends with a `turn/completed` whose status is `interrupted` rather than `completed`. Whatever files already landed stay landed: the workspace is truth.
+
+## Collaboration modes
+
+Blueprint before demolition: have the agent propose before it builds. An honesty note first, because this concept moved under our feet: older protocol versions exposed a `collaborationMode` param on `turn/start`, and the current pinned CLI (0.142.4) does not; the mode concept survives only as a setting in Codex's own TUI.
+
+So this series builds the blueprint behavior from primitives that are stable: a plan-first request runs as a [read-only](#sandbox-policies) turn, the agent explores and proposes, and the proposal arrives as `plan` [items](#items). While a plan executes, `item/plan/delta` and `turn/plan/updated` stream the checklist state: the written estimate taped to the window, ticking itself off. Part 10 builds the whole flow.
+
+## Reasoning effort
+
+How long the carpenter measures before cutting. `effort` is a per-turn dial for reasoning depth; the legal values are advertised per model, not fixed by the protocol: `model/list` returns each model's `supportedReasoningEfforts`, and both `gpt-5.4-mini` and `gpt-5.5` advertise `low` through `xhigh`. More effort means better plans on hard briefs and more [tokens billed](#token-usage), so products expose it as a care-level switch rather than a hidden constant.
+
+`summary` is the companion dial (`auto`, `concise`, `detailed`, `none`): how much of the reasoning gets narrated into the readable summary stream (`item/reasoning/summaryTextDelta`). The narration is a summary the model writes about its own thinking, not a transcript; render it faint and collapsed, and never parse it in code.
+
+## Request user input
+
+The contractor calling mid-job: "matte or gloss?" `item/tool/requestUserInput` is a server-initiated request, same reversed shape as an [approval](#approvals): the turn pauses, a structured question comes up the wire, and your response sends the answer back down. It rides the exact same Future bridge as approvals, which is why adding question cards to a product that already has approval cards costs almost nothing.
+
+Honesty about its status: on the pinned CLI it did not fire on default settings in our testing; the production app this series is drawn from forces it on with a feature flag at `thread/start` (`config: {"features.default_mode_request_user_input": true}`). Part 10 verifies the current behavior live and teaches whatever is true then. The UX pattern itself is shared with the sibling series' [structured questions](/blog/agent-sdk-10-interactive).
+
+## Review mode
+
+The building inspector: a different clipboard from the builder's. `review/start` runs Codex's built-in reviewer against a target, and the point is fresh eyes; asking the same thread "check your work" invites it to defend its own choices.
+
+Params: `{threadId, target, delivery}`. Targets: `{type: "uncommittedChanges"}` (the working tree; needs git), `{type: "baseBranch", branch}`, `{type: "commit", ...}`, and `{type: "custom", instructions}`, which is free-form and needs no git at all; that last one is Pagewright's lane. Delivery is `inline` (default: the review runs as a turn on your thread) or `detached` (a fresh thread; the response carries `reviewThreadId`).
+
+The stream brackets the work with `enteredReviewMode` and `exitedReviewMode` [items](#items), with real investigation (commands, file reads) in between. The findings live in the `exitedReviewMode` item's `review` field as *tagged prose*, not structured JSON: a summary plus bullets tagged `[P1]`/`[P2]`/`[P3]` with `path:line` references, repeated in a final `agentMessage`. Your product parses the tags or renders the markdown. Budget patience: a one-file review took 3m45s on the default review model in our testing. Part 11 turns all this into the report card that gates Publish.
+
+## Output schema
+
+The handover form: a form instead of an essay. Pass `outputSchema` (a JSON Schema) on `turn/start` and the agent works exactly as it always does (commands, file changes, reasoning), but its final `agentMessage.text` *is* the schema-conformant JSON string.
+
+Two practical rules from testing. Validate client-side (a pydantic `model_validate` at your server's edge), because the schema shapes the output rather than guaranteeing it. And sanitize string values: the model may embed markdown links inside them. The product pattern (machine-checkable results, schema-or-retry policies, LLM judges returning structured verdicts) is the same one the sibling series develops in its [structured outputs entry](/blog/agent-sdk-concepts#structured-outputs). Part 11 uses it for Pagewright's site manifest.
+
+## MCP
+
+Rented power tools, checked in through the same airlock. The Model Context Protocol is the standard interface between agents and external tools; the full treatment (servers, discovery, tool descriptions as prompt) lives in the [sibling series' MCP entry](/blog/agent-sdk-concepts#mcp), and it applies here unchanged.
+
+The Codex-specific wiring: servers are configured in the engine's config (under `CODEX_HOME`), their tools surface in the stream as ordinary `mcpToolCall` [items](#items) with namespaced `server:tool` names, and `mcpServerStatus/list` reports each server's startup health. The governance point matters most: MCP tool calls run inside the same [sandbox](#sandbox-policies) and [approval](#approval-policies) regime as everything else. Rented tools don't get their own key to the building. Part 12 wires one in.
+
+## Skills
+
+The pattern book on the bench. A skill is a markdown playbook the agent loads on demand: cheap to advertise, billed only when used. The philosophy (skills versus prompt stuffing, discovery versus motivation) is covered in the [sibling series' skills entry](/blog/agent-sdk-concepts#skills).
+
+Codex-side mechanics: skills live under `CODEX_HOME`, `skills/list` enumerates what the engine can see, and you can invoke one explicitly by adding a `{type: "skill"}` part to a turn's `input`. Part 12 ships a `brand-kit` skill that teaches Pagewright's agent to read a client's asset folder consistently.
+
+<a id="agents-md"></a>
+
+## AGENTS.md
+
+The site-rules poster by the door. `AGENTS.md` is a markdown file in the workspace that the agent reads when it starts working there: standing instructions that apply to every job on this site (semantic HTML, alt text always, no inline styles). It's the cheapest capability upgrade in the series, because it costs a text file.
+
+How it differs from `developerInstructions` on `thread/start`: the instructions param travels with the thread you started, while AGENTS.md lives with the files, so *any* Codex surface that opens the workspace (yours, the CLI, the IDE extension) honors the same poster. Part 12 adds one to Pagewright's workspace scaffold and diffs a build before and after.
+
+## Token usage
+
+The taxi meter on the workshop wall. During a turn, `thread/tokenUsage/updated` fires several times, carrying `tokenUsage: {total, last, modelContextWindow}` where `total` breaks down into `totalTokens`, `inputTokens`, `cachedInputTokens`, `outputTokens`, and `reasoningOutputTokens`.
+
+The catch that reshaped this series' plumbing: `turn/completed` carries **no usage field**. The notifications are the only source, so a meter reads them or reads nothing. And there is no cost-in-USD anywhere in the protocol: converting tokens to money is your job, from published per-token prices. For the wider gauge, `account/rateLimits/read` reports your plan's limits; Part 8 builds the live meter, and Part 13 checks the gauges before putting the engine on a public box.
+
+## Protocol versioning
+
+Torque specs for this exact engine revision. The app-server protocol is explicitly experimental: methods appear, params vanish (see [collaboration modes](#collaboration-modes)), and enums drift between docs, READMEs, and reality. The series' discipline: pin the exact CLI version (`npm i -g @openai/codex@<pin>`), never let it drift mid-series, and treat the generated schema as the source of truth.
+
+That schema is yours to generate: `codex app-server generate-json-schema --out DIR` (and `generate-ts`) emit the protocol schema for the *installed* CLI version. When two written sources disagree, the schema wins; it's how this series settled the [approval-policy enum](#approval-policies). The companion repo vendors the schema for the series' pin, and Part 13 hands you the regenerate-and-diff ritual for when you deliberately upgrade.
+
+## Futures and events
+
+A promise with no worker attached: an `asyncio.Future` is an empty result slot that one piece of code awaits and another fills, exactly once. Human-in-the-loop is that idiom wearing a hard hat: the [approval request](#approvals) parks a Future keyed by request id and emits an event so the UI shows a card; the decision endpoint fills the slot; the JSON-RPC response rides back down stdio.
+
+This entry stays short because the pattern is series-independent and already taught from zero: the sibling's [futures and events entry](/blog/agent-sdk-concepts#futures-and-events) and [Agent SDK Part 7](/blog/agent-sdk-7-approvals) build it a piece at a time. In this series the bridge is designed in Part 2, carries approvals in Part 7, and absorbs questions in Part 10 without modification.
+
+## SSE
+
+Server-sent events: the plain-HTTP way to stream. The response stays open and the server writes parcels shaped `data: {...}\n\n` as they happen. One conveyor belt, labeled parcels; this series defines its label vocabulary in Part 2 and then only ever adds new label types.
+
+Short on purpose: [LangGraph Part 5](/blog/langgraph-5-streaming) teaches SSE from zero, including the browser-side parsing bug everyone hits once. If SSE is new, read that first; this series assumes it.
+
+## Event source
+
+`EventSource` is the browser's built-in SSE client: point it at a URL, get an event per parcel, and reconnection is free, including the `Last-Event-ID` bookmark that lets a server resume the stream where the connection dropped. Its limitation is that it only speaks GET, which is why chat UIs that POST a message usually start with a hand-rolled fetch-reader instead ([LangGraph Part 5](/blog/langgraph-5-streaming) builds one).
+
+This series makes the same move at the same moment as its sibling: fetch-reader until streams become resumable GETs, then `EventSource` from Part 9 on. The durable-stream theory behind that switch (worker/viewer split, sequence numbers, replay) is taught from zero in [Agent SDK Part 9](/blog/agent-sdk-9-durable-streams); this series' Part 9 is the Codex-shaped build of it.

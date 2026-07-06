@@ -1,0 +1,46 @@
+---
+name: "Codex App Server in Production"
+accentWord: "Production"
+tagline: "Build Pagewright, an AI website builder with FastAPI and Next.js, by speaking the raw JSON-RPC protocol behind every Codex surface: describe a site, watch it assembled in a live preview with diffs, approvals, and steering, then ship it to a real server."
+plannedParts: 13
+image: "/images/series/codex/cover-light.png"
+imageAlt: "A cartoon of Yad, a bearded man with headphones, posting a paper note into a workshop service hatch labeled APP-SERVER while, behind a glass window, two small robots assemble a glowing storefront web page standing on an easel."
+createdAt: "2026-07-06T00:00:00.000Z"
+updatedAt: "2026-07-06T00:00:00.000Z"
+tags: ["codex", "openai", "fastapi", "nextjs", "tutorial", "series"]
+stages:
+  - { name: "Act I · Build the product", from: 1, to: 5 }
+  - { name: "Act II · Control", from: 6, to: 9 }
+  - { name: "Act III · Advanced capabilities and shipping", from: 10, to: 13 }
+---
+
+{/* cover prompt: Flat cartoon illustration, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones around his ears, dark t-shirt, "Yad"). Wide single-panel scene inside a cozy workshop. On the left, Yad stands at a wooden wall and posts a small folded paper note into a mail-slot service hatch. Above the hatch a small metal plaque reads "APP-SERVER" in clean capital letters. To the right of the hatch, a large glass window looks into the workshop floor: two small friendly round robots are assembling a glowing website page that stands on a wooden artist's easel, the page styled like a warm storefront web page with a header bar, a hero picture, and a small menu section. One robot holds a wrench, the other slots a rectangular section into the page like a puzzle piece. Blueprints, gears, and a toolbox around them. The only text in the image is the plaque "APP-SERVER". Clean readable letterforms, no other words, no caption box, no watermark. */}
+
+`codex app-server` is the engine inside every Codex surface. The CLI, the IDE extension, the web app, and the desktop app are all clients of the same JSON-RPC process, and OpenAI opened that process to everyone. This series builds on it directly: no SDK, no wrapper, nothing between you and the engine. You write the JSON yourself, read every notification the agent emits, and answer the requests it sends back. By the end of Part 1 you're speaking the same protocol VS Code speaks.
+
+What you build is **Pagewright**, an AI website builder that runs on your machine and, by the end, on a real server. Describe a site in plain English ("a one-page site for a specialty coffee chain: warm, editorial, a menu section") and watch the agent assemble it file by file in a live preview: commands streaming, patches landing, a diff drawer showing exactly what changed. Risky actions wait for your Approve click. You can steer a build mid-flight ("actually, make the header green") without restarting it. And before anything ships, the agent's own reviewer inspects the work; the Publish button has to be earned.
+
+Thirteen parts, three acts:
+
+- **Act I (Parts 1 to 5): build the product.** Speak the protocol by hand, wrap it in a real async client behind FastAPI, stream into a chat UI, then the hero feature: per-project workspaces with a live preview and a diff drawer. Close with projects that persist, resume, and fork.
+- **Act II (Parts 6 to 9): control.** Codex's safety model is sandbox-first: the OS itself fences what the agent may touch, and you tune the fence. Then human-in-the-loop approvals, a Stop button that works, mid-turn steering, a live token meter, and streams that survive a page refresh.
+- **Act III (Parts 10 to 13): advanced capabilities and shipping.** Plans before demolition, structured questions, reasoning depth as a dial, the built-in reviewer gating Publish, structured outputs and smoke evals, MCP servers and skills and AGENTS.md, and a real deployment to a Hetzner VM where published sites get real URLs.
+
+## Which series first?
+
+This is the third series on this blog built from FastAPI, Next.js, and server-sent events, and the three are deliberate rungs on one ladder:
+
+- **If FastAPI or Next.js are new to you**, start with [LangGraph from Scratch](/series/langgraph-fastapi-nextjs). It teaches every fundamental this series assumes, from your first endpoint to a deployed chatbot, and whenever a basic comes up here, the exact LangGraph part that teaches it is linked.
+- **[Claude Agent SDK in Production](/series/claude-agent-sdk-fastapi-nextjs) is this series' SDK-flavored twin.** That one drops in a crate engine via a Python library and builds a product around it; this one hands you the wiring harness and no crate. You don't need it first. This series stands alone. But readers of both will feel the rhymes, and they're on purpose: the same streaming contract carries both engines, and finishing both means you've effectively built a provider-agnostic agent layer.
+- **Start here** if you can write a FastAPI endpoint and a React component and you want the thing nobody else has written up: building a product on the app-server protocol itself.
+
+Four rules hold across all thirteen parts:
+
+- **Every part ends with something running.** Never "trust me, this pays off later".
+- **Versions are pinned, hard.** The app-server protocol is explicitly experimental and moves faster than any dependency in the sibling series. Every part states the exact CLI version it was written and tested against, the companion repo vendors the generated protocol schema for that pin, and the final part shows you how to re-verify against a newer version yourself.
+- **Costs are real.** Agent loops multiply tokens, so every part prints what its runs actually used, measured from the protocol's own usage notifications, and the habit graduates into a live meter in Part 8.
+- **Errors are part of the curriculum.** Each part breaks something on purpose and reads the real output with you: the handshake wall, the killed subprocess, the kernel refusing a write.
+
+All the code lives in the [companion repo, `codex-app-server-in-production`](https://github.com/yadneshSalvi/codex-app-server-in-production): one folder per part, each the complete project exactly as it exists at the end of that part, tested end to end against the pinned CLI. Inside every part, code blocks with a GitHub icon in the header link straight to the exact file in the repo.
+
+What you need: a laptop (macOS or Linux; on Windows, WSL2), a terminal, and either the ChatGPT plan you already pay for or a few dollars of OpenAI API credit. [Part 1](/blog/codex-1-first-thread) covers the login and how to cap what you can possibly spend.

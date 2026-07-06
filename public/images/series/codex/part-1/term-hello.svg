@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="424" viewBox="0 0 1040 424" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="424" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; backend</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62">$</tspan> uv run python hello_appserver.py</text>
+    <text x="32" y="116" xml:space="preserve"></text>
+    <text x="32" y="144" xml:space="preserve">engine says: {</text>
+    <text x="32" y="172" xml:space="preserve">  "userAgent": "<tspan fill="#e5825a">pagewright/0.142.4</tspan> (Mac OS 26.3.0; arm64) vscode/3.5.33 (pagewright; 0.1)",</text>
+    <text x="32" y="200" xml:space="preserve">  "codexHome": "/Users/you/.codex",</text>
+    <text x="32" y="228" xml:space="preserve">  "platformFamily": "unix",</text>
+    <text x="32" y="256" xml:space="preserve">  "platformOs": "macos"</text>
+    <text x="32" y="284" xml:space="preserve">}</text>
+    <text x="32" y="312" xml:space="preserve"></text>
+    <text x="32" y="340" xml:space="preserve"><tspan fill="#756d62"># the engine took the name we sent (“pagewright”) and wove it into its</tspan></text>
+    <text x="32" y="368" xml:space="preserve"><tspan fill="#756d62"># own user agent. the handshake is real; you are officially a client.</tspan></text>
+  </g>
+</svg>

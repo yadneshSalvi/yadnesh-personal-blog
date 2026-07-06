@@ -1,0 +1,556 @@
+---
+title: "Codex App Server in Production, Part 1: Setup and Your First Thread"
+subtitle: "The Codex CLI is secretly a server, and every Codex surface is one of its clients. By the end of this page, so is a Python script you wrote: one prompt in, a real website out."
+image: "/images/series/codex/part-1/cover-light.svg"
+imageDark: "/images/series/codex/part-1/cover-dark.svg"
+createdAt: "2026-07-06T00:00:00.000Z"
+updatedAt: "2026-07-06T00:00:00.000Z"
+tags: ["codex", "openai", "python", "agents", "tutorial"]
+series: "codex-app-server-fastapi-nextjs"
+seriesPart: 1
+---
+
+Here's the last line of a terminal session from the end of this page: `[completed in 45.0s · 117968 in / 7084 out]`. Forty-five seconds earlier, a Python script slid one JSON object into a process called `codex app-server`: build a one-page site for a coffee chain called Beanline. The agent listed the empty folder, wrote a 19 KB `index.html` with a warm editorial hero, a menu grid, and a coffee cup drawn in pure CSS, then re-read its own HTML to proofread it, and reported back. The script that drove all of this is about 120 lines of Python with zero dependencies, and by the end of this page you'll have written every one of them.
+
+## Where this series is going
+
+This is Part 1 of **Codex App Server in Production**, a thirteen-part series that builds **Pagewright**: an AI website builder. You describe a site in plain English and watch an agent assemble it file by file in a live preview, with commands streaming, patches landing in a diff drawer, risky actions waiting for your approval, and a built-in reviewer inspecting the work before anything ships. By the end it runs on a real server and publishes to real URLs:
+
+<Figure
+  src="/images/series/codex/part-1/fig-finished-app-light.svg"
+  srcDark="/images/series/codex/part-1/fig-finished-app-dark.svg"
+  alt="A browser window with the finished Pagewright app. On the left a chat panel: a user request for a Beanline coffee site, a completed shell command badge, a running file edit badge, and an approval card showing a small patch with Approve and Deny buttons. On the right, a live preview of the warm Beanline page with a menu grid, and a dark diff drawer peeking in from the right edge."
+  caption="The destination. Chat and approvals on the left, the site assembling itself on the right, the turn's diff one click away. Everything in this window gets built across the series."
+  width={1280}
+  height={600}
+/>
+
+Act I (Parts 1 to 5) builds the product: today's raw-protocol script, then a FastAPI bridge, a chat UI, the live preview with the diff drawer, and persistent projects. Act II (Parts 6 to 9) is control: the OS sandbox, human approvals, a Stop button with mid-turn steering, and streams that survive a page refresh. Act III (Parts 10 to 13) makes it a product: plans and structured questions, a review-gated Publish button, MCP servers and skills, and a real deployment.
+
+Two notes on who this is for. It's an intermediate series: it assumes you can write a FastAPI endpoint and a React component, and when it leans on a fundamental it links the exact part of [LangGraph from Scratch](/series/langgraph-fastapi-nextjs) that teaches it from zero. And it has a sibling: [Claude Agent SDK in Production](/series/claude-agent-sdk-fastapi-nextjs) builds an AI data analyst on Anthropic's SDK. The two series rhyme on purpose, and where this one inverts a lesson from that one, I'll say so out loud. You need neither to start. This page is pure Python.
+
+## The engine and its service hatch
+
+Install the Codex CLI and you get a terminal app: you type, an agent codes. But the terminal app is not where the agent lives. Under the hood, every Codex surface, the CLI, the VS Code extension, the web app, the desktop app, is a client of one process: `codex app-server`. It speaks [JSON-RPC](/blog/codex-concepts#json-rpc) over stdin and stdout, one JSON object per line. The CLI draws its interface by talking to it. So does VS Code.
+
+You've probably had this exact discovery with a web app: you open the network tab to debug something, watch the requests fly past, and realize the polished UI is a thin veneer over an API you could call yourself. Every developer who's done it remembers the small thrill of bypassing the front door. This is that, for Codex, except OpenAI left the [service hatch](/blog/codex-concepts#app-server) open on purpose and documented it.
+
+<Figure
+  src="/images/series/codex/part-1/fig-engine-hatch-light.svg"
+  srcDark="/images/series/codex/part-1/fig-engine-hatch-dark.svg"
+  alt="Diagram of one engine and its clients. A large box labeled codex app-server holds chips for threads and turns, the agent loop, OS sandbox, rollout archive, model access, and approvals. Through a vertical door line labeled STDIO, wires connect to five clients: Codex CLI, IDE extension, Codex web, Codex desktop app, and, highlighted in accent color, Your app: Pagewright. A legend shows the two kinds of note: a numbered request that gets exactly one reply, and an unnumbered notification that arrives unasked."
+  caption="The engine and its clients. The threads, the agent loop, the sandbox, and the session archive all live in the engine; a client is anything that passes it notes over stdio."
+  width={1240}
+  height={660}
+/>
+
+That's the reveal this part is built around. The agent loop, the sandboxing, the session archive, the approval machinery: all of it lives in the engine, already written, already battle-tested by every official Codex surface. What OpenAI's own clients get, you get, because you connect through the same hatch. Today you write the fifth client in that diagram, in about 120 lines.
+
+<Callout type="info" title="There are official SDKs. We're not using them, deliberately.">
+OpenAI ships a TypeScript SDK and a beta Python SDK that wrap this same protocol by shelling out to the CLI. They're fine, and they hide most of the surface this series is about: the notification stream, server-initiated approvals, steering, review mode. The protocol is the product here, so we build on the protocol. If you ever want the wrapped version afterwards, everything you learn transfers down.
+</Callout>
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 2 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels side by side separated by thin vertical black dividers, about discovering that a machine is secretly a whole workshop with a service hatch. Panel 1: Yad kneels behind a large vending machine branded "CODEX" on its side, prying off its back panel with a screwdriver, curious expression, a few loose screws on the floor. Panel 2: the removed panel reveals an entire tiny workshop inside the machine: a small friendly robot at a workbench with tools and blueprints pinned on the inner wall; on the frame edge a brass mail slot clearly labeled "APP-SERVER"; Yad, delighted, posts a small folded paper note into the slot. Panel 3: a freshly printed webpage slides out of the same slot into Yad's hands like a long receipt, showing a tiny coffee cup drawing and the word "BEANLINE" as a headline; Yad beams and says in a speech bubble: "IT WAS A SERVER ALL ALONG." Clean readable hand-lettered speech bubbles and labels, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/codex/part-1/comic-vending-machine.png"
+  alt="Comic in three panels. Panel one: Yad, a bearded developer with headphones, kneels behind a vending machine branded CODEX, prying off its back panel with a screwdriver. Panel two: the open panel reveals a whole tiny workshop inside, a small robot at a workbench with blueprints on the wall, and a brass mail slot labeled APP-SERVER, into which Yad delightedly posts a folded note. Panel three: a freshly printed webpage headed BEANLINE slides out of the slot like a receipt, and Yad holds it up saying: IT WAS A SERVER ALL ALONG."
+  caption="The machine you've been feeding coins is a workshop with a mail slot. This part is about learning to write the notes."
+  width={1536}
+  height={1024}
+/>
+
+## Setup, checklist style
+
+The whole series is written and tested against pinned versions. The app-server protocol is officially experimental and moves fast, so the pin matters more here than in any series on this blog. When something behaves differently on your machine, check this table before blaming yourself:
+
+| Tool | Version |
+|---|---|
+| Codex CLI | 0.142.4, pinned: `npm i -g @openai/codex@0.142.4` |
+| Python | 3.13 |
+| uv | 0.8.x |
+| Node.js | 22 LTS (running the CLI; the frontend waits until Part 3) |
+| Model | `gpt-5.4-mini` |
+
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) if you don't have it, then scaffold. If uv itself is new to you, [LangGraph Part 1](/blog/langgraph-1-setup) covers environment setup from zero:
+
+```bash
+npm install -g @openai/codex@0.142.4
+mkdir pagewright && cd pagewright
+uv init backend --bare --python 3.13
+cd backend
+```
+
+No `uv add` line, and that's not an oversight. Today's scripts use nothing but the standard library: `asyncio`, `json`, `pathlib`. The dependency is the protocol.
+
+<Callout type="info" title="Windows readers: use WSL2">
+Everything here spawns subprocesses and, from Part 6 on, depends on OS-level sandboxing (Seatbelt on macOS, Landlock on Linux). Both stories are best on Unix-like systems, so on Windows, run the whole series inside [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install). One command to install, and everything on this page behaves as printed.
+</Callout>
+
+### Log in once
+
+The engine needs an OpenAI account behind it, and there are two doors:
+
+**Option A, you have a ChatGPT plan.** Run `codex login` and finish the browser flow. Usage draws on your plan's Codex allowance. This is the everyday path for local development.
+
+**Option B, an API key.** Create a key at [platform.openai.com](https://platform.openai.com), and before anything else set a **hard monthly budget** (five dollars is plenty for this series) in the billing settings. Then run `codex login --api-key` and paste the key when prompted. Usage bills like any API call.
+
+<Callout type="warning" title="An API key is a password">
+Anyone holding the key can spend your money. It never goes in source code, never in a screenshot, never in git. The budget cap isn't because you'll hit it; it's so you never have to think about it. Keys are disposable; budgets are not.
+</Callout>
+
+Either way, the login lands in `~/.codex/`, and that's all the app server needs at runtime: no environment variable, no key in your code. Before we open the hood, drive the car once:
+
+```bash
+codex
+```
+
+Ask it something small, watch it work, type `/quit`. Whatever it did in that session, reading files, running commands, streaming its reasoning, is exactly what your Python script is about to do through the hatch. Same engine, different client.
+
+## Hello, app-server
+
+First script: spawn the engine, shake hands, prove the wiring. Create `hello_appserver.py` in `backend/`:
+
+```python filename="backend/hello_appserver.py" repo="part-01-first-thread/backend/hello_appserver.py" lines="1-20"
+"""Part 1, step one: shake hands with the engine.
+
+Spawns `codex app-server`, sends the mandatory initialize request, reads the
+response, and confirms the handshake. Nothing else. If this runs, everything
+in the series can run.
+"""
+
+import asyncio
+import json
+
+
+async def main() -> None:
+    proc = await asyncio.create_subprocess_exec(
+        "codex", "app-server",
+        stdin=asyncio.subprocess.PIPE,
+        stdout=asyncio.subprocess.PIPE,
+    )
+
+    def send(msg: dict) -> None:
+        proc.stdin.write((json.dumps(msg) + "\n").encode())
+```
+
+`create_subprocess_exec` starts `codex app-server` as a child process with pipes on both ends. That's the whole transport: JSON objects, one per line, written to its stdin and read from its stdout. The `send` helper does the framing, `json.dumps` plus a newline.
+
+Now the handshake itself:
+
+```python filename="backend/hello_appserver.py" repo="part-01-first-thread/backend/hello_appserver.py" lines="22-42"
+    send({
+        "jsonrpc": "2.0", "id": 1, "method": "initialize",
+        "params": {
+            "clientInfo": {"name": "pagewright", "title": "Pagewright", "version": "0.1"},
+            "capabilities": {},
+        },
+    })
+    await proc.stdin.drain()
+
+    line = await proc.stdout.readline()
+    reply = json.loads(line)
+    print("engine says:", json.dumps(reply["result"], indent=2))
+
+    send({"jsonrpc": "2.0", "method": "initialized", "params": {}})
+    await proc.stdin.drain()
+
+    proc.terminate()
+    await proc.wait()
+
+
+asyncio.run(main())
+```
+
+Look closely at the two messages, because the difference between them is the biggest idea in this part. The first has an `"id"`. The second doesn't. That's the entire grammar of JSON-RPC:
+
+<Callout type="info" title="JSON-RPC in one box">
+A message with an **id** is a **request**: whoever sends it is owed exactly one reply carrying the same id. A message without an id is a **notification**: fire and forget, no reply ever comes. `initialize` is a request (we need the engine's answer); `initialized` is a notification (we're announcing we're ready, nothing to wait for). Ids are how you match answers to questions when many are in flight at once. The [concepts page](/blog/codex-concepts#json-rpc) keeps the full grammar.
+</Callout>
+
+Think of it as numbered notes passed under a door. Note #1 goes under; eventually a reply quoting #1 comes back. Unnumbered notes slide out on their own schedule, and you'll meet a flood of them shortly. Run it:
+
+```bash
+uv run python hello_appserver.py
+```
+
+<Figure
+  src="/images/series/codex/part-1/term-hello.svg"
+  alt="A dark terminal running uv run python hello_appserver.py. The output reads: engine says, followed by a JSON object with userAgent pagewright/0.142.4 (Mac OS 26.3.0; arm64) vscode/3.5.33 (pagewright; 0.1), codexHome /Users/you/.codex, platformFamily unix, and platformOs macos. A comment notes the engine wove the name pagewright into its own user agent, and that you are officially a client."
+  caption="First contact. The engine introduces itself and quotes your client name back inside its user agent. The same handshake VS Code performs when you open the Codex panel."
+  width={1040}
+  height={424}
+/>
+
+That `userAgent` line is worth a pause: the engine took the `clientInfo` we sent, name `pagewright`, and wove it into its own identity string. As far as `codex app-server` is concerned, Pagewright is now a Codex surface, same standing as the IDE extension. The handshake is mandatory, though, and I'd rather you hit the wall now, on purpose, than in Part 4 by accident.
+
+## Break it on purpose: skipping the handshake
+
+Copy `hello_appserver.py` to a scratch file, `skip_handshake.py`, and swap the handshake for the next thing we'd naturally want to do: make the very first message a `thread/start` request (a method you'll meet properly in a minute), with `"id": 1` and nothing sent before it. Run it:
+
+<Figure
+  src="/images/series/codex/part-1/term-not-initialized.svg"
+  alt="A dark terminal running skip_handshake.py, which sent thread/start without initializing first. The engine replies with a single JSON line: error code -32600, message Not initialized, id 1. Comments note there was no crash and no silence, a proper JSON-RPC error quoting our id, and that the engine refuses every method until the handshake is done."
+  caption="The wall, met on purpose. The engine doesn't hang or die; it answers our id with a typed error and waits for someone politer."
+  width={1040}
+  height={284}
+/>
+
+Read the reply like the engine wrote it, because it did: `{"error":{"code":-32600,"message":"Not initialized"},"id":1}`. Three things worth collecting. It's an **error, not a crash**: the process is still alive and will happily serve us once we initialize. It **quotes our id**, so even failure follows the numbered-notes rule; a request always gets its reply, and error replies are replies. And it's **typed**: a machine-readable code, not prose to string-match. The protocol has a contract and enforces it, which is exactly the behavior you want from something you're about to build a product on.
+
+<Callout type="warning" title="This protocol is experimental, and this series pins hard">
+OpenAI marks the app-server protocol experimental: shapes can change between CLI versions. That's why every command in this series installs `@openai/codex@0.142.4` exactly, why the companion repo vendors the protocol's generated JSON schema for that pin, and why Part 13 pins the same version on the production server. When you eventually upgrade, `codex app-server generate-json-schema` prints the new contract; diff it against the vendored copy before touching code. The pin is the contract.
+</Callout>
+
+## Your first thread
+
+Handshake proven. Now the real script: `first_thread.py`, the one from the opening of this page. It starts with constants:
+
+```python filename="backend/first_thread.py" repo="part-01-first-thread/backend/first_thread.py" lines="1-20"
+"""Part 1: your first thread. One prompt in, a real website out.
+
+Speaks JSON-RPC to `codex app-server` over stdio: initialize, thread/start,
+turn/start, then narrates the notification stream until the turn completes.
+Run it, then open site/index.html in a browser.
+"""
+
+import asyncio
+import json
+import sys
+from pathlib import Path
+
+MODEL = "gpt-5.4-mini"
+SITE = Path("site")
+
+DEFAULT_PROMPT = (
+    "Build a single-page site for Beanline, a specialty coffee chain: warm, "
+    "editorial, a hero and a menu section. One index.html, inline CSS, no "
+    "external resources."
+)
+```
+
+`MODEL` is a constant for the same reason it was one in the sibling series: agent loops multiply tokens, so default to the cheap end of the lineup (`gpt-5.4-mini` builds surprisingly good pages, as you're about to see) and make upgrading to `gpt-5.5` a one-line change you can measure. `SITE` is the folder the agent will work in. And the prompt insists on inline CSS with no external resources because the sandbox we're about to configure ships with its network switched off: a Google Fonts link would be a request the box won't let out. Part 6 owns that switch; until then, self-contained sites.
+
+Then the client, a class small enough to earn the name barely:
+
+```python filename="backend/first_thread.py" repo="part-01-first-thread/backend/first_thread.py" lines="23-39"
+class AppServer:
+    """The smallest possible client: numbered notes under the door."""
+
+    def __init__(self) -> None:
+        self.proc = None
+        self.next_id = 0
+
+    async def start(self) -> None:
+        self.proc = await asyncio.create_subprocess_exec(
+            "codex", "app-server",
+            stdin=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+        )
+
+    async def send(self, msg: dict) -> None:
+        self.proc.stdin.write((json.dumps(msg) + "\n").encode())
+        await self.proc.stdin.drain()
+```
+
+Same spawn, same framing as `hello_appserver.py`, plus a counter. The counter feeds the two methods that map straight onto the two kinds of message:
+
+```python filename="backend/first_thread.py" repo="part-01-first-thread/backend/first_thread.py" lines="41-61"
+    async def request(self, method: str, params: dict) -> dict:
+        """Send a numbered note, then read lines until its numbered reply."""
+        self.next_id += 1
+        await self.send({"jsonrpc": "2.0", "id": self.next_id,
+                         "method": method, "params": params})
+        while True:
+            msg = json.loads(await self.proc.stdout.readline())
+            if msg.get("id") == self.next_id:
+                if "error" in msg:
+                    raise RuntimeError(msg["error"]["message"])
+                return msg["result"]
+
+    async def notifications(self):
+        """Yield every unnumbered note the server slides under the door."""
+        while True:
+            line = await self.proc.stdout.readline()
+            if not line:
+                return
+            msg = json.loads(line)
+            if "method" in msg and "id" not in msg:
+                yield msg
+```
+
+`request` sends a numbered note and reads lines until the one quoting its number comes back; `notifications` is an async generator yielding every unnumbered note forever. One honest limitation, named now because we'll fix it properly: `request` throws away any notification that arrives while it's waiting for its reply. For today's two-request script nothing of value is lost, but it's a toy reader, and [Part 2](/blog/codex-2-fastapi-bridge) replaces it with a real one: a single reader task, futures keyed by id, a queue for notifications.
+
+Now the setup half of `main`, where the two most consequential lines of this part live:
+
+```python filename="backend/first_thread.py" repo="part-01-first-thread/backend/first_thread.py" lines="81-98"
+async def main(prompt: str) -> None:
+    SITE.mkdir(exist_ok=True)
+    engine = AppServer()
+    await engine.start()
+
+    await engine.request("initialize", {
+        "clientInfo": {"name": "pagewright", "title": "Pagewright", "version": "0.1"},
+        "capabilities": {},
+    })
+    await engine.send({"jsonrpc": "2.0", "method": "initialized", "params": {}})
+
+    thread = await engine.request("thread/start", {
+        "cwd": str(SITE.resolve()),
+        "sandbox": "workspace-write",
+        "approvalPolicy": "never",
+        "model": MODEL,
+    })
+    print(f"[thread {thread['thread']['id']}]\n")
+```
+
+A [thread](/blog/codex-concepts#threads-and-turns) is the engine's unit of conversation: the job folder for one project, holding every exchange, persisted by the engine itself (more on where, at the end of this page). `thread/start` opens a fresh one, and its params are the working agreement:
+
+- **`cwd`**: the job site. Every relative path the agent touches resolves inside `site/`.
+- **`sandbox: "workspace-write"`**: the agent may read broadly but **write only inside the workspace**, enforced by the operating system.
+- **`approvalPolicy: "never"`**: don't stop to ask a human before acting.
+
+That last pair should make you sit up, especially if you've read the sibling series. An agent that runs shell commands, with nobody approving anything? Here's why that's a calmer sentence than it sounds:
+
+<Callout type="warning" title="The scissors come pre-sheathed">
+In the [Claude sibling series](/blog/agent-sdk-1-first-agent), Part 1 runs with `bypassPermissions` and a warning: containment by convention, an open debt repaid two acts later. Codex inverts that arc, and it's the deepest design difference between the two engines. Here the [sandbox](/blog/codex-concepts#sandbox-policies) is not a convention; `workspace-write` is enforced by the OS kernel, Seatbelt on macOS, Landlock and seccomp on Linux. If the agent tries to write outside `site/`, the write fails at the syscall, no matter what the model decided. Approvals-off is sane *because* the walls are real. Part 6 opens up the dials (and gleefully runs the agent into those walls); Part 7 adds the human. Today you get containment first, consent later: the exact reverse of the sibling's journey, and the honest Codex story.
+</Callout>
+
+## Your first turn
+
+A thread is an open folder; a [turn](/blog/codex-concepts#threads-and-turns) is one work order dropped into it. Before starting the turn, we need something to catch what falls out. `narrate`, sitting above `main` in the file, turns the firehose into a readable trace:
+
+```python filename="backend/first_thread.py" repo="part-01-first-thread/backend/first_thread.py" lines="64-78"
+def narrate(note: dict, usage: dict) -> None:
+    method, p = note["method"], note.get("params", {})
+    if method == "item/started":
+        item = p.get("item", {})
+        kind = item.get("type", "?")
+        if kind == "commandExecution":
+            print(f"  -> runs: {item.get('command', '')[:80]}")
+        elif kind == "fileChange":
+            print(f"  -> edits files")
+        elif kind == "reasoning":
+            print(f"  ...thinking")
+    elif method == "item/agentMessage/delta":
+        print(p.get("delta", ""), end="", flush=True)
+    elif method == "thread/tokenUsage/updated":
+        usage.update(p.get("tokenUsage", {}).get("total", {}) or p.get("tokenUsage", {}))
+```
+
+Three notification methods, three behaviors: an `item/started` prints one line describing what kind of work opened, `item/agentMessage/delta` prints the agent's prose token by token, and `thread/tokenUsage/updated` quietly keeps the latest totals for the receipt. Every name in that ladder gets a proper introduction in the next section; let it run first. The bottom of `main` starts the turn and drains the stream:
+
+```python filename="backend/first_thread.py" repo="part-01-first-thread/backend/first_thread.py" lines="100-120"
+    await engine.request("turn/start", {
+        "threadId": thread["thread"]["id"],
+        "input": [{"type": "text", "text": prompt}],
+    })
+
+    usage: dict = {}
+    async for note in engine.notifications():
+        narrate(note, usage)
+        if note["method"] == "turn/completed":
+            turn = note["params"]["turn"]
+            print(f"\n\n[{turn['status']} in {turn['durationMs'] / 1000:.1f}s"
+                  f" · {usage.get('inputTokens', '?')} in / "
+                  f"{usage.get('outputTokens', '?')} out]")
+            break
+
+    engine.proc.terminate()
+    await engine.proc.wait()
+
+
+if __name__ == "__main__":
+    asyncio.run(main(" ".join(sys.argv[1:]) or DEFAULT_PROMPT))
+```
+
+Note what `turn/start`'s response is *not*: the finished work. It comes back almost instantly with `"status": "inProgress"`, a claim ticket, and everything that matters arrives as notifications until `turn/completed` rings the bell. Run it, and watch the whole minute:
+
+```bash
+uv run python first_thread.py
+```
+
+<Figure
+  src="/images/series/codex/part-1/term-first-thread.svg"
+  alt="A dark terminal transcript of the first Beanline run. A thread id prints, then the narrated stream: thinking markers, reasoning summaries in prose, command lines like runs /bin/zsh -lc 'rg --files' and ls -la, an edits-files marker, then a sed readback of index.html described as the agent proofreading its own work. The final message lists what was built: a warm editorial hero with brand lockup and a custom coffee illustration, a menu section with six items, fully inline CSS, responsive layout. The receipt reads completed in 45.0 seconds, 117968 tokens in, 7084 out."
+  caption="The dessert, narrated live. Notice the shape: think, look around, write, then re-read its own file before declaring victory. Nobody told it to proofread."
+  width={1040}
+  height={1096}
+/>
+
+This is the moment the series is named after, so let it land. You didn't tell it to check whether the folder was empty; it ran `rg --files`, `ls -la`, and `find` to see for itself. You didn't tell it to verify its work; it paged through its own `index.html` with `sed` before reporting done, the same think-act-observe loop you'd want from a careful contractor. Every one of those commands ran for real, inside the sandbox, launched by an engine you drove with four JSON messages.
+
+Now collect the payoff:
+
+```bash
+open site/index.html   # macOS; on Linux: xdg-open site/index.html
+```
+
+A real website. Warm cream background, an editorial serif hero for Beanline, a six-item menu with prices and little tag chips, and a coffee cup drawn entirely in CSS, steam and all. It's genuinely handsome, not "good for a robot" handsome, and it came out of a folder that was empty a minute ago, built by JSON you wrote by hand!
+
+Then run it again with your own client brief, because the script takes one:
+
+```bash
+uv run python first_thread.py "Build a one-page site for a tiny bookshop called Dog-Eared"
+```
+
+## Anatomy of the notification stream
+
+You've now watched the stream through `narrate`'s summary. Time to read it raw, because **this stream is the series' raw material**: Part 2 translates it into server-sent events, Part 3 renders it as UI, Part 7 pauses it for approvals. Here's the same Beanline turn as it actually looked on the wire, trimmed but real:
+
+<Figure
+  src="/images/series/codex/part-1/fig-stream-anatomy-light.svg"
+  srcDark="/images/series/codex/part-1/fig-stream-anatomy-dark.svg"
+  alt="Annotated trace of one real turn. A turn/start request with id 3 is answered by a response quoting id 3 with status inProgress, annotated as the receipt, not the result. Below, unnumbered notifications: item/started opening a commandExecution item, item/agentMessage/delta carrying single-token deltas keyed by itemId, item/completed settling a fileChange item with the added index.html and its diff, thread/tokenUsage/updated carrying the only usage numbers including 117968 input tokens of which 96640 were cached, turn/diff/updated re-sending the turn's growing git-style diff, and finally turn/completed with status and duration but no usage field."
+  caption="The Rosetta stone of Act I, drawn from the real Beanline run. Two numbered messages, then narration all the way down."
+  width={1240}
+  height={1991}
+/>
+
+Four lessons, and they carry the next twelve parts:
+
+**The id line divides the protocol in two.** Everything above the divider is correlated: request `id: 3` gets exactly one response quoting `id: 3`. Everything below has no id and no reply. Our toy `request()` method and `notifications()` generator are these two halves as code.
+
+**[Items](/blog/codex-concepts#items) are the unit of agent work.** Every discrete thing the agent does, a shell command, a file change, a stretch of reasoning, a paragraph of prose to you, is an item with a lifecycle: `item/started`, zero or more deltas, `item/completed` with results attached. One turn produced seventeen items in our run. When Part 3 builds the chat UI, an assistant turn will be rendered as a list of item blocks, and the design will feel inevitable rather than clever: the protocol already thinks in blocks.
+
+**Usage lives in `thread/tokenUsage/updated`, and only there.** You might reasonably expect the final `turn/completed` to carry the bill. It doesn't: status, timing, error, and that's all. The meter is its own notification, firing several times mid-turn (five times in our run), and the last reading is the total. Miss this and you'll build a usage display that shows zeros forever; our `narrate` function already handles it correctly.
+
+**`turn/diff/updated` is a gift we're not unwrapping yet.** The engine aggregates every file change in the turn into one git-style unified diff and re-sends it as it grows. Today it scrolled past unused. In Part 4 it becomes the diff drawer, one of Pagewright's two hero features, for the cost of rendering a string we're already receiving.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 2 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels side by side separated by thin vertical black dividers, about numbered requests versus unnumbered notifications. Panel 1: Yad kneels at a closed wooden door labeled "CODEX", sliding one paper note under it; the note clearly reads "#3 BUILD ME A WEBSITE". Panel 2: a torrent of unnumbered paper notes comes flying out from under the same door, piling up around a startled Yad; visible snippets on three notes read "THINKING", "RUNNING LS", "EDITING FILES"; Yad shouts: "I ASKED ONE QUESTION!" Panel 3: one tidy note slides out and lands on top of the pile, clearly reading "#3 DONE"; Yad holds it up, calm and satisfied, saying: "AH. MY REPLY." Clean readable hand-lettered speech bubbles and note text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/codex/part-1/comic-numbered-notes.png"
+  alt="Comic in three panels. Panel one: Yad slides a note reading #3 BUILD ME A WEBSITE under a closed door labeled CODEX. Panel two: a torrent of unnumbered notes floods out from under the door and buries a startled Yad; visible notes read THINKING, RUNNING LS, and EDITING FILES, and he shouts I ASKED ONE QUESTION. Panel three: still waist-deep in notes, Yad calmly holds up the one note reading #3 DONE and says: AH. MY REPLY."
+  caption="One numbered note in, one numbered reply out. Everything between is narration, and narration doesn't wait to be asked."
+  width={1536}
+  height={1024}
+/>
+
+## The meter ritual
+
+Every part of this series ends its runs by printing the meter, and every part quotes real measured numbers. Today's reading, from the run above: **117,968 tokens in, 7,084 out**, of which 96,640 input tokens were cache hits. That input number deserves a double take. One prompt became a multi-step agent conversation: every command output, every file readback, every reasoning pass rode back through the model as input, and that's how a one-sentence request becomes six figures of input tokens. Caching is why it's affordable: over 80 percent of those tokens were replayed context, billed at a fraction of the fresh-input rate.
+
+Notice what the protocol did *not* tell us: a price. The engine reports tokens, never currency, so the cost math is ours to do, and honesty requires doing it against the current price list. At `gpt-5.4-mini` rates as I write this, the run above works out to a few cents; check OpenAI's pricing page and run the arithmetic against your own meter readings, because models and prices move faster than blog posts. The habit that matters is the ritual itself: print the meter every run, know your cost shape from day one. In Part 8 this line graduates into a live gauge in the UI, fed by the same [notification](/blog/codex-concepts#token-usage) you're already parsing.
+
+{/* [ANECDOTE slot, optional upgrade (WRITING-STYLE §6): a true first-person story from Yadnesh about discovering a hidden API under a UI (network-tab moment) or a token-bill surprise, 3 beats, 5 sentences. If provided, it can replace the network-tab paragraph in "The engine and its service hatch" or extend this meter section. */}
+
+## The archive the engine keeps
+
+One more discovery before we ship, and it costs nothing to look at. The engine has been keeping records this whole time:
+
+```bash
+ls ~/.codex/sessions/2026/07/06/
+# rollout-2026-07-06T23-03-06-019f387d-a6b4-75f1-ae60-1ae4baa9a087.jsonl
+```
+
+That filename ends with the exact thread id our script printed. Every thread you start becomes a [rollout file](/blog/codex-concepts#rollouts): one JSONL file, one line per event, filed by date under `~/.codex/sessions`. Your interactive `codex` session from the setup section is in there too. We're not going to *use* the archive yet; notice what it means. Conversation persistence already exists, engine-side, before we've written a single line of storage code, and threads can be resumed, forked, and listed straight from it. Part 5 turns that into Pagewright's project sidebar, mostly by asking the engine to read its own archive back.
+
+## Wrap it in git
+
+Standard series ritual, from the `pagewright/` project root. The ignore file matters more than usual because our agent creates files by design:
+
+```text filename=".gitignore"
+.venv/
+__pycache__/
+.env
+.env.local
+node_modules/
+site/
+projects/
+.DS_Store
+```
+
+`site/` is agent-built output, regenerable from one prompt, so it stays out of history. `projects/` doesn't exist yet; it's Part 4's per-project workspaces, ignored in advance so no generated site ever lands in a commit. Then:
+
+```bash
+git init
+git add .
+git commit -m "part 1: two scripts that speak app-server, and a website to show for it"
+```
+
+Glance at `git status` before that commit, today and every day: if anything you don't recognize is staged, fix the ignore file first.
+
+<DemoVideo
+  src="/videos/codex/part-1-demo.mp4"
+  poster="/videos/codex/part-1-poster.jpg"
+  caption="The real Part 1 run, replayed at reading speed: one prompt goes in, the narrated stream scrolls, and the Beanline page the agent built appears. A live gpt-5.4-mini run, not a mock."
+  label="Screen recording of Part 1: the terminal script narrating a real agent run, ending on the finished Beanline website"
+/>
+
+<Recap
+  part={1}
+  items={[
+    "A mental model that reframes the whole toolchain: `codex app-server` is the engine inside every Codex surface, and your 120 lines of Python are now a peer of the VS Code extension, connected through the same JSON-RPC hatch.",
+    "The protocol's grammar: numbered requests that each get one reply (`initialize`, `thread/start`, `turn/start`), unnumbered notifications that narrate the work, and a typed `Not initialized` error when the mandatory handshake is skipped.",
+    "A contained first agent: `thread/start` with `cwd`, a `workspace-write` sandbox enforced by the OS kernel, and `approvalPolicy: never`, which is sane here precisely because the walls are real.",
+    "The stream, decoded: items as the unit of work with a started/delta/completed lifecycle, usage arriving only via `thread/tokenUsage/updated`, and `turn/diff/updated` banked for Part 4's diff drawer.",
+    "The meter ritual and the archive: 117,968 tokens in and 7,084 out for a real page, printed every run, and every thread already persisted as a rollout file under ~/.codex/sessions.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "Your client sends {\"id\": 7, \"method\": \"thread/start\", ...} and then reads the stream. How do you recognize the engine's answer to that specific message?",
+      options: [
+        "It's always the very next line the engine writes",
+        "It has \"method\": \"thread/started\" in it",
+        "It carries \"id\": 7, the same id the request used",
+        "It arrives on stderr instead of stdout",
+      ],
+      answer: 2,
+      explain: "Requests are numbered notes: the one reply that quotes your id is yours, no matter how many notifications arrive in between. thread/started is a separate notification, not the response.",
+    },
+    {
+      q: "A script sends thread/start as its very first message, before initialize. What happens?",
+      options: [
+        "The engine queues the request and answers it after someone initializes",
+        "The engine replies to that id with a typed error: code -32600, \"Not initialized\"",
+        "The codex process exits with a stack trace",
+        "It works, because initialize is only needed for optional capabilities",
+      ],
+      answer: 1,
+      explain: "The handshake is mandatory and the contract is enforced politely: a proper JSON-RPC error reply quoting your id, while the process stays alive and waits for a correct initialize.",
+    },
+    {
+      q: "Part 1 runs with approvalPolicy set to \"never\", and the series calls that sane. What's the load-bearing reason?",
+      options: [
+        "gpt-5.4-mini is too small a model to do anything risky",
+        "The sandbox is OS-enforced: under workspace-write, Seatbelt or Landlock blocks writes outside the workspace at the syscall level",
+        "The agent only gets read-only tools in Part 1",
+        "The script filters out any dangerous commands before they run",
+      ],
+      answer: 1,
+      explain: "Codex's safety posture is sandbox-first: containment comes from the kernel, not from the model's judgment or the client's politeness. That's the inverse of the Claude sibling's Part 1, where containment was convention until Acts II and III.",
+    },
+    {
+      q: "Where do a turn's token usage numbers come from?",
+      options: [
+        "The turn/completed notification's usage field",
+        "The response to turn/start",
+        "thread/tokenUsage/updated notifications; the last one holds the turn's totals",
+        "You have to call a separate usage/read method after the turn",
+      ],
+      answer: 2,
+      explain: "turn/completed carries status and timing only, no usage. The meter is its own notification stream, firing several times per turn, which is exactly why narrate() keeps updating a running usage dict.",
+    },
+    {
+      q: "After your run, what is sitting in ~/.codex/sessions?",
+      options: [
+        "Nothing, unless you opted into persistence at thread/start",
+        "A rollout JSONL file per thread, named with its id, holding the thread's events line by line",
+        "Only the sites the agent built",
+        "A SQLite database of every conversation",
+      ],
+      answer: 1,
+      explain: "The engine archives every thread as a rollout file, filed by date and named by thread id, including your interactive codex sessions. Part 5 builds resume, fork, and the project sidebar on top of this archive.",
+    },
+  ]}
+/>
+
+A script that prints JSON to your terminal is a demo, not a product: your API access is on your laptop, the stream dies with the process, and only you can use it. In [Part 2](/blog/codex-2-fastapi-bridge) the toy reader grows into a real async client behind FastAPI, and this raw stream gets translated into an event vocabulary that the next eleven parts extend without ever breaking a client.
+
+Every part of this series has a companion folder in the [`codex-app-server-in-production` repo](https://github.com/yadneshSalvi/codex-app-server-in-production): the complete, tested project exactly as it exists at the end of that part. This part's folder is [`part-01-first-thread`](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-01-first-thread). Code blocks with a GitHub icon in the header link straight to the exact file, and "View full file" shows the whole file in place with this section's lines highlighted.

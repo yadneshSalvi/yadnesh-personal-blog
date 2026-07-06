@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="660" viewBox="0 0 1240 660">
+  <rect width="1240" height="660" fill="#faf9f6"/>
+  <text x="60" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#8f887a">ONE ENGINE &#183; MANY CLIENTS &#183; SAME NOTES UNDER THE SAME DOOR</text>
+
+  <!-- the engine -->
+  <rect x="60" y="104" width="420" height="380" rx="16" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="86" y="144" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#8f887a">THE ENGINE</text>
+  <text x="86" y="186" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="25" font-weight="700" fill="#1f1c19">codex app-server</text>
+  <text x="86" y="216" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14.5" fill="#5b554c">one process, spoken to over stdin and stdout</text>
+  
+  <rect x="86" y="246" width="175" height="34" rx="8" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="173.5" y="268" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#5b554c" text-anchor="middle">threads &amp; turns</text>
+  
+  <rect x="279" y="246" width="175" height="34" rx="8" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="366.5" y="268" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#5b554c" text-anchor="middle">the agent loop</text>
+  
+  <rect x="86" y="292" width="175" height="34" rx="8" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="173.5" y="314" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#5b554c" text-anchor="middle">OS sandbox</text>
+  
+  <rect x="279" y="292" width="175" height="34" rx="8" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="366.5" y="314" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#5b554c" text-anchor="middle">rollout archive</text>
+  
+  <rect x="86" y="338" width="175" height="34" rx="8" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="173.5" y="360" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#5b554c" text-anchor="middle">model access</text>
+  
+  <rect x="279" y="338" width="175" height="34" rx="8" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="366.5" y="360" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#5b554c" text-anchor="middle">approvals</text>
+  <text x="86" y="420" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#5b554c">Everything a Codex surface can do</text>
+  <text x="86" y="442" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#5b554c">lives here, behind one JSON-RPC door.</text>
+
+  <!-- the door -->
+  <line x1="566" y1="94" x2="566" y2="494" stroke="#8f887a" stroke-width="2"/>
+  
+  <rect x="563" y="142" width="6" height="18" rx="3" fill="#faf9f6" stroke="#8f887a" stroke-width="1.5"/>
+  <rect x="563" y="214" width="6" height="18" rx="3" fill="#faf9f6" stroke="#8f887a" stroke-width="1.5"/>
+  <rect x="563" y="286" width="6" height="18" rx="3" fill="#faf9f6" stroke="#8f887a" stroke-width="1.5"/>
+  <rect x="563" y="358" width="6" height="18" rx="3" fill="#faf9f6" stroke="#8f887a" stroke-width="1.5"/>
+  <rect x="563" y="430" width="6" height="18" rx="3" fill="#faf9f6" stroke="#b3441a" stroke-width="1.5"/>
+  
+  <line x1="480" y1="151" x2="660" y2="151" stroke="#e7e3d9" stroke-width="1.5"/>
+  <line x1="480" y1="223" x2="660" y2="223" stroke="#e7e3d9" stroke-width="1.5"/>
+  <line x1="480" y1="295" x2="660" y2="295" stroke="#e7e3d9" stroke-width="1.5"/>
+  <line x1="480" y1="367" x2="660" y2="367" stroke="#e7e3d9" stroke-width="1.5"/>
+  <line x1="480" y1="439" x2="660" y2="439" stroke="#b3441a" stroke-width="2.5"/>
+  
+  <rect x="660" y="122" width="520" height="58" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="680" y="147" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#1f1c19">Codex CLI</text>
+  <text x="680" y="167" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5b554c">the terminal app you ran during setup</text>
+  <rect x="660" y="194" width="520" height="58" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="680" y="219" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#1f1c19">IDE extension</text>
+  <text x="680" y="239" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5b554c">the Codex panel inside VS Code</text>
+  <rect x="660" y="266" width="520" height="58" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="680" y="291" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#1f1c19">Codex web</text>
+  <text x="680" y="311" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5b554c">chatgpt.com/codex, cloud tasks</text>
+  <rect x="660" y="338" width="520" height="58" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="680" y="363" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#1f1c19">Codex desktop app</text>
+  <text x="680" y="383" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5b554c">same engine, native window</text>
+  <rect x="660" y="410" width="520" height="58" rx="12" fill="#f6e7df" stroke="#dcb09a" stroke-width="1.5"/>
+  <text x="680" y="435" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700" fill="#b3441a">Your app: Pagewright</text>
+  <text x="680" y="455" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5b554c">starting today, about 60 lines of Python</text>
+  <text x="566" y="526" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2" fill="#8f887a" text-anchor="middle">STDIO &#183; JSON, ONE LINE PER NOTE</text>
+
+  <!-- legend: the two kinds of note -->
+  <rect x="60" y="564" width="470" height="58" rx="10" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="80" y="588" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#b3441a">{"id": 3, "method": "turn/start", &#8230;}</text>
+  <text x="80" y="610" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5b554c">a request: numbered, gets exactly one reply</text>
+  <rect x="556" y="564" width="470" height="58" rx="10" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="576" y="588" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#5b554c">{"method": "item/started", &#8230;}</text>
+  <text x="576" y="610" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5b554c">a notification: no number, arrives unasked</text>
+</svg>

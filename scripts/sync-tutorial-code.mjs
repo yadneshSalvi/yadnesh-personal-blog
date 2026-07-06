@@ -21,6 +21,11 @@ const SERIES = [
     source: path.resolve(process.cwd(), "../claude-agent-sdk-in-production"),
     dest: path.resolve(process.cwd(), "content/code/agent-sdk"),
   },
+  {
+    // local checkout of https://github.com/yadneshSalvi/codex-app-server-in-production
+    source: path.resolve(process.cwd(), "../codex-app-server-in-production"),
+    dest: path.resolve(process.cwd(), "content/code/codex"),
+  },
 ];
 
 // Only vendor text files a post might display.
