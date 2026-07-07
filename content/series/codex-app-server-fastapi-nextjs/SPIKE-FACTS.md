@@ -153,6 +153,31 @@ Order observed: `thread/started` → `thread/status/changed (active)` →
   the reference app sets `config: {"features.default_mode_request_user_input":
   true}` at thread/start to force it. Verify live when building Part 10.
 
+## Part-7-build findings (verified live)
+
+- `item/fileChange/requestApproval` IS triggerable: (1) the product case:
+  apply_patch targeting a path outside writableRoots under on-request; (2)
+  readOnly sandbox + on-request + any edit; (3) untrusted + any patch. EXACT
+  params: `{threadId, turnId, itemId, startedAtMs, reason, grantRoot}` — NO
+  diff, NO file list, NO availableDecisions. The patch content arrives on
+  `item/started` for the same itemId, ALWAYS before the request → backends
+  keep an itemId→fileChange join to enrich approval UI. Accepted patches land
+  OUTSIDE the sandbox walls: approval = escalation. `grantRoot` is [UNSTABLE]
+  in the schema, null in all traces.
+- Command approvals under on-request: network commands and out-of-workspace
+  copies ask, with a human-readable `reason`. Wire `availableDecisions` in
+  0.142.4 OMITS decline and acceptForSession, yet both are honored live: the
+  SCHEMA enum (accept|acceptForSession|decline|cancel, + the
+  acceptWithExecpolicyAmendment object variant) is the truth; validate
+  against it, not the wire field.
+- `acceptForSession` cache is EXACT-COMMAND-scoped (`git init` vs `git init .`
+  re-asks), thread-wide across turns.
+- Unanswered approvals: client-side timeout → respond decline; the turn
+  continues and completes. Denied fileChange items still fire item/completed
+  (generic badge shows success); denied COMMANDS get status "declined".
+- Agent adapts on denial with explicit narration ("...was denied, so I'm
+  saving the same notes in the workspace instead").
+
 ## review/start
 
 - Params: `{threadId, target, delivery?}`. Targets: `{type:

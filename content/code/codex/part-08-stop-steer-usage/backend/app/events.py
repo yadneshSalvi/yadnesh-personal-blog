@@ -1,13 +1,20 @@
 """The SSE event vocabulary: one envelope, extended forever, never changed.
 
 Part 2 defined six event types, Part 3 added two, Part 4 three more, Part 5
-one, Part 6 none. Part 7 adds two: `approval_request` (the server asked a
-question and the item is frozen until someone answers) and
-`approval_resolved` (the answer, who gave it — you or the clock — and
-when). Both originate on OUR side of the bridge: app.approvals turns the
-server's JSON-RPC request into synthetic `approval/requested` and
-`approval/resolved` notes on the thread's queue, so they ride the stream
-in arrival order and the card lands exactly where the turn paused.
+one, Part 6 none, Part 7 two. Part 8 adds two more: `usage_update` (the
+live meter — every thread/tokenUsage/updated becomes a wire event instead
+of being swallowed at the end of the turn) and `steered` (a mid-turn
+instruction was accepted into the running turn; synthetic, ours, injected
+onto the thread queue by the chat endpoint so it lands in the stream
+exactly where the steer arrived — the same trick app.approvals plays with
+`approval/requested`).
+
+One correction ships with the meter: `tokenUsage.total` is
+THREAD-CUMULATIVE, not per-turn (verified live in Part 6: 1.09M after a
+few font-hunting turns). The per-turn truth is `tokenUsage.last`. The
+`complete` receipt's `usage` now carries `.last`, with the cumulative
+number alongside as `thread_total` — the receipt under a turn stops
+billing the customer for the whole invoice history.
 
 Still notably absent: a "sandbox blocked this" event. The
 protocol has no such signal (verified against the 0.142.4 schema and live
@@ -42,6 +49,17 @@ def item_detail(item: dict) -> dict:
     if kind == "agentMessage":
         return {}
     return {}
+
+
+def usage_event(token_usage: dict) -> dict:
+    """thread/tokenUsage/updated, both readings on one dial: `last` is
+    this turn's meter (what the receipt shows), `total` is the thread's
+    lifetime count (what the gauge shows on hover). Same shape whether
+    it rides the stream or answers GET /usage."""
+    return {"type": "usage_update",
+            "last": token_usage.get("last") or {},
+            "total": token_usage.get("total") or {},
+            "context_window": token_usage.get("modelContextWindow")}
 
 
 def file_change_event(item: dict, status: str, workspace: Path) -> dict:
@@ -153,11 +171,22 @@ def translate(note: dict) -> dict | None:
         # field `diff`; accept the camelCase spelling too, just in case.
         return {"type": "diff_updated",
                 "unified_diff": p.get("diff", p.get("unifiedDiff", ""))}
+    if method == "thread/tokenUsage/updated":
+        return usage_event(p.get("tokenUsage", {}))
     if method == "approval/requested":
         # Synthetic (ours, from app.approvals) — already wire-shaped.
         return {"type": "approval_request", **p}
     if method == "approval/resolved":
         return {"type": "approval_resolved", **p}
+    if method == "steer/accepted":
+        # Synthetic (ours, from the chat endpoint): a mid-turn message
+        # was absorbed into the running turn. Verified live: the steered
+        # text DOES resurface later as a plain userMessage item, at the
+        # model's next inference boundary — indistinguishable from any
+        # other user message, which is why userMessage items stay
+        # dropped (as they have been since Part 2) and this synthetic
+        # note carries the steer's identity, immediately.
+        return {"type": "steered", **p}
     if method == "turn/completed":
         turn = p.get("turn", {})
         return {"type": "complete", "status": turn.get("status", ""),

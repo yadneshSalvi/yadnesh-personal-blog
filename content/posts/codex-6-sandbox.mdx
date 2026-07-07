@@ -1,0 +1,382 @@
+---
+title: "Codex App Server in Production, Part 6: The Sandbox: What the Builder May Touch"
+subtitle: "Act II opens with a kernel saying no. Three trust modes ride one structured policy per turn, the agent gets run into the walls on purpose from both sides, and the wire turns out to tell you less about it than you'd hope. Knowing exactly how much less is the production lesson."
+image: "/images/series/codex/part-6/cover-light.svg"
+imageDark: "/images/series/codex/part-6/cover-dark.svg"
+createdAt: "2026-07-07T00:00:00.000Z"
+updatedAt: "2026-07-07T00:00:00.000Z"
+tags: ["codex", "openai", "fastapi", "nextjs", "tutorial"]
+series: "codex-app-server-fastapi-nextjs"
+seriesPart: 6
+---
+
+`zsh:1: operation not permitted: /Users/yadneshsalvi/pagewright-escape-test.txt`
+
+I told Pagewright's builder to save a note in my home directory, and, because the model is too polite to try that on its own, I added: *if the write fails, run it anyway and show me the exact error output.* It ran it. The command executed, the write hit the operating system, and the operating system refused. Not a model deciding to behave. Not a policy check in my backend. A kernel, telling a process no. The file does not exist; the turn took 4.4 seconds; and the strangest part, the part this page keeps circling back to, is what that refusal looked like on the protocol wire: almost nothing.
+
+By the end of this page, every Pagewright project carries a **trust mode**, one of three wristbands: **Read-only** (look and plan, the OS refuses every write), **Standard** (write inside the workspace, no network), and **Trusted** (same bench, network door open). The mode is one line in `projects.json` and one structured object on `turn/start`, switchable between turns with no thread surgery. And you'll have run the agent straight into the walls from both sides, so you know what they refuse, what they allow, and what the wire does and doesn't show you when it happens.
+
+<Figure
+  src="/images/series/codex/part-6/browser-readonly-light.svg"
+  srcDark="/images/series/codex/part-6/browser-readonly-dark.svg"
+  alt="Pagewright with a three-segment trust mode picker in the header reading Read-only, Standard, Trusted, with Read-only active and a header blurb saying look and plan, the OS refuses every write. The chat shows the tail of an earlier turn that added two Playfair Display woff2 files, then the user asks to rewrite the about section opening sentence to be friendlier. The agent replies that it can't apply the edit in this read-only session but offers the friendliest replacement sentence in a code block, with a receipt of 1,090,668 tokens in 4 seconds. A blue planning-mode hint sits above the composer. The preview on the right renders the Beanline coffee shop site with serif Playfair headings, and the files pane lists the two woff2 files and index.html."
+  caption="The end of this part, drawn from the real run. Read-only selected in the picker, a refusal that comes with the exact replacement text, and a Beanline preview whose serif headings were fetched from the real network one mode earlier."
+  width={1120}
+  height={780}
+/>
+
+That screenshot is the part in one frame. The picker in the header is new. The refusal in the chat is new, and note it isn't a shrug: the agent read the file it wasn't allowed to change and handed back the precise sentence it *would* have written. The serif headings in the preview are new too, and they exist because Trusted mode let a `curl` through that Standard mode had bounced at DNS. Three postures, one afternoon of walls, all of it real output.
+
+## Five parts of borrowed trust
+
+[Part 5](/blog/codex-5-threads) closed Act I with a confession: the agent has run every shell command of this series with `approvalPolicy: "never"`, inside walls you've never actually seen refuse anything. You've been trusting a claim made back in [Part 1](/blog/codex-1-first-thread#your-first-turn): that `workspace-write` is enforced by the OS kernel, Seatbelt on macOS, Landlock and seccomp on Linux, and that approvals-off is sane *because* the walls are real. Every part since has leaned on that claim a little harder. Nobody has tested it.
+
+You know this posture from your own machine. A README says the setup script needs `sudo`, and you run it, reading the source in another tab, too late for the reading to matter. Trust, extended because withholding it was inconvenient, verified never. That's a fine way to install a linter. It's not a fine way to ship a product whose core feature is *an AI that executes shell commands on your server*. Act II exists to replace that borrowed trust with checked trust, and it starts here because of a design fact worth naming out loud.
+
+Codex's permission model is **sandbox-first**. Containment is the default posture; asking a human is the escape hatch, and it arrives *later*, in Part 7. If you've read the [sibling series](/blog/agent-sdk-12-mcp-sandboxing), notice the arc is exactly inverted: the Claude analyst started with application-level permission callbacks in Act II and earned its OS sandbox in Act III, as the capstone rung of a safety ladder. Codex hands you the OS sandbox in Part 1 and makes you wait five parts for a permission prompt. Neither order is wrong; they're two engines' honest answers to "which safety do you get for free?". Here, the walls come with the engine. What this part adds is the *dials*.
+
+## Two dials, one grid
+
+Every turn the engine runs sits in exactly one cell of a two-axis grid. One axis is [`sandboxPolicy`](/blog/codex-concepts#sandbox-policies): what the agent's commands may physically touch. The other is [`approvalPolicy`](/blog/codex-concepts#approval-policies): when a human gets asked first. Containment and consent. They compose, and they are set independently, per thread or per turn.
+
+<Figure
+  src="/images/series/codex/part-6/fig-grid-light.svg"
+  srcDark="/images/series/codex/part-6/fig-grid-dark.svg"
+  alt="A two-axis grid. Columns are the approvalPolicy values untrusted, on-failure, on-request, and never, under the axis label consent, when does a human get asked. Rows are the sandboxPolicy values readOnly, workspaceWrite with network off, workspaceWrite with network on, and dangerFullAccess, under the axis label containment, what may commands touch. Three product chips sit in the never column: Read-only in the readOnly row, Standard in the workspaceWrite network-off row, and Trusted in the workspaceWrite network-on row. A dashed arrow from Standard points to the on-request column labeled Part 7 moves Standard's consent dial here. The dangerFullAccess row is tinted red and labeled not offered, no cell in this row exists in the product. A footer reads: the sandbox contains, approvals ask, independent dials; Act I ran entirely in Standard's cell, contained but never asked."
+  caption="Pagewright's three postures are named cells. All three sit in the never column today; Part 7 slides Standard's consent dial left without touching its containment row."
+  width={1240}
+  height={800}
+/>
+
+The three wristbands Pagewright exposes are named cells in that grid, and this mirrors how production builder products actually ship: not eight raw enum combinations in a settings page, but a small set of postures with honest one-line descriptions. Read-only is `readOnly`. Standard is `workspaceWrite` with the network off. Trusted is `workspaceWrite` with the network on. All three keep `approvalPolicy: "never"` for now, which means this part changes *containment only*, and everything Act I built keeps running exactly as before, in the cell labeled Standard.
+
+<Callout type="info" title="Sandbox and approvals are different dials, not degrees of the same one">
+A sandbox is a wall: the kernel refuses, whatever the model thinks. An approval is a question: the engine pauses and asks a human. You can have walls without questions (all of Act I), questions without walls (`dangerFullAccess` plus `untrusted`, a combination this series will never send), or both. Keeping the two dials separate in your head now is what makes [Part 7](/blog/codex-concepts#approvals) a small part instead of a confusing one: it completes the grid line this page opens.
+</Callout>
+
+## Four policies, three wristbands
+
+The protocol offers four sandbox policies; the product offers three modes. The gap between those numbers is a product decision worth spelling out, so here is the entire mapping, the part's most important nine lines of Python:
+
+```python filename="backend/app/main.py" repo="part-06-sandbox/backend/app/main.py" lines="37-47"
+def sandbox_policy(mode: str, workspace) -> dict:
+    """The mode → policy mapping, the whole grid in one place. read-only
+    is the look-only wristband; standard and trusted share the same bench
+    (writableRoots) and differ only in whether the network door opens."""
+    if mode == "read-only":
+        return {"type": "readOnly"}
+    return {
+        "type": "workspaceWrite",
+        "writableRoots": [str(workspace)],
+        "networkAccess": mode == "trusted",
+    }
+```
+
+`readOnly` needs no configuration: commands may look, nothing may write. `workspaceWrite` is the interesting one, and its two fields are the two dials-within-the-dial. `writableRoots` lists the folders where writes are legal; we pass exactly one, the project's own `site/` folder, which is why one client's builder cannot touch another client's desk even in Trusted mode. `networkAccess` opens or bricks the network door, DNS included, and it's the only difference between Standard and Trusted. There are two more fields we leave at their defaults, `excludeSlashTmp` and `excludeTmpdirEnvVar`, and one of those defaults will quietly star in a scene later in this page.
+
+The fourth policy is `{"type": "dangerFullAccess"}`, and it deserves one honest paragraph instead of a scare sticker. It removes the walls entirely, and there are real situations where that's the right call: a throwaway CI runner, a container built to be deleted after the run, a benchmark rig where the box *is* the wall and the sandbox would only get in the way. The line Pagewright draws, and the one hard rule this series will repeat in Part 13, is that a hosted product never sends it, because a hosted product's process shares a machine with other tenants' data, its own secrets, and the registry file this whole series depends on. The comment in `main.py` says exactly this, right where a future maintainer would go looking for the enum value. (The protocol also has `externalSandbox`, for when you bring your own containment, say a gVisor or Firecracker box around the whole engine, and want Codex to stop double-guarding inside it.)
+
+## The wristband, wired end to end
+
+The wiring is deliberately boring, which is the compliment infrastructure earns. A project's registry line grows one field, with a default for every project created before this part existed:
+
+```python filename="backend/app/projects.py" repo="part-06-sandbox/backend/app/projects.py" lines="31-39"
+def load_registry() -> list[dict]:
+    if not REGISTRY.exists():
+        return []
+    entries = json.loads(REGISTRY.read_text())
+    for entry in entries:
+        # Registries written before Part 6 carry no mode; every project
+        # holds the default posture until its owner changes it.
+        entry.setdefault("mode", "standard")
+    return entries
+```
+
+A `PATCH /projects/{id}/mode` endpoint validates the mode against the `MODES` tuple, 404s unknown projects, and writes the registry line; six lines, in the full file. Forks inherit the original's mode, because a copy of a project starts life as the same project. And the turn pipeline reads the wristband right before every work order:
+
+```python filename="backend/app/main.py" repo="part-06-sandbox/backend/app/main.py" lines="228-236"
+async def run_turn(project_id: str, message: str):
+    entry = projects.get_project(project_id)
+    workspace = projects.site_dir(project_id).resolve()
+    mode = entry.get("mode", "standard")
+    thread_id, reset = await ensure_thread(entry, workspace)
+    queue = client.queue_for(thread_id)
+    await client.request("turn/start", {
+        "threadId": thread_id,
+        "input": [{"type": "text", "text": message}],
+```
+
+The work order itself now carries the policy, structured, next to an `approvalPolicy` that this part states explicitly instead of inheriting silently:
+
+```python filename="backend/app/main.py" repo="part-06-sandbox/backend/app/main.py" lines="240-248"
+        "sandboxPolicy": sandbox_policy(mode, workspace),
+        "approvalPolicy": "never",
+        # Without this the model reasons silently and the drawer stays
+        # empty. Part 10 turns summary (and effort) into user-facing dials.
+        "summary": "detailed",
+    })
+
+    yield sse({"type": "session_start", "session_id": thread_id,
+               "project_id": project_id, "mode": mode})
+```
+
+<Callout type="warning" title="Two spellings, one dial: the thread baseline and the turn override">
+You've seen the sandbox set once before, in `ensure_thread`, where `thread/start` passes `sandbox: "workspace-write"` as a plain string. That's not sloppiness; it's the protocol's shape, [verified against the generated schema](/blog/codex-concepts#sandbox-policies): `thread/start` takes a mode **string** and sets the thread's baseline, while `turn/start` takes the structured **object** and overrides it for that turn. Pagewright leans on the override on purpose. Because the wristband rides on every work order, a mode switch is a registry write that takes effect on the very next turn: same thread, same memory, no surgery. The alternative, encoding trust at `thread/start`, would mean forking or restarting a conversation every time a user toggles a switch.
+</Callout>
+
+```python filename="backend/app/main.py" repo="part-06-sandbox/backend/app/main.py" lines="199-207"
+    # thread/start takes a mode STRING and sets the thread's baseline;
+    # the structured per-mode policy rides on every turn/start instead,
+    # so a mode switch never needs a new thread.
+    started = await client.request("thread/start", {
+        "cwd": str(workspace),
+        "sandbox": "workspace-write",
+        "approvalPolicy": "never",
+        "model": MODEL,
+    })
+```
+
+The frontend's half is one union type and one optimistic handler. The type file says in ten lines what this entire part is about:
+
+```tsx filename="frontend/lib/types.ts" repo="part-06-sandbox/frontend/lib/types.ts" lines="5-16"
+// The three trust postures a project can hold (Part 6). No fourth: the
+// protocol's dangerFullAccess exists, and Pagewright never sends it.
+export type Mode = "read-only" | "standard" | "trusted";
+
+export type ItemDetail = {
+  command?: string;
+  exit_code?: number | null;
+  files?: { path: string; kind: string }[];
+};
+
+export type AgentEvent =
+  | { type: "session_start"; session_id: string; project_id: string; mode: Mode }
+```
+
+`session_start` growing a `mode` field is, for the record, this part's *entire* wire change: the [event vocabulary](/blog/codex-2-fastapi-bridge#designing-the-envelope) adds no new event types today, and the reason why is the subject of the second break below. The picker itself is a three-segment radio group in the header (`ModePicker.tsx`, with a `ModeChip` echoing the posture in the chat column), and its handler moves the UI before the network answers:
+
+```tsx filename="frontend/app/page.tsx" repo="part-06-sandbox/frontend/app/page.tsx" lines="206-223"
+  // Change the active project's wristband. Optimistic: the picker moves
+  // now, the PATCH persists it, and a failure rolls the registry back.
+  async function changeMode(mode: Mode) {
+    if (!activeId) return;
+    const before = projects;
+    setProjects((all) => all.map((p) => (p.id === activeId ? { ...p, mode } : p)));
+    try {
+      const res = await fetch(`${API_BASE}/projects/${activeId}/mode`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode }),
+      });
+      if (!res.ok) throw new Error(`The server said ${res.status}.`);
+    } catch {
+      setProjects(before);
+      setToast("Could not change the mode. Is the backend running?");
+    }
+  }
+```
+
+Checkpoint. Right now you have: a mode on every project, a picker that persists it, and a structured `sandboxPolicy` on every turn. Nothing visible has changed, because every project is in Standard and Standard is what Act I always was. Time to make things visible, by breaking them.
+
+## Break it on purpose: look, don't touch
+
+Flip a project to Read-only and ask for a real change; mine was a one-line tagline edit on the Beanline site. What came back, 5.5 seconds later, is my favorite refusal in this series. The agent ran one command, `sed -n '1,220p' index.html`, reading the file it intended to edit. Then it stopped, and instead of the edit, it produced the edit's *description*: the exact current line, the exact replacement line, and an offer to apply it "if you can provide a writable workspace."
+
+I checked the workspace the paranoid way, capturing every file's mtime and size before and after the turn: byte-identical, down to the timestamp. Zero `fileChange` items on the stream. Zero writes reached the disk, and not because the kernel had to bat anything away; the model read its policy, understood the wristband, and *planned instead of building*. Read-only turns out to be a feature, not a lock: it's blueprint mode, and Part 10 will build a whole flow on top of exactly this behavior.
+
+One wrinkle worth two sentences of honesty: a refused edit in Read-only produces *no item at all* on the wire, not a failed one. If you want your UI to say "planning mode" rather than leave users wondering why nothing changed, that hint has to come from your product (ours is the quiet line above the composer in the dessert screenshot), because the protocol will not announce it.
+
+## Break it on purpose: the bench boundary
+
+Now the wall itself. Back to Standard mode, and this time the target is outside the bench: *"Save a note at `~/pagewright-escape-test.txt`."*
+
+Asked plainly, the agent declines without lifting a tool. The raw trace shows it reasoning about `writableRoots`, concluding that `~` resolves to `/Users/yadneshsalvi`, which is outside them, and answering: "I can't create `~/pagewright-escape-test.txt` from this sandbox... If you want, I can create the same file inside the workspace instead." Note what's missing: a failed command. There isn't one. The model knows its own wristband, so **the natural blocked write almost never happens**; the wall works by being known, the way a fence works on people who can see it.
+
+Which is lovely, and useless as a test of the fence. So I forced the swing: *if the write fails, run it anyway and show me the exact error output.* The agent, obligingly literal, ran the redirect. The kernel refused it. The turn came back in 4.4 seconds with the line this page opened on, quoted verbatim from the shell. And here is where it gets weird, and where the production lesson lives. Watch the wire during that turn:
+
+<Figure
+  src="/images/series/codex/part-6/term-escape.svg"
+  alt="A dark terminal titled the forced write, what the wire does not show. After a comment quoting the user request to save a note at pagewright-escape-test.txt and run it anyway, the notifications stream past: turn/started, a completed reasoning item, an agentMessage item whose text says it is trying the write directly, then a second agentMessage whose text reads the write failed with this exact shell error, zsh colon 1 colon operation not permitted colon /Users/yadneshsalvi/pagewright-escape-test.txt, then turn/completed with durationMs 4359. A comment notes the command ran and the kernel refused it, yet the stream contains zero commandExecution items, so the narration is the only witness. A final shell prompt runs ls on the file and gets No such file or directory."
+  caption="The whole forced-escape turn, from the real capture. Count the commandExecution items: zero. The kernel's refusal exists on the wire only as words inside the agent's message."
+  width={1040}
+  height={648}
+/>
+
+The command ran. The kernel said no. And the protocol emitted **zero `commandExecution` items**: no `item/started`, no failed status, no exit code, nothing your event translator could latch onto. The forced write went down the engine's `unifiedExec` interaction path, which doesn't surface as command items at this pin, and the only evidence that a sandbox wall was ever touched is the error string the *model chose to quote* inside an ordinary `agentMessage`. If it had chosen to summarize instead ("the write didn't work"), the exact refusal would exist nowhere in your product's records.
+
+I went into this part assuming I'd find a tidy `sandbox_blocked` notification to translate into a red badge. I searched the generated schema for it. The `CommandExecutionStatus` enum reads `inProgress | completed | failed | declined`; nothing sandbox-shaped anywhere. That absence, verified, is why `events.py` adds **no new event types this part**, and its docstring now records the investigation so the next maintainer doesn't repeat it: inventing a `blocked` event would mean string-matching shell output for "operation not permitted" and presenting the guess as telemetry. The honest inventory of what the wire gives you is exactly three behaviors:
+
+1. **Blocked network**: the only wall with real item telemetry. The command runs, fails, and completes as an ordinary failed item: `status: "failed"`, `exitCode: 6`, the curl error in `aggregatedOutput`. (You'll see it live in the next section.)
+2. **Blocked write, asked naturally**: no failed item, because no attempt. The model reads `writableRoots` and declines up front.
+3. **Blocked write, forced**: the command runs and dies at the kernel, and the wire shows zero items. The refusal survives only if the narration quotes it.
+
+Your telemetry for the sandbox, at protocol pin 0.142.4, is exit codes plus narration. Design for that instead of wishing, and the design stays honest.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 2 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 2-panel comic strip, panels side by side separated by a thin vertical black divider, set in a cozy woodworking workshop. A friendly little robot apprentice wears a small rubber wristband on its arm. A bold dashed outline is painted on the floor around one workbench. Panel 1: the robot saws a long wooden plank on the workbench with great energy; the plank sticks out past the painted dashed boundary line; Yad stands nearby holding a small open box full of rubber wristbands, the box label reads "THIS-BENCH-ONLY"; the robot says "ONE LONG CUT, COMING UP." Panel 2: the saw is frozen mid-stroke exactly at the dashed boundary line, stopped flat against an invisible glass wall drawn as a subtle tall vertical shine with two small impact stars; the robot strains at the saw with both arms and a sweat drop; the robot says "WHO PUT GLASS HERE?"; Yad calmly points at the robot's wristband and says "THIS-BENCH-ONLY." Clean readable hand-lettered speech bubbles, short ALL-CAPS text, minimal text. No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/codex/part-6/comic-bench.png"
+  alt="Comic in two panels. Panel one: in a workshop, a small robot apprentice wearing a rubber wristband saws a long plank that sticks out past a dashed boundary line painted on the floor around the workbench, saying ONE LONG CUT, COMING UP, while Yad, a bearded developer with headphones, watches holding a box of wristbands labeled THIS-BENCH-ONLY. Panel two: the saw is frozen mid-stroke exactly at the painted line, stopped flat against an invisible glass wall drawn as a vertical shine with impact stars; the straining robot asks WHO PUT GLASS HERE? and Yad, calm, points at the robot's wristband and says THIS-BENCH-ONLY."
+  caption="The saw stops exactly at the bench outline, mid-stroke, held by a wall nobody drew. The wristband was the wall the whole time."
+  width={1536}
+  height={1024}
+/>
+
+## How the box is built
+
+So what, physically, is refusing? Not the model (it can be talked into swinging the saw; we did). Not our backend (it forwards work orders; it saw nothing). The engine launches every command inside an OS-level sandbox, and the mechanism differs by platform while the deal stays the same: on macOS it's **Seatbelt** (the `sandbox-exec` profile machinery), on Linux it's **Landlock plus seccomp** (filesystem rules plus a syscall filter, kernel 5.13 and newer). A write outside `writableRoots` doesn't fail because something inspected your intent; it fails because the syscall isn't permitted for that process. Physics, not persuasion, which is the entire [sandboxing](/blog/codex-concepts#sandboxing) entry on the concepts page in one sentence.
+
+<Figure
+  src="/images/series/codex/part-6/fig-walls-light.svg"
+  srcDark="/images/series/codex/part-6/fig-walls-dark.svg"
+  alt="A diagram titled how the box is built, workspaceWrite drawn honestly. On the left, a box with solid red walls labeled writes outside the bench blocked at the syscall, and network including DNS blocked until networkAccess, but a dashed open left side labeled reads open, the whole disk is visible. Inside sits a green workspace bench labeled writableRoots projects slash id slash site, plus /tmp because excludeSlashTmp defaults off. Below, two chips read macOS Seatbelt with sandbox-exec profiles, and Linux Landlock plus seccomp with kernel 5.13 or newer, re-verified in Part 13, above the note that a refusal is a kernel error, not a model decision. On the right, a panel titled what the wire shows when a wall is hit lists three cases: blocked network completes as a failed commandExecution item with exitCode 6, the one wall with real item telemetry; a natural blocked write produces no item because the model declines up front; a forced blocked write runs via unifiedExec and emits zero items, with the kernel refusal appearing only in the narration. A footer notes no sandbox_blocked event exists at this pin, telemetry is exit codes plus narration."
+  caption="The box, with its one open side drawn honestly. Writes and network are kernel walls; reads are a design gap you plan around; and only one of the three refusals is visible as an item on the wire."
+  width={1240}
+  height={780}
+/>
+
+Look at the open side of that box, because it's not an oversight in the diagram; it's the policy. **`workspaceWrite` confines writes and network. It does not confine reads.** The agent can read your dotfiles, your caches, your other projects, anything the backend's user can read. [Part 4 raised an eyebrow at this](/blog/codex-4-live-preview#break-it-on-purpose-the-wall-you-cant-see-from-here) when a blocked font download sent the agent rummaging through caches far outside the workspace; this part confirms the rummaging was completely legal, and the next section shows it again in higher resolution. The mitigation isn't a sandbox flag, it's an operational rule you already know: don't leave secrets readable on disk where any process, agentic or otherwise, can read them, and run the backend as a user whose reads you'd be comfortable narrating out loud. (Part 13 sizes the production version of this: a dedicated VM user whose home *is* the app.)
+
+Two footnotes for the box. Windows: the walls described here are Unix mechanisms, which is why Part 1 pointed Windows readers at WSL2 and this series hasn't looked back. And Linux readers get an IOU that matters: Landlock needs the kernel's cooperation, so "works on my Mac" is not a security story; Part 13 reruns this part's forced escape on the production VM and screenshots the same refusal before any traffic reaches the box.
+
+## The network switch
+
+Part 4 ended its fonts story with a cliffhanger: the same request that produced an honest, expensive refusal ("download the Playfair Display woff2 files and self-host them") would succeed the day the sandbox got its network switch. Today's the day. First, the refusal, rerun under Standard mode in this part's app, because it teaches the one piece of telemetry the sandbox actually gives you:
+
+<Figure
+  src="/images/series/codex/part-6/term-netwall.svg"
+  alt="A dark terminal titled a blocked curl is an ordinary failed command. A comment says Standard mode, the agent reaches for Google Fonts and DNS does not resolve inside the box, and the notification is a normal item/completed. The JSON shows a commandExecution item whose command is a zsh curl call to fonts.googleapis.com for the Playfair Display CSS, with status failed, exitCode 6, and aggregatedOutput containing curl error 6, could not resolve host fonts.googleapis.com. A closing comment notes there is no sandbox flag and no special status; failed plus exit 6 is all the protocol says, and this is the only kind of sandbox wall that shows up as an item."
+  caption="The one legible wall, from the real capture. A blocked network call completes as an ordinary failed command: status, exit code, and the error text, with nothing sandbox-shaped anywhere in the shape."
+  width={1040}
+  height={480}
+/>
+
+`exit 6` is curl's "could not resolve host": with `networkAccess: false` the box has no DNS, so the machine next door might as well not exist. What the agent did *after* that failure is the reads-are-open lesson wearing a lab coat. Over the next three minutes it swept everywhere it could legally look for a local copy of Playfair Display: `/Library/Fonts` and the system font directories, my user caches, a Spotlight query via `mdfind`, the npm cache, `fc-match` against the font registry. Eleven commands, every one of them outside the workspace, every one of them permitted, because reads are open. Its own running commentary explained the sweep better than I can: it was checking local sources, it said, *"so I can avoid faking the download step."* Finding nothing, it refused with receipts: the exact curl error quoted, the page left unchanged, and an offer to proceed if I could supply the files or the network. Three minutes and five seconds, roughly 624,000 tokens of trying, and this series' recurring moral restated: a blocked capability costs the failure plus everything the agent honestly attempts around it.
+
+Then the switch. Click **Trusted** in the picker (one PATCH, no new thread), send the identical request again, and watch the wall fail to exist:
+
+<Figure
+  src="/images/series/codex/part-6/browser-fonts-light.svg"
+  srcDark="/images/series/codex/part-6/browser-fonts-dark.svg"
+  alt="Pagewright with the Trusted segment active in the header mode picker and the header blurb reading same workspace walls, with the network door open. The chat shows the Standard-mode failure first: the font download request, a red failed curl command badge, and the agent's message quoting curl error 6 could not resolve host fonts.googleapis.com. Then the user says try again now, a tar command badge extracts a tarball staged in /private/tmp, and the agent reports Done: font files downloaded into fonts/, font-face wired into index.html, headings set to Playfair Display, with a receipt of 1,057,275 tokens in 32 seconds. The preview shows the Beanline site with serif Playfair headings and the files pane lists the two woff2 files at 21.3 and 22.7 kilobytes."
+  caption="The payoff, drawn from the real run. Same request, same thread, one wristband apart: the refusal above, the woff2 files below, 32 seconds end to end."
+  width={1120}
+  height={780}
+/>
+
+The 32-second success run is worth reading as a transcript, because it's a tiny masterclass in agentic resourcefulness now that the door is open. The Google Fonts CSS endpoint answered but offered only TTF files to curl's user agent, so the agent changed suppliers mid-turn: it pulled the `@fontsource/playfair-display` package metadata from the npm registry, downloaded the tarball with curl, extracted exactly the two Latin woff2 weights it needed into `fonts/`, wired the `@font-face` rules, and pointed the headings at the local files. Refresh the preview and Beanline's serifs are self-hosted, no third-party fetch left in the page.
+
+<Callout type="warning" title="The tarball in /tmp: a default worth knowing about">
+Mid-run, the agent staged that npm tarball at `/private/tmp/playfair-display.tgz`. Outside the workspace. In Standard's own write policy. Perfectly legal, because `workspaceWrite` leaves `/tmp` writable unless you set the policy's `excludeSlashTmp` flag, and it defaults to **off**. That's a sensible default (half the Unix toolbox assumes a writable temp dir) and exactly the kind you want to have met in a tutorial rather than discovered in an audit: on a shared machine, "the sandboxed agent can write world-readable files to /tmp" may or may not fit your threat model. The flag exists; now you know its default, from a real trace rather than the docs.
+</Callout>
+
+Should the door default open? No, and now you can defend the default in one sentence per direction. Closed: an agent with network access can be talked into *sending* things as well as fetching them, and the reads-are-open asymmetry means there's plenty on disk worth exfiltrating; sandbox plus prompt injection is a Part 12 topic, but the wall is cheap insurance today. Open: some jobs, like this one, legitimately need bytes from the internet, and an honest refusal plus a one-click, one-turn escalation is a better product than either silent failure or permanent trust. Standard stays the default wristband; Trusted is the informed exception, chosen per project by the human who knows what's on the machine.
+
+## The meter ritual, wall-tax edition
+
+Every row a real run from building this part, in order, on one thread:
+
+| Run | Mode | What happened | Receipt (thread total) |
+|---|---|---|---|
+| Build the Beanline site | Standard | one-prompt build, 13.8s | 46,334 tokens |
+| Forced escape attempt | Standard | kernel refusal, quoted; 4.4s | 78,788 tokens |
+| Tagline edit | Read-only | proposal in prose, zero writes; 5.5s | 113,196 tokens |
+| Self-hosted fonts | Standard | curl exit 6, legal disk sweep, honest refusal; 3m 5s | 737,175 tokens |
+| Self-hosted fonts, retry | Trusted | tarball to woff2 to @font-face; 32s | 1,057,275 tokens |
+| Friendlier about-sentence | Read-only | proposal in prose; 4s | 1,090,668 tokens |
+
+Two lessons hiding in the arithmetic. First, subtract adjacent rows and the wall tax jumps out: the blocked fonts run burned about 624,000 tokens to produce zero file changes, while the Trusted rerun spent roughly 320,000 to actually finish. The cheapest turn on this table is the one where a wall you chose matches the work you asked for; the most expensive is a wall fighting the work. Pick wristbands per task, not per ideology. Second, a bookkeeping honesty note before Part 8 builds the live gauge: these receipts are **thread-cumulative**, because [`thread/tokenUsage/updated`](/blog/codex-concepts#token-usage) reports a `total` object that accumulates across the thread's whole life, and that's what our `complete` event currently forwards. The same notification carries a `.last` object with the most recent call's usage, and the per-turn gauge in Part 8 switches to it; until then, the climb down this table is a feature, one running meter per project, as long as you know that's what you're reading.
+
+## Act II, opened
+
+The trusting builder now has dials. Containment is no longer a claim inherited from Part 1; you've watched the kernel refuse a write you forced, watched Read-only produce a plan instead of a patch, and watched the network door swing on a single registry field. Just as important, you know the shape of the silence: no `sandbox_blocked` event exists, a forced refusal emits zero items, and honest telemetry means forwarding exit codes and narration rather than inventing signals the protocol never sent. The grid has one wired axis. The other axis, consent, is still bolted to `"never"` in every mode, which means the product can *contain* the agent but never *ask you* about it.
+
+<DemoVideo
+  src="/videos/codex/part-6-demo.mp4"
+  poster="/videos/codex/part-6-poster.jpg"
+  caption='A real run against the finished part: the project switched to Read-only refuses a tagline edit and proposes the exact change in prose instead, then Trusted mode lets the woff2 download through and the Beanline preview re-renders with self-hosted Playfair Display headings.'
+  label="Screen recording of Part 6: the trust mode picker switching to Read-only and producing a refusal with a proposed edit, then switching to Trusted and succeeding at the font download, ending on the preview with serif headings"
+/>
+
+<Recap
+  part={6}
+  items={[
+    "Two dials, named and separated: sandboxPolicy is containment (what commands may touch), approvalPolicy is consent (when a human gets asked), and Pagewright's Read-only / Standard / Trusted postures are three cells of that grid, all still in the never column.",
+    "A per-turn wristband: mode is one line in projects.json, sandbox_policy() maps it to the structured sandboxPolicy on turn/start, and a PATCH takes effect on the next turn with no thread surgery, because thread/start's mode string is only the baseline.",
+    "Read-only proven byte-for-byte: the agent reads, plans, and proposes the exact edit in prose; mtimes identical before and after, zero fileChange items, and the planning hint is the product's job because the protocol won't announce a refused patch.",
+    "The honest telemetry lesson: a blocked network call is the only wall that surfaces as an item (status failed, exitCode 6, error in aggregatedOutput); natural blocked writes never execute; a forced blocked write emits zero items and the kernel's refusal survives only in narration.",
+    "The network door, both directions: under Standard the fonts request died at DNS and triggered a perfectly legal read sweep of the whole disk before an honest refusal; under Trusted the same request succeeded in 32 seconds via an npm tarball staged in /tmp, which workspaceWrite allows because excludeSlashTmp defaults off.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "Every turn in Act I ran in exactly one cell of the sandbox-and-approvals grid. Which one?",
+      options: [
+        "readOnly with approvalPolicy never",
+        "workspaceWrite with network off, approvalPolicy never",
+        "workspaceWrite with network on, approvalPolicy on-request",
+        "dangerFullAccess with approvalPolicy untrusted",
+      ],
+      answer: 1,
+      explain: "Act I was Standard mode before it had a name: writes confined to the workspace by the OS, network off, and nobody ever asked, which was sane precisely because the walls were real.",
+    },
+    {
+      q: "Under Standard mode the agent is forced to attempt a write outside writableRoots. What does the protocol stream show?",
+      options: [
+        "A commandExecution item with status sandboxBlocked",
+        "A commandExecution item with status failed and the refusal in aggregatedOutput",
+        "Zero commandExecution items: the kernel refusal appears only if the agent quotes it in an agentMessage",
+        "A turn/completed with status failed and a SandboxError payload",
+      ],
+      answer: 2,
+      explain: "The forced write runs via the unifiedExec path and emits no command items at this pin. The zsh 'operation not permitted' line reached the transcript only because the agent chose to quote it. Narration is the only witness.",
+    },
+    {
+      q: "Which sandbox wall is the only one that produces real item telemetry when hit?",
+      options: [
+        "A write outside writableRoots",
+        "A blocked network call: an ordinary failed commandExecution with exitCode 6 and the error text in aggregatedOutput",
+        "A refused apply_patch in a read-only turn",
+        "A read of a file outside the workspace",
+      ],
+      answer: 1,
+      explain: "The blocked curl completes as a normal failed command, nothing sandbox-shaped about it. Natural blocked writes never execute, forced ones emit zero items, and reads outside the workspace are not blocked at all.",
+    },
+    {
+      q: "During the blocked fonts run, the agent swept /Library/Fonts, Spotlight, user caches, and the npm cache. Why did the sandbox allow that?",
+      options: [
+        "Trusted mode was accidentally active for that turn",
+        "The sweep ran inside /tmp, which the policy exempts",
+        "workspaceWrite confines writes and network but does not confine reads, so the whole readable disk is in bounds",
+        "Font directories are allow-listed by Seatbelt's default profile",
+      ],
+      answer: 2,
+      explain: "Reads are the open side of the box, by policy. The mitigation is operational (what's readable on the machine, which user runs the backend), not a sandbox flag, and Part 4's raised eyebrow is now a confirmed design fact.",
+    },
+    {
+      q: "A user flips a project from Standard to Trusted while a conversation already exists. Why does the change apply cleanly to the very next message?",
+      options: [
+        "The backend restarts the codex app-server process with new flags",
+        "The backend forks the thread and replays history under the new policy",
+        "PATCH rewrites the thread's baseline via thread/start",
+        "The mode is read from the registry before each turn and sent as the structured sandboxPolicy on turn/start, overriding the thread's baseline string",
+      ],
+      answer: 3,
+      explain: "The wristband rides on every work order. thread/start's mode string is only the baseline; the per-turn structured object wins, so trust changes need a registry write and nothing else. Same thread, same memory.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 6: the sandbox - trust modes, per-turn policies, walls tested"
+```
+
+The box is real, you've felt its edges from both sides, and the builder still never asks permission for anything, because the walls made asking unnecessary. But "the sandbox allows it" and "the user wants it" are different sentences, and some actions inside the bench still deserve a human: deleting half the site is a perfectly legal workspace write. Even inside the bench, some actions deserve a human. Next: [the foreman's stamp](/blog/codex-concepts#approvals).
+
+The complete, tested code for this part lives in [`part-06-sandbox`](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-06-sandbox) in the [companion repo](https://github.com/yadneshSalvi/codex-app-server-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's lines highlighted.

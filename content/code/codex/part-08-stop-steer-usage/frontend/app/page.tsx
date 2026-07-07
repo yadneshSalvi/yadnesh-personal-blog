@@ -8,6 +8,7 @@ import type {
   HistoryMessage,
   Mode,
   Project,
+  UsageReading,
   WorkspaceFile,
 } from "@/lib/types";
 import { API_BASE } from "@/lib/api";
@@ -23,6 +24,7 @@ import { FilesPane } from "@/components/FilesPane";
 import { DiffDrawer } from "@/components/DiffDrawer";
 import { ApprovalCard } from "@/components/ApprovalCard";
 import { ModeChip, ModePicker } from "@/components/ModePicker";
+import { TokenGauge } from "@/components/TokenGauge";
 
 const SAMPLE_PROMPTS = [
   "Read brief/brief.md and build the site it describes",
@@ -142,9 +144,11 @@ export default function Home() {
   const [working, setWorking] = useState(false);
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const stickRef = useRef(true);
+  // A steer's race fallback can briefly overlap two open streams; the
+  // composer's "a turn is running" truth is a count, not a boolean.
+  const streamsRef = useRef(0);
 
   // The workspace side of the screen: which project, its files, the
   // preview's cache-buster, and the turn's diff.
@@ -156,6 +160,9 @@ export default function Home() {
   const [diff, setDiff] = useState("");
   const [diffOpen, setDiffOpen] = useState(false);
   const [previewVersion, setPreviewVersion] = useState(0);
+  // The meter: the latest usage_update for the open project — `.last`
+  // for the turn, `.total` for the thread.
+  const [usage, setUsage] = useState<UsageReading | null>(null);
 
   const loadFiles = useCallback(async (id: string) => {
     try {
@@ -186,6 +193,20 @@ export default function Home() {
     }
   }, []);
 
+  // Refill the gauge when a project is reopened. In-memory server-side,
+  // so it reads empty after a backend restart — honestly (Part 9 makes
+  // things durable).
+  const loadUsage = useCallback(async (id: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/projects/${id}/usage`);
+      if (!res.ok) return;
+      const data: { usage: UsageReading } = await res.json();
+      setUsage(data.usage && data.usage.total ? data.usage : null);
+    } catch {
+      // Quiet: a missing gauge is not worth a toast.
+    }
+  }, []);
+
   const selectProject = useCallback(
     (id: string) => {
       setActiveId(id);
@@ -194,11 +215,13 @@ export default function Home() {
       setDiff("");
       setDiffOpen(false);
       setFiles([]);
+      setUsage(null);
       setPreviewVersion((v) => v + 1);
       loadFiles(id);
       loadHistory(id);
+      loadUsage(id);
     },
-    [loadFiles, loadHistory],
+    [loadFiles, loadHistory, loadUsage],
   );
 
   // Re-pull the registry after events that change it server-side: a
@@ -287,6 +310,23 @@ export default function Home() {
     [activeId],
   );
 
+  // The Stop button. It does NOT abort the fetch — it asks the backend
+  // to turn/interrupt the live turn, and the truth comes back on the
+  // stream: turn/completed with status "interrupted", which the receipt
+  // renders as "stopped by you". Closing the tap is not stopping the
+  // machine; this stops the machine.
+  const stopTurn = useCallback(async () => {
+    if (!activeId) return;
+    try {
+      const res = await fetch(`${API_BASE}/projects/${activeId}/interrupt`, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error(`The server said ${res.status}.`);
+    } catch {
+      setToast("Could not stop the turn — it may have just finished.");
+    }
+  }, [activeId]);
+
   async function forkProject(id: string) {
     // Both halves get photocopied server-side — thread/fork for the
     // conversation, cp -r for the workspace — and a new sidebar entry
@@ -318,12 +358,137 @@ export default function Home() {
     });
   }
 
+  function beginStream(at: number) {
+    streamsRef.current += 1;
+    setWorking(true);
+    setStartedAt(at);
+  }
+
+  function endStream() {
+    streamsRef.current = Math.max(0, streamsRef.current - 1);
+    if (streamsRef.current === 0) {
+      setWorking(false);
+      setStartedAt(null);
+    }
+  }
+
+  // Read one turn's SSE stream to its end. Shared by the normal send
+  // path and the steer race fallback — the events are the same either
+  // way; only how the turn began differs.
+  async function consumeStream(res: Response, projectId: string) {
+    let gotReceipt = false;
+    for await (const event of readSse(res)) {
+      if (event.type === "complete") {
+        patchLastTurn({
+          status:
+            event.status === "completed"
+              ? "done"
+              : event.status === "interrupted"
+                ? "stopped"
+                : "error",
+          // Per-turn since Part 8: the receipt shows `.last`, what THIS
+          // turn cost — not the thread's cumulative bill.
+          totalTokens: event.usage?.totalTokens,
+          durationMs: event.duration_ms,
+        });
+        gotReceipt = true;
+        // Commands (cp, rm) change the workspace without fileChange
+        // items; one refresh at the end catches whatever they did.
+        loadFiles(projectId);
+        setPreviewVersion((v) => v + 1);
+        // The first completed turn auto-titles the thread server-side;
+        // re-pull the registry so the sidebar learns the name.
+        refreshProjects();
+      } else if (event.type === "usage_update") {
+        setUsage({ last: event.last, total: event.total, context_window: event.context_window });
+      } else if (event.type === "steered") {
+        // The chip was set optimistically when the POST answered; the
+        // stream's copy is for anyone else watching (Part 9's two tabs).
+      } else if (event.type === "thread_reset") {
+        // The saved conversation could not be restored; a fresh thread
+        // took its place. Slot a quiet notice in front of the message
+        // that triggered it — the files are fine, only history is gone.
+        setMessages((all) => [
+          ...all.slice(0, -2),
+          { role: "notice", text: "History could not be restored. Files are intact." },
+          ...all.slice(-2),
+        ]);
+      } else if (event.type === "error") {
+        patchLastTurn({ status: "error" });
+        setToast(event.message);
+        gotReceipt = true;
+      } else if (event.type === "file_change") {
+        setBadges((prev) => {
+          const next = { ...prev };
+          for (const f of event.files) next[f.path] = f.kind;
+          return next;
+        });
+        if (event.status === "done") loadFiles(projectId);
+      } else if (event.type === "diff_updated") {
+        setDiff(event.unified_diff);
+      } else if (event.type === "preview_refresh") {
+        setPreviewVersion((v) => v + 1);
+      } else {
+        setMessages((all) => {
+          const last = all[all.length - 1];
+          if (last?.role !== "assistant") return all;
+          return [...all.slice(0, -1), { ...last, blocks: applyEvent(last.blocks, event) }];
+        });
+      }
+    }
+    // A stream that closes without complete or error is itself a failure.
+    if (!gotReceipt) {
+      patchLastTurn({ status: "error" });
+      setToast("The stream ended before the agent finished.");
+    }
+  }
+
+  // A message sent while a turn is running. The backend routes it to
+  // turn/steer and answers in plain JSON — the events keep riding the
+  // original stream. Unless the turn finished a beat earlier: then the
+  // answer is a NEW turn's SSE stream (the race fallback), the chip
+  // comes off, and we read it like any other turn.
+  async function steer(prompt: string, projectId: string) {
+    setMessages((all) => [...all, { role: "user", text: prompt, steered: true }]);
+    try {
+      const res = await fetch(`${API_BASE}/projects/${projectId}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: prompt }),
+      });
+      if (!res.ok || !res.body) throw new Error(`The server said ${res.status}.`);
+      const contentType = res.headers.get("content-type") ?? "";
+      if (contentType.includes("text/event-stream")) {
+        setMessages((all) => {
+          const unchipped = all.map((m, i) =>
+            i === all.length - 1 && m.role === "user" ? { ...m, steered: false } : m,
+          );
+          return [...unchipped, { role: "assistant", blocks: [], status: "working" }];
+        });
+        beginStream(Date.now());
+        setBadges({});
+        setDiff("");
+        try {
+          await consumeStream(res, projectId);
+        } finally {
+          endStream();
+        }
+      }
+      // JSON answer ({steered: true}): nothing more to do here — the
+      // running turn absorbed it, and its stream tells the rest.
+    } catch {
+      setToast("Could not send the message. Is the backend running?");
+    }
+  }
+
   async function send(text: string) {
     const prompt = text.trim();
-    if (!prompt || working || !activeId) return;
+    if (!prompt || !activeId) return;
     setInput("");
-    setWorking(true);
-    setStartedAt(Date.now());
+    // The composer stays live during a run: sending mid-turn steers the
+    // running build instead of queueing a new one.
+    if (working) return steer(prompt, activeId);
+    beginStream(Date.now());
     // The badges and the diff describe ONE turn; a new turn starts clean.
     setBadges({});
     setDiff("");
@@ -332,84 +497,19 @@ export default function Home() {
       { role: "user", text: prompt },
       { role: "assistant", blocks: [], status: "working" },
     ]);
-    const controller = new AbortController();
-    abortRef.current = controller;
     try {
       const res = await fetch(`${API_BASE}/projects/${activeId}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: prompt }),
-        signal: controller.signal,
       });
       if (!res.ok || !res.body) throw new Error(`The server said ${res.status}.`);
-      let gotReceipt = false;
-      for await (const event of readSse(res)) {
-        if (event.type === "complete") {
-          patchLastTurn({
-            status: event.status === "completed" ? "done" : "error",
-            totalTokens: event.usage?.totalTokens,
-            durationMs: event.duration_ms,
-          });
-          setWorking(false); // the receipt is in; don't keep offering Stop
-          setStartedAt(null);
-          gotReceipt = true;
-          // Commands (cp, rm) change the workspace without fileChange
-          // items; one refresh at the end catches whatever they did.
-          loadFiles(activeId);
-          setPreviewVersion((v) => v + 1);
-          // The first completed turn auto-titles the thread server-side;
-          // re-pull the registry so the sidebar learns the name.
-          refreshProjects();
-        } else if (event.type === "thread_reset") {
-          // The saved conversation could not be restored; a fresh thread
-          // took its place. Slot a quiet notice in front of the message
-          // that triggered it — the files are fine, only history is gone.
-          setMessages((all) => [
-            ...all.slice(0, -2),
-            { role: "notice", text: "History could not be restored. Files are intact." },
-            ...all.slice(-2),
-          ]);
-        } else if (event.type === "error") {
-          patchLastTurn({ status: "error" });
-          setToast(event.message);
-          setWorking(false);
-          setStartedAt(null);
-          gotReceipt = true;
-        } else if (event.type === "file_change") {
-          setBadges((prev) => {
-            const next = { ...prev };
-            for (const f of event.files) next[f.path] = f.kind;
-            return next;
-          });
-          if (event.status === "done") loadFiles(activeId);
-        } else if (event.type === "diff_updated") {
-          setDiff(event.unified_diff);
-        } else if (event.type === "preview_refresh") {
-          setPreviewVersion((v) => v + 1);
-        } else {
-          setMessages((all) => {
-            const last = all[all.length - 1];
-            if (last?.role !== "assistant") return all;
-            return [...all.slice(0, -1), { ...last, blocks: applyEvent(last.blocks, event) }];
-          });
-        }
-      }
-      // A stream that closes without complete or error is itself a failure.
-      if (!gotReceipt) {
-        patchLastTurn({ status: "error" });
-        setToast("The stream ended before the agent finished.");
-      }
-    } catch (err) {
-      if ((err as Error).name === "AbortError") {
-        patchLastTurn({ status: "stopped" });
-      } else {
-        patchLastTurn({ status: "error" });
-        setToast("Lost the connection to the server. Is the backend running?");
-      }
+      await consumeStream(res, activeId);
+    } catch {
+      patchLastTurn({ status: "error" });
+      setToast("Lost the connection to the server. Is the backend running?");
     } finally {
-      setWorking(false);
-      setStartedAt(null);
-      abortRef.current = null;
+      endStream();
     }
   }
 
@@ -435,9 +535,11 @@ export default function Home() {
             the site builder
           </span>
         </div>
-        {/* The wristband rack for the open project. Per project, applied
-            per turn — switching needs no new thread. */}
-        {activeProject && <ModePicker mode={mode} busy={working} onChange={changeMode} />}
+        <div className="flex shrink-0 items-center gap-3">
+          {/* The meter (this turn · this thread) and the wristband rack. */}
+          <TokenGauge usage={usage} />
+          {activeProject && <ModePicker mode={mode} busy={working} onChange={changeMode} />}
+        </div>
       </header>
 
       <div className="flex min-h-0 flex-1">
@@ -508,10 +610,19 @@ export default function Home() {
 
               {messages.map((message, i) =>
                 message.role === "user" ? (
-                  <div key={i} className="mb-5 flex justify-end">
+                  <div key={i} className="mb-5 flex flex-col items-end">
                     <p className="max-w-[85%] rounded-2xl rounded-br-md bg-stone-900 px-4 py-2.5 text-[15px] text-stone-50 dark:bg-stone-100 dark:text-stone-900">
                       {message.text}
                     </p>
+                    {message.steered && (
+                      <span
+                        data-testid="steering-chip"
+                        className="mt-1 flex items-center gap-1.5 font-mono text-[11px] text-accent"
+                      >
+                        <span className="size-1.5 rounded-full bg-accent" />
+                        steering — absorbed mid-turn
+                      </span>
+                    )}
                   </div>
                 ) : message.role === "notice" ? (
                   <div key={i} className="mb-5 flex justify-center">
@@ -534,10 +645,10 @@ export default function Home() {
                     {message.status !== "working" && (
                       <p className="mt-2 font-mono text-xs text-stone-400 dark:text-stone-500">
                         {[
-                          message.status === "stopped" ? "stopped" : null,
+                          message.status === "stopped" ? "stopped by you" : null,
                           message.status === "error" ? "ended with an error" : null,
                           message.totalTokens !== undefined
-                            ? `${message.totalTokens.toLocaleString()} tokens`
+                            ? `${message.totalTokens.toLocaleString()} tokens this turn`
                             : null,
                           message.durationMs !== undefined
                             ? `${Math.round(message.durationMs / 1000)}s`
@@ -582,26 +693,32 @@ export default function Home() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 disabled={!activeId}
-                placeholder={activeId ? "Describe the site you want…" : "Create a project first"}
+                placeholder={
+                  !activeId
+                    ? "Create a project first"
+                    : working
+                      ? "Steer the build — it lands mid-turn…"
+                      : "Describe the site you want…"
+                }
                 className="min-w-0 flex-1 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-[15px] outline-none placeholder:text-stone-400 focus:border-accent disabled:opacity-50 dark:border-stone-800 dark:bg-stone-900"
               />
-              {working ? (
+              {working && (
                 <button
                   type="button"
-                  onClick={() => abortRef.current?.abort()}
+                  data-testid="stop-button"
+                  onClick={stopTurn}
                   className="rounded-xl border border-stone-300 px-5 text-sm font-medium text-stone-600 hover:border-red-400 hover:text-red-600 dark:border-stone-700 dark:text-stone-300"
                 >
                   Stop
                 </button>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={!input.trim() || !activeId}
-                  className="rounded-xl bg-accent px-5 text-sm font-medium text-white disabled:opacity-40"
-                >
-                  Send
-                </button>
               )}
+              <button
+                type="submit"
+                disabled={!input.trim() || !activeId}
+                className="rounded-xl bg-accent px-5 text-sm font-medium text-white disabled:opacity-40"
+              >
+                Send
+              </button>
             </form>
           </footer>
         </section>

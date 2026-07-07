@@ -1,15 +1,19 @@
-"""Part 7: approvals — the foreman's stamp.
+"""Part 8: stop, steer, and the meter — live control over a running turn.
 
-The grid completes. Standard mode's approval dial flips from "never" to
-"on-request": the agent may now ask to step past the bench — a network
-command, a write outside the workspace — and the server sends US a
-JSON-RPC request and freezes the item until we respond. Each question
-becomes an asyncio.Future in app.approvals; the SSE stream announces it
-(`approval_request`), POST /approvals/{id}/decision resolves it, and the
-answer goes back down stdio. Read-only stays "never" (it never acts);
-Trusted stays "never" (the sandbox contains). Nobody answers within
-PAGEWRIGHT_APPROVAL_TIMEOUT (default 10 minutes) → auto-decline, named
-honestly on the wire as reason "timeout".
+Three controls, all keyed by one fact the backend now remembers: WHICH
+turn is live on each project (app.turns, written when turn/start answers
+with `turn.id`). Stop: POST /interrupt sends `turn/interrupt {threadId,
+turnId}` and the stream answers with the same turn/completed every turn
+ends with — status "interrupted". Steer: a chat message that arrives
+while a turn is active routes to `turn/steer {threadId, expectedTurnId,
+input}` instead of starting a new turn; the running build absorbs it
+without restarting. The expectedTurnId precondition IS the race guard:
+if the turn finished a beat before the message landed, steer fails and
+the endpoint falls back to a normal turn/start. And the meter: every
+thread/tokenUsage/updated becomes a `usage_update` event — `.last` for
+this turn, `.total` for the thread — and the receipt's usage switches
+to `.last`, because `.total` is thread-cumulative and a per-turn
+receipt showing the lifetime bill is lying.
 """
 
 from contextlib import asynccontextmanager
@@ -20,7 +24,7 @@ from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from app import approvals, projects
+from app import approvals, projects, turns
 from app.codex_client import CodexClient, CodexError
 from app.events import (approval_patch, file_change_event, history_from_turns,
                         relativize_diff, sse, translate)
@@ -287,7 +291,7 @@ async def run_turn(project_id: str, message: str):
     mode = entry.get("mode", "standard")
     thread_id, reset = await ensure_thread(entry, workspace)
     queue = client.queue_for(thread_id)
-    await client.request("turn/start", {
+    started = await client.request("turn/start", {
         "threadId": thread_id,
         "input": [{"type": "text", "text": message}],
         # The wristband for THIS work order: the project's current mode,
@@ -300,14 +304,21 @@ async def run_turn(project_id: str, message: str):
         # empty. Part 10 turns summary (and effort) into user-facing dials.
         "summary": "detailed",
     })
+    # The response names the turn — and interrupt and steer both need
+    # that name. This line is what makes live control possible.
+    turns.begin(project_id, thread_id, started["turn"]["id"])
 
     yield sse({"type": "session_start", "session_id": thread_id,
-               "project_id": project_id, "mode": mode})
+               "project_id": project_id, "mode": mode,
+               "turn_id": started["turn"]["id"]})
     if reset:
         yield sse({"type": "thread_reset",
                    "message": "chat history could not be restored; "
                               "the site files are intact"})
-    usage: dict = {}
+    # The meter's two readings, kept for the receipt: `last` is this
+    # turn, `total` is the thread's lifetime count.
+    usage_last: dict = {}
+    usage_total: dict = {}
     # fileChange items seen this turn, by id. A fileChange approval names
     # only its itemId; the patch it is asking about arrived on the item's
     # own item/started, always before the question (verified live) —
@@ -316,14 +327,18 @@ async def run_turn(project_id: str, message: str):
     try:
         while True:
             note = await queue.get()
-            if note["method"] == "thread/tokenUsage/updated":
-                usage = note["params"].get("tokenUsage", {}).get("total", {})
-                continue
             event = translate(note)
             if event is None:
                 continue
+            if event["type"] == "usage_update":
+                usage_last, usage_total = event["last"], event["total"]
+                turns.record_usage(project_id, {k: v for k, v in event.items()
+                                                if k != "type"})
             if event["type"] == "complete":
-                event["usage"] = usage
+                # The receipt: `.last` is what THIS turn cost. `.total`
+                # rides along under its true name.
+                event["usage"] = usage_last
+                event["thread_total"] = usage_total
                 await finish_turn(project_id, thread_id, message)
             if event["type"] == "diff_updated":
                 event["unified_diff"] = relativize_diff(event["unified_diff"], workspace)
@@ -346,11 +361,107 @@ async def run_turn(project_id: str, message: str):
                 return
     except CodexError as exc:
         yield sse({"type": "error", "message": str(exc)})
+    finally:
+        # However the turn ended — completed, interrupted, failed, or
+        # the stream died — the floor is empty again. Named, so a stream
+        # outliving its turn can't erase a newer turn's ledger line.
+        turns.end(project_id, started["turn"]["id"])
 
 
 @app.post("/projects/{project_id}/chat")
 async def chat(project_id: str, req: ChatRequest):
+    """One endpoint, two verbs — the router the protocol enforces. A
+    message that arrives while a turn is ACTIVE becomes a steer: the
+    running build absorbs it without restarting. Otherwise it starts a
+    turn, as it has since Part 2. The client can tell which happened by
+    the response's content type: a steer answers in plain JSON (the
+    events keep riding the ORIGINAL turn's stream); a new turn streams."""
     if projects.get_project(project_id) is None:
         raise HTTPException(status_code=404, detail="no such project")
+    active = turns.active(project_id)
+    if active is not None:
+        try:
+            await client.request("turn/steer", {
+                "threadId": active["thread_id"],
+                # The precondition, not a formality: steer fails unless
+                # this matches the turn that is live RIGHT NOW. That
+                # failure is the race guard — see except below.
+                "expectedTurnId": active["turn_id"],
+                "input": [{"type": "text", "text": req.message}],
+            })
+        except CodexError:
+            # The turn finished a beat before the message landed
+            # (verified live: -32600 "no active turn to steer"). Not an
+            # error a user should see — the ledger is stale, so clear
+            # it and fall through to a normal turn/start.
+            turns.end(project_id, active["turn_id"])
+        else:
+            # Tell the original turn's stream a steer landed (the
+            # approvals trick: a synthetic note rides the queue in
+            # arrival order). The steered text will also resurface as a
+            # plain userMessage item at the model's next inference
+            # boundary — but that item doesn't say "steer"; this does.
+            await client.queue_for(active["thread_id"]).put(
+                {"method": "steer/accepted",
+                 "params": {"text": req.message, "turn_id": active["turn_id"]}})
+            return {"steered": True, "turn_id": active["turn_id"]}
     return StreamingResponse(run_turn(project_id, req.message),
                              media_type="text/event-stream")
+
+
+@app.post("/projects/{project_id}/interrupt")
+async def interrupt_turn(project_id: str):
+    """The Stop button. turn/interrupt names the exact turn (both params
+    required) and returns almost immediately; the real answer arrives on
+    the STREAM as the same turn/completed every turn ends with — status
+    "interrupted". Cooperative at the AGENT level, verified live: the
+    turn ends at once and the in-flight item is abandoned mid-lifecycle
+    (no item/completed ever fires for it), but the OS process it started
+    is NOT killed — a sleepy shell loop kept writing for 9 more seconds
+    after the interrupt and every write landed. Stop halts the agent,
+    not the machine; the workspace keeps whatever lands."""
+    if projects.get_project(project_id) is None:
+        raise HTTPException(status_code=404, detail="no such project")
+    active = turns.active(project_id)
+    if active is None:
+        raise HTTPException(status_code=409, detail="no active turn to interrupt")
+    try:
+        await client.request("turn/interrupt", {
+            "threadId": active["thread_id"], "turnId": active["turn_id"]})
+    except CodexError as exc:
+        # Same race as steer: the turn ended on its own first.
+        raise HTTPException(status_code=409, detail=str(exc))
+    return {"interrupted": True, "turn_id": active["turn_id"]}
+
+
+@app.get("/projects/{project_id}/turn")
+async def active_turn(project_id: str):
+    """Debug, like GET /threads: the ledger's view of the shop floor.
+    `active` is null between turns — and it can be honestly stale for a
+    moment when a viewer stalls (the steer fallback exists for exactly
+    that window)."""
+    if projects.get_project(project_id) is None:
+        raise HTTPException(status_code=404, detail="no such project")
+    return {"active": turns.active(project_id)}
+
+
+@app.get("/projects/{project_id}/usage")
+async def project_usage(project_id: str):
+    """The meter, on demand: the latest usage_update this project has
+    seen (last turn + thread total), from memory. Empty until the first
+    tokenUsage note — and after a restart, which is honest: durability
+    is Part 9's job."""
+    if projects.get_project(project_id) is None:
+        raise HTTPException(status_code=404, detail="no such project")
+    return {"usage": turns.usage(project_id)}
+
+
+@app.get("/usage/limits")
+async def usage_limits():
+    """account/rateLimits/read, proxied for the grown-ups: how much of
+    the account's rate windows this machine has burned. Part 13 puts
+    this on a status page next to the server's own vitals."""
+    try:
+        return await client.request("account/rateLimits/read", {})
+    except CodexError as exc:
+        raise HTTPException(status_code=502, detail=str(exc))

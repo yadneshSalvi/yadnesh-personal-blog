@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="480" viewBox="0 0 1040 480" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="480" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; a blocked curl is an ordinary failed command</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># Standard mode. The agent reaches for Google Fonts; DNS does not resolve</tspan></text>
+    <text x="32" y="116" xml:space="preserve"><tspan fill="#756d62"># inside the box. The notification is a NORMAL item/completed:</tspan></text>
+    <text x="32" y="144" xml:space="preserve"><tspan fill="#756d62">←</tspan> {"method": <tspan fill="#e5825a">"item/completed"</tspan>, "params": {"item": {</text>
+    <text x="32" y="172" xml:space="preserve">      "type": <tspan fill="#6fa8dc">"commandExecution"</tspan>,</text>
+    <text x="32" y="200" xml:space="preserve">      "command": "/bin/zsh -lc \"curl -fsSL 'https://fonts.googleapis.com/css2</text>
+    <text x="32" y="228" xml:space="preserve">                  ?family=Playfair+Display:wght@400;700&amp;display=swap'\"",</text>
+    <text x="32" y="256" xml:space="preserve">      "status": <tspan fill="#d97676">"failed"</tspan>,</text>
+    <text x="32" y="284" xml:space="preserve">      "exitCode": <tspan fill="#d97676">6</tspan>,</text>
+    <text x="32" y="312" xml:space="preserve">      "aggregatedOutput": "<tspan fill="#d97676">curl: (6) Could not resolve host: fonts.googleapis.com</tspan>\n",</text>
+    <text x="32" y="340" xml:space="preserve">      …}}}</text>
+    <text x="32" y="368" xml:space="preserve"></text>
+    <text x="32" y="396" xml:space="preserve"><tspan fill="#756d62"># no sandbox flag, no special status. "failed" + exit 6 is all the protocol</tspan></text>
+    <text x="32" y="424" xml:space="preserve"><tspan fill="#756d62"># says. This is the ONLY kind of sandbox wall that shows up as an item.</tspan></text>
+  </g>
+</svg>

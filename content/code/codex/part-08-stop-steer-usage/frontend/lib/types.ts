@@ -1,4 +1,4 @@
-// The wire vocabulary from Parts 2–7, as TypeScript sees it. One
+// The wire vocabulary from Parts 2–8, as TypeScript sees it. One
 // discriminated union: switch on `type`, and the compiler knows the
 // payload's shape.
 
@@ -17,8 +17,31 @@ export type ItemDetail = {
   files?: { path: string; kind: string }[];
 };
 
+// One reading of the meter (Part 8). The wire sends two of these per
+// tokenUsage note: `last` (this turn — what a receipt may show) and
+// `total` (the THREAD's lifetime count — cumulative, never per-turn).
+export type TokenUsage = {
+  totalTokens?: number;
+  inputTokens?: number;
+  cachedInputTokens?: number;
+  outputTokens?: number;
+  reasoningOutputTokens?: number;
+};
+
+export type UsageReading = {
+  last?: TokenUsage;
+  total?: TokenUsage;
+  context_window?: number | null;
+};
+
 export type AgentEvent =
-  | { type: "session_start"; session_id: string; project_id: string; mode: Mode }
+  | {
+      type: "session_start";
+      session_id: string;
+      project_id: string;
+      mode: Mode;
+      turn_id: string;
+    }
   | { type: "text_delta"; text: string }
   | { type: "item_start"; item_id: string; kind: string; detail: ItemDetail }
   | { type: "item_done"; item_id: string; kind: string; detail: ItemDetail }
@@ -56,11 +79,15 @@ export type AgentEvent =
       reason: ApprovalOutcomeReason;
       resolved_at_ms: number;
     }
+  // Part 8: the live meter and the steer's only trace on the wire.
+  | ({ type: "usage_update" } & UsageReading)
+  | { type: "steered"; text: string; turn_id: string }
   | {
       type: "complete";
-      status: string;
+      status: string; // "completed" | "interrupted" | "failed"
       duration_ms?: number;
-      usage: Record<string, number>;
+      usage: TokenUsage; // per-turn (.last) since Part 8 — NOT cumulative
+      thread_total?: TokenUsage;
     }
   | { type: "error"; message: string };
 
@@ -119,7 +146,9 @@ export type ApprovalBlock = {
 export type Block = TextBlock | ItemBlock | ApprovalBlock;
 
 export type ChatMessage =
-  | { role: "user"; text: string }
+  // steered (Part 8): this message was sent mid-turn and absorbed into
+  // the running build — the chip that makes the difference legible.
+  | { role: "user"; text: string; steered?: boolean }
   // The quiet inline notice — Part 5 uses it when a thread reset.
   | { role: "notice"; text: string }
   | {

@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="780" viewBox="0 0 1120 780">
+  <rect width="1120" height="780" fill="#0c0a09"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#211e1a"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#2b2723" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#3a3530"/><circle cx="56" cy="28" r="7" fill="#3a3530"/><circle cx="82" cy="28" r="7" fill="#3a3530"/>
+  <rect x="320" y="13" width="420" height="30" rx="15" fill="#1a1816" stroke="#3a3530"/>
+  <text x="530" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#a49c90" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#292524" stroke-width="1"/>
+  <circle cx="24" cy="79" r="5" fill="#4fb8b3"/>
+  <text x="38" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">Pagewright</text>
+  <text x="150" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">the site builder</text>
+  <text x="852" y="83" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#78716c" text-anchor="end">Look and plan: the OS refuses every write.</text>
+  <rect x="864" y="64" width="240" height="30" rx="9" fill="#1c1917" stroke="#292524"/>
+  <rect x="869" y="68" width="82" height="22" rx="6" fill="#f5f5f4"/>
+  <text x="910" y="83" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#1c1917" text-anchor="middle">Read-only</text>
+  <text x="990" y="83" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">Standard</text>
+  <text x="1064" y="83" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">Trusted</text>
+  <line x1="200" y1="102" x2="200" y2="780" stroke="#292524" stroke-width="1"/><rect x="8" y="114" width="184" height="64" rx="8" fill="#4fb8b3" opacity="0.07"/>
+  <rect x="8" y="114" width="184" height="64" rx="8" fill="none" stroke="#4fb8b3" stroke-opacity="0.4"/><text x="18" y="133" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#4fb8b3">Sandbox test</text>
+  <text x="18" y="149" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c">Create index.html for a small coffee s…</text>
+  <text x="18" y="167" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" fill="#78716c">just now</text><rect x="152" y="155" width="34" height="16" rx="3.5" fill="none" stroke="#292524"/>
+  <text x="169" y="166.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" fill="#d6d3d1" text-anchor="middle">Fork</text><line x1="0" y1="696" x2="200" y2="696" stroke="#292524" stroke-width="1"/>
+  <rect x="12" y="706" width="176" height="26" rx="7" fill="#1c1917" stroke="#292524"/>
+  <text x="22" y="723" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#d6d3d1">blank workspace</text>
+  <path d="M 170 717 l 4.5 5 l 4.5 -5" fill="none" stroke="#78716c" stroke-width="1.4"/>
+  <rect x="12" y="740" width="176" height="28" rx="7" fill="#4fb8b3"/>
+  <text x="100" y="758" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#ffffff" text-anchor="middle">New project</text>
+  <line x1="200" y1="136" x2="640" y2="136" stroke="#292524" stroke-width="1"/>
+  <text x="216" y="124" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#e7e5e4">Sandbox test</text>
+  <rect x="546.6" y="109" width="77.4" height="20" rx="10" fill="none" stroke="#0c4a6e"/>
+  <text x="585.3000000000001" y="123" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#7dd3fc" text-anchor="middle">read-only</text>
+  
+  <text x="216" y="168" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">Files added:</text>
+  <circle cx="220" cy="189" r="2" fill="#e7e5e4"/>
+  <g transform="translate(14,0)">
+  <rect x="216" y="181" width="319" height="17" rx="4" fill="#292524"/>
+  <text x="220" y="193" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1">fonts/playfair-display-latin-400-normal.woff2</text></g>
+  <circle cx="220" cy="212" r="2" fill="#e7e5e4"/>
+  <g transform="translate(14,0)">
+  <rect x="216" y="204" width="319" height="17" rx="4" fill="#292524"/>
+  <text x="220" y="216" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1">fonts/playfair-display-latin-700-normal.woff2</text></g>
+  <text x="216" y="241" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">1,057,275 tokens · 32s</text>
+  <rect x="376" y="261" width="248" height="52" rx="14" fill="#f5f5f4"/>
+  <text x="391" y="283" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1c1917">Rewrite the about section opening</text>
+  <text x="391" y="302" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1c1917">sentence to be friendlier.</text>
+  <circle cx="220" cy="334" r="2.5" fill="#78716c"/>
+  <text x="230" y="338" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" letter-spacing="1.5" fill="#78716c">THINKING</text>
+  <path d="M 304 332 l 4 4.5 l 4 -4.5" fill="none" stroke="#78716c" stroke-width="1.3"/>
+  
+  <text x="216" y="367" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">I can't apply the edit in this read-only</text>
+  <text x="216" y="388" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">session, but the friendliest replacement for</text>
+  <text x="216" y="409" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">the opening sentence is:</text>
+  <rect x="216" y="426" width="388" height="73" rx="8" fill="#292524"/>
+  <text x="230" y="448" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#d6d3d1">Beanline is your cozy neighborhood</text>
+  <text x="230" y="467" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#d6d3d1">coffee shop, serving carefully made</text>
+  <text x="230" y="486" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#d6d3d1">espresso and simple pastries.</text>
+  
+  <text x="216" y="523" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">If you want, I can also rewrite the full</text>
+  <text x="216" y="544" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">about paragraph to match that tone.</text>
+  <text x="216" y="571" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">1,090,668 tokens · 4s</text>
+  <text x="216" y="710" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#7dd3fc">Planning mode: the builder reads and plans, the OS refuses every write.</text>
+  <line x1="200" y1="718" x2="640" y2="718" stroke="#292524" stroke-width="1"/>
+  <rect x="216" y="730" width="336" height="36" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="229" y="753" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#78716c">Describe the site you want&#8230;</text>
+  <rect x="562" y="730" width="62" height="36" rx="10" fill="#4fb8b3" opacity="0.45"/>
+  <text x="593" y="753" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  <line x1="640" y1="102" x2="640" y2="780" stroke="#292524" stroke-width="1"/>
+  <text x="656" y="124" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#78716c">/preview/f25ea11b/</text>
+  <rect x="1002" y="108" width="56" height="22" rx="6" fill="none" stroke="#292524"/>
+  <text x="1030" y="123" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#d6d3d1" text-anchor="middle">Reload</text>
+  <rect x="1064" y="108" width="40" height="22" rx="6" fill="none" stroke="#292524" opacity="0.55"/>
+  <text x="1084" y="123" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c" text-anchor="middle" opacity="0.8">Diff</text>
+  <line x1="640" y1="136" x2="1120" y2="136" stroke="#292524" stroke-width="1"/>
+  <!-- the rendered site keeps its own colors in both themes, like a real iframe -->
+  <rect x="641" y="137" width="479" height="515" fill="#f4ead9"/>
+  <rect x="668" y="158" width="424" height="128" rx="10" fill="#fbf5ea"/>
+  <text x="880" y="220" font-family="Georgia, 'Times New Roman', serif" font-size="42" font-weight="700" fill="#241c14" text-anchor="middle">Beanline</text>
+  <text x="880" y="252" font-family="Georgia, 'Times New Roman', serif" font-size="14" fill="#8a4a22" text-anchor="middle">Fresh brews, calm mornings, and a warm place to pause.</text>
+  <rect x="668" y="302" width="424" height="118" rx="10" fill="#fbf5ea"/>
+  <text x="690" y="336" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" fill="#241c14">About Beanline</text>
+  <text x="690" y="362" font-family="Georgia, 'Times New Roman', serif" font-size="12" fill="#5c4f40">Beanline is a small neighborhood coffee shop serving</text>
+  <text x="690" y="381" font-family="Georgia, 'Times New Roman', serif" font-size="12" fill="#5c4f40">carefully made espresso, smooth filter coffee, and</text>
+  <text x="690" y="400" font-family="Georgia, 'Times New Roman', serif" font-size="12" fill="#5c4f40">simple pastries. The pace stays slow on purpose.</text>
+  <rect x="668" y="436" width="424" height="44" rx="10" fill="#fbf5ea"/>
+  <text x="880" y="463" font-family="Georgia, 'Times New Roman', serif" font-size="12.5" fill="#241c14" text-anchor="middle">Beanline Coffee Shop &#183; Open daily &#183; 7:00 AM to 6:00 PM</text>
+  <!-- the files pane (app UI, themed) -->
+  <line x1="640" y1="652" x2="1120" y2="652" stroke="#292524" stroke-width="1"/>
+  <rect x="641" y="653" width="479" height="127" fill="#1c1917" opacity="0.35"/>
+  <text x="656" y="676" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#78716c">FILES</text>
+  <text x="1104" y="676" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c" text-anchor="end">3</text>
+  <text x="656" y="698" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">fonts/</text>
+  <text x="668" y="718" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#e7e5e4">playfair-display-latin-400-normal.woff2</text>
+  <text x="1104" y="718" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end">21.3 kB</text>
+  <text x="668" y="738" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#e7e5e4">playfair-display-latin-700-normal.woff2</text>
+  <text x="1104" y="738" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end">22.7 kB</text>
+  <text x="656" y="758" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#e7e5e4">index.html</text>
+  <text x="1104" y="758" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end">3.2 kB</text>
+</svg>
