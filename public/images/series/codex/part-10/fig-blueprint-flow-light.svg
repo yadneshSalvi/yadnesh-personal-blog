@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="980" viewBox="0 0 1240 980" role="img">
+  <rect width="1240" height="980" fill="#faf9f6"/>
+  <text x="48" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#8f887a">BLUEPRINT, THEN BUILD &#183; TWO TURNS, TWO WRISTBANDS</text>
+  <line x1="48" y1="66" x2="1192" y2="66" stroke="#e7e3d9" stroke-width="1.5"/>
+
+  <!-- the honesty strip -->
+  <rect x="48" y="84" width="1144" height="84" rx="12" fill="none" stroke="#dfa3a3" stroke-width="1.2" stroke-dasharray="7 5"/>
+  <text x="70" y="112" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b91c1c" text-anchor="start">WHAT THIS IS NOT</text>
+  <text x="70" y="136" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">There is no collaborationMode on turn/start in 0.142.4; the old "plan mode" param is gone. A blueprint is not a protocol mode:</text>
+  <text x="70" y="156" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">it is an ordinary turn wearing the look-only wristband. The OS enforces what a prompt could only request.</text>
+
+  <!-- lane kickers -->
+  <text x="48" y="208" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#0e6ea8" text-anchor="start">TURN 1 &#183; THE BLUEPRINT</text>
+  <text x="636" y="208" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#b3441a" text-anchor="start">TURN 2 &#183; "BUILD IT."</text>
+  <line x1="620" y1="224" x2="620" y2="770" stroke="#e7e3d9" stroke-dasharray="4 6"/>
+
+  <!-- left lane: the blueprint turn -->
+  <rect x="48" y="224" width="556" height="74" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="68" y="252" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#1f1c19" text-anchor="start">POST /chat</text>
+  <text x="166" y="252" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#b3441a" text-anchor="start">{"message": "&#8230;", "plan_first": true}</text>
+  <text x="68" y="278" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">the toggle is one-shot: it arms exactly one turn, then disarms</text>
+
+  <line x1="326" y1="298" x2="326" y2="330" stroke="#8f887a" stroke-width="1.5" />
+     <path d="M 326 330 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 326 330)"/>
+
+  <rect x="48" y="330" width="556" height="128" rx="12" fill="#e8f3fa" stroke="#9cc8e3" stroke-width="2"/>
+  <text x="68" y="358" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#0e6ea8" text-anchor="start">turn/start</text>
+  <text x="68" y="382" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">sandboxPolicy: {"type": "readOnly"}</text>
+  <text x="68" y="402" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">approvalPolicy: "never"</text>
+  <text x="68" y="426" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">+ the nudge, appended to the message: propose a numbered</text>
+  <text x="68" y="442" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">plan first; do not write any files in this turn.</text>
+
+  <line x1="326" y1="458" x2="326" y2="490" stroke="#8f887a" stroke-width="1.5" />
+     <path d="M 326 490 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 326 490)"/>
+
+  <rect x="48" y="490" width="556" height="150" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="68" y="518" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">WHAT COMES BACK (live capture)</text>
+  <text x="68" y="542" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">read-only exploration: rg --files, sed -n brief.md &#8230;</text>
+  <text x="68" y="566" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">then the plan, as numbered prose through text_delta:</text>
+  <text x="68" y="590" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1f1c19" text-anchor="start">"1. Build a single index.html &#8230; 8. Add the last polish"</text>
+  <text x="68" y="614" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#0e6ea8" text-anchor="start">701 text deltas &#183; 0 plan_updates &#183; 0 files changed</text>
+
+  <line x1="326" y1="640" x2="326" y2="672" stroke="#8f887a" stroke-width="1.5" />
+     <path d="M 326 672 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 326 672)"/>
+  <rect x="48" y="672" width="556" height="58" rx="12" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="68" y="696" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">the receipt names the posture:</text>
+  <text x="68" y="716" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#0e6ea8" text-anchor="start">blueprint (read-only) &#183; 62,085 tokens this turn &#183; 13s</text>
+
+  <!-- right lane: the build turn -->
+  <rect x="636" y="224" width="556" height="74" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="656" y="252" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">the approval is a reply, not a button:</text>
+  <text x="656" y="278" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">POST /chat {"message": "Build it."}</text>
+
+  <line x1="914" y1="298" x2="914" y2="330" stroke="#8f887a" stroke-width="1.5" />
+     <path d="M 914 330 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 914 330)"/>
+
+  <rect x="636" y="330" width="556" height="128" rx="12" fill="#f6e7df" stroke="#dcb09a" stroke-width="2"/>
+  <text x="656" y="358" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#b3441a" text-anchor="start">turn/start</text>
+  <text x="656" y="382" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1f1c19" text-anchor="start">sandboxPolicy: the project's own mode (workspaceWrite)</text>
+  <text x="656" y="406" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">same thread: the model remembers the plan it just wrote,</text>
+  <text x="656" y="422" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">so two words are enough to cash it in.</text>
+  <text x="656" y="444" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#8f887a" text-anchor="start">effort / summary ride along, per turn</text>
+
+  <line x1="914" y1="458" x2="914" y2="490" stroke="#8f887a" stroke-width="1.5" />
+     <path d="M 914 490 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 914 490)"/>
+
+  <rect x="636" y="490" width="556" height="150" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="656" y="518" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">WHAT COMES BACK (same capture, 54s)</text>
+  <text x="656" y="542" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">turn/plan/updated &#8594; the checklist, whole, twice:</text>
+  <text x="672" y="566" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1f1c19" text-anchor="start">1st: [inProgress, pending, pending]</text>
+  <text x="672" y="590" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#3f6212" text-anchor="start">2nd: [completed, completed, completed]</text>
+  <text x="656" y="614" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#b3441a" text-anchor="start">+ fileChange: index.html (594 lines) &#183; preview refresh</text>
+
+  <line x1="914" y1="640" x2="914" y2="672" stroke="#8f887a" stroke-width="1.5" />
+     <path d="M 914 672 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 914 672)"/>
+  <rect x="636" y="672" width="556" height="58" rx="12" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="656" y="696" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">the estimate taped to the window, ticking itself:</text>
+  <text x="656" y="716" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#b3441a" text-anchor="start">THE BUILDER'S PLAN &#183; pending &#8594; inProgress &#8594; completed</text>
+
+  <!-- the two-axes footer -->
+  <rect x="48" y="764" width="1144" height="92" rx="12" fill="#f2f7e8" stroke="#e7e3d9" stroke-width="1.2"/>
+  <text x="70" y="792" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#3f6212" text-anchor="start">TWO AXES, NOT ONE</text>
+  <text x="70" y="816" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">Collaboration posture (plan first, then build) is a PRODUCT decision expressed in prompts and turn order. Containment (readOnly,</text>
+  <text x="70" y="836" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">workspaceWrite) is an OS decision expressed in sandbox policy. The blueprint borrows the second to guarantee the first.</text>
+
+  <rect x="48" y="880" width="1144" height="56" rx="10" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="68" y="904" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">The plan tool never fires on its own: config include_plan_tool switches it on, developerInstructions asks for it,</text>
+  <text x="68" y="924" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#b3441a" text-anchor="start">and even then the checklist belongs to the BUILD turn. The blueprint arrives as prose. Both verified live.</text>
+</svg>

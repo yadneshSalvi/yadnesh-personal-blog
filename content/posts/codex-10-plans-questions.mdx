@@ -1,0 +1,511 @@
+---
+title: "Codex App Server in Production, Part 10: Plans, Questions, and the Reasoning Dial"
+subtitle: "Act III opens: a Plan-first toggle sends the builder out read-only to propose before it acts, the engine's own checklist ticks itself across every tab, item/tool/requestUserInput freezes a turn until you pick a palette, and effort stops being a constant."
+image: "/images/series/codex/part-10/cover-light.svg"
+imageDark: "/images/series/codex/part-10/cover-dark.svg"
+createdAt: "2026-07-09T00:00:00.000Z"
+updatedAt: "2026-07-09T00:00:00.000Z"
+tags: ["codex", "openai", "fastapi", "nextjs", "tutorial"]
+series: "codex-app-server-fastapi-nextjs"
+seriesPart: 10
+---
+
+Mid-build, unprompted by any UI of ours, the agent stopped. Its tool call froze on the wire, a JSON-RPC request with an `id` slid up the pipe, and inside it: three cafe color palettes, each with a label and a one-line description, waiting for a human. We picked "Midnight Velvet". The turn thawed, and the site that landed was charcoal, caramel, and muted rose, exactly as described. That round trip is real, captured, and about a page of code, because the machinery it needs has existed since [Part 2](/blog/codex-2-fastapi-bridge#the-reader-task-one-loop-three-destinations).
+
+Act III opens here. Acts I and II built a builder and put you in control of it; this act gives it judgment you can see. By the end of this page, Pagewright proposes a written plan before touching the disk, ticks off its own checklist while it builds, asks structured questions instead of guessing, and thinks exactly as hard as each message deserves, with [Part 8's meter](/blog/codex-8-stop-steer-usage#the-meter-stops-rounding-to-a-feeling) showing what the thinking cost.
+
+<Figure
+  src="/images/series/codex/part-10/browser-checklist-light.svg"
+  srcDark="/images/series/codex/part-10/browser-checklist-dark.svg"
+  alt="Pagewright mid-build. The chat shows the tail of a numbered blueprint ending with the agent saying it has not written any files in this turn, a receipt reading blueprint (read-only), 62,085 tokens this turn, 13 seconds, then a two-word user message, Build it. Below the running commands, a panel titled THE BUILDER'S PLAN shows 2 of 4 steps: two struck through as done, one bold and in progress reading implement the single-file HTML/CSS build, one pending. The composer row carries a Plan first pill and a care-level picker reading Quick, Standard, Thorough, Max."
+  caption="The dessert, from the real e2e run. A blueprint that cost 62,085 tokens and changed zero files, approved with two words, and the agent's own checklist ticking at 2/4. Every element in this frame is on the wire."
+  width={1120}
+  height={900}
+/>
+
+Look at the receipt under the plan: `blueprint (read-only)`. That label is not decoration. The planning turn ran inside a sandbox that refuses writes at the OS level, which means "propose first" stopped being a request and became a guarantee. Getting there honestly, though, requires admitting that the protocol feature this part was originally designed around **no longer exists**. That story first.
+
+## The guess you paid for
+
+Every builder you have met so far in this series swings on the first message. Hand it the Beanline brief and it reads, reasons, and produces `index.html` in one motion. For a one-page cafe site, that eagerness is charming. Now imagine the brief is ambiguous, the client is picky, and the build burns 150k tokens before anyone checks the direction. An eager guess at that scale is not charming; it's an invoice.
+
+The sibling series named this problem [the anatomy of an expensive guess](/blog/agent-sdk-10-interactive#the-anatomy-of-an-expensive-guess) and spent a part fixing it with plan mode and structured questions. If you want the from-zero treatment of the *UX pattern*, read that page; it earns the pattern one design question at a time, and nothing here re-teaches it. This part builds the **Codex-shaped version**, and the protocol shapes underneath turn out to be almost entirely new material: a mode that vanished, a tool that must be switched on twice, and a server request that politely warns you it is under development.
+
+## Blueprint mode: a turn that cannot touch the disk
+
+Here's the honesty the [concepts page](/blog/codex-concepts#collaboration-modes) has been promising since the series began. Older protocol versions had a `collaborationMode` param on `turn/start`; the 0.139-era reference app this series is drawn from still sends one. On our pinned 0.142.4, **it is gone**. The mode concept survives only as a setting in Codex's own TUI; there is no "plan mode" to ask the wire for.
+
+So what is a blueprint, if the protocol won't name one? A blueprint is a turn that *cannot* write. You already own everything needed to say that precisely, because [Part 6 taught the wristbands](/blog/codex-6-sandbox#two-dials-one-grid): send the turn out with the look-only policy and the OS itself enforces "propose, don't build". No mode enum, no trust in the prompt, no way for an enthusiastic model to helpfully start early. This is a stronger promise than `collaborationMode` ever made, and it costs three fields.
+
+The API grows one flag and two dials. `None` means "the default", so every client from Parts 3 through 9 keeps working unchanged:
+
+```python filename="backend/app/main.py" repo="part-10-plans-questions/backend/app/main.py" lines="187-195"
+class ChatRequest(BaseModel):
+    message: str
+    # Part 10: the consultative dials. plan_first sends the turn out
+    # read-only with the blueprint nudge; effort and summary ride
+    # turn/start as-is. None means "the default", so old clients keep
+    # working unchanged.
+    plan_first: bool = False
+    effort: str | None = None
+    summary: str | None = None
+```
+
+And the chat endpoint's `turn/start` learns to dress a blueprint turn differently (ignore `effort` and `summary` for now; they get their own section):
+
+```python filename="backend/app/main.py" repo="part-10-plans-questions/backend/app/main.py" lines="554-561,568-576"
+    started = await client.request("turn/start", {
+        "threadId": thread_id,
+        # A blueprint turn carries the nudge INSIDE the message: the
+        # sandbox guarantees "no files", the nudge asks for the plan
+        # instead of a narration about not being able to write.
+        "input": [{"type": "text", "text":
+                   (req.message + BLUEPRINT_NUDGE) if req.plan_first
+                   else req.message}],
+        "sandboxPolicy": ({"type": "readOnly"} if req.plan_first
+                          else sandbox_policy(mode, workspace)),
+        "approvalPolicy": "never" if req.plan_first else approval_policy(mode),
+        # The dials, per turn. summary "detailed" has been the setting
+        # since Part 3 (without it the reasoning drawer stays empty);
+        # now both are the sender's choice, message by message.
+        "effort": effort,
+        "summary": summary,
+    })
+```
+
+Two decisions in that fence deserve slow reading. The `sandboxPolicy` override is the whole feature: a `plan_first` turn ships `{"type": "readOnly"}` regardless of the project's mode, and `approvalPolicy` drops to `"never"` because there is nothing to escalate when nothing can be written. And the nudge rides **inside the message**, not in the policy:
+
+```python filename="backend/app/main.py" repo="part-10-plans-questions/backend/app/main.py" lines="65-69,75-78"
+# The blueprint nudge, appended to the user's message on plan_first
+# turns. The read-only sandbox already guarantees "no files"; the nudge
+# is so the agent PLANS instead of narrating that it cannot write.
+BLUEPRINT_NUDGE = ("\n\nPropose a numbered build plan first; "
+                   "do not write any files in this turn.")
+PLAN_TOOL_NUDGE = (
+    "When a task involves more than one step, maintain a live plan with "
+    "the update_plan tool: set it before you start building and update "
+    "step statuses as you complete them.")
+```
+
+Why both a wall and a request? Because they do different jobs. The sandbox guarantees no files change; it cannot make the model *plan*. Without the nudge, a read-only turn tends to produce a shrug: an explanation that it would love to build but cannot write, would you like it to describe what it might do. The nudge turns containment into intent. The wall keeps it honest; the words give it a job. (The second constant, `PLAN_TOOL_NUDGE`, belongs to the next section; it's here because they live together at the top of the file.)
+
+Here's the whole flow from the real capture, both turns:
+
+<Figure
+  src="/images/series/codex/part-10/fig-blueprint-flow-light.svg"
+  srcDark="/images/series/codex/part-10/fig-blueprint-flow-dark.svg"
+  alt="Two-lane flow diagram titled blueprint, then build. A dashed honesty strip on top says there is no collaborationMode on turn/start in 0.142.4 and a blueprint is an ordinary turn wearing the look-only wristband. Turn 1, the blueprint: POST /chat with plan_first true, one-shot toggle, leads to turn/start with sandboxPolicy readOnly, approvalPolicy never, and the nudge appended to the message; what comes back is read-only exploration commands, then the plan as numbered prose through text_delta, 701 text deltas, zero plan updates, zero files changed, and a receipt reading blueprint (read-only), 62,085 tokens this turn, 13 seconds. Turn 2, Build it: the approval is a reply, not a button; a normal turn/start at the project's own workspaceWrite mode on the same thread; what comes back is turn/plan/updated twice, first in progress then all completed, plus a fileChange landing index.html at 594 lines. A green band underneath says collaboration posture is a product decision, containment is an OS decision, and the blueprint borrows the second to guarantee the first."
+  caption="The honest two-path story, every number from the live capture. Left: a turn that cannot write, asked to plan. Right: two words on the same thread cash the plan in."
+  width={1240}
+  height={980}
+/>
+
+Run it against the Beanline brief with the toggle armed, and the wire does exactly what the diagram claims. The agent reads `brief.md`, the copy deck, and the logo, narrating as it goes. Then the plan arrives, and here is the second honesty beat of the part: **it arrives as prose.** Numbered markdown, streaming through `text_delta` like any answer since [Part 3](/blog/codex-3-builder-ui#two-new-parcels-on-the-same-belt). Eight steps for Beanline: inline the logo SVG to honor the single-file rule, set CSS variables for the brand colors, structure four semantic sections, one section per plan item, ending with "If you want, I can next turn this plan into the actual `index.html`." The capture's tallies: 701 text deltas, zero plan notifications, zero file changes, and the file tree did not move. The blueprint is a *document you read*, not a data structure, and pretending otherwise would be this part inventing a protocol that isn't there.
+
+Approval, then, needs no new endpoint, no decision enum, no card. You read the plan; if you like it, you say so. The frontend arms exactly one turn per toggle (the pill disarms itself after sending, so the follow-up naturally goes out at the project's own mode), and "Build it." is an ordinary message on the same thread. The model remembers the plan it wrote one turn ago; two words are enough to cash it in. Fifty-four seconds later there's a 594-line `index.html` honoring all eight numbered steps.
+
+<Callout type="info" title="Plan mode and the read-only sandbox are different axes">
+Don't let the trick blur the concepts. *Collaboration posture* (propose first, build after approval) is a product decision: it lives in prompts, toggles, and turn order. *Containment* (readOnly, workspaceWrite, network off) is an enforcement decision: it lives in the OS. Part 6's grid did not gain a "planning" row today; the blueprint borrows a containment level to make a posture trustworthy. You could ship plan-first with no sandbox at all, and it would work until the day the model got excited. The two axes compose; they never merge.
+</Callout>
+
+Checkpoint. Right now you have: a toggle that sends one turn out read-only with a planning nudge, a receipt that names the posture, and approval that costs two words. What you don't have yet is any machine-readable trace of plans. That changes on the build turn.
+
+## The living checklist
+
+Watch the build turn from the dessert shot again: above the composer, a panel titled "The builder's plan", four steps, two struck through, one pulsing. Nothing in our backend invented those steps. The engine has a **plan tool** (`update_plan`): the agent calls it to declare its own step list and to update statuses as it works, and every call surfaces as a `turn/plan/updated` notification. That's the written estimate taped to the workshop window, ticking itself off.
+
+Getting it to fire took two switches, and discovering that took most of a morning, so here is the truth in one place. Switch one is thread-level config: `include_plan_tool` hands the agent the tool. Verified live: **the flag alone changes nothing.** Four traces, zero plan notifications; the model never volunteers the tool, it builds. Switch two is a standing instruction in `developerInstructions` (the `PLAN_TOOL_NUDGE` you saw above), and with both set, build turns emit the checklist reliably. Both ride `thread/start`:
+
+```python filename="backend/app/main.py" repo="part-10-plans-questions/backend/app/main.py" lines="367-371,377-380,383-384"
+    started = await client.request("thread/start", {
+        "cwd": str(workspace),
+        "sandbox": "workspace-write",
+        "approvalPolicy": "never",
+        "model": MODEL,
+        "config": {
+            "include_plan_tool": True,
+            "features.default_mode_request_user_input": True,
+        },
+        "developerInstructions": PLAN_TOOL_NUDGE,
+    })
+```
+
+(The second config key is the next section arriving early; thread switches travel in pairs here because `thread/start` happens once per conversation.)
+
+The notification's shape is friendly: the whole plan, re-sent in full on every change, `{plan: [{step, status}], explanation}` with statuses `pending`, `inProgress`, `completed`. Note the camelCase `inProgress`; the protocol's enum spelling, worth copying exactly into your types. The translation is one more arm on the [Part 2 envelope](/blog/codex-2-fastapi-bridge#designing-the-envelope), eight parts old and still absorbing new event types without a redesign:
+
+```python filename="backend/app/events.py" repo="part-10-plans-questions/backend/app/events.py" lines="220,226-236"
+    if method == "turn/plan/updated":
+        return {"type": "plan_update",
+                "steps": [{"step": s.get("step", ""),
+                           "status": s.get("status", "")}
+                          for s in p.get("plan", [])],
+                "explanation": p.get("explanation")}
+    if method == "item/plan/delta":
+        # In the schema, never in a live 0.142.4 trace (the checklist
+        # arrives whole via turn/plan/updated). Translated so a CLI that
+        # starts streaming plan text doesn't get dropped on the floor.
+        return {"type": "plan_delta", "item_id": p.get("itemId", ""),
+                "text": p.get("delta", "")}
+```
+
+That second branch is schema archaeology, disclosed rather than hidden: `item/plan/delta` exists in the generated schema, presumably for streaming plan text, and it never fired in any trace we captured. We translate it anyway, so a future CLI that starts using it degrades gracefully instead of dropping frames.
+
+Because `plan_update` lands in [Part 9's event log](/blog/codex-9-durable-streams) like everything else, the frontend's job is four lines, and the whole-plan-every-time shape is why. Last write wins; replay into a fresh tab reconstructs the current checklist for free:
+
+```tsx filename="frontend/app/page.tsx" repo="part-10-plans-questions/frontend/app/page.tsx" lines="300,303"
+      } else if (event.type === "plan_update") {
+        setPlan({ steps: event.steps, explanation: event.explanation });
+```
+
+Now the part of this section you should trust *because* it's untidy. The plan tool is **stochastic**. On build turns with both switches set, it fired in every capture, but the *step granularity* varies run to run: sometimes three steps, sometimes five for the same brief. On read-only blueprint turns it usually stays silent, which fits its nature (the tool tracks progress, and a blueprint turn produces no progress to track), yet one live run cheerfully used it to track the planning legwork itself: read the brief, inspect assets, draft the plan. If your product design *requires* a checklist on every turn, this tool will disappoint you. Pagewright's design absorbs the variance instead: the panel renders when a plan exists and renders nothing when none does, and its absence is a normal state, not a bug. The estimate taped to the window is the builder's own habit, not a form you made it fill in.
+
+Checkpoint. Right now you have: blueprints as readable prose on read-only turns, and on build turns, the agent's own step list ticking `pending → inProgress → completed` in every tab, replay included. Time for the feature this part opened with: the turn that stops and asks.
+
+## The question that freezes a tool call
+
+Everyone has lived both versions of the contractor phone call. Version one: silence for three days, then a finished bathroom in a gloss white you would never have picked. Version two: a photo of two tile samples at 2pm, "matte or gloss?", one word back, and the right bathroom. The difference isn't skill; it's that the second contractor knew which decision wasn't theirs to make.
+
+`item/tool/requestUserInput` is version two, wired into the protocol. And its arrival mechanics should feel deeply familiar: it is a **server-initiated JSON-RPC request**, carrying an `id`, expecting a response, exactly like the approval requests of [Part 7](/blog/codex-7-approvals#the-request-that-turns-the-desk-around). The desk turns around again: the engine asks, your backend answers.
+
+First, the honesty that belongs in the same breath as the feature. On a default thread, this request **never fires**. It sits behind a feature flag you saw in the `thread/start` fence above (`features.default_mode_request_user_input`), and when you set that flag, the engine sends a `warning` notification on every thread, verbatim from the wire:
+
+> Under-development features enabled: default_mode_request_user_input. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in $CODEX_HOME/config.toml.
+
+Read that the way it's meant: the engine is telling you this surface may move under your product. Pagewright ships it anyway, clearly labeled, because the capability is worth teaching and the fallback is graceful (no flag, no questions, everything else works). Your production judgment may differ, and the honest wire message is exactly what you need to make it.
+
+Here's the request itself on stdio, from the raw trace, with our response and the engine's acknowledgment:
+
+<Figure
+  src="/images/series/codex/part-10/term-question.svg"
+  alt="A dark terminal showing one JSON-RPC round trip. Incoming: a request with method item/tool/requestUserInput and id 0, params carrying threadId, turnId, itemId, and a questions array with one entry: id cafe_palette, header Palette, question asking which color palette to use, isOther true, isSecret false, and three options, Warm Roast, Fresh Mint, and Midnight Velvet, each with a description. A comment notes questions is an array, one request can carry many questions. Outgoing: a response quoting id 0 whose result wraps answers under the question id, cafe_palette, answers, Fresh Mint. Incoming: serverRequest/resolved. A final line shows the verbatim warning notification about under-development features."
+  caption="The whole consultation at the wire level. One request, one response quoting its id, one acknowledgment. The engine says under-development out loud, so we do too."
+  width={1040}
+  height={564}
+/>
+
+Three shape facts to engrave, all verified live. **`questions` is an array**: one request can carry a whole intake form, several questions each with its own `id`, `header`, `question` text, `isOther` (free text allowed), `isSecret` (mask the input), and `options` as `{label, description}` pairs or `null` for pure free-text. **The response wraps twice**: `{answers: {<question_id>: {answers: ["<label>"]}}}`, a list per question id, then the whole sheet under one more `answers` key. Miss the double wrap and the request fails. And **an answered question is a requirement, not a suggestion**: the run that picked "Midnight Velvet" produced a page whose source contains that palette, named.
+
+Bridging it costs almost nothing, and that fact is the design lesson of the whole series paying out. Part 2 built one seam for server-initiated requests; Part 7's approvals were its first two customers; this is the third, and the seam absorbs it **without modification**. Register a handler, park a Future, answer through an endpoint:
+
+```python filename="backend/app/main.py" repo="part-10-plans-questions/backend/app/main.py" lines="159-165"
+    # the agent asks the human a question and freezes until the answer
+    # comes back down the same JSON-RPC pipe.
+    async def question_handler(params: dict) -> dict:
+        notify = client.queue_for(params["threadId"]).put
+        return await questions.ask(params, notify)
+
+    client.on_server_request("item/tool/requestUserInput", question_handler)
+```
+
+The new module, `app/questions.py`, is the [foreman's inbox](/blog/codex-7-approvals#the-bridge-a-future-in-the-foremans-inbox) with a second drawer. One pending entry per request, holding the questions list and a Future as the mailbox:
+
+```python filename="backend/app/questions.py" repo="part-10-plans-questions/backend/app/questions.py" lines="34-49"
+class PendingQuestion:
+    """One unanswered request (which may hold several questions). The
+    Future is the mailbox: the JSON-RPC handler awaits it, the answer
+    endpoint fills it with {question_id: [answers]}."""
+
+    def __init__(self, thread_id: str, item_id: str, questions: list[dict]) -> None:
+        self.id = uuid.uuid4().hex[:8]
+        self.thread_id = thread_id
+        self.item_id = item_id
+        self.questions = questions
+        self.timeout = timeout_seconds()
+        self.expires_at_ms = int((time.time() + self.timeout) * 1000)
+        self.future: asyncio.Future = asyncio.get_running_loop().create_future()
+
+
+_registry: dict[str, PendingQuestion] = {}
+```
+
+`ask()` announces the question on the project's stream (a synthetic `question_request` event, the same trick approvals use, so the card lands in the transcript exactly where the turn paused, in every tab), then awaits the Future. The interesting half is what happens when nobody comes:
+
+```python filename="backend/app/questions.py" repo="part-10-plans-questions/backend/app/questions.py" lines="85-88,93-104"
+    try:
+        answers = await asyncio.wait_for(pending.future, pending.timeout)
+        reason = "user"
+    except asyncio.TimeoutError:
+        answers, reason = {}, "timeout"
+    finally:
+        _registry.pop(pending.id, None)
+    await notify({"method": "question/resolved", "params": {
+        "question_id": pending.id,
+        "answers": answers,
+        "reason": reason,
+        "resolved_at_ms": int(time.time() * 1000),
+    }})
+    # The protocol's answer shape wraps each id's list one level deeper:
+    # {answers: {id: {answers: [...]}}} (verified live).
+    return {"answers": {qid: {"answers": ans} for qid, ans in answers.items()}}
+```
+
+<Callout type="warning" title="There is no decline">
+Approvals speak a verdict language: accept, decline, sometimes acceptForSession. Questions don't. Look at the protocol's response shape and you'll find no refusal variant at all, and that absence forces a product decision the approvals timeout never had to face. Pagewright's answer: after ten minutes, respond with an **empty sheet**, `{"answers": {}}`. The agent proceeds on its own judgment, which is exactly what it would have done had it never asked, and the card in every tab flips to "unanswered (the builder chose for itself)". What we refuse to do is invent a preference: picking the first option to satisfy the shape would be the backend expressing an opinion the user never had. Silence in, honest silence out.
+</Callout>
+
+The answering endpoint is the approvals decision endpoint's twin, with one extra courtesy: it validates that you're answering questions that were actually asked, so a stale or malformed sheet gets a clean 400 instead of a confused agent:
+
+```python filename="backend/app/main.py" repo="part-10-plans-questions/backend/app/main.py" lines="273-274,279-292"
+@app.post("/projects/{project_id}/questions/{question_id}/answer")
+async def answer_question(project_id: str, question_id: str, req: AnswerRequest):
+    entry = projects.get_project(project_id)
+    if entry is None:
+        raise HTTPException(status_code=404, detail="no such project")
+    pending = questions.get(question_id)
+    if pending is None or pending.thread_id != entry.get("thread_id"):
+        raise HTTPException(status_code=404,
+                            detail="no such pending question for this project")
+    asked = {q.get("id") for q in pending.questions}
+    if unknown := set(req.answers) - asked:
+        raise HTTPException(status_code=400,
+                            detail=f"answers for questions never asked: {sorted(unknown)}")
+    if not questions.resolve(question_id, req.answers):
+        raise HTTPException(status_code=404, detail="question already answered")
+    return {"question_id": question_id, "answers": req.answers}
+```
+
+On the frontend, the card is the approval card's visual cousin (amber border while it hangs, outcome stamped in place when it resolves), and the block bookkeeping is the same patch-in-place pattern the transcript has used since Part 7:
+
+```tsx filename="frontend/app/page.tsx" repo="part-10-plans-questions/frontend/app/page.tsx" lines="119-143"
+  if (event.type === "question_request") {
+    return [
+      ...blocks,
+      {
+        type: "question",
+        id: event.question_id,
+        questions: event.questions,
+        expiresAtMs: event.expires_at_ms,
+      },
+    ];
+  }
+  if (event.type === "question_resolved") {
+    return blocks.map((b) =>
+      b.type === "question" && b.id === event.question_id
+        ? {
+            ...b,
+            resolved: {
+              answers: event.answers,
+              reason: event.reason,
+              atMs: event.resolved_at_ms,
+            },
+          }
+        : b,
+    );
+  }
+```
+
+<Figure
+  src="/images/series/codex/part-10/browser-question-light.svg"
+  srcDark="/images/series/codex/part-10/browser-question-dark.svg"
+  alt="Pagewright showing a question card mid-turn. The user asked to be shown three color palettes before anything is built. Below a thinking row, an amber-bordered card titled THE BUILDER HAS A QUESTION shows a Palette section asking which color palette to use, three radio options with descriptions, Warm Espresso, Fresh Citrus which is selected, and Midnight Brulee, a free-text field reading or type your own, and an Answer button. Under the card a working row reads Building, 7 seconds, and an amber chip above the composer says the builder is waiting for your answer, the card above has the choices."
+  caption="The consultation card from the real e2e run. The turn is frozen on the wire; the timer keeps counting because the turn is alive, only the tool call inside it is waiting."
+  width={1120}
+  height={900}
+/>
+
+Because the card is an event in the log, everything Part 9 bought applies without a line of new code: the question renders in every open tab, any tab can answer it, the resolution flips the card everywhere at once, and a tab opened *after* the answer replays the whole exchange in order. And note the small piece of protocol choreography that makes the card feel alive: the agent's tool call is frozen, but the notification pump is not (the dispatch task runs handlers concurrently, a decision made in Part 7 for approvals that this feature inherits), so the working timer ticks on while the question hangs.
+
+One design question remains: when should the agent *ask*? That's a prompt-and-product decision, not a protocol one; the wire happily carries a question about anything. The working rule Pagewright inherits from the sibling series: ask when the decision is **irreversible, expensive, or a matter of taste**. Palette is taste. Brand voice is taste. "Should the nav be sticky" is not worth a frozen turn, and a model told to ask about everything will pepper the user into disabling the feature. Which is a warning the next comic takes literally.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 2 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). Single wide panel, about a robot builder who over-plans a tiny job. Scene: a cozy workshop office; a friendly little robot builder in a yellow hard hat stands on a stool and unrolls an ENORMOUS architectural blueprint all the way across Yad's small desk, the paper spilling over both edges and burying his keyboard and coffee mug; the blueprint is covered in tiny technical sketches of a very small lemonade stand with arrows and small empty checkboxes, and a large title on the paper reads "PLAN". The robot holds up a clipboard and asks, in a speech bubble: "QUESTION 1 OF 2: SERIF OR SANS?". Yad sits behind the buried desk holding one tiny yellow sticky note, deadpan tired expression, and replies in a speech bubble: "I ASKED FOR A LEMONADE STAND." Clean readable hand-lettered speech bubbles, short ALL-CAPS text, minimal text: only "PLAN", "QUESTION 1 OF 2: SERIF OR SANS?", "I ASKED FOR A LEMONADE STAND." No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/codex/part-10/comic-blueprint.png"
+  alt="Comic, one wide panel. In a cozy workshop, a small robot builder in a yellow hard hat stands on a stool and unrolls an enormous blueprint titled PLAN across Yad's desk, burying his keyboard and coffee. The blueprint is covered in tiny technical sketches of a very small lemonade stand with checkboxes. The robot holds up a clipboard and asks, question 1 of 2: serif or sans? Yad, a bearded developer with headphones holding one tiny sticky note, replies deadpan: I asked for a lemonade stand."
+  caption="Consultation is a dial too. The plan tool, the question tool, and a one-line brief, all firing at once. Somewhere between this and the silent gloss-white bathroom is your product."
+  width={1536}
+  height={1024}
+/>
+
+Checkpoint. Right now you have: a builder that can freeze mid-job, hand you a structured form of one or many questions, honor the answer in the artifact it builds, and proceed honestly on its own judgment when the form times out. The bridge cost one module and one endpoint, because the Part 2 seam keeps paying compound interest: three server-request customers, zero seam changes.
+
+## The reasoning dial, finally on the composer
+
+Since Part 3, two constants have ridden every turn without comment: how hard the model thinks, and how much of that thinking gets narrated. Time to admit they were dials all along. `turn/start` accepts `effort` and `summary` per turn; the legal efforts are whatever `model/list` advertises for the model (`low`, `medium`, `high`, `xhigh` for gpt-5.4-mini), and `summary` is `auto`, `concise`, or `detailed`. Per **turn** is the detail that makes this a product feature rather than a config file: one conversation can think cheap on a copy tweak at 2:03 and hard on a redesign at 2:04, no thread surgery, no new project.
+
+```python filename="backend/app/main.py" repo="part-10-plans-questions/backend/app/main.py" lines="56-63"
+# The reasoning dials, exactly as the engine advertises them: model/list
+# names the efforts gpt-5.4-mini supports, and summary is the protocol
+# enum minus "none" (Part 3 learned the hard way that "none" means the
+# reasoning drawer stays empty forever).
+EFFORTS = ("low", "medium", "high", "xhigh")
+SUMMARIES = ("auto", "concise", "detailed")
+DEFAULT_EFFORT = "medium"
+DEFAULT_SUMMARY = "detailed"
+```
+
+Two protocol dials make a bad UI, though. "Effort xhigh, summary concise" is a sentence for people who read this series; your users are choosing between "quick tweak" and "take your time". So the composer folds both into one question, **care level**, four notches with opinionated pairings:
+
+| Care level | `effort` | `summary` | Meant for |
+|---|---|---|---|
+| Quick | `low` | `concise` | Copy tweaks, small fixes |
+| Standard | `medium` | `detailed` | The default; most messages |
+| Thorough | `high` | `detailed` | Layout and structure work |
+| Max | `xhigh` | `detailed` | Redesigns, hard briefs; costs real tokens |
+
+Quick drops the summary to `concise` deliberately: less thinking to narrate, less narration to read. Everything else keeps `detailed`, the setting [the reasoning drawer](/blog/codex-3-builder-ui#the-drawer-that-stayed-empty) has depended on since Part 3, and at Thorough and Max that drawer finally earns its keep: the summaries get long enough to actually watch the model weigh layouts against the brief. (House rule from the concepts page still applies: the narration is [a summary the model writes about its own thinking](/blog/codex-concepts#reasoning-effort), not a transcript; render it faint, never parse it.)
+
+The send path threads the chosen pair onto every message, and the receipt threads it back (a non-default effort prints on the turn's receipt, so the transcript remembers which turns were expensive on purpose):
+
+```tsx filename="frontend/app/page.tsx" repo="part-10-plans-questions/frontend/app/page.tsx" lines="627-645"
+    // The dials ride every message. plan_first is one-shot: the toggle
+    // arms ONE blueprint turn and disarms itself, so the natural
+    // follow-up ("build it") goes out at the project's own mode without
+    // the user having to remember the switch.
+    const { effort, summary } = careDials(careLevel);
+    const blueprint = planFirst && !working;
+    try {
+      const res = await fetch(`${API_BASE}/projects/${activeId}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: prompt,
+          plan_first: blueprint,
+          effort,
+          summary,
+        }),
+      });
+      if (!res.ok) throw new Error(`The server said ${res.status}.`);
+      if (blueprint) setPlanFirst(false);
+```
+
+<Figure
+  src="/images/series/codex/part-10/browser-care-light.svg"
+  srcDark="/images/series/codex/part-10/browser-care-dark.svg"
+  alt="Pagewright after a finished build. The chat shows the agent's implementation notes as a numbered list, a closing offer to tune visual density, and a receipt reading 248,398 tokens this turn, 57 seconds. The builder's plan panel shows 4 of 4 steps all struck through with the note that the page has been implemented and checked against the brief. In the composer row the Plan first pill is armed in blue and the care-level picker has Max active. The preview pane shows the finished Beanline site: logo, the kicker specialty coffee chain since 2019, a large serif headline reading slow coffee for fast mornings, body copy, and a rust-colored find your store button. The files panel lists index.html with an updated badge."
+  caption="Max, armed and paid for: 248,398 tokens on the thread for the full blueprint-then-build arc, checklist at 4/4, and the site in the preview. The Plan first pill is armed for the next message."
+  width={1120}
+  height={900}
+/>
+
+The obvious question, and it deserves numbers rather than adjectives: what does the dial actually buy?
+
+## Break it on purpose: the same brief at low and xhigh
+
+This part's deliberate break isn't a traceback; it's a bill. We took the identical Beanline brief, two fresh projects, same model, same `summary: "detailed"`, and turned only the dial: `effort: "low"` against `effort: "xhigh"`. Real runs, receipts verbatim:
+
+| | `low` | `xhigh` | ratio |
+|---|---|---|---|
+| Wall time | 38.6s | 131.7s | 3.4x |
+| Total tokens (turn) | 154.0k | 230.6k | 1.5x |
+| Reasoning tokens | 458 | 11,432 | **25x** |
+| Finished `index.html` | 9.6 kB | 13.2 kB | +38% |
+
+<Figure
+  src="/images/series/codex/part-10/fig-effort-dial-light.svg"
+  srcDark="/images/series/codex/part-10/fig-effort-dial-dark.svg"
+  alt="Chart titled the reasoning dial, same brief, same model, two settings. A strip on top maps the four care levels to their dials: Quick is effort low plus concise, Standard is medium plus detailed, Thorough is high plus detailed, Max is xhigh plus detailed and is highlighted. Below, paired horizontal bars compare low and xhigh on the live A/B: wall time 38.6 seconds versus 131.7 seconds, 3.4 times; total tokens 154.0k versus 230.6k, 1.5 times; reasoning tokens 458 versus 11,432, 25 times; page size 9.6 kilobytes versus 13.2 kilobytes, plus 38 percent. A footer notes both runs completed the brief and xhigh bought richer sectioning and typography detail."
+  caption="The A/B, drawn to scale. The middle row is the one to memorize: reasoning tokens are where the dial actually lives, and where it bills."
+  width={1240}
+  height={760}
+/>
+
+Read the rows separately, because they tell different stories. Total tokens moved by half, but **reasoning tokens moved by twenty-five times**: at `low`, 458 reasoning tokens is thinking as a formality, a model glancing at the brief and typing; at `xhigh`, 11,432 tokens is the model genuinely deliberating, and you can read the deliberation in the drawer. The qualitative gap matched the receipts: both runs completed the brief honestly (hero, four drinks, six stores, footer; nothing missing from either), but the `xhigh` page carried noticeably richer sectioning and typography detail, 38% more markup for the same content. The `low` page is correct and plainer. Neither run failed; that's what makes this a dial and not a quality switch.
+
+So when do you pay for Max? The receipts suggest the rule: pay when *judgment* is the bottleneck, not typing. A hard brief with tensions to resolve, a redesign where structure is up for grabs, a review of someone else's mess: xhigh. Adding a paragraph, fixing a link, changing a color: low, and pocket the 93 seconds. And because the dial is per-message, the expensive thinking can be reserved for exactly the messages that need it, with the receipt printing `effort xhigh` so nobody wonders later why one turn cost triple. The dial is real, and so is the bill; the point of surfacing both is that the person holding the dial can finally see it.
+
+## The meter ritual, consultation edition
+
+Every number a real run from building this part, per-turn deltas as [Part 8 taught](/blog/codex-8-stop-steer-usage#the-meter-stops-rounding-to-a-feeling):
+
+| Run | Receipt |
+|---|---|
+| The Beanline blueprint (read-only, zero files changed) | 62,085 tokens · 13s |
+| "Build it." (the whole plan, cashed in with two words) | 171,928 tokens · 54s |
+| The palette question round trip, answer honored in the page | 167,831 tokens · 41s |
+| Same brief, effort low | 154.0k tokens · 38.6s |
+| Same brief, effort xhigh | 230.6k tokens · 131.7s |
+| The blueprint-then-build arc at Max, thread total | 310.5k tokens |
+
+Read the first two rows together: the blueprint cost about a third of the build that followed it. That is the price of looking before swinging, and on a brief where the first swing would have gone the wrong way, it's the cheapest 62k tokens in the table.
+
+<DemoVideo
+  src="/videos/codex/part-10-demo.mp4"
+  poster="/videos/codex/part-10-poster.jpg"
+  caption='The consultative builder on camera, against the real app: Plan first is armed, the blueprint arrives as numbered prose with a read-only receipt and zero file changes; "Build it." starts a normal turn and the builder&#39;s plan panel ticks itself from pending to done while index.html lands; then a fresh project asks its palette question, the amber card takes an answer, and the built site comes back in exactly that palette.'
+  label="Screen recording of Part 10: a plan-first blueprint turn that changes no files, a two-word approval that builds the site while the live checklist ticks, and a structured question card whose answer the finished site honors"
+/>
+
+<Recap
+  part={10}
+  items={[
+    "Blueprint mode without a mode: collaborationMode is gone from 0.142.4, so a plan_first turn ships sandboxPolicy {type: readOnly} + approvalPolicy never with a planning nudge appended to the message. The OS guarantees zero writes (verified: 701 text deltas, 0 files), the plan arrives as numbered prose, and approval is an ordinary two-word reply on the same thread.",
+    "The living checklist: the engine's update_plan tool fires turn/plan/updated ({plan: [{step, status}], explanation}, camelCase inProgress, re-sent whole) only when thread/start sets config include_plan_tool AND developerInstructions asks for it. It speaks on build turns, usually stays silent on blueprints, and varies run to run; the UI treats absence as a normal state.",
+    "Structured questions: item/tool/requestUserInput is a server-initiated JSON-RPC request behind an under-development feature flag (the engine warns on the wire, and so does this page). questions is an array; the response double-wraps as {answers: {qid: {answers: [...]}}}; the Part 2 seam absorbed its third customer without modification.",
+    "No decline exists for questions: a timeout answers with an empty sheet, the agent proceeds on its own judgment, and the card says so in every tab, because inventing a preference would be the backend expressing an opinion the user never had.",
+    "The reasoning dials ride every message: effort and summary are per-turn params surfaced as four care levels, and the live A/B (low vs xhigh, same brief) measured 3.4x wall time, 1.5x total tokens, 25x reasoning tokens, and a 38% richer page, so the expensive thinking goes only where judgment is the bottleneck.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "Pagewright's Plan-first toggle doesn't send a collaborationMode param. Why not?",
+      options: [
+        "collaborationMode requires ChatGPT-plan authentication",
+        "It exists but only works on gpt-5.5",
+        "The param is gone from turn/start in the pinned CLI (0.142.4), so a blueprint is built from stable primitives instead: a readOnly sandboxPolicy the OS enforces, plus a planning nudge in the message",
+        "Sending it would disable the sandbox for the turn",
+      ],
+      answer: 2,
+      explain: "The 0.139-era reference app still sends collaborationMode; on 0.142.4 the concept survives only as a TUI setting. The replacement is stronger anyway: read-only is containment doing the work of collaboration posture, and a prompt can't talk its way past the OS.",
+    },
+    {
+      q: "You set config {include_plan_tool: true} at thread/start, but build turns never emit turn/plan/updated. What's missing?",
+      options: [
+        "A per-turn plan: true flag on turn/start",
+        "A standing ask in developerInstructions; verified live, the flag alone changes nothing because the model never volunteers the tool",
+        "The summary must be set to detailed first",
+        "plan_first must be true on the same turn",
+      ],
+      answer: 1,
+      explain: "Both switches are required: the config flag hands the agent the update_plan tool, and the developer instructions make it use one. Even then the checklist belongs to build turns; blueprint turns usually deliver their plan as prose instead.",
+    },
+    {
+      q: "The engine asks {questions: [{id: \"palette\", ...}]} via item/tool/requestUserInput and the user picks \"Fresh Sage\". What does your JSON-RPC response look like?",
+      options: [
+        "{\"answers\": [\"Fresh Sage\"]}",
+        "{\"palette\": \"Fresh Sage\"}",
+        "{\"decision\": \"accept\", \"answer\": \"Fresh Sage\"}",
+        "{\"answers\": {\"palette\": {\"answers\": [\"Fresh Sage\"]}}}",
+      ],
+      answer: 3,
+      explain: "The shape wraps twice: a list of answers per question id (one request can carry several questions, each allowing several answers), then the whole sheet under answers. Verified live; the built page used the chosen palette.",
+    },
+    {
+      q: "A question card sits unanswered past the timeout. What does Pagewright send back, and why?",
+      options: [
+        "An empty sheet, {\"answers\": {}}: no decline variant exists for questions, and picking a default option would invent a preference the user never expressed. The agent proceeds on its own judgment",
+        "{\"decision\": \"decline\"}, mirroring the approvals timeout",
+        "It re-sends the question card every 10 minutes until answered",
+        "It interrupts the turn, since the agent cannot continue without an answer",
+      ],
+      answer: 0,
+      explain: "The protocol's response shape has no refusal variant, which forces a product decision. The empty sheet leaves the agent exactly where it would have been had it never asked, and the card in every tab flips to 'unanswered (the builder chose for itself)'.",
+    },
+    {
+      q: "In the live A/B (same Beanline brief, low vs xhigh), which number moved the most?",
+      options: [
+        "Wall time, at 3.4x",
+        "Reasoning tokens, at 25x (458 vs 11,432); total tokens moved only 1.5x, which is why effort is priced per message rather than per project",
+        "Total tokens, at 25x",
+        "Page size, which doubled",
+      ],
+      answer: 1,
+      explain: "The dial lives in the reasoning budget. Both runs completed the brief; xhigh bought visibly richer structure for 3.4x the time, so the care-level picker exists to spend that only where judgment is the bottleneck.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 10: blueprint mode, living checklist, structured questions, reasoning dials"
+```
+
+Act III is open, and the builder has become a consultant: it proposes before demolition, publishes its estimate on the window, phones you about taste, and bills its thinking honestly. But every one of those courtesies still ends the same way, with the builder grading its own work. The builder plans and asks. But who checks the finished work? Next: the inspector.
+
+The complete, tested code for this part lives in [`part-10-plans-questions`](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-10-plans-questions) in the [companion repo](https://github.com/yadneshSalvi/codex-app-server-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's lines highlighted.

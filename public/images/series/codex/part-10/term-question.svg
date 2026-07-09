@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="592" viewBox="0 0 1040 592" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="592" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">stdio &#183; item/tool/requestUserInput, one round trip (raw trace)</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># the engine's request: a JSON-RPC REQUEST (it has an id), not a notification</tspan></text>
+    <text x="32" y="116" xml:space="preserve">&#8592; {"method": <tspan fill="#e5825a">"item/tool/requestUserInput"</tspan>, "id": <tspan fill="#dcae62">0</tspan>, "params": {</text>
+    <text x="32" y="144" xml:space="preserve">     "threadId": "019f4566-506e&#8230;", "turnId": "019f4566-51d7&#8230;", "itemId": "call_D4rg&#8230;",</text>
+    <text x="32" y="172" xml:space="preserve">     "questions": <tspan fill="#6fa8dc">[</tspan> {"id": <tspan fill="#e5825a">"cafe_palette"</tspan>, "header": "Palette",</text>
+    <text x="32" y="200" xml:space="preserve">        "question": "Which color palette should I use for the small cafe site?",</text>
+    <text x="32" y="228" xml:space="preserve">        "isOther": <tspan fill="#8fb573">true</tspan>, "isSecret": false, "options": [</text>
+    <text x="32" y="256" xml:space="preserve">          {"label": <tspan fill="#8fb573">"Warm Roast"</tspan>,     "description": "Coffee brown, cream, terracotta&#8230;"},</text>
+    <text x="32" y="284" xml:space="preserve">          {"label": <tspan fill="#8fb573">"Fresh Mint"</tspan>,     "description": "Soft mint, sage, warm white&#8230;"},</text>
+    <text x="32" y="312" xml:space="preserve">          {"label": <tspan fill="#8fb573">"Midnight Velvet"</tspan>, "description": "Deep charcoal, burgundy, blush&#8230;"}]} <tspan fill="#6fa8dc">]</tspan>,</text>
+    <text x="32" y="340" xml:space="preserve">     "autoResolutionMs": null}}   <tspan fill="#756d62"># questions is an ARRAY: one request, many questions</tspan></text>
+    <text x="32" y="368" xml:space="preserve"></text>
+    <text x="32" y="396" xml:space="preserve"><tspan fill="#756d62"># our response quotes the id and wraps each answer list under its question id</tspan></text>
+    <text x="32" y="424" xml:space="preserve">&#8594; {"jsonrpc": "2.0", "id": <tspan fill="#dcae62">0</tspan>, "result": {"answers": {"cafe_palette": {"answers": [<tspan fill="#8fb573">"Fresh Mint"</tspan>]}}}}</text>
+    <text x="32" y="452" xml:space="preserve">&#8592; {"method": <tspan fill="#6fa8dc">"serverRequest/resolved"</tspan>, "params": {"threadId": "019f4566&#8230;", "requestId": 0}}</text>
+    <text x="32" y="480" xml:space="preserve"></text>
+    <text x="32" y="508" xml:space="preserve"><tspan fill="#756d62"># and earlier on the same thread, the flag's price of admission, verbatim:</tspan></text>
+    <text x="32" y="536" xml:space="preserve">&#8592; {"method": <tspan fill="#d97676">"warning"</tspan>, "params": {"message": "Under-development features enabled&#8230;"}}</text>
+  </g>
+</svg>

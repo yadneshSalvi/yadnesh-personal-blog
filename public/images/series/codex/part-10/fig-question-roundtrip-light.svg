@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="950" viewBox="0 0 1240 950" role="img">
+  <rect width="1240" height="950" fill="#faf9f6"/>
+  <text x="48" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#8f887a">ONE QUESTION, ROUND TRIP &#183; THE SEAM'S THIRD CUSTOMER</text>
+  <line x1="48" y1="66" x2="1192" y2="66" stroke="#e7e3d9" stroke-width="1.5"/>
+
+  <!-- the engine asks -->
+  <rect x="48" y="92" width="560" height="168" rx="12" fill="#fdf3e0" stroke="#e4c27e" stroke-width="2"/>
+  <text x="70" y="120" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#92600a" text-anchor="start">SERVER &#8594; CLIENT REQUEST (id: 0, expects a response)</text>
+  <text x="70" y="146" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#1f1c19" text-anchor="start">item/tool/requestUserInput</text>
+  <text x="70" y="172" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">questions: [ {id: "cafe_palette", header: "Palette",</text>
+  <text x="70" y="192" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">question: "Which color palette&#8230;?", isOther: true,</text>
+  <text x="70" y="212" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">isSecret: false, options: [{label, description} &#215;3]} ]</text>
+  <text x="70" y="240" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#92600a" text-anchor="start">questions is an ARRAY: one request can carry a whole form</text>
+
+  <rect x="680" y="92" width="512" height="168" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="702" y="120" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">MEANWHILE, THE TURN</text>
+  <text x="702" y="148" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">The agent's tool call is FROZEN: it cannot see the</text>
+  <text x="702" y="168" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">workspace, cannot run commands, cannot proceed until</text>
+  <text x="702" y="188" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">the JSON-RPC response arrives. The notification pump</text>
+  <text x="702" y="208" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">keeps running (the dispatch task is separate), so the</text>
+  <text x="702" y="228" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">stream stays alive while the question hangs.</text>
+
+  <line x1="328" y1="260" x2="328" y2="296" stroke="#8f887a" stroke-width="1.5" />
+     <path d="M 328 296 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 328 296)"/>
+  <text x="342" y="284" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">questions.ask() &#183; the Part 2 seam, third customer</text>
+
+  <!-- the bridge -->
+  <rect x="48" y="296" width="560" height="128" rx="12" fill="#f6e7df" stroke="#dcb09a" stroke-width="2"/>
+  <text x="70" y="324" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b3441a" text-anchor="start">THE FUTURE BRIDGE (same rhythm as approvals)</text>
+  <text x="70" y="350" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1f1c19" text-anchor="start">register PendingQuestion &#183; publish question_request</text>
+  <text x="70" y="374" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1f1c19" text-anchor="start">to the event log &#183; await the Future (10 min timeout)</text>
+  <text x="70" y="400" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">the card rides the same SSE stream as every other event</text>
+
+  <line x1="328" y1="424" x2="328" y2="460" stroke="#8f887a" stroke-width="1.5" />
+     <path d="M 328 460 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 328 460)"/>
+
+  <!-- the card -->
+  <rect x="48" y="460" width="560" height="128" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="70" y="488" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">EVERY TAB RENDERS THE CARD (Part 9's log)</text>
+  <text x="70" y="514" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">radio options with descriptions &#183; free text if isOther</text>
+  <text x="70" y="538" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">masked input if isSecret &#183; one Answer button</text>
+  <text x="70" y="564" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">POST /projects/{id}/questions/{qid}/answer</text>
+
+  <!-- the answer path -->
+  <line x1="608" y1="524" x2="700" y2="524" stroke="#b3441a" stroke-width="1.5" />
+     <path d="M 700 524 l -5 -8 l 10 0 z" fill="#b3441a" transform="rotate(-90 700 524)"/>
+  <text x="654" y="510" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b3441a" text-anchor="middle">resolve()</text>
+
+  <rect x="700" y="460" width="492" height="128" rx="12" fill="#f1efe9" stroke="#e7e3d9" stroke-width="2"/>
+  <text x="722" y="488" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">THE JSON-RPC RESPONSE (verbatim, frame 1051)</text>
+  <text x="722" y="516" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1f1c19" text-anchor="start">{"jsonrpc": "2.0", "id": 0, "result": {"answers":</text>
+  <text x="722" y="540" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#b3441a" text-anchor="start">{"cafe_palette": {"answers": ["Fresh Mint"]}}}}</text>
+  <text x="722" y="566" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">note the double wrap: {answers: {qid: {answers: [&#8230;]}}}</text>
+
+  <line x1="946" y1="588" x2="946" y2="624" stroke="#8f887a" stroke-width="1.5" />
+     <path d="M 946 624 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 946 624)"/>
+  <text x="930" y="612" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="end">serverRequest/resolved &#183; the tool call unfreezes</text>
+
+  <rect x="48" y="624" width="1144" height="92" rx="12" fill="#f2f7e8" stroke="#e7e3d9" stroke-width="1.2"/>
+  <text x="70" y="652" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#3f6212" text-anchor="start">THE BUILD HONORS THE ANSWER (live)</text>
+  <text x="70" y="676" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">The app run picked "Midnight Velvet" (charcoal, caramel, muted rose) and the built index.html used exactly that palette:</text>
+  <text x="70" y="696" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">the chosen label appears in the page source. An answered question is a requirement, not a suggestion.</text>
+
+  <!-- the no-decline strip -->
+  <rect x="48" y="744" width="1144" height="108" rx="12" fill="none" stroke="#e4c27e" stroke-width="1.4"/>
+  <text x="70" y="772" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#92600a" text-anchor="start">THERE IS NO DECLINE</text>
+  <text x="70" y="796" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">Approvals offer accept and decline; a question offers only answers. When nobody answers in time, the honest response is an</text>
+  <text x="70" y="816" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">EMPTY sheet: {"answers": {}}. The agent proceeds on its own judgment, which is exactly what it would have done had it never</text>
+  <text x="70" y="836" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">asked. A timeout answers the protocol without inventing a preference the user never expressed.</text>
+
+  <rect x="48" y="872" width="1144" height="1" fill="#e7e3d9"/>
+  <text x="48" y="900" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">Feature flag honesty: the request never fires on a default thread. thread/start opts in with</text>
+  <text x="48" y="922" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#b3441a" text-anchor="start">config {"features.default_mode_request_user_input": true}, and the engine answers with a warning: under development.</text>
+</svg>

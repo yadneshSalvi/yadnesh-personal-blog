@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="900" viewBox="0 0 1120 900">
+  <rect width="1120" height="900" fill="#0c0a09"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#211e1a"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#2b2723" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#3a3530"/><circle cx="56" cy="28" r="7" fill="#3a3530"/><circle cx="82" cy="28" r="7" fill="#3a3530"/>
+  <rect x="320" y="13" width="420" height="30" rx="15" fill="#1a1816" stroke="#3a3530"/>
+  <text x="530" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#a49c90" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#292524" stroke-width="1"/>
+  <circle cx="24" cy="79" r="5" fill="#4fb8b3"/>
+  <text x="38" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">Pagewright</text>
+  <text x="150" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">the site builder</text>
+  <text x="852" y="83" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#78716c" text-anchor="end">Write inside this workspace; the network stays off.</text>
+  
+  <rect x="864" y="64" width="240" height="30" rx="9" fill="#1c1917" stroke="#292524"/>
+  <text x="910" y="83" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">Read-only</text>
+  <rect x="951" y="68" width="78" height="22" rx="6" fill="#f5f5f4"/>
+  <text x="990" y="83" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#1c1917" text-anchor="middle">Standard</text>
+  <text x="1064" y="83" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">Trusted</text>
+  <line x1="200" y1="102" x2="200" y2="900" stroke="#292524" stroke-width="1"/><text x="18" y="133" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#e7e5e4">Beanline</text>
+  <text x="18" y="149" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c">Read brief/brief.md and tell me how y…</text>
+  <text x="18" y="167" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" fill="#78716c">8m ago</text>
+  <rect x="152" y="155" width="34" height="16" rx="3.5" fill="none" stroke="#292524"/>
+  <text x="169" y="166.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" fill="#d6d3d1" text-anchor="middle">Fork</text><rect x="8" y="186" width="184" height="64" rx="8" fill="#4fb8b3" opacity="0.07"/>
+  <rect x="8" y="186" width="184" height="64" rx="8" fill="none" stroke="#4fb8b3" stroke-opacity="0.4"/><text x="18" y="205" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#4fb8b3">Palette question</text>
+  <text x="18" y="221" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c">Before building anything, ask me whi…</text>
+  <text x="18" y="239" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" fill="#78716c">just now</text>
+  <rect x="152" y="227" width="34" height="16" rx="3.5" fill="none" stroke="#292524"/>
+  <text x="169" y="238.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" fill="#d6d3d1" text-anchor="middle">Fork</text><text x="18" y="277" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#e7e5e4">Effort low</text>
+  <text x="18" y="293" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c">Read brief/brief.md and build the site…</text>
+  <text x="18" y="311" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" fill="#78716c">7m ago</text>
+  <rect x="152" y="299" width="34" height="16" rx="3.5" fill="none" stroke="#292524"/>
+  <text x="169" y="310.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" fill="#d6d3d1" text-anchor="middle">Fork</text><text x="18" y="349" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#e7e5e4">Effort xhigh</text>
+  <text x="18" y="365" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c">Read brief/brief.md and build the site…</text>
+  <text x="18" y="383" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" fill="#78716c">4m ago</text>
+  <rect x="152" y="371" width="34" height="16" rx="3.5" fill="none" stroke="#292524"/>
+  <text x="169" y="382.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" fill="#d6d3d1" text-anchor="middle">Fork</text><line x1="0" y1="816" x2="200" y2="816" stroke="#292524" stroke-width="1"/>
+  <rect x="12" y="826" width="176" height="26" rx="7" fill="#1c1917" stroke="#292524"/>
+  <text x="22" y="843" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#d6d3d1">beanline brief</text>
+  <path d="M 170 837 l 4.5 5 l 4.5 -5" fill="none" stroke="#78716c" stroke-width="1.4"/>
+  <rect x="12" y="860" width="176" height="28" rx="7" fill="#4fb8b3"/>
+  <text x="100" y="878" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#ffffff" text-anchor="middle">New project</text>
+  <line x1="200" y1="136" x2="640" y2="136" stroke="#292524" stroke-width="1"/>
+  <text x="216" y="124" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#e7e5e4">Palette question</text>
+  <rect x="553.2" y="109" width="70.8" height="20" rx="10" fill="none" stroke="#292524"/>
+  <text x="588.6" y="123" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c" text-anchor="middle">standard</text>
+  <rect x="257" y="156" width="367" height="71" rx="14" fill="#f5f5f4"/>
+  <text x="272" y="178" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1c1917">Before building anything, ask me which of three</text>
+  <text x="272" y="197" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1c1917">color palettes I prefer for a small cafe site. Then</text>
+  <text x="272" y="216" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1c1917">build index.html using my answer.</text>
+  <circle cx="220" cy="249" r="3" fill="#78716c"/>
+  <text x="230" y="253" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#78716c">THINKING</text>
+  <path d="M 302 246 l 4 4.5 l 4 -4.5" fill="none" stroke="#78716c" stroke-width="1.3"/>
+  
+  <text x="216" y="279" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">I need your palette choice before I touch the page.</text>
+  <text x="216" y="300" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">I'll use your selection to build </text>
+  <rect x="426" y="288" width="77" height="17" rx="4" fill="#292524"/>
+  <text x="430" y="300" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1">index.html</text>
+  <text x="506" y="300" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4"> , then</text>
+  <text x="216" y="321" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">verify the result.</text>
+  <rect x="216" y="340" width="398" height="348" rx="10" fill="#1c1917" stroke="#a16207" stroke-width="1.6"/>
+  <clipPath id="qc-dark-340"><rect x="216" y="340" width="398" height="348" rx="10"/></clipPath>
+  <g clip-path="url(#qc-dark-340)"><rect x="216" y="340" width="398" height="30" fill="#2a2008"/>
+  <circle cx="231" cy="355" r="3.5" fill="#f59e0b"/>
+  <text x="243" y="359" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1.2" fill="#fcd34d">THE BUILDER HAS A QUESTION</text><text x="230" y="388" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1.2" fill="#78716c">PALETTE</text><text x="230" y="410" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#e7e5e4">Which color palette should I use for the small cafe site?</text><rect x="228" y="424" width="374" height="52" rx="8" fill="none" stroke="#292524" stroke-width="1"/>
+  <circle cx="244" cy="442" r="5.5" fill="none" stroke="#78716c" stroke-width="1.4"/><text x="258" y="446" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#e7e5e4">Warm Espresso</text>
+  <text x="345.9" y="446" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#d6d3d1">&#183; Coffee-brown, cream, and muted</text><text x="258" y="464" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#d6d3d1">caramel tones for a cozy, classic feel.</text><rect x="228" y="484" width="374" height="52" rx="8" fill="#1c1917" stroke="#e7e5e4" stroke-width="1.5"/>
+  <circle cx="244" cy="502" r="5.5" fill="none" stroke="#e7e5e4" stroke-width="1.4"/><circle cx="244" cy="502" r="3" fill="#e7e5e4"/><text x="258" y="506" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#e7e5e4">Fresh Citrus</text>
+  <text x="339.6" y="506" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#d6d3d1">&#183; Soft sage, warm white, and citrus</text><text x="258" y="524" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#d6d3d1">accents for a brighter, airy feel.</text><rect x="228" y="544" width="374" height="52" rx="8" fill="none" stroke="#292524" stroke-width="1"/>
+  <circle cx="244" cy="562" r="5.5" fill="none" stroke="#78716c" stroke-width="1.4"/><text x="258" y="566" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#e7e5e4">Midnight Brulee</text>
+  <text x="358.5" y="566" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#d6d3d1">&#183; Deep charcoal, espresso, and gold</text><text x="258" y="584" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#d6d3d1">accents for a premium evening feel.</text><rect x="228" y="604" width="374" height="30" rx="8" fill="#1c1917" stroke="#292524"/>
+  <text x="240" y="623" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#78716c">Or type your own&#8230;</text><line x1="216" y1="642" x2="614" y2="642" stroke="#292524"/><rect x="228" y="652" width="62" height="26" rx="8" fill="#f5f5f4"/>
+  <text x="259" y="669" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#1c1917" text-anchor="middle">Answer</text></g>
+  <rect x="216" y="340" width="398" height="348" rx="10" fill="none" stroke="#a16207" stroke-width="1.6"/>
+  <circle cx="221" cy="708" r="3.5" fill="#4fb8b3"/>
+  <text x="232" y="712" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#d6d3d1">Building… 7s</text>
+  <line x1="200" y1="778" x2="640" y2="778" stroke="#292524" stroke-width="1"/><circle cx="221" cy="795" r="3" fill="#f59e0b"/>
+  <text x="231" y="799" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#fcd34d">The builder is waiting for your answer: the card above has the choices.</text><rect x="216" y="814" width="78" height="22" rx="11" fill="none" stroke="#292524"/>
+  <circle cx="229" cy="825" r="2.5" fill="#57534e"/>
+  <text x="238" y="829" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="500" fill="#d6d3d1">Plan first</text><rect x="400" y="813" width="224" height="24" rx="8" fill="none" stroke="#292524"/><text x="428" y="829" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">Quick</text><rect x="452" y="816" width="64" height="18" rx="6" fill="#f5f5f4"/><text x="484" y="829" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#1c1917" text-anchor="middle">Standard</text><text x="549" y="829" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">Thorough</text><text x="601" y="829" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">Max</text><rect x="216" y="850" width="268" height="36" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="229" y="873" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#78716c">Steer the build: it lands mid-turn&#8230;</text>
+  <rect x="562" y="850" width="62" height="36" rx="10" fill="#4fb8b3" opacity="0.9"/>
+  <text x="593" y="873" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  <rect x="494" y="850" width="58" height="36" rx="10" fill="none" stroke="#292524" stroke-width="1.5"/>
+  <text x="523" y="873" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">Stop</text>
+  <line x1="640" y1="102" x2="640" y2="900" stroke="#292524" stroke-width="1"/>
+  <text x="656" y="124" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#78716c">/preview/6d121548/</text>
+  <rect x="1002" y="108" width="56" height="22" rx="6" fill="none" stroke="#292524"/>
+  <text x="1030" y="123" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#d6d3d1" text-anchor="middle">Reload</text>
+  <rect x="1064" y="108" width="40" height="22" rx="6" fill="none" stroke="#292524" opacity="0.55"/>
+  
+  <text x="1087" y="123" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c" text-anchor="middle" opacity="0.9">Diff</text>
+  <line x1="640" y1="136" x2="1120" y2="136" stroke="#292524" stroke-width="1"/>
+  <circle cx="880" cy="436" r="4" fill="#78716c" opacity="0.7"/>
+  <text x="880" y="470" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#d6d3d1" text-anchor="middle">Nothing to preview yet</text>
+  <text x="880" y="492" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#78716c" text-anchor="middle">Ask for a site and watch it appear here.</text>
+  <line x1="640" y1="804" x2="1120" y2="804" stroke="#292524" stroke-width="1"/>
+  <rect x="641" y="805" width="479" height="95" fill="#1c1917" opacity="0.35"/>
+  <text x="656" y="828" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#78716c">FILES</text>
+  <text x="1104" y="828" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c" text-anchor="end">0</text>
+  <text x="656" y="850" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#78716c">The workspace is empty.</text>
+</svg>
