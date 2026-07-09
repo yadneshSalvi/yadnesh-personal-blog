@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="536" viewBox="0 0 1040 536" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="536" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">stdio &#183; a real command approval, request and response</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># the engine numbers ITS note this time (id 0) and stops until we answer:</tspan></text>
+    <text x="32" y="116" xml:space="preserve"><tspan fill="#756d62">←</tspan> {"id": <tspan fill="#e5825a">0</tspan>, "method": <tspan fill="#e5825a">"item/commandExecution/requestApproval"</tspan>, "params": {</text>
+    <text x="32" y="144" xml:space="preserve">      "threadId": "019f38df-…", "itemId": "call_iZyre5…",</text>
+    <text x="32" y="172" xml:space="preserve">      "command": <tspan fill="#6fa8dc">"/bin/zsh -lc 'curl -sI https://example.com | head -3'"</tspan>,</text>
+    <text x="32" y="200" xml:space="preserve">      "cwd": "…/probes/ws-a",</text>
+    <text x="32" y="228" xml:space="preserve">      "reason": <tspan fill="#8fb573">"Do you want to allow this network command to run outside</tspan></text>
+    <text x="32" y="256" xml:space="preserve">                 <tspan fill="#8fb573">the sandbox so I can execute it exactly as requested?"</tspan>,</text>
+    <text x="32" y="284" xml:space="preserve">      "proposedExecpolicyAmendment": ["curl", "-sI", "https://example.com"],</text>
+    <text x="32" y="312" xml:space="preserve">      "availableDecisions": [<tspan fill="#dcae62">"accept", {"acceptWithExecpolicyAmendment": …}, "cancel"</tspan>]}}</text>
+    <text x="32" y="340" xml:space="preserve"><tspan fill="#756d62"># note what that list does NOT offer: no "decline", no "acceptForSession".</tspan></text>
+    <text x="32" y="368" xml:space="preserve"><tspan fill="#756d62"># yet the schema declares both, and the server honors both (verified live).</tspan></text>
+    <text x="32" y="396" xml:space="preserve"></text>
+    <text x="32" y="424" xml:space="preserve"><tspan fill="#756d62">→</tspan> {"jsonrpc": "2.0", "id": <tspan fill="#e5825a">0</tspan>, "result": {"decision": <tspan fill="#8fb573">"accept"</tspan>}}</text>
+    <text x="32" y="452" xml:space="preserve"><tspan fill="#756d62">←</tspan> {"method": <tspan fill="#e5825a">"serverRequest/resolved"</tspan>, "params": {"threadId": "019f38df-…", "requestId": 0}}</text>
+    <text x="32" y="480" xml:space="preserve"><tspan fill="#756d62"># the frozen item runs; item/completed lands with exitCode 0</tspan></text>
+  </g>
+</svg>

@@ -1,33 +1,39 @@
-"""Part 8: stop, steer, and the meter — live control over a running turn.
+"""Part 9: durable streams — the build survives the refresh.
 
-Three controls, all keyed by one fact the backend now remembers: WHICH
-turn is live on each project (app.turns, written when turn/start answers
-with `turn.id`). Stop: POST /interrupt sends `turn/interrupt {threadId,
-turnId}` and the stream answers with the same turn/completed every turn
-ends with — status "interrupted". Steer: a chat message that arrives
-while a turn is active routes to `turn/steer {threadId, expectedTurnId,
-input}` instead of starting a new turn; the running build absorbs it
-without restarting. The expectedTurnId precondition IS the race guard:
-if the turn finished a beat before the message landed, steer fails and
-the endpoint falls back to a normal turn/start. And the meter: every
-thread/tokenUsage/updated becomes a `usage_update` event. Verified live:
-the wire's `.total` is THREAD-cumulative and `.last` is only the most
-recent MODEL REQUEST (a build turn makes many; `total` grows by exactly
-`last` each update) — so neither is "this turn", and the receipt's
-number is computed: total now minus total when the turn began. A
-per-turn receipt showing the lifetime bill — or one request's sliver —
-would be lying in opposite directions.
+The architecture change of Act II, and it is one split: running the
+turn and watching the turn stop sharing a lifetime. Since Part 2 the
+consumer loop lived inside the POST /chat response — whoever sent the
+message held the only pipe, and when that pipe died (a refresh, a lost
+Wi-Fi beat), the events kept flowing into a queue nobody would ever
+drain again. The agent never noticed; only the audience left the room.
+
+Now POST /chat starts the turn, hands the notification queue to a
+BACKGROUND consumer task (drain → translate → append to app.eventlog),
+and returns a claim ticket: {turn_id, stream_url}. Watching happens
+somewhere else entirely: GET /projects/{id}/stream is a dumb pipe that
+replays the log past the viewer's Last-Event-ID bookmark, then follows
+live appends via the project's condition. Open it twice, close it,
+reopen it mid-build — the consumer never notices. Stop and approvals
+were ALREADY project-scoped POSTs (Part 7's Futures, Part 8's
+interrupt), so any tab can press them; the stream they answer onto is
+now every tab's stream. And at startup the orphan sweep tells the
+truth about turns the previous process took down with it:
+backend_restarted in the log, "orphaned" in the turns table, nothing
+resurrected — the workspace and the thread survived, which is
+everything of value.
 """
 
+import asyncio
+import time
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from app import approvals, projects, turns
+from app import approvals, eventlog, projects, turns
 from app.codex_client import CodexClient, CodexError
 from app.events import (approval_patch, file_change_event, history_from_turns,
                         relativize_diff, sse, translate)
@@ -89,6 +95,20 @@ def approval_handler(kind: str):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    eventlog.init()
+    # The orphan sweep: turns still "running" in the table belonged to
+    # the previous process. Say so in each project's log BEFORE serving
+    # a single request — a tab that reconnects gets the tombstone as
+    # its next event, exactly where the stream went quiet.
+    for orphan in eventlog.sweep_orphans():
+        await eventlog.publish(orphan["project_id"], {
+            "type": "backend_restarted",
+            "turn_id": orphan["turn_id"],
+            "message": "The backend restarted while this build was running. "
+                       "Everything up to the last logged event was kept; the "
+                       "rest of that turn is gone. The site files and the "
+                       "conversation survived — just send the next message.",
+        })
     for entry in projects.load_registry():
         mount_preview(app, entry["id"])
     # The Part 2 seam, finally used: server-initiated requests get
@@ -99,6 +119,7 @@ async def lifespan(app: FastAPI):
                              approval_handler("file_change"))
     await client.start()
     yield
+    eventlog.close()
 
 
 app = FastAPI(lifespan=lifespan)
@@ -288,36 +309,20 @@ async def finish_turn(project_id: str, thread_id: str, message: str) -> None:
     projects.touch(project_id)
 
 
-async def run_turn(project_id: str, message: str):
-    entry = projects.get_project(project_id)
-    workspace = projects.site_dir(project_id).resolve()
-    mode = entry.get("mode", "standard")
-    thread_id, reset = await ensure_thread(entry, workspace)
-    queue = client.queue_for(thread_id)
-    started = await client.request("turn/start", {
-        "threadId": thread_id,
-        "input": [{"type": "text", "text": message}],
-        # The wristband for THIS work order: the project's current mode,
-        # translated to a structured policy — and now both dials turn.
-        # Standard sends "on-request"; the other two postures still
-        # never ask (for opposite reasons — see approval_policy).
-        "sandboxPolicy": sandbox_policy(mode, workspace),
-        "approvalPolicy": approval_policy(mode),
-        # Without this the model reasons silently and the drawer stays
-        # empty. Part 10 turns summary (and effort) into user-facing dials.
-        "summary": "detailed",
-    })
-    # The response names the turn — and interrupt and steer both need
-    # that name. This line is what makes live control possible.
-    turns.begin(project_id, thread_id, started["turn"]["id"])
+# Every consumer task currently in flight, keyed by turn_id. This dict
+# is doing invisible, load-bearing work: asyncio keeps only WEAK
+# references to tasks, so a create_task() result nobody stores can be
+# garbage-collected mid-run. Holding it here is what keeps it alive.
+CONSUMERS: dict[str, asyncio.Task] = {}
 
-    yield sse({"type": "session_start", "session_id": thread_id,
-               "project_id": project_id, "mode": mode,
-               "turn_id": started["turn"]["id"]})
-    if reset:
-        yield sse({"type": "thread_reset",
-                   "message": "chat history could not be restored; "
-                              "the site files are intact"})
+
+async def consume_turn(project_id: str, thread_id: str, turn_id: str,
+                       message: str, workspace, queue: asyncio.Queue) -> None:
+    """The consumer: one background task per turn, draining the thread's
+    notification queue into the event log. This is Part 2's read loop
+    with a different destination — every translate() call, the usage
+    delta, the fileChange join, all unchanged — but nobody holds a pipe
+    to it. The turn now outlives every viewer, which is the whole part."""
     # The meter. Verified live: the wire's `last` is the most recent
     # MODEL REQUEST (not the turn — a build turn makes many, and `total`
     # grows by exactly `last` on every update); `total` is the THREAD's
@@ -332,16 +337,18 @@ async def run_turn(project_id: str, message: str):
     # own item/started, always before the question (verified live) —
     # this is the join table.
     file_changes: dict[str, dict] = {}
-    turn_id = started["turn"]["id"]
+    # What the turns table will remember. Anything short of a clean
+    # wire-reported ending counts as failed.
+    outcome = "failed"
     try:
         while True:
             note = await queue.get()
-            # One turn's stream carries ONE turn's events. Every
-            # turn-scoped notification names its turn (`turnId`, or
-            # `turn.id` on turn/completed — verified against live
-            # traces); a viewer that stalled and was abandoned leaves
-            # its turn's backlog in the thread queue, and without this
-            # check the NEXT turn's stream would replay it as its own.
+            # One consumer drains ONE turn's events. Every turn-scoped
+            # notification names its turn (`turnId`, or `turn.id` on
+            # turn/completed — verified against live traces); a stalled
+            # Part-8 viewer used to leave the NEXT turn a backlog, and
+            # the same guard keeps a lingering consumer from logging a
+            # successor's events as its own.
             named = ((note.get("params") or {}).get("turnId")
                      or ((note.get("params") or {}).get("turn") or {}).get("id"))
             if named is not None and named != turn_id:
@@ -365,6 +372,7 @@ async def run_turn(project_id: str, message: str):
                 # name.
                 event["usage"] = turn_usage
                 event["thread_total"] = usage_total
+                outcome = event["status"] or "completed"
                 await finish_turn(project_id, thread_id, message)
             if event["type"] == "diff_updated":
                 event["unified_diff"] = relativize_diff(event["unified_diff"], workspace)
@@ -373,35 +381,41 @@ async def run_turn(project_id: str, message: str):
             if event["type"] == "approval_request" and event["kind"] == "file_change":
                 item = file_changes.get(event["item_id"], {})
                 event["files"], event["diff"] = approval_patch(item, workspace)
-            yield sse(event)
+            await eventlog.publish(project_id, event)
             # fileChange items get a second, dedicated event with
             # workspace-relative paths — and, once the patch has landed,
             # a nudge to reload the iframe.
             if event["type"] in ("item_start", "item_done") and event["kind"] == "fileChange":
                 item = note["params"].get("item", {})
                 status = "started" if event["type"] == "item_start" else "done"
-                yield sse(file_change_event(item, status, workspace))
+                await eventlog.publish(project_id,
+                                       file_change_event(item, status, workspace))
                 if status == "done":
-                    yield sse({"type": "preview_refresh", "project_id": project_id})
+                    await eventlog.publish(project_id, {
+                        "type": "preview_refresh", "project_id": project_id})
             if event["type"] in ("complete", "error"):
                 return
-    except CodexError as exc:
-        yield sse({"type": "error", "message": str(exc)})
+    except Exception as exc:  # noqa: BLE001 — a consumer nobody awaits
+        # must turn failures into logged events, or they vanish.
+        await eventlog.publish(project_id, {"type": "error", "message": str(exc)})
     finally:
         # However the turn ended — completed, interrupted, failed, or
-        # the stream died — the floor is empty again. Named, so a stream
-        # outliving its turn can't erase a newer turn's ledger line.
+        # the consumer itself blew up — the floor is empty again and
+        # the table gets the ending. Named, so a consumer outliving its
+        # turn can't erase a newer turn's ledger line.
         turns.end(project_id, turn_id)
+        eventlog.finish_turn(turn_id, outcome)
+        CONSUMERS.pop(turn_id, None)
 
 
 @app.post("/projects/{project_id}/chat")
 async def chat(project_id: str, req: ChatRequest):
-    """One endpoint, two verbs — the router the protocol enforces. A
-    message that arrives while a turn is ACTIVE becomes a steer: the
-    running build absorbs it without restarting. Otherwise it starts a
-    turn, as it has since Part 2. The client can tell which happened by
-    the response's content type: a steer answers in plain JSON (the
-    events keep riding the ORIGINAL turn's stream); a new turn streams."""
+    """One endpoint, two verbs, and — since Part 9 — ZERO streams. A
+    message that arrives while a turn is ACTIVE becomes a steer, exactly
+    as in Part 8. Otherwise it starts the turn, spawns the consumer, and
+    answers with a claim ticket: {turn_id, stream_url}. What it no
+    longer does is hold the events hostage in its own response body —
+    the sender's tab watches the same GET /stream as every other tab."""
     if projects.get_project(project_id) is None:
         raise HTTPException(status_code=404, detail="no such project")
     active = turns.active(project_id)
@@ -422,17 +436,102 @@ async def chat(project_id: str, req: ChatRequest):
             # it and fall through to a normal turn/start.
             turns.end(project_id, active["turn_id"])
         else:
-            # Tell the original turn's stream a steer landed (the
-            # approvals trick: a synthetic note rides the queue in
-            # arrival order). The steered text will also resurface as a
-            # plain userMessage item at the model's next inference
-            # boundary — but that item doesn't say "steer"; this does.
+            # Tell the log a steer landed (the approvals trick: a
+            # synthetic note rides the queue in arrival order). The
+            # steered text will also resurface as a plain userMessage
+            # item at the model's next inference boundary — but that
+            # item doesn't say "steer"; this does.
             await client.queue_for(active["thread_id"]).put(
                 {"method": "steer/accepted",
                  "params": {"text": req.message, "turn_id": active["turn_id"]}})
             return {"steered": True, "turn_id": active["turn_id"]}
-    return StreamingResponse(run_turn(project_id, req.message),
-                             media_type="text/event-stream")
+    entry = projects.get_project(project_id)
+    workspace = projects.site_dir(project_id).resolve()
+    mode = entry.get("mode", "standard")
+    thread_id, reset = await ensure_thread(entry, workspace)
+    queue = client.queue_for(thread_id)
+    started = await client.request("turn/start", {
+        "threadId": thread_id,
+        "input": [{"type": "text", "text": req.message}],
+        # The wristband for THIS work order: the project's current mode,
+        # translated to a structured policy — both dials, as in Part 8.
+        "sandboxPolicy": sandbox_policy(mode, workspace),
+        "approvalPolicy": approval_policy(mode),
+        # Without this the model reasons silently and the drawer stays
+        # empty. Part 10 turns summary (and effort) into user-facing dials.
+        "summary": "detailed",
+    })
+    turn_id = started["turn"]["id"]
+    # The response names the turn — interrupt and steer need that name
+    # (in memory, this process), and the restart sweep needs the row.
+    turns.begin(project_id, thread_id, turn_id)
+    eventlog.begin_turn(project_id, turn_id)
+    # session_start now carries the user's message: every tab is just a
+    # viewer of the log — including the one that typed — so the question
+    # itself has to be on the wire.
+    await eventlog.publish(project_id, {
+        "type": "session_start", "session_id": thread_id,
+        "project_id": project_id, "mode": mode, "turn_id": turn_id,
+        "message": req.message, "started_at_ms": int(time.time() * 1000)})
+    if reset:
+        await eventlog.publish(project_id, {
+            "type": "thread_reset",
+            "message": "chat history could not be restored; "
+                       "the site files are intact"})
+    CONSUMERS[turn_id] = asyncio.create_task(consume_turn(
+        project_id, thread_id, turn_id, req.message, workspace, queue))
+    return {"turn_id": turn_id, "thread_id": thread_id,
+            "stream_url": f"/projects/{project_id}/stream"}
+
+
+@app.get("/projects/{project_id}/stream")
+async def stream(project_id: str, request: Request, after: int = 0):
+    """The dumb pipe: replay-then-follow. It knows nothing about turns
+    or agents — it reads a log and waits by a doorbell. A fresh viewer
+    gets the whole story from seq 1; a reconnecting EventSource sends
+    Last-Event-ID and gets only what it missed; `?after=` is the same
+    bookmark for curl and tests. The header wins when both are present,
+    because the browser's bookmark is the truer one."""
+    if projects.get_project(project_id) is None:
+        raise HTTPException(status_code=404, detail="no such project")
+    header = request.headers.get("last-event-id", "")
+    if header.isdigit():
+        after = int(header)
+
+    async def frames(last: int):
+        # Replay: the past, straight from the table.
+        for seq, event in eventlog.replay(project_id, last):
+            last = seq
+            yield sse(event, event_id=seq)
+        # The seam between past and present, marked honestly. Ephemeral:
+        # never logged, no id — it isn't an event that happened, it's
+        # the stream saying "you're current".
+        yield sse({"type": "caught_up", "last_seq": last})
+        # Follow: wait by the doorbell, re-read the log, repeat. The
+        # log is the source of truth; the condition only says "look
+        # again". A 15s silence becomes a keepalive comment — same
+        # dead-socket insurance as Part 7.
+        cond = eventlog.condition_for(project_id)
+        while True:
+            rows = eventlog.replay(project_id, last)
+            for seq, event in rows:
+                last = seq
+                yield sse(event, event_id=seq)
+            if rows:
+                continue
+            async with cond:
+                # Re-check under the lock: an append between our read
+                # and this line must not become a missed wakeup.
+                if eventlog.tail_seq(project_id) > last:
+                    continue
+                try:
+                    await asyncio.wait_for(cond.wait(), timeout=15)
+                    continue
+                except TimeoutError:
+                    pass
+            yield ": keepalive\n\n"
+
+    return StreamingResponse(frames(after), media_type="text/event-stream")
 
 
 @app.post("/projects/{project_id}/interrupt")

@@ -1,20 +1,33 @@
 """The SSE event vocabulary: one envelope, extended forever, never changed.
 
 Part 2 defined six event types, Part 3 added two, Part 4 three more, Part 5
-one, Part 6 none, Part 7 two. Part 8 adds two more: `usage_update` (the
-live meter — every thread/tokenUsage/updated becomes a wire event instead
-of being swallowed at the end of the turn) and `steered` (a mid-turn
-instruction was accepted into the running turn; synthetic, ours, injected
-onto the thread queue by the chat endpoint so it lands in the stream
-exactly where the steer arrived — the same trick app.approvals plays with
-`approval/requested`).
+one, Part 6 none, Part 7 two, Part 8 two (`usage_update` — the live meter —
+and `steered` — a mid-turn instruction absorbed into the running turn).
+Part 9 changes no existing type and adds two and a half:
+
+- `backend_restarted` (logged) — written at startup for every turn the
+  previous process left "running". The honest tombstone: that turn will
+  never finish; the workspace and the thread survived.
+- `caught_up` (ephemeral — never logged, carries no seq) — the stream's
+  own marker that replay is over and what follows is live. A viewer uses
+  it to tell "redrawing the past" from "watching the present".
+- And the half: `session_start` gains `message` and `started_at_ms`.
+  Until now the user's own words never rode the wire — the tab that sent
+  them already had them. In Part 9 every tab is just a viewer of the
+  project's log, INCLUDING the one that typed, so the question has to be
+  in the log or a second tab renders an answer to nothing.
+
+The envelope itself grows one line: `id:`, set to the event's
+per-project seq from app.eventlog. That id is what the browser echoes
+back as `Last-Event-ID` when EventSource reconnects — the entire replay
+contract fits in one header.
 
 One correction ships with the meter, sharpened live while building this
 part: `tokenUsage.total` is THREAD-CUMULATIVE (Part 6 saw 1.09M after a
 few font-hunting turns), and `tokenUsage.last` is only the most recent
 MODEL REQUEST — `total` grows by exactly `last` on every update, and a
 build turn makes many requests. Neither field is "this turn"; the honest
-per-turn number is a delta of totals, which main.run_turn computes and
+per-turn number is a delta of totals, which main.consume_turn computes and
 attaches as `turn` on `usage_update` and as `usage` on the `complete`
 receipt. The receipt under a turn stops billing the customer for the
 whole invoice history — and stops under-billing them one request's
@@ -34,9 +47,15 @@ import json
 from pathlib import Path
 
 
-def sse(event: dict) -> str:
-    """One envelope on the wire: data: {...}\n\n"""
-    return f"data: {json.dumps(event)}\n\n"
+def sse(event: dict, event_id: int | None = None) -> str:
+    """One envelope on the wire: data: {...}\n\n — since Part 9 usually
+    preceded by id: {seq}, the line the browser gives back to us as
+    Last-Event-ID. Ephemeral frames (caught_up) carry no id on purpose:
+    an id would move the browser's bookmark past events that were never
+    in the log."""
+    if event_id is None:
+        return f"data: {json.dumps(event)}\n\n"
+    return f"id: {event_id}\ndata: {json.dumps(event)}\n\n"
 
 
 def item_detail(item: dict) -> dict:
@@ -193,8 +212,11 @@ def translate(note: dict) -> dict | None:
         # note carries the steer's identity, immediately.
         return {"type": "steered", **p}
     if method == "turn/completed":
+        # turn_id rides along since Part 9: a replayed log holds many
+        # turns, and a viewer patches the receipt onto the right one.
         turn = p.get("turn", {})
         return {"type": "complete", "status": turn.get("status", ""),
+                "turn_id": turn.get("id", ""),
                 "duration_ms": turn.get("durationMs")}
     if method == "error":
         return {"type": "error", "message": p.get("message", "unknown error")}

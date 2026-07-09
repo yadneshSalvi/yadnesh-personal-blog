@@ -178,6 +178,24 @@ Order observed: `thread/started` → `thread/status/changed (active)` →
 - Agent adapts on denial with explicit narration ("...was denied, so I'm
   saving the same notes in the workspace instead").
 
+## Part-8-build findings (verified live)
+
+- Token usage: NEITHER wire field means "this turn". `.last` = one MODEL
+  REQUEST; `.total` = thread-cumulative; `.total` grows by exactly `.last`
+  each update. Per-turn numbers must be computed as a delta from the turn's
+  baseline (first update's total minus its last). Part 8's backend attaches
+  the computed `turn` field on usage_update and stamps receipts with it.
+- `turn/interrupt` is COOPERATIVE at the agent level, NOT a hard kill: the
+  in-flight commandExecution item gets item_start and never item_done, the
+  turn completes status "interrupted", but the running shell command keeps
+  executing to completion and its writes land (a 10x sleep-2 loop finished
+  ~6s after the interrupt; all writes present).
+- Steer after completion: raw wire error `{"code": -32600, "message": "no
+  active turn to steer"}` → catch, clear the ledger, fall back to turn/start.
+- `account/rateLimits/read` is AUTH-MODE DEPENDENT: under API-key auth it
+  errors "chatgpt authentication required to read rate limits" (proxy → 502
+  with that detail); ChatGPT-plan auth returns GetAccountRateLimitsResponse.
+
 ## review/start
 
 - Params: `{threadId, target, delivery?}`. Targets: `{type:

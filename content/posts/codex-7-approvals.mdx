@@ -1,0 +1,476 @@
+---
+title: "Codex App Server in Production, Part 7: Approvals: The Foreman's Stamp"
+subtitle: "The protocol turns around: the engine sends your backend a numbered JSON-RPC request and freezes mid-turn until somebody answers it. A Future parks in a registry, the approval card shows the actual patch, and when nobody clicks, the clock says no for you."
+image: "/images/series/codex/part-7/cover-light.svg"
+imageDark: "/images/series/codex/part-7/cover-dark.svg"
+createdAt: "2026-07-07T00:00:00.000Z"
+updatedAt: "2026-07-07T00:00:00.000Z"
+tags: ["codex", "openai", "fastapi", "nextjs", "tutorial"]
+series: "codex-app-server-fastapi-nextjs"
+seriesPart: 7
+---
+
+Flip one policy string and run a turn. That's the entire setup for this part's opening mystery. Standard mode's approval dial goes from `"never"` to `"on-request"`, meaning the agent may now *ask permission* to step past [Part 6's walls](/blog/codex-6-sandbox). So I asked for the one thing Standard always refuses, a `curl` to the live network, and watched the agent get rejected. Instantly. By nobody. No prompt appeared, no human clicked anything, and the agent shrugged: *"I couldn't run it because the escalated network request was rejected."*
+
+Something inside Pagewright is answering questions we never see. Finding that something, then replacing it with a real human holding a real stamp, is this whole part. By the end of this page, risky commands and out-of-bounds patches pause mid-turn on an amber card in the chat, with the agent's own stated reason and, for file changes, the actual diff, and the build continues the moment you click Approve or Deny. Walk away instead, and a clock answers for you, honestly.
+
+<Figure
+  src="/images/series/codex/part-7/browser-command-light.svg"
+  srcDark="/images/series/codex/part-7/browser-command-dark.svg"
+  alt="Pagewright in Standard mode, frozen on an approval. The user asked the agent to run a curl command against example.com with escalated permissions. Below the agent's commentary and a spinning command badge sits an amber card titled Approval needed, command, asking: do you want to allow a networked curl request to example.com so I can return the HTTP status line? The card shows the full command, /bin/zsh -lc curl -sI example.com piped to head, the working directory, and three buttons: Approve, Approve for session, and Deny. The composer below shows an amber chip explaining the build is waiting for approval, next to a Stop button. The preview pane on the right is empty."
+  caption="The end of this part, from the real run. The turn is genuinely paused: the engine is awaiting a JSON-RPC response, the backend is awaiting a Future, and the Future is awaiting your click."
+  width={1120}
+  height={780}
+/>
+
+That card is the most protocol-dense UI element in the series so far. Behind it sits the mechanic this part exists to teach: **for approvals, the app server sends *us* a JSON-RPC request.** It numbers its own note, slides it under the door, and stops. Every id on the wire so far has been ours; this one is the engine's, and the reply is owed *by us*. The [sibling series](/blog/agent-sdk-7-approvals) met the same product problem through an SDK callback; here you'll see it raw, as a message direction reversing on a pipe.
+
+## Two lines, and a phantom foreman
+
+The change that starts everything is embarrassingly small. `approval_policy()` joins `sandbox_policy()` in `main.py`: Read-only and Trusted keep `"never"` (for opposite reasons, and the [grid section](#the-grid-completes) will cash that phrase out), while Standard now returns `"on-request"`. Both dials ride every `turn/start`, so the mode picker from Part 6 needs no new wiring at all:
+
+```python filename="backend/app/main.py" repo="part-07-approvals/backend/app/main.py" lines="297-302"
+        "sandboxPolicy": sandbox_policy(mode, workspace),
+        "approvalPolicy": approval_policy(mode),
+        # Without this the model reasons silently and the drawer stays
+        # empty. Part 10 turns summary (and effort) into user-facing dials.
+        "summary": "detailed",
+    })
+```
+
+The mapping itself is one expression, `return "on-request" if mode == "standard" else "never"`, and per the [approval-policy enum](/blog/codex-concepts#approval-policies) it's verified live that the per-turn value overrides the thread's `"never"` baseline. Run the curl request now and you get the mystery from the opening: a rejection with no rejector. Here's the same moment captured raw over stdio, in a probe that answers exactly the way Part 2's client does:
+
+```text
+← {"id": 0, "method": "item/commandExecution/requestApproval",
+   "params": {..., "command": "/bin/zsh -lc 'curl -sI https://example.com | head -3'"}}
+→ {"jsonrpc": "2.0", "id": 0, "result": {}}
+← {"method": "item/completed", "params": {"item": {"type": "commandExecution",
+   "status": "declined", "exitCode": null, ...}}}
+```
+
+The probe answered the way [Part 2's reader](/blog/codex-2-fastapi-bridge#the-reader-task-one-loop-three-destinations) answers any server request it has no handler for: the polite empty reply. And the engine, receiving an answer with no `decision` in it, treated the question as settled: the command item completed with status `"declined"`, no shell ever ran, and the agent adapted to a refusal nobody made. Five seconds, turn complete, everyone confidently wrong.
+
+That polite empty reply was the *right* call in Part 2, because the alternative is worse. I ran that version too: a probe that receives the approval request and answers nothing at all. For 100 seconds (until I killed it), the engine sent **zero** further messages. No retry, no nudge, no timeout of its own. The item stays frozen and the turn holds its breath, indefinitely. Part 2 chose "answer something over deadlock", and that kept four parts of code deadlock-free. But once the policy invites real questions, "answer something" becomes a phantom foreman stamping DENY on every work order before you ever see it.
+
+So the fix has a precise shape. Not "make the backend stop hanging" (it never hung), but: **route the engine's question to a human, hold the JSON-RPC response open while they think, and answer with their words.**
+
+## The request that turns the desk around
+
+First, look hard at the thing we're routing, because it breaks a pattern four parts old. [Part 1's stream anatomy](/blog/codex-1-first-thread#anatomy-of-the-notification-stream) taught three message shapes: our requests (we number them), the engine's responses (they quote our number), and notifications (unnumbered narration). Part 2's reader compiled that grammar into a three-way switch, plus one case that had never fired in anger: a message with an id *and* a method. The engine asking us.
+
+<Figure
+  src="/images/series/codex/part-7/fig-reversed-request-light.svg"
+  srcDark="/images/series/codex/part-7/fig-reversed-request-dark.svg"
+  alt="Diagram of the fourth message shape. At the top, three ghost cards recap the known grammar: request (you to engine, has an id you numbered), response (engine to you, quotes your id), and notification (engine to you, no id, no reply owed). Below, a hero card shows a real captured message from engine to you labeled server request, has an id, blocks: id 0, method item/commandExecution/requestApproval, with params carrying the threadId, itemId, the curl command, the cwd, and the engine's reason asking whether to allow the network command to run outside the sandbox. An amber band notes that nothing moves: the item is frozen, the turn holds its breath, no retry and no timeout of its own. A final card shows our reply quoting id 0 with result decision accept, followed by a serverRequest/resolved notification. Side notes read: the roles swap, every id so far was ours, this one is the engine's, and Part 2's reader already routes id plus method to server handlers; and returning equals answering, with an asyncio Future waiting between request and return."
+  caption="The fourth shape, drawn from a real capture. The engine numbers its note, and the numbered-notes discipline from Part 1 now works in reverse: exactly one reply must quote id 0, and it comes from us."
+  width={1240}
+  height={880}
+/>
+
+Here's a real one on the wire, with the response our finished backend sends. Two details deserve staring at:
+
+<Figure
+  src="/images/series/codex/part-7/term-request-approval.svg"
+  alt="A dark terminal showing a real command approval exchange over stdio. The engine sends id 0, method item/commandExecution/requestApproval, with params: threadId, itemId, the command /bin/zsh -lc curl -sI example.com piped to head, the cwd, a reason string asking whether to allow this network command to run outside the sandbox, a proposedExecpolicyAmendment array, and availableDecisions listing only accept, an acceptWithExecpolicyAmendment object, and cancel. A comment notes what the list does not offer: no decline, no acceptForSession, yet the schema declares both and the server honors both, verified live. Our reply quotes id 0 with result decision accept, and a serverRequest/resolved notification follows before the frozen item runs."
+  caption="A real requestApproval and its answer. Note the reason field: the engine argues its case in a full sentence. And note availableDecisions, which omits two decisions the server demonstrably honors."
+  width={1040}
+  height={564}
+/>
+
+First, the **`reason`**. The engine doesn't send a bare "may I?"; it sends an argument: *"Do you want to allow this network command to run outside the sandbox so I can execute it exactly as requested?"* That sentence was written by the model, for the human, and it's free UI copy of a quality most permission dialogs never reach. Our card renders it verbatim.
+
+Second, **`availableDecisions`**, which looks like the authoritative menu of legal answers and is not. In 0.142.4 the wire lists only `accept`, an execpolicy-amendment variant, and `cancel`. Yet the generated schema's decision enums declare `accept | acceptForSession | decline | cancel`, and both missing decisions work live: decline a command and its item completes with status `"declined"`; accept for session and the re-ask disappears. When the wire and the schema disagree, **the schema is the vocabulary and the wire field is a hint.** Pagewright validates against the schema enum and says so in a comment right where the next maintainer will look.
+
+<Callout type="info" title="Why the direction reversal is worth a whole part">
+Every earlier capability rode messages we initiated. This one can't: only the engine knows the exact moment a command wants to step past the sandbox, and it needs an answer *before* proceeding, not advice after. A notification would be too weak (no reply owed) and polling would be too slow. A server-initiated request with a blocking response is the only shape that fits, and it's the same shape `item/tool/requestUserInput` (Part 10) and review rides (Part 11) will arrive in. Learn it once here, collect twice later.
+</Callout>
+
+## The bridge: a Future in the foreman's inbox
+
+Between "the handler receives params" and "the handler returns a decision" sits an arbitrary amount of human time. The tool for suspending a coroutine until some *other* code decides to wake it is an [`asyncio.Future`](/blog/codex-concepts#futures-and-events), and if you want that pattern built from zero, with its failure modes hunted down one by one, the sibling series teaches it as [a full chapter](/blog/agent-sdk-7-approvals#the-gate-an-event-out-a-future-in). Here it's one page, because the transport is the new material. Each pending question becomes a `PendingApproval` in a registry, in the new `app/approvals.py`:
+
+```python filename="backend/app/approvals.py" repo="part-07-approvals/backend/app/approvals.py" lines="36-47"
+class PendingApproval:
+    """One unanswered question. The Future is the mailbox: the JSON-RPC
+    handler awaits it, the decision endpoint fills it."""
+
+    def __init__(self, kind: str, thread_id: str, item_id: str) -> None:
+        self.id = uuid.uuid4().hex[:8]
+        self.kind = kind  # "command" | "file_change"
+        self.thread_id = thread_id
+        self.item_id = item_id
+        self.timeout = timeout_seconds()
+        self.expires_at_ms = int((time.time() + self.timeout) * 1000)
+        self.future: asyncio.Future = asyncio.get_running_loop().create_future()
+```
+
+The registry's `ask()` function runs the whole life of a question: file the `PendingApproval`, announce it as a synthetic `approval/requested` note on the thread's own notification queue (so the card rides the same SSE stream as everything else and lands in the chat at the exact position the turn paused), then wait. The waiting half is where the product decision lives:
+
+```python filename="backend/app/approvals.py" repo="part-07-approvals/backend/app/approvals.py" lines="91-104"
+    try:
+        decision = await asyncio.wait_for(pending.future, pending.timeout)
+        reason = "user"
+    except asyncio.TimeoutError:
+        decision, reason = "decline", "timeout"
+    finally:
+        _registry.pop(pending.id, None)
+    await notify({"method": "approval/resolved", "params": {
+        "approval_id": pending.id,
+        "decision": decision,
+        "reason": reason,
+        "resolved_at_ms": int(time.time() * 1000),
+    }})
+    return {"decision": decision}
+```
+
+Read the `except` branch as a policy statement, because that's what it is. You proved above that the engine will wait forever; a hosted product must not, because "forever" is a work order held open, an engine slot occupied, and a turn nobody can finish, all because a human closed a tab. So Pagewright decides, explicitly: **an unanswered approval declines itself after `PAGEWRIGHT_APPROVAL_TIMEOUT` seconds (ten minutes by default), and the wire says so honestly**, with `reason: "timeout"` rather than a forged human "no". The clock is a member of the team, and its decisions are labeled as its own.
+
+Wiring the bridge into the app is the moment Part 2's most deliberate design finally pays out. The seam that has sat empty for five parts gets handlers:
+
+```python filename="backend/app/main.py" repo="part-07-approvals/backend/app/main.py" lines="83-94"
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    for entry in projects.load_registry():
+        mount_preview(app, entry["id"])
+    # The Part 2 seam, finally used: server-initiated requests get
+    # handlers instead of the polite empty reply.
+    client.on_server_request("item/commandExecution/requestApproval",
+                             approval_handler("command"))
+    client.on_server_request("item/fileChange/requestApproval",
+                             approval_handler("file_change"))
+    await client.start()
+    yield
+```
+
+`approval_handler(kind)` builds a tiny closure: grab the thread's queue as the `notify` channel, then `return await approvals.ask(kind, params, notify)`. Because the dispatcher awaits the handler and `ask()` awaits the Future, **returning from the handler is literally answering the JSON-RPC request**: the value flows back through `CodexClient._respond` and down stdio with the engine's own id on it. No new transport code was written for this part. The seam absorbed its first real tenant without modification, exactly as designed in Part 2, and Parts 10 and 11 will move in the same way.
+
+The human's half is one endpoint. Note which failures it refuses to paper over:
+
+```python filename="backend/app/main.py" repo="part-07-approvals/backend/app/main.py" lines="170-183"
+    entry = projects.get_project(project_id)
+    if entry is None:
+        raise HTTPException(status_code=404, detail="no such project")
+    if req.decision not in approvals.DECISIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"decision must be one of {list(approvals.DECISIONS)}")
+    pending = approvals.get(approval_id)
+    if pending is None or pending.thread_id != entry.get("thread_id"):
+        raise HTTPException(status_code=404,
+                            detail="no such pending approval for this project")
+    if not approvals.resolve(approval_id, req.decision):
+        raise HTTPException(status_code=404, detail="approval already resolved")
+    return {"approval_id": approval_id, "decision": req.decision}
+```
+
+The last branch is the double-answer guard. Click Approve in two tabs, or click after the timeout already declined for you, and the second answer gets an honest 404: the question is gone. A stale card must find out it's stale, not pretend it won. And notice what the endpoint *doesn't* care about: which browser, which tab, which viewer. Any client that can POST can answer, because the Future doesn't know who filled it. Part 9's multi-tab work will collect that dividend without touching this code.
+
+<Figure
+  src="/images/series/codex/part-7/fig-decision-flow-light.svg"
+  srcDark="/images/series/codex/part-7/fig-decision-flow-dark.svg"
+  alt="Swimlane diagram with three lanes: codex app-server over stdio, the FastAPI backend with the approvals registry, and the browser with SSE down and POST back. A requestApproval with id 0 arrives and then silence; the handler fires and a Future parks in the registry; an approval_request event rides SSE and the card renders amber. An amber band spans all lanes: the turn is frozen, the Future is empty, zero events, zero model calls, zero tokens. Ending A, somebody clicks: Approve is clicked, a POST to the decision endpoint resolves the Future, the JSON-RPC response with decision accept goes back down stdio, serverRequest/resolved arrives and the item runs, and an approval_resolved event with reason user flips the card to Approved by you. Ending B, nobody answers: asyncio.wait_for expires, decision decline with reason timeout goes down stdio, and the card flips to Denied automatically, nobody answered in time. A footer records the measured run: with the timeout set to 20 seconds the clock declined at plus 20 seconds and the turn still completed at 25.8 seconds, and notes that a declined approval ends a question, not the turn; only Stop ends the turn."
+  caption="One question's life, both endings, timed from real runs. Either way the engine gets exactly one response quoting its id, and either way the turn continues."
+  width={1240}
+  height={900}
+/>
+
+Checkpoint. Right now you have: a backend where the engine's questions become parked Futures, an SSE event announcing each one, and an endpoint that resolves them. What you don't have is anything to click. Time to build the window the queue forms at.
+
+## The card at the window
+
+You know the reflex. A dialog appears mid-task and your cursor is moving toward the confirm button before your eyes have moved at all, because a decade of cookie banners and "unlock Keychain" prompts trained you to treat questions as friction instead of information. Approval UIs die by that reflex, and they earn it by asking often and showing little. Pagewright's card fights back with specifics: the engine's own `reason` as the headline, the exact command in mono, the directory it would run in, and, for patches, the diff itself. A question that shows its work invites an answer that means something.
+
+On the frontend, an approval is its own block type, appended at arrival position (exactly where the turn froze) and patched in place when the answer comes back. The reducer in `applyEvent` needs two new cases; here's the first:
+
+```tsx filename="frontend/app/page.tsx" repo="part-07-approvals/frontend/app/page.tsx" lines="76-92"
+  if (event.type === "approval_request") {
+    return [
+      ...blocks,
+      {
+        type: "approval",
+        id: event.approval_id,
+        kind: event.kind,
+        command: event.command,
+        cwd: event.cwd,
+        reason: event.reason,
+        files: event.files ?? [],
+        diff: event.diff ?? "",
+        availableDecisions: event.available_decisions,
+        expiresAtMs: event.expires_at_ms,
+      },
+    ];
+  }
+```
+
+The `approval_resolved` case maps over the blocks and attaches `resolved: {decision, reason, atMs}` to the matching card, which swaps its buttons for an outcome line. Those are the [event vocabulary's](/blog/codex-2-fastapi-bridge#designing-the-envelope) thirteenth and fourteenth types, the first additions since Part 5, and, for the fourth part running, every existing consumer kept working unmodified.
+
+The card itself (`ApprovalCard.tsx`) turns the decision enum into buttons, and one omission there is deliberate enough to quote:
+
+```tsx filename="frontend/components/ApprovalCard.tsx" repo="part-07-approvals/frontend/components/ApprovalCard.tsx" lines="13-20"
+// Wire decisions → button labels. `cancel` (deny + interrupt the turn)
+// stays off the card: the Stop button already owns "abandon the turn",
+// and two red buttons with different blast radii is how mistakes happen.
+const BUTTONS: { decision: string; label: string; deny?: boolean }[] = [
+  { decision: "accept", label: "Approve" },
+  { decision: "acceptForSession", label: "Approve for session" },
+  { decision: "decline", label: "Deny", deny: true },
+];
+```
+
+`cancel` is a legal decision (deny *and* interrupt the whole turn), and the card refuses to offer it, because "Deny" (no, but keep working) and "Deny and kill everything" differ by a blast radius, and adjacent red buttons with different blast radii are how Friday evenings go wrong. Stop already owns turn-killing; one verb per button.
+
+Clicking calls `decide()`, and its most important property is a thing it doesn't do:
+
+```tsx filename="frontend/app/page.tsx" repo="part-07-approvals/frontend/app/page.tsx" lines="270-288"
+  const decide = useCallback(
+    async (approvalId: string, decision: string) => {
+      if (!activeId) return;
+      try {
+        const res = await fetch(
+          `${API_BASE}/projects/${activeId}/approvals/${approvalId}/decision`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ decision }),
+          },
+        );
+        if (!res.ok) throw new Error(`The server said ${res.status}.`);
+      } catch {
+        setToast("Could not send the decision. Is the backend running?");
+      }
+    },
+    [activeId],
+  );
+```
+
+No optimistic flip. The card doesn't paint itself "Approved" on click; it disables its buttons and waits for `approval_resolved` to come down the stream, because the stream is the single source of truth about what was decided, and an optimistic UI plus a 404'd double-answer equals a card lying about history. The composer stays usable while a question hangs (type your next thought freely), with an amber chip under it explaining why nothing new is running yet. In the real approve run, the whole exchange settled fast: question up, human click, `HTTP/2 200` reported back, 19.0 seconds and 30,928 tokens for the turn.
+
+## The dry-cleaning ticket
+
+Now the second request type, and the part's best protocol puzzle. Ask for a *patch* outside the walls ("create `~/pagewright-fc-test.txt` with two lines, using apply_patch") and `item/fileChange/requestApproval` arrives. Its params, in full: `threadId`, `turnId`, `itemId`, `startedAtMs`, `reason: null`, `grantRoot: null`. Read that twice. **No diff. No file list. Not even the `availableDecisions` hint.** The question the human most needs pictured, "approve *what*, exactly?", arrives with no picture.
+
+The picture exists; it went past you moments earlier. Watch the wire:
+
+<Figure
+  src="/images/series/codex/part-7/term-join-table.svg"
+  alt="A dark terminal showing two stdio messages from the same millisecond. First, item/started opens a fileChange item with id call_U2FCrAls, whose changes array carries the target path, the kind add, and the diff, hello from h. Then the approval request: id 0, method item/fileChange/requestApproval, whose params carry only threadId, turnId, the same itemId call_U2FCrAls, startedAtMs, reason null, and grantRoot null. Comments note: no diff, no file list, no availableDecisions; the itemId is the join key, and the card's diff is item/started's payload matched by call_U2FCrAls."
+  caption="Same millisecond, two notes. The item announces itself carrying the patch; the question that follows names the item and nothing else. In every captured trace the item arrived first."
+  width={1040}
+  height={508}
+/>
+
+The `fileChange` item's own `item/started` carries the complete `changes` array, diffs included, and it arrived *before* the question in every trace captured for this part, same `itemId` on both. So the backend keeps a one-turn join table: remember each `fileChange` item as it opens, and when a file-change approval names an `itemId`, look the patch up and enrich the SSE event before it reaches the browser:
+
+```python filename="backend/app/main.py" repo="part-07-approvals/backend/app/main.py" lines="330-334"
+            if event["type"] == "item_start" and event["kind"] == "fileChange":
+                file_changes[event["item_id"]] = note["params"].get("item", {})
+            if event["type"] == "approval_request" and event["kind"] == "file_change":
+                item = file_changes.get(event["item_id"], {})
+                event["files"], event["diff"] = approval_patch(item, workspace)
+```
+
+`approval_patch()` in `events.py` does the dressing-up: workspace-relative paths where possible (absolute paths kept loudly visible when the target is *outside* the workspace, which for this card is the whole point), and a synthesized `diff --git` header per file so [Part 4's diff renderer](/blog/codex-4-live-preview#the-diff-drawer-before-and-after-photos-of-the-job-site) can be reused inside the card unchanged. One wrinkle from the traces: `update` diffs arrive as ready-made `@@` hunks, but `add` diffs arrive as the raw new file content, so new files get wrapped as a single insert hunk:
+
+```python filename="backend/app/events.py" repo="part-07-approvals/backend/app/events.py" lines="71-87"
+    files, parts = [], []
+    for change in item.get("changes", []):
+        raw = change.get("path", "")
+        try:
+            path = Path(raw).relative_to(workspace).as_posix()
+        except ValueError:
+            path = raw  # outside the workspace: keep it absolute and visible
+        kind = change.get("kind", {}).get("type", "")
+        files.append({"path": path, "kind": kind})
+        diff = change.get("diff", "")
+        if kind == "add":
+            lines = diff.splitlines()
+            diff = "\n".join([f"@@ -0,0 +1,{len(lines)} @@",
+                              *("+" + line for line in lines)])
+        header = path.lstrip("/")  # a//tmp/x reads worse than a/tmp/x
+        parts.append(f"diff --git a/{header} b/{header}\n{diff}")
+    return files, "\n".join(parts)
+```
+
+The result is the dry-cleaning counter this part is named for: the ticket says what's on the hanger, and you inspect the garment before it's hung.
+
+<Figure
+  src="/images/series/codex/part-7/browser-patch-light.svg"
+  srcDark="/images/series/codex/part-7/browser-patch-dark.svg"
+  alt="Pagewright frozen on a file-change approval. The user asked the agent to create a file outside the workspace using a file patch. Below the agent's commentary and a spinning files badge sits an amber card titled Approval needed, file change, showing the patch itself rendered as a diff: a diff git header, a hunk marker for adding two lines, and two green insert lines reading approved by the foreman and stamped. Under the diff, a mono line lists the operation: add, with the absolute path in the home directory. The Approve, Approve for session, and Deny buttons wait below, and the composer shows the amber waiting chip."
+  caption="A patch inspected before it lands. The request carried none of this; the diff and the path came from the join table, matched by itemId."
+  width={1120}
+  height={780}
+/>
+
+I clicked Approve on that card, and the two lines landed at the target path, verbatim: `approved by the foreman`, `stamped`. Sit with where that file is: **outside `writableRoots`**. The sandbox that spent all of Part 6 refusing exactly this write stood aside, because your accept escalated the action past the walls. An approval is not a speed bump in front of the sandbox; it's a gate *through* it. That's why the card shows paths outside the workspace in full and ugly, why "Approve for session" deserves a beat of thought before it becomes your reflex, and why the timeout defaults to declining. When this button is wrong, the kernel will not save you, because you overruled it.
+
+<Callout type="warning" title="Cards are rare on purpose: what never asks">
+Under Standard's `on-request`, the agent asks only when it wants *past* the bench: a network fetch, a write outside `writableRoots`. In-workspace writes stay auto-allowed by the sandbox and produce no card, and reads never ask at all, so building a whole site usually shows zero approvals. The question volume is governed by policy and sandbox *together*, the same evaluation-order lesson the sibling series learned about [auto-approved tools never reaching the callback](/blog/agent-sdk-7-approvals#the-evaluation-order-honestly). If you want more asking, `untrusted` interrogates nearly everything (`git init` reliably asks), and a `readOnly` sandbox with `on-request` turns every edit into a question. The grid is your dial, not the card code.
+</Callout>
+
+## Decisions, and the menu that understates itself
+
+Four decisions, verified against the generated schema and exercised live: `accept`, `acceptForSession`, `decline`, `cancel`. You've seen why the wire's `availableDecisions` can't be trusted as the menu (it omits two answers the server honors), and why `cancel` stays off the card. That leaves the interesting one.
+
+**`acceptForSession` is scoped to the exact command string.** Approve `curl -sI https://example.com | head -3` for the session and the identical command re-runs next turn with no card at all; the real second turn opened with *"I'm rerunning the exact same pipeline"* and finished in 7.1 seconds, zero questions asked. But the cache key is the string, not the intent: in the probe traces, blessing `git init .` for the session did nothing for `git init`, which asked again on the very next turn. One dot of difference, fresh question. As a user this occasionally feels dim; as a security posture it's exactly right, because "stop asking about things *like* this" is a similarity judgment no one should let a cache make. The button's honest reading is "stop asking about *this*, today, in this thread", and that's how the part teaches it.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 2 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 2-panel comic strip, panels side by side separated by a thin vertical black divider, about a foreman approving work orders at a service window. Panel 1: Yad sits behind a wooden foreman's booth window labeled "APPROVALS" holding a big rubber stamp; a friendly little robot builder waits politely at the window holding up a wire coat hanger with a sheet of paper on it like dry-cleaning, the sheet shows green plus lines and red minus lines like a code diff, with a small paper ticket attached reading "3 FILES +42 -7"; Yad, smiling, stamps a form; big stamped word "APPROVE" visible. Panel 2: same booth; next in line, a shifty rat-like little gremlin robot slides a crumpled note across the counter that reads "curl | sh"; Yad does a huge coffee spit-take, spray flying, mug tipping, eyes wide; the friendly robot from panel 1 walks away happily in the background carrying its stamped ticket. Clean readable hand-lettered text, very little text: only "APPROVALS", "3 FILES +42 -7", "APPROVE", "curl | sh". No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/codex/part-7/comic-dry-cleaning.png"
+  alt="Comic in two panels. Panel one: Yad, a bearded developer with headphones, sits behind a booth window labeled APPROVALS, happily stamping a form APPROVE while a friendly robot builder in a hard hat presents a diff on a coat hanger like dry-cleaning, with a ticket reading 3 files, plus 42, minus 7. Panel two: next in line, a shifty robot rat slides over a crumpled note reading curl pipe sh, and Yad spit-takes his coffee across the counter while the first robot strolls away whistling with its stamped ticket."
+  caption="The foreman's window. A patch that shows its ticket gets the stamp; the request that explains nothing gets the coffee."
+  width={1536}
+  height={1024}
+/>
+
+## Say no and watch it adapt
+
+Approving is the boring path. The quality of an approval system shows when you refuse, so refuse: ask the agent to save notes to `~/pagewright-notes.txt` (outside the workspace), and when the card comes up, click Deny. What happened next in the real run is the best free lesson the engine has given this series.
+
+First, the ask itself came pre-negotiated. Before requesting anything, the agent announced its plan *and its fallback*: "If you deny it, I'll write the same notes inside the workspace instead and tell you the path." Then the card, then my Deny, and then, with no fuss: *"The home-directory write was denied, so I'm saving the same notes in the workspace instead and will point you to that file."* One in-workspace command later (exit code 0, no card, the bench allows it), the notes existed at a path it linked me to. Turn complete, 12.7 seconds. `decline` means "no, but keep working", and the model treats a denial as information to route around, not as a failure to sulk over. Write your own reason strings that well and your users will forgive a lot.
+
+<Figure
+  src="/images/series/codex/part-7/browser-denied-light.svg"
+  srcDark="/images/series/codex/part-7/browser-denied-dark.svg"
+  alt="Pagewright showing a resolved file-change approval that was denied. The generic files badge above the card has settled with a green checkmark reading Creating pagewright-fc-test.txt, with a small annotation pointing out that the badge settled with a checkmark. The approval card below it shows the same two-line patch diff, now with a red outcome line reading Denied by you at 1:15:56 AM. Under the card the agent says the write was denied, nothing landed at that path, and offers to save the lines inside the workspace instead."
+  caption="The denial, resolved. Spot the contradiction: the badge above the card settled with a checkmark, and the red line below it is the one telling the truth."
+  width={1120}
+  height={700}
+/>
+
+That screenshot contains a wrinkle you should meet here rather than in production. **A denied `fileChange` item still fires `item/completed`**, so the generic badge from Part 3, which styles by item completion, settles with its usual done state even though no file landed (denied *commands* are cleaner: their item completes with status `"declined"`). The protocol isn't lying, an item's lifecycle did complete; it's answering "did this item finish?" when the user is asking "did this change happen?". The card is the component that answers the real question, which is why it renders the outcome in red at the exact spot the decision was made and why it never gets removed from the transcript. When a badge and a card disagree, believe the card.
+
+Now the second refusal, the one nobody performs. Set `PAGEWRIGHT_APPROVAL_TIMEOUT=20`, ask for the network command, and let the card rot. At exactly +20 seconds, the wire speaks:
+
+```text
+data: {"type": "approval_resolved", "approval_id": "3e72f758",
+       "decision": "decline", "reason": "timeout",
+       "resolved_at_ms": 1783366690929}
+```
+
+The Future never resolved, `asyncio.wait_for` raised, and the clock's decline went down stdio quoting the engine's id. The card flips to "Denied automatically (nobody answered in time)", a red countdown having warned about it once fewer than two minutes remained, and the turn *continued*: the agent adapted the same way it does to a human "no" and completed at 25.8 seconds. Rerun it and answer normally, then try to answer *again* with a second curl: 404, "approval already resolved". Every escape hatch from a parked Future exists and is labeled.
+
+## The grid completes
+
+Part 6 drew a two-axis grid and left one axis unwired, with a dashed arrow labeled "Part 7 moves Standard's consent dial here". Promise kept:
+
+<Figure
+  src="/images/series/codex/part-7/fig-grid-complete-light.svg"
+  srcDark="/images/series/codex/part-7/fig-grid-complete-dark.svg"
+  alt="The two-axis grid from Part 6, now completed. Columns are the approvalPolicy values untrusted, on-failure, on-request, and never; rows are the sandboxPolicy values readOnly, workspaceWrite with network off, workspaceWrite with network on, and dangerFullAccess. The Read-only chip sits in readOnly and never; the Trusted chip sits in workspaceWrite network-on and never; the Standard chip now sits in workspaceWrite network-off and on-request, with an arrow showing it moved from the never column, where a dashed ghost box is labeled Acts one through two so far. The dangerFullAccess row is tinted red and labeled still not offered, no cell in this row exists in the product. Footer lines read: Read-only never asks because it never acts, Trusted never asks because the sandbox contains, Standard asks and freezes the item on your answer, and approval is escalation, an accepted command or patch acts outside the walls the sandbox drew."
+  caption="Both dials wired. Standard changed columns without changing rows: same bench, same walls, and now a foreman for anything that wants past them."
+  width={1240}
+  height={760}
+/>
+
+Say the three postures out loud once, because the symmetry is the retention device. **Read-only never asks because it never acts.** **Standard asks**, and only about escalations. **Trusted never asks because the sandbox contains**: the walls hold everything that matters, so questions would be noise. Two "never"s, opposite reasons, and between them a mode where the human is in the loop exactly at the boundary and nowhere else.
+
+<Callout type="warning" title="The one hard rule of this series">
+The grid has a fourth row, and now that approvals exist, the temptation has a name: `dangerFullAccess` plus `"never"`, no walls and no questions, the cell where everything works in the demo. A hosted product must never send it. Your backend shares a machine with your registry, your other projects' workspaces, your `CODEX_HOME`, and every credential in the environment; an agent with no walls and no foreman is one prompt-injection away from being someone else's agent. CI runners and disposable containers can argue for it (the box itself is the wall); Pagewright doesn't ship a mode picker option for it, and the comment in `main.py` explaining why is the cheapest security documentation you'll ever write.
+</Callout>
+
+## The meter ritual, question-shaped
+
+Every row a real run from building this part:
+
+| Run | What happened | Receipt |
+|---|---|---|
+| Network curl, approved from the card | command ran outside the walls, reported `HTTP/2 200` | 30,928 tokens · 19.0s |
+| Home-directory notes, denied | agent adapted, wrote the notes in the workspace instead | 47,987 tokens · 12.7s |
+| Same curl, "Approve for session" | ran after one click | 30,971 tokens · 4.7s |
+| The identical command, next turn | zero cards, "rerunning the exact same pipeline" | 62,385 tokens · 7.1s |
+| Out-of-workspace patch, approved | two lines landed outside `writableRoots` | 47,464 tokens · 6.3s |
+| Card left to rot (20s timeout) | clock declined with `reason: "timeout"`, turn completed anyway | 31,168 tokens · 25.8s |
+
+One number deserves its own sentence: the frozen minutes cost nothing. While a card hangs, the engine sends no events, calls no model, and burns no tokens; the receipts above are all work, no waiting, and the timeout run's 25.8 seconds contains 20 seconds of absolute, free silence. Human deliberation is the cheapest resource on this page. (The totals are the thread-cumulative figures from [`thread/tokenUsage/updated`](/blog/codex-concepts#token-usage), as always since Part 6; each row here is a fresh test project, so the first turn of each reads as its own cost.)
+
+<DemoVideo
+  src="/videos/codex/part-7-demo.mp4"
+  poster="/videos/codex/part-7-poster.jpg"
+  caption='Two real approvals, recorded live: a Standard-mode network command pausing on the amber card (the reason is the engine&apos;s own sentence) and continuing the moment Approve is clicked, then an out-of-workspace patch showing its full diff on the card and getting denied, with the agent adapting out loud instead of failing.'
+  label="Screen recording of Part 7: a command approval card appearing mid-turn with a waiting chip, being approved, and the build continuing; then a file-change approval card showing a diff, being denied, and the agent routing around the refusal"
+/>
+
+<Recap
+  part={7}
+  items={[
+    "The reversed request, handled: item/commandExecution/requestApproval and item/fileChange/requestApproval arrive as server-to-client JSON-RPC requests (an id, a demanded response, a frozen item), and Part 2's empty-reply seam now routes them to real handlers, ending the phantom foreman that silently declined every escalation.",
+    "The Future bridge, Codex-shaped: each question parks an asyncio.Future in a registry, rides the SSE stream as approval_request at the exact position the turn paused, and POST /approvals/{id}/decision resolves it, with returning from the handler literally answering the engine.",
+    "A timeout as a named product decision: unanswered approvals auto-decline after PAGEWRIGHT_APPROVAL_TIMEOUT with reason \"timeout\" on the wire, because the engine itself will verifiably wait forever, and double answers get an honest 404.",
+    "The join-table patch card: fileChange approval requests carry no diff and no file list, so the backend joins them by itemId to the patch that arrived on item/started, and Part 4's diff renderer shows the ticket before it's hung.",
+    "Decisions grounded in the schema, not the wire: accept, acceptForSession (exact-command-scoped, thread-wide), decline (the agent adapts, with narration), and cancel (kept off the card), plus the escalation truth: an accepted action lands OUTSIDE the sandbox walls.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "On the wire, what distinguishes an approval request from every notification the stream has carried since Part 1?",
+      options: [
+        "It arrives on stderr instead of stdout",
+        "It carries both an id and a method: the engine is sending a request and blocks that item until a response quotes its id",
+        "It uses a different JSON-RPC version field",
+        "It arrives outside any turn, before turn/started",
+      ],
+      answer: 1,
+      explain: "Notifications have a method and no id; responses have an id and no method. An approval request has both, which is the fourth grammar shape: the engine numbered its own note and is waiting on our reply.",
+    },
+    {
+      q: "A fileChange approval request arrives. Where does the diff shown on the approval card come from?",
+      options: [
+        "From the request's params, which carry the changes array",
+        "From reading the workspace files and diffing them against git",
+        "From the item/started notification for the same itemId, which carried the patch moments earlier and is joined to the request by the backend",
+        "From turn/diff/updated, which always fires before the request",
+      ],
+      answer: 2,
+      explain: "The request names only its itemId (plus reason and grantRoot, both null in the traces). The patch arrived on the item's own item/started, always before the question in every capture, so run_turn keeps a per-turn itemId join table and enriches the SSE event.",
+    },
+    {
+      q: "The request's availableDecisions field lists only accept, an execpolicy amendment, and cancel. What should your backend accept as legal decisions?",
+      options: [
+        "Exactly what availableDecisions lists, since the wire is authoritative",
+        "Only accept and cancel, to be safe",
+        "The generated schema's enum (accept, acceptForSession, decline, cancel): the wire field is narrower than the truth, and the server honors both missing decisions live",
+        "Any string, since the engine validates it anyway",
+      ],
+      answer: 2,
+      explain: "Verified live in 0.142.4: decline completes the command item with status \"declined\" and acceptForSession suppresses the re-ask, even though neither appears in the wire field. The schema enum is the vocabulary; Pagewright validates against it.",
+    },
+    {
+      q: "You click \"Approve for session\" on `git init .`. Next turn, the agent wants to run `git init`. What happens?",
+      options: [
+        "It runs without asking; the session cache covers similar commands",
+        "It asks again: the acceptForSession cache is scoped to the exact command string, though it does persist across turns in the thread",
+        "It is auto-declined as a suspected duplicate",
+        "The whole thread stops asking about git entirely",
+      ],
+      answer: 1,
+      explain: "The cache key is the literal command. The identical string re-runs with no card (verified across two turns), but one dot of difference is a fresh question. \"Stop asking about things like this\" is a judgment the cache refuses to make.",
+    },
+    {
+      q: "Nobody answers an approval card. What does the finished Part 7 backend do, and why?",
+      options: [
+        "Nothing; the engine times out server-side after a minute and declines",
+        "It re-sends the approval_request event until someone answers",
+        "It answers accept, since the sandbox would have contained the action anyway",
+        "asyncio.wait_for expires after PAGEWRIGHT_APPROVAL_TIMEOUT and the backend answers decline with reason \"timeout\": the engine verifiably waits forever, so ending the wait is our product decision to make",
+      ],
+      answer: 3,
+      explain: "A probe that never answered saw zero engine messages for 100 straight seconds: no retry, no timeout of its own. The clock's decline is labeled reason \"timeout\" on the wire, the turn continues, and a late human click gets an honest 404.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 7: approvals - the foreman's stamp"
+```
+
+The foreman's window is open: the builder works free inside the walls, asks before stepping past them, shows you the ticket before anything is hung, and takes no for an answer gracefully. But every question and every answer here happens *before* the action. Once a turn is running, you still have no way to redirect it, and the only lever you've ever had mid-flight is the one this part deliberately kept off the card. You can say no before it acts. Next: [changing its mind mid-flight](/blog/codex-concepts#steering), with a Stop button that works and a `turn/steer` that doesn't even make it stop hammering.
+
+The complete, tested code for this part lives in [`part-07-approvals`](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-07-approvals) in the [companion repo](https://github.com/yadneshSalvi/codex-app-server-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's lines highlighted.

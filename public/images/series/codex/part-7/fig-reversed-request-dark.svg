@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="880" viewBox="0 0 1240 880" role="img">
+  <rect width="1240" height="880" fill="#151311"/>
+  <text x="48" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#756d62">THE FOURTH SHAPE &#183; THE DIRECTION OF AUTHORITY REVERSES</text>
+  <line x1="48" y1="66" x2="1192" y2="66" stroke="#2b2723" stroke-width="1.5"/>
+
+  <text x="60" y="94" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#a49c90" text-anchor="start">The grammar Part 1 taught (and Part 2's reader already routes):</text>
+  
+  <rect x="60" y="106" width="352" height="86" rx="12" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="82" y="138" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14.5" fill="#a49c90" text-anchor="start">request</text>
+  <text x="82" y="162" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#756d62" text-anchor="start">you &#8594; engine &#183; one reply will quote your id</text>
+  <text x="390" y="138" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#756d62" text-anchor="end">ID &#183; YOU NUMBER IT</text>
+  
+  <rect x="444" y="106" width="352" height="86" rx="12" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="466" y="138" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14.5" fill="#a49c90" text-anchor="start">response</text>
+  <text x="466" y="162" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#756d62" text-anchor="start">engine &#8594; you &#183; the reply that quotes it</text>
+  <text x="774" y="138" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#756d62" text-anchor="end">SAME ID</text>
+  
+  <rect x="828" y="106" width="352" height="86" rx="12" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="850" y="138" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14.5" fill="#a49c90" text-anchor="start">notification</text>
+  <text x="850" y="162" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#756d62" text-anchor="start">engine &#8594; you &#183; narration, no reply owed</text>
+  <text x="1158" y="138" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#756d62" text-anchor="end">NO ID</text>
+
+  <!-- the fourth shape, hero card: a REAL captured request -->
+  <text x="60" y="246" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#e5825a" text-anchor="start">And the shape approvals add: the engine numbers ITS note, slides it under the door, and stops:</text>
+  <rect x="60" y="264" width="760" height="238" rx="14" fill="#211e1a" stroke="#5e463a" stroke-width="2"/>
+  <text x="86" y="298" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="18" fill="#ebe7df" text-anchor="start">engine &#8594; you</text>
+  <text x="794" y="298" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#e5825a" text-anchor="end">SERVER REQUEST &#183; HAS AN ID &#183; BLOCKS</text>
+  <line x1="60" y1="312" x2="820" y2="312" stroke="#2b2723"/>
+  <text x="86" y="342" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#e5825a" text-anchor="start">{"id": 0, "method": "item/commandExecution/requestApproval",</text>
+  <text x="86" y="368" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#ebe7df" text-anchor="start"> "params": {"threadId": "019f38df-&#8230;", "itemId": "call_iZyre5&#8230;",</text>
+  <text x="86" y="394" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#ebe7df" text-anchor="start">   "command": "/bin/zsh -lc 'curl -sI https://example.com | head -3'",</text>
+  <text x="86" y="420" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#ebe7df" text-anchor="start">   "cwd": "&#8230;/probes/ws-a",</text>
+  <text x="86" y="446" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#a49c90" text-anchor="start">   "reason": "Do you want to allow this network command to run</text>
+  <text x="86" y="472" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#a49c90" text-anchor="start">              outside the sandbox so I can execute it exactly &#8230;?", &#8230;}}</text>
+
+  <!-- the wait -->
+  <rect x="60" y="524" width="760" height="64" rx="12" fill="#26200f" stroke="#6b5426" stroke-width="1.5"/>
+  <text x="86" y="550" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#dcae62" text-anchor="start">&#8230; and nothing moves. The item is frozen; the turn holds its breath.</text>
+  <text x="86" y="572" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#dcae62" text-anchor="start">No retry, no timeout of its own: the engine will wait as long as we let it.</text>
+
+  <!-- our reply -->
+  <rect x="60" y="610" width="760" height="118" rx="14" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="86" y="644" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="18" fill="#ebe7df" text-anchor="start">you &#8594; engine</text>
+  <text x="794" y="644" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#756d62" text-anchor="end">RESPONSE &#183; QUOTES ID 0</text>
+  <line x1="60" y1="658" x2="820" y2="658" stroke="#2b2723"/>
+  <text x="86" y="688" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#a3c57d" text-anchor="start">{"jsonrpc": "2.0", "id": 0, "result": {"decision": "accept"}}</text>
+  <text x="86" y="712" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#756d62" text-anchor="start">&#8594; serverRequest/resolved arrives; the frozen item runs</text>
+
+  <!-- side notes -->
+  <line x1="838" y1="290" x2="862" y2="290" stroke="#e5825a" stroke-width="1.5"/>
+  <text x="872" y="296" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="700" font-size="15" fill="#e5825a" text-anchor="start">The roles swap.</text>
+  <text x="872" y="322" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a49c90" text-anchor="start">Every id so far was ours. This one is</text>
+  <text x="872" y="344" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a49c90" text-anchor="start">the engine's, and now WE owe the reply.</text>
+  <text x="872" y="366" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a49c90" text-anchor="start">Part 2's reader already routes id+method</text>
+  <text x="872" y="388" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a49c90" text-anchor="start">to _server_handlers; the desk was built</text>
+  <text x="872" y="410" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a49c90" text-anchor="start">four parts ago. Today it gets staffed.</text>
+
+  <line x1="838" y1="640" x2="862" y2="640" stroke="#a3c57d" stroke-width="1.5"/>
+  <text x="872" y="646" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-weight="700" font-size="15" fill="#a3c57d" text-anchor="start">Returning = answering.</text>
+  <text x="872" y="672" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a49c90" text-anchor="start">The handler's return value IS the</text>
+  <text x="872" y="694" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a49c90" text-anchor="start">JSON-RPC response. Between request</text>
+  <text x="872" y="716" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a49c90" text-anchor="start">and return, an asyncio.Future waits</text>
+  <text x="872" y="738" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#a49c90" text-anchor="start">for a click that may never come.</text>
+
+  <text x="620" y="800" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#a49c90" text-anchor="middle">One wrinkle the next figure resolves: fileChange requests carry NO patch and NO file list,</text>
+  <text x="620" y="824" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#a49c90" text-anchor="middle">only an itemId. The patch arrived moments earlier, on the item's own item/started. Join them.</text>
+</svg>

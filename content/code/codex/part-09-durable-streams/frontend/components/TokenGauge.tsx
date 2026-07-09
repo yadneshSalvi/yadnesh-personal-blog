@@ -24,11 +24,10 @@ function Row({ label, reading }: { label: string; reading?: TokenUsage }) {
   );
 }
 
-// The live meter in the header (Part 8). The big number is THIS TURN —
-// the backend's computed delta, because neither wire field means "this
-// turn" (`.last` is one model request, `.total` is the thread's life);
-// the thread's cumulative total sits beside it in a quieter voice,
-// under its true name. Click for the full breakdown of all three.
+// The live meter in the header (Part 8). The big number is THIS TURN
+// (`.last` — the only per-turn reading the protocol offers); the thread's
+// cumulative total sits beside it in a quieter voice, under its true
+// name. Click for the full breakdown of both readings.
 export function TokenGauge({ usage }: { usage: UsageReading | null }) {
   const [open, setOpen] = useState(false);
   if (!usage?.total?.totalTokens) return null;
@@ -41,7 +40,7 @@ export function TokenGauge({ usage }: { usage: UsageReading | null }) {
         title="Tokens this turn · this thread (click for the breakdown)"
         className="flex items-center gap-1.5 rounded-lg border border-stone-200 px-2.5 py-1 font-mono text-xs text-stone-500 hover:border-accent hover:text-accent dark:border-stone-800 dark:text-stone-400"
       >
-        <span data-testid="gauge-turn">{compact((usage.turn ?? usage.last)?.totalTokens)}</span>
+        <span data-testid="gauge-turn">{compact(usage.last?.totalTokens)}</span>
         <span className="text-stone-300 dark:text-stone-600">·</span>
         <span data-testid="gauge-thread" className="text-stone-400 dark:text-stone-500">
           {compact(usage.total?.totalTokens)} thread
@@ -63,8 +62,7 @@ export function TokenGauge({ usage }: { usage: UsageReading | null }) {
               </tr>
             </thead>
             <tbody>
-              <Row label="this turn" reading={usage.turn ?? usage.last} />
-              <Row label="last request" reading={usage.last} />
+              <Row label="this turn" reading={usage.last} />
               <Row label="this thread" reading={usage.total} />
             </tbody>
           </table>

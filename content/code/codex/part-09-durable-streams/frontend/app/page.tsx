@@ -160,9 +160,8 @@ export default function Home() {
   const [diff, setDiff] = useState("");
   const [diffOpen, setDiffOpen] = useState(false);
   const [previewVersion, setPreviewVersion] = useState(0);
-  // The meter: the latest usage_update for the open project — `.turn`
-  // for the running turn (the backend's computed delta), `.total` for
-  // the thread.
+  // The meter: the latest usage_update for the open project — `.last`
+  // for the turn, `.total` for the thread.
   const [usage, setUsage] = useState<UsageReading | null>(null);
 
   const loadFiles = useCallback(async (id: string) => {
@@ -387,9 +386,8 @@ export default function Home() {
               : event.status === "interrupted"
                 ? "stopped"
                 : "error",
-          // Per-turn since Part 8: `usage` is the backend's computed
-          // delta of totals — what THIS turn cost. Not the thread's
-          // cumulative bill, and not `.last` (one model request's sliver).
+          // Per-turn since Part 8: the receipt shows `.last`, what THIS
+          // turn cost — not the thread's cumulative bill.
           totalTokens: event.usage?.totalTokens,
           durationMs: event.duration_ms,
         });
@@ -402,12 +400,7 @@ export default function Home() {
         // re-pull the registry so the sidebar learns the name.
         refreshProjects();
       } else if (event.type === "usage_update") {
-        setUsage({
-          last: event.last,
-          total: event.total,
-          turn: event.turn,
-          context_window: event.context_window,
-        });
+        setUsage({ last: event.last, total: event.total, context_window: event.context_window });
       } else if (event.type === "steered") {
         // The chip was set optimistically when the POST answered; the
         // stream's copy is for anyone else watching (Part 9's two tabs).
