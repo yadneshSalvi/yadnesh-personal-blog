@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="960" viewBox="0 0 1240 960" role="img">
+  <rect width="1240" height="960" fill="#faf9f6"/>
+  <text x="48" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#8f887a">RUNNING AND WATCHING STOP SHARING A LIFETIME</text>
+  <line x1="48" y1="66" x2="1192" y2="66" stroke="#e7e3d9" stroke-width="1.5"/>
+
+  <!-- the before strip -->
+  <rect x="48" y="88" width="1144" height="92" rx="12" fill="none" stroke="#dfa3a3" stroke-width="1.2" stroke-dasharray="7 5"/>
+  <text x="70" y="116" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b91c1c" text-anchor="start">PARTS 2-8</text>
+  <text x="70" y="140" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">POST /chat held the only pipe: the consumer loop lived inside the response, so whoever typed WAS the audience.</text>
+  <text x="70" y="160" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">A refresh cut it, events drained into a queue nobody would read again, and on a one-way wire "silence and thinking are indistinguishable" (Part 2's confession).</text>
+
+  <!-- the run lane -->
+  <rect x="48" y="220" width="300" height="96" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="198" y="252" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" fill="#1f1c19" text-anchor="middle">POST /projects/{id}/chat</text>
+  <text x="198" y="276" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="middle">answers in milliseconds with a</text>
+  <text x="198" y="294" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#b3441a" text-anchor="middle">claim ticket: {turn_id, stream_url}</text>
+
+  <line x1="198" y1="316" x2="198" y2="352" stroke="#8f887a" stroke-width="1.5" />
+     <path d="M 198 352 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 198 352)"/>
+  <text x="210" y="340" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">turn/start &#183; spawns the consumer</text>
+
+  <rect x="48" y="352" width="300" height="128" rx="12" fill="#f6e7df" stroke="#dcb09a" stroke-width="2"/>
+  <text x="198" y="382" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14.5" fill="#b3441a" text-anchor="middle">the consumer task</text>
+  <text x="198" y="406" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1f1c19" text-anchor="middle">drain the queue &#8594; translate() &#8594;</text>
+  <text x="198" y="426" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1f1c19" text-anchor="middle">append to the log &#183; one per turn</text>
+  <text x="198" y="452" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#5b554c" text-anchor="middle">held in CONSUMERS (asyncio keeps</text>
+  <text x="198" y="468" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#5b554c" text-anchor="middle">only weak refs to tasks)</text>
+
+  <line x1="348" y1="416" x2="452" y2="416" stroke="#b3441a" stroke-width="1.5" />
+     <path d="M 452 416 l -5 -8 l 10 0 z" fill="#b3441a" transform="rotate(-90 452 416)"/>
+  <text x="400" y="402" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b3441a" text-anchor="middle">append</text>
+
+  <!-- the log -->
+  <rect x="452" y="336" width="340" height="190" rx="12" fill="#f1efe9" stroke="#e7e3d9" stroke-width="2"/>
+  <text x="622" y="366" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" fill="#1f1c19" text-anchor="middle">events.db &#183; SQLite, WAL mode</text>
+  <text x="622" y="390" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="middle">events: PK (project_id, seq)</text>
+  <text x="622" y="410" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="middle">seq = COALESCE(MAX(seq),0)+1 in the INSERT</text>
+  <text x="622" y="430" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="middle">turns: running &#8594; completed | orphaned</text>
+  <line x1="472" y1="446" x2="772" y2="446" stroke="#e7e3d9"/>
+  <text x="622" y="468" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#b3441a" text-anchor="middle">the log is the source of truth;</text>
+  <text x="622" y="486" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#5b554c" text-anchor="middle">the wakeup (asyncio.Condition per project)</text>
+  <text x="622" y="502" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#5b554c" text-anchor="middle">is a courtesy knock on the door</text>
+
+  <!-- the watch lane -->
+  <line x1="792" y1="416" x2="896" y2="416" stroke="#8f887a" stroke-width="1.5" />
+     <path d="M 896 416 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(-90 896 416)"/>
+  <text x="844" y="402" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="middle">SELECT &#183; knock</text>
+
+  <rect x="896" y="336" width="296" height="190" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="1044" y="366" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#1f1c19" text-anchor="middle">GET /projects/{id}/stream</text>
+  <text x="1044" y="392" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="middle">the dumb pipe: replay rows past the</text>
+  <text x="1044" y="410" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="middle">Last-Event-ID bookmark, mark the seam</text>
+  <text x="1044" y="428" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="middle">(caught_up), then follow the doorbell</text>
+  <line x1="916" y1="446" x2="1172" y2="446" stroke="#e7e3d9"/>
+  <text x="1044" y="470" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#8f887a" text-anchor="middle">knows nothing about turns or agents:</text>
+  <text x="1044" y="488" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#8f887a" text-anchor="middle">it reads a table and waits by a bell.</text>
+  <text x="1044" y="508" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b3441a" text-anchor="middle">id: {seq} on every logged frame</text>
+
+  <!-- the audience row -->
+  <rect x="60" y="596" width="262" height="74" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.2"/><text x="191" y="626" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="middle">the tab that typed</text><text x="191" y="650" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#8f887a" text-anchor="middle">a viewer like any other</text><line x1="191" y1="592" x2="191" y2="558" stroke="#8f887a" stroke-width="1.5" stroke-dasharray="5 4"/>
+     <path d="M 191 558 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(-180 191 558)"/><rect x="346" y="596" width="262" height="74" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.2"/><text x="477" y="626" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="middle">the refreshed tab</text><text x="477" y="650" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#8f887a" text-anchor="middle">replays 1..N, then follows</text><line x1="477" y1="592" x2="477" y2="558" stroke="#8f887a" stroke-width="1.5" stroke-dasharray="5 4"/>
+     <path d="M 477 558 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(-180 477 558)"/><rect x="632" y="596" width="262" height="74" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.2"/><text x="763" y="626" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="middle">a second tab</text><text x="763" y="650" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#8f887a" text-anchor="middle">same log, same pixels</text><line x1="763" y1="592" x2="763" y2="558" stroke="#8f887a" stroke-width="1.5" stroke-dasharray="5 4"/>
+     <path d="M 763 558 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(-180 763 558)"/><rect x="918" y="596" width="262" height="74" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.2"/><text x="1049" y="626" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="middle">curl -N</text><text x="1049" y="650" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#8f887a" text-anchor="middle">the wire, unimpressed</text><line x1="1049" y1="592" x2="1049" y2="558" stroke="#8f887a" stroke-width="1.5" stroke-dasharray="5 4"/>
+     <path d="M 1049 558 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(-180 1049 558)"/>
+  <text x="620" y="546" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#5b554c" text-anchor="middle">every viewer, identical: replay, then follow</text>
+
+  <!-- the control lane -->
+  <rect x="48" y="710" width="1144" height="100" rx="12" fill="#f2f7e8" stroke="#e7e3d9" stroke-width="1.2"/>
+  <text x="70" y="740" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#3f6212" text-anchor="start">CONTROL WAS ALREADY PROJECT-SCOPED</text>
+  <text x="70" y="764" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">POST /interrupt and POST /approvals/{id}/decision never belonged to a stream: they name the project, the ledger and the Futures live server-side,</text>
+  <text x="70" y="784" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">and the outcome lands in the log, where every tab reads it. Part 7 and Part 8 built cross-tab control without knowing it; Part 9 just opens the second tab.</text>
+
+  <rect x="48" y="844" width="1144" height="68" rx="10" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="68" y="872" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">The debt from Part 2, formally repaid: the wire is still one-way and silence still looks like thinking on a socket,</text>
+  <text x="68" y="894" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#b3441a" text-anchor="start">but the socket is now disposable. The log has a bookmark; any viewer can die, come back, and ask what it missed.</text>
+</svg>

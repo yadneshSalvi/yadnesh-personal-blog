@@ -196,6 +196,31 @@ Order observed: `thread/started` → `thread/status/changed (active)` →
   errors "chatgpt authentication required to read rate limits" (proxy → 502
   with that detail); ChatGPT-plan auth returns GetAccountRateLimitsResponse.
 
+## Part-10-build findings (verified live)
+
+- `item/tool/requestUserInput` WORKS on 0.142.4 behind thread/start config
+  `{"features.default_mode_request_user_input": true}`. Real params:
+  `{threadId, turnId, itemId, questions: [{id, header, question, isOther,
+  isSecret, options: [{label, description}]|null}], autoResolutionMs}`.
+  Response: `{answers: {<question_id>: {answers: ["<label>"]}}}`. A "warning"
+  notification ("Under-development features enabled...") rides the stream;
+  suppressible via `suppress_unstable_features_warning`.
+- Plan items: NO plan notifications fire naturally on a read-only planning
+  prompt (the blueprint arrives as numbered markdown agentMessage; readOnly
+  verified zero writes). `turn/plan/updated` fires ONLY when BOTH
+  `{"include_plan_tool": true}` (thread/start config) AND a
+  developerInstructions nudge are set; shape `{plan: [{step, status:
+  pending|inProgress|completed}], explanation}` (status enum is camelCase
+  "inProgress"), re-sent whole as steps tick, mostly during BUILD turns
+  (occasionally the model tracks planning legwork too: stochastic).
+  `item/plan/delta` never fired in any trace. Honest story: blueprint =
+  prose plan on a readOnly turn; the living checklist belongs to the build
+  turn. One request can carry SEVERAL questions (requestUserInput questions
+  is an array); there is no "decline" for questions: timeout = empty sheet.
+- Effort A/B (beanline brief, gpt-5.4-mini, summary=detailed): low = 38.6s,
+  154.0k total tokens (458 reasoning); xhigh = 131.7s, 230.6k total (11,432
+  reasoning). 3.4x wall time, 25x reasoning tokens, 38% larger page.
+
 ## review/start
 
 - Params: `{threadId, target, delivery?}`. Targets: `{type:

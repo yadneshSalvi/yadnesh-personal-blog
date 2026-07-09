@@ -6,6 +6,7 @@ import type {
   Block,
   ChatMessage,
   Mode,
+  PlanStep,
   Project,
   UsageReading,
   WorkspaceFile,
@@ -23,6 +24,13 @@ import { DiffDrawer } from "@/components/DiffDrawer";
 import { ApprovalCard } from "@/components/ApprovalCard";
 import { ModeChip, ModePicker } from "@/components/ModePicker";
 import { TokenGauge } from "@/components/TokenGauge";
+import { QuestionCard } from "@/components/QuestionCard";
+import { PlanChecklist } from "@/components/PlanChecklist";
+import {
+  CareLevelPicker,
+  careDials,
+  type CareLevel,
+} from "@/components/CareLevelPicker";
 
 const SAMPLE_PROMPTS = [
   "Read brief/brief.md and build the site it describes",
@@ -106,18 +114,48 @@ function applyEvent(blocks: Block[], event: AgentEvent): Block[] {
         : b,
     );
   }
+  // Part 10: a question is the approval pattern's third customer — same
+  // arrival-position card, same patch-in-place answer.
+  if (event.type === "question_request") {
+    return [
+      ...blocks,
+      {
+        type: "question",
+        id: event.question_id,
+        questions: event.questions,
+        expiresAtMs: event.expires_at_ms,
+      },
+    ];
+  }
+  if (event.type === "question_resolved") {
+    return blocks.map((b) =>
+      b.type === "question" && b.id === event.question_id
+        ? {
+            ...b,
+            resolved: {
+              answers: event.answers,
+              reason: event.reason,
+              atMs: event.resolved_at_ms,
+            },
+          }
+        : b,
+    );
+  }
   return blocks;
 }
 
 function BlockView({
   block,
   onDecide,
+  onAnswer,
 }: {
   block: Block;
   onDecide: (approvalId: string, decision: string) => Promise<void>;
+  onAnswer: (questionId: string, answers: Record<string, string[]>) => Promise<void>;
 }) {
   if (block.type === "text") return <Markdown text={block.text} />;
   if (block.type === "approval") return <ApprovalCard block={block} onDecide={onDecide} />;
+  if (block.type === "question") return <QuestionCard block={block} onAnswer={onAnswer} />;
   if (block.kind === "commandExecution") return <CommandBadge block={block} />;
   if (block.kind === "reasoning") return <ReasoningDrawer block={block} />;
   return <ItemBadge block={block} />;
@@ -176,6 +214,17 @@ export default function Home() {
   // for the running turn (the backend's computed delta), `.total` for
   // the thread.
   const [usage, setUsage] = useState<UsageReading | null>(null);
+  // Part 10, the composer's two new dials: send the next message as a
+  // read-only blueprint turn, and how hard the builder should think.
+  const [planFirst, setPlanFirst] = useState(false);
+  const [careLevel, setCareLevel] = useState<CareLevel>("standard");
+  // The agent's checklist for the newest turn (plan_update); null when
+  // the turn hasn't sent one — many turns don't, and blueprint turns
+  // usually don't (the plan tool tracks progress, not proposals).
+  const [plan, setPlan] = useState<{
+    steps: PlanStep[];
+    explanation?: string | null;
+  } | null>(null);
 
   const loadFiles = useCallback(async (id: string) => {
     try {
@@ -226,24 +275,32 @@ export default function Home() {
     (event: AgentEvent, projectId: string) => {
       const live = liveRef.current;
       if (event.type === "session_start") {
-        // A new turn enters the log. The badges and the diff describe
-        // ONE turn; a new turn starts clean (this was send()'s job when
-        // the sender owned the stream).
+        // A new turn enters the log. The badges, the diff and the plan
+        // describe ONE turn; a new turn starts clean (this was send()'s
+        // job when the sender owned the stream).
         setBadges({});
         setDiff("");
+        setPlan(null);
         setWorking(true);
         setMessages((all) => {
           const next: ChatMessage[] = [...all];
-          if (event.message !== undefined) next.push({ role: "user", text: event.message });
+          if (event.message !== undefined)
+            next.push({ role: "user", text: event.message, blueprint: event.plan_first });
           next.push({
             role: "assistant",
             blocks: [],
             status: "working",
             turnId: event.turn_id,
+            planFirst: event.plan_first,
+            effort: event.effort,
             startedAtMs: event.started_at_ms ?? Date.now(),
           });
           return next;
         });
+      } else if (event.type === "plan_update") {
+        // The checklist, whole every time — the last write wins, which
+        // is also what makes replay trivial.
+        setPlan({ steps: event.steps, explanation: event.explanation });
       } else if (event.type === "steered") {
         // Every tab learns a steer landed the same way — including the
         // one that sent it. The chip is no longer optimistic.
@@ -401,6 +458,8 @@ export default function Home() {
       setDiffOpen(false);
       setFiles([]);
       setUsage(null);
+      setPlan(null);
+      setPlanFirst(false);
       setWorking(false);
       setPreviewVersion((v) => v + 1);
       loadFiles(id);
@@ -488,6 +547,30 @@ export default function Home() {
     [activeId],
   );
 
+  // Answer one question card — the decide() pattern, third customer.
+  // No optimistic flip here either: the backend fills the Future, the
+  // JSON-RPC response unfreezes the agent's tool call, and the
+  // question_resolved event flips the card in every tab at once.
+  const answer = useCallback(
+    async (questionId: string, answers: Record<string, string[]>) => {
+      if (!activeId) return;
+      try {
+        const res = await fetch(
+          `${API_BASE}/projects/${activeId}/questions/${questionId}/answer`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ answers }),
+          },
+        );
+        if (!res.ok) throw new Error(`The server said ${res.status}.`);
+      } catch {
+        setToast("Could not send the answer. Is the backend running?");
+      }
+    },
+    [activeId],
+  );
+
   // The Stop button. It does NOT abort the fetch — it asks the backend
   // to turn/interrupt the live turn, and the truth comes back on the
   // stream: turn/completed with status "interrupted", which the receipt
@@ -541,13 +624,25 @@ export default function Home() {
     if (!prompt || !activeId || sendingRef.current) return;
     setInput("");
     sendingRef.current = true;
+    // The dials ride every message. plan_first is one-shot: the toggle
+    // arms ONE blueprint turn and disarms itself, so the natural
+    // follow-up ("build it") goes out at the project's own mode without
+    // the user having to remember the switch.
+    const { effort, summary } = careDials(careLevel);
+    const blueprint = planFirst && !working;
     try {
       const res = await fetch(`${API_BASE}/projects/${activeId}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: prompt }),
+        body: JSON.stringify({
+          message: prompt,
+          plan_first: blueprint,
+          effort,
+          summary,
+        }),
       });
       if (!res.ok) throw new Error(`The server said ${res.status}.`);
+      if (blueprint) setPlanFirst(false);
     } catch {
       setToast("Could not send the message. Is the backend running?");
       setInput(prompt); // hand the words back instead of eating them
@@ -566,6 +661,14 @@ export default function Home() {
       m.role === "assistant" &&
       m.status === "working" &&
       m.blocks.some((b) => b.type === "approval" && !b.resolved),
+  );
+  // Same freeze, different card: the agent asked a question and its
+  // tool call waits on the answer sheet.
+  const awaitingQuestion = messages.some(
+    (m) =>
+      m.role === "assistant" &&
+      m.status === "working" &&
+      m.blocks.some((b) => b.type === "question" && !b.resolved),
   );
 
   return (
@@ -677,6 +780,15 @@ export default function Home() {
                         steering — absorbed mid-turn
                       </span>
                     )}
+                    {message.blueprint && (
+                      <span
+                        data-testid="blueprint-chip"
+                        className="mt-1 flex items-center gap-1.5 font-mono text-[11px] text-sky-700 dark:text-sky-400"
+                      >
+                        <span className="size-1.5 rounded-full bg-sky-500" />
+                        blueprint — read-only planning turn
+                      </span>
+                    )}
                   </div>
                 ) : message.role === "notice" ? (
                   <div key={i} className="mb-5 flex justify-center">
@@ -691,6 +803,7 @@ export default function Home() {
                         key={block.type === "text" ? j : block.id}
                         block={block}
                         onDecide={decide}
+                        onAnswer={answer}
                       />
                     ))}
                     {message.status === "working" && message.startedAtMs !== undefined && (
@@ -702,6 +815,12 @@ export default function Home() {
                           message.status === "stopped" ? "stopped by you" : null,
                           message.status === "error" ? "ended with an error" : null,
                           message.status === "orphaned" ? "backend restarted mid-build" : null,
+                          // Part 10: the receipt names the turn's posture
+                          // and effort — the A/B lives right here.
+                          message.planFirst ? "blueprint (read-only)" : null,
+                          message.effort && message.effort !== "medium"
+                            ? `effort ${message.effort}`
+                            : null,
                           message.totalTokens !== undefined
                             ? `${message.totalTokens.toLocaleString()} tokens this turn`
                             : null,
@@ -719,6 +838,11 @@ export default function Home() {
             </main>
           </div>
 
+          {/* The living checklist: pinned above the composer while the
+              newest turn has one. Most turns don't — the panel's absence
+              is the honest default, not a bug. */}
+          {plan && <PlanChecklist steps={plan.steps} explanation={plan.explanation} />}
+
           <footer className="border-t border-stone-200 px-5 py-4 dark:border-stone-800">
             {awaitingApproval && (
               <p
@@ -729,6 +853,15 @@ export default function Home() {
                 The build is waiting for your approval — answer the card above to continue.
               </p>
             )}
+            {awaitingQuestion && (
+              <p
+                data-testid="question-waiting-chip"
+                className="mb-2.5 flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400"
+              >
+                <span className="size-1.5 animate-pulse rounded-full bg-amber-500" />
+                The builder is waiting for your answer — the card above has the choices.
+              </p>
+            )}
             {mode === "read-only" && activeProject && (
               <p
                 data-testid="planning-hint"
@@ -737,6 +870,30 @@ export default function Home() {
                 Planning mode — the builder can read and plan, but the OS refuses every write.
               </p>
             )}
+            {/* The consultative dials: arm ONE blueprint turn, and pick
+                how hard the builder thinks about the next message. */}
+            <div className="mb-2.5 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={planFirst}
+                data-testid="plan-first-toggle"
+                disabled={!activeId || working}
+                onClick={() => setPlanFirst((v) => !v)}
+                title="Send the next message as a read-only planning turn: the builder proposes a numbered plan and cannot write files."
+                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors disabled:opacity-40 ${
+                  planFirst
+                    ? "border-sky-400 bg-sky-50 text-sky-700 dark:border-sky-700 dark:bg-sky-950/40 dark:text-sky-400"
+                    : "border-stone-200 text-stone-500 hover:border-stone-300 dark:border-stone-800 dark:text-stone-400"
+                }`}
+              >
+                <span
+                  className={`size-1.5 rounded-full ${planFirst ? "bg-sky-500" : "bg-stone-300 dark:bg-stone-600"}`}
+                />
+                Plan first
+              </button>
+              <CareLevelPicker level={careLevel} onChange={setCareLevel} />
+            </div>
             <form
               className="flex w-full gap-2.5"
               onSubmit={(e) => {
@@ -753,7 +910,9 @@ export default function Home() {
                     ? "Create a project first"
                     : working
                       ? "Steer the build — it lands mid-turn…"
-                      : "Describe the site you want…"
+                      : planFirst
+                        ? "Describe the job — the builder will propose a plan, not build…"
+                        : "Describe the site you want…"
                 }
                 className="min-w-0 flex-1 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-[15px] outline-none placeholder:text-stone-400 focus:border-accent disabled:opacity-50 dark:border-stone-800 dark:bg-stone-900"
               />

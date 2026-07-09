@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="880" viewBox="0 0 1240 880" role="img">
+  <rect width="1240" height="880" fill="#faf9f6"/>
+  <text x="48" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#8f887a">REPLAY, THEN FOLLOW &#183; ONE RECONNECT, VERBATIM</text>
+  <line x1="48" y1="66" x2="1192" y2="66" stroke="#e7e3d9" stroke-width="1.5"/>
+
+  <!-- browser side -->
+  <rect x="48" y="100" width="504" height="108" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="70" y="130" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">THE BROWSER, AFTER A DROP</text>
+  <text x="70" y="158" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">EventSource reconnects by itself and sends the</text>
+  <text x="70" y="178" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#5b554c" text-anchor="start">last id: it saw, as a header:</text>
+  <text x="300" y="200" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#b3441a" text-anchor="start">Last-Event-ID: 685</text>
+
+  <line x1="552" y1="154" x2="688" y2="154" stroke="#8f887a" stroke-width="1.5" />
+     <path d="M 688 154 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(-90 688 154)"/>
+  <text x="620" y="140" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="middle">GET /stream</text>
+
+  <!-- server side -->
+  <rect x="688" y="100" width="504" height="108" rx="12" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="710" y="130" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">THE DUMB PIPE</text>
+  <text x="710" y="160" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">SELECT seq, payload FROM events</text>
+  <text x="710" y="182" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#b3441a" text-anchor="start">WHERE project_id = ? AND seq &gt; 685</text>
+  <text x="710" y="200" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">ORDER BY seq</text>
+
+  <!-- the frames, verbatim from p9-sse-replay.txt T1b -->
+  <rect x="220" y="268" width="800" height="44" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.2"/><text x="244" y="295" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#3f6212" text-anchor="start">id: 686</text><text x="340" y="295" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">data: {"type": "text_delta", &#8230;}</text><rect x="220" y="322" width="800" height="44" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.2"/><text x="244" y="349" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#3f6212" text-anchor="start">id: 687</text><text x="340" y="349" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">data: {"type": "text_delta", &#8230;}</text><rect x="220" y="376" width="800" height="44" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.2"/><text x="244" y="403" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#3f6212" text-anchor="start">id: 688</text><text x="340" y="403" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">data: {"type": "item_done", "kind": "fileChange", &#8230;}</text><rect x="220" y="430" width="800" height="44" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.2"/><text x="244" y="457" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#3f6212" text-anchor="start">id: 689</text><text x="340" y="457" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">data: {"type": "complete", "status": "completed", "usage": &#8230;}</text><rect x="220" y="484" width="800" height="44" rx="12" fill="#f6e7df" stroke="#dcb09a" stroke-width="2"/><text x="244" y="511" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#b3441a" text-anchor="start">(no id)</text><text x="340" y="511" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#b3441a" text-anchor="start">data: {"type": "caught_up", "last_seq": 689}</text><text x="1040" y="295" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#8f887a" text-anchor="start">&#8592; exactly the four</text><text x="1040" y="313" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#8f887a" text-anchor="start">rows past the</text><text x="1040" y="331" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#8f887a" text-anchor="start">bookmark. Not 689,</text><text x="1040" y="349" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#8f887a" text-anchor="start">not zero: four.</text>
+
+  <!-- the caught_up lesson -->
+  <rect x="220" y="560" width="800" height="106" rx="12" fill="none" stroke="#dcb09a" stroke-width="1.4"/>
+  <text x="244" y="590" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b3441a" text-anchor="start">WHY caught_up CARRIES NO id</text>
+  <text x="244" y="614" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">The browser bookmarks the LAST id it saw, whatever frame carried it. caught_up is</text>
+  <text x="244" y="634" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">ephemeral (never logged): give it an id and the bookmark can point past rows that exist,</text>
+  <text x="244" y="652" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">at frames that were never written down. Only logged rows may move the bookmark.</text>
+
+  <!-- follow phase -->
+  <line x1="620" y1="672" x2="620" y2="700" stroke="#8f887a" stroke-width="1.5" />
+     <path d="M 620 700 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 620 700)"/>
+  <rect x="220" y="700" width="800" height="88" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="244" y="730" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">THE FOLLOW PHASE</text>
+  <text x="244" y="754" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">wait by the project's asyncio.Condition &#8594; re-read the log past the cursor &#8594; repeat;</text>
+  <text x="244" y="774" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">15 quiet seconds become a keepalive comment. Mid-turn reconnect, live: died at 730, resumed at id: 731.</text>
+
+  <rect x="48" y="814" width="1144" height="1" fill="#e7e3d9"/>
+  <text x="48" y="842" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#b3441a" text-anchor="start">The whole contract is one header and one WHERE clause; the browser already speaks its half.</text>
+</svg>

@@ -1,0 +1,525 @@
+---
+title: "Codex App Server in Production, Part 9: Durable Streams: Survive the Refresh"
+subtitle: "POST /chat becomes a claim ticket, a background consumer writes every event to a SQLite log, and every tab becomes a disposable viewer. Refresh mid-build and the conversation rebuilds itself mid-sentence. Kill the backend mid-build and the UI tells the truth about the one thing that died."
+image: "/images/series/codex/part-9/cover-light.svg"
+imageDark: "/images/series/codex/part-9/cover-dark.svg"
+createdAt: "2026-07-09T00:00:00.000Z"
+updatedAt: "2026-07-09T00:00:00.000Z"
+tags: ["codex", "openai", "fastapi", "nextjs", "tutorial"]
+series: "codex-app-server-fastapi-nextjs"
+seriesPart: 9
+---
+
+Here is a number from a real capture: a viewer of a live build died at event 730 and came back asking for what it missed. The server sent it event 731. Not the whole run again, not a shrug, not a spinner over a blank transcript: the one event it hadn't seen, then everything after, live, to the receipt. That single exchange is this part. By the end of this page, a refresh mid-build costs you nothing, a second tab renders the same build pixel for pixel, the Stop button works from a tab that never sent the message, and even `kill -9` on the backend ends in an honest sentence instead of a mystery.
+
+And it closes a debt. [Part 2 killed the engine mid-turn](/blog/codex-2-fastapi-bridge#break-it-on-purpose-kill-the-engine-mid-turn) and confessed the limit of everything it built: on a one-way wire, **silence and thinking are indistinguishable from the receiving end**, and the fix had a name we deferred for seven parts. This is that part.
+
+<Figure
+  src="/images/series/codex/part-9/browser-twotabs-light.svg"
+  srcDark="/images/series/codex/part-9/browser-twotabs-dark.svg"
+  alt="Two browser windows side by side showing the same Pagewright project, byte for byte. Tab 1 is labeled sent every message; tab 2 is labeled never typed, clicked Stop, then Approve. Both show a stopped receipt reading stopped by you, 6 seconds, then a curl request that raised an approval card. The card reads Approved by you 10:41:22 in both tabs, followed by the HTTP/2 200 output and a receipt of 31,149 tokens this turn in 7 seconds. The approval card in tab 2 is outlined, marking where the clicks actually happened."
+  caption="The dessert, from the real e2e run. Tab 2 never typed a word. It stopped the first turn at 6s, approved the second turn's curl, and both tabs rendered every consequence identically, because both are reading the same log."
+  width={1250}
+  height={690}
+/>
+
+Look at what that screenshot claims. The tab on the right has no privileged connection to anything: it opened late, replayed a log, and kept following. Yet Stop worked from it, an approval worked from it, and its transcript matches the sender's. "Which tab owns the build?" has stopped being a meaningful question, and making it meaningless is the whole architecture.
+
+## The disappearing build
+
+First, the crime scene, reproducible in Part 8's Pagewright in ten seconds. Start a build. Watch two badges light up. Press refresh. The page comes back polite and amnesiac: the conversation reloads from [`thread/read`](/blog/codex-5-threads) *up to the last completed turn*, and the turn that was alive when you refreshed is gone from the screen. Not from the world: the agent is still hammering and files are still landing in the workspace. You threw away the only pipe that was watching.
+
+The root cause is a decision made all the way back in [Part 2's envelope design](/blog/codex-2-fastapi-bridge#designing-the-envelope) and never revisited: `POST /chat` returns a `StreamingResponse`, so the consumer loop lives inside one HTTP response, so whoever sent the message *is* the audience. Every part since has made that single pipe more valuable: it carries command output, patches, [approval cards](/blog/codex-7-approvals), [steer confirmations](/blog/codex-8-stop-steer-usage#shouting-through-the-hatch), per-turn receipts. And every part left it exactly as fragile as a browser tab, which is to say: fragile as a sneeze.
+
+You know this failure from the rest of your life as an engineer. Everyone has started a long migration over SSH from a hotel, watched the wifi hiccup at minute forty, and reconnected to a healthy database, a finished job, and no way to see the output that scrolled into a dead terminal. The work succeeded; the *delivery* died. The fix that time (`tmux`, next time, always) is the same fix as this time: put a process that survives disconnection between the work and the watcher, and write things down.
+
+Here's where this series gets to cheat, pleasantly. The sibling series taught this exact architecture from zero: [Agent SDK Part 9](/blog/agent-sdk-9-durable-streams) derives the worker/viewer split from first principles, builds the [flight recorder](/blog/agent-sdk-9-durable-streams#the-flight-recorder), agonizes properly over [subscribe-first-or-replay-first](/blog/agent-sdk-9-durable-streams#the-hub-carries-the-present), and earns the [dumb pipe](/blog/agent-sdk-9-durable-streams#the-dumb-pipe) one design question at a time. If durable streams are new to you, read it; it's the from-zero chapter and nothing here re-teaches it. This part builds the **Codex-shaped version**, which turns out to differ in honest, instructive ways: our worker already exists (the notification queue has been waiting since Part 2), our log is per-*project* rather than per-request, and our fan-out needs no hub at all. One figure for the whole machine, then we build it:
+
+<Figure
+  src="/images/series/codex/part-9/fig-worker-viewer-light.svg"
+  srcDark="/images/series/codex/part-9/fig-worker-viewer-dark.svg"
+  alt="Architecture diagram titled running and watching stop sharing a lifetime. A dashed red strip recalls Parts 2 through 8: POST /chat held the only pipe, whoever typed was the audience, and on a one-way wire silence and thinking were indistinguishable, Part 2's confession. Below, the new machine: POST /projects/id/chat answers in milliseconds with a claim ticket of turn_id and stream_url, spawns the consumer task, which drains the queue, translates, and appends to events.db, a SQLite file in WAL mode with primary key project_id and seq, where seq is computed as MAX plus one inside the insert. The turns table tracks running to completed or orphaned. An arrow labeled SELECT and knock leads to GET /projects/id/stream, the dumb pipe that replays rows past the Last-Event-ID bookmark, marks the seam with caught_up, then follows the per-project asyncio.Condition doorbell. Four identical subscribers hang below: the tab that typed, the refreshed tab, a second tab, and curl -N. A green band notes control was already project-scoped: interrupt and approval decisions name the project, land in the log, and every tab reads them. A footer says the debt from Part 2 is formally repaid: the socket is now disposable, the log has a bookmark."
+  caption="The architecture change of Act II, one split: the consumer writes the log, viewers replay then follow. The Part 2 confession sits at the top because this diagram is its repayment plan."
+  width={1240}
+  height={960}
+/>
+
+## SQLite enters, on a leash
+
+Eight parts, zero databases. That was a deliberate discipline: threads live in [the engine's own rollouts](/blog/codex-concepts#rollouts), projects live in a flat `projects.json`, sites live as files on disk. Every time state appeared, something that already existed turned out to own it. So why does Part 9 finally break the streak?
+
+Because this state has no owner. Think about what a reconnecting tab actually needs to ask: *which events of this project's life have I not seen?* The app-server can't answer that. It holds the **conversation**, durable in the rollout, replayable with `thread/read`, and it holds it well. But "what did your product already deliver to which viewer" is not a protocol concept; it's a delivery guarantee, and delivery guarantees belong to the product making them. What was already streamed, what a dead tab missed, which turn was mid-flight when the process died: those are our facts. Our facts get our table.
+
+```python filename="backend/app/eventlog.py" repo="part-09-durable-streams/backend/app/eventlog.py" lines="38-53"
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS events (
+    project_id TEXT NOT NULL,
+    seq        INTEGER NOT NULL,
+    payload    TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    PRIMARY KEY (project_id, seq)
+);
+CREATE TABLE IF NOT EXISTS turns (
+    turn_id      TEXT PRIMARY KEY,
+    project_id   TEXT NOT NULL,
+    status       TEXT NOT NULL,
+    started_at   TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    completed_at TEXT
+);
+"""
+```
+
+One file (`projects/events.db`, living with the rest of the gitignored runtime state), two tables, no ORM, and one difference from the sibling worth noticing: the primary key is `(project_id, seq)`, not `(request_id, seq)`. The sibling logged each *run* as its own numbered story; Pagewright logs each **project** as one continuous tape, every turn appended to the same reel. That choice is what lets a fresh tab replay an entire conversation, receipts and all, from a single stream.
+
+The write path is two operations, and the second one is this part's favorite trick:
+
+```python filename="backend/app/eventlog.py" repo="part-09-durable-streams/backend/app/eventlog.py" lines="82,87-98"
+async def publish(project_id: str, event: dict) -> int:
+    cur = _conn.execute(
+        "INSERT INTO events (project_id, seq, payload) "
+        "SELECT ?, COALESCE(MAX(seq), 0) + 1, ? FROM events WHERE project_id = ? "
+        "RETURNING seq",
+        (project_id, json.dumps(event), project_id),
+    )
+    seq = cur.fetchone()[0]
+    _conn.commit()
+    cond = condition_for(project_id)
+    async with cond:
+        cond.notify_all()
+    return seq
+```
+
+Two things earn their lines here. First, **the sequence number is computed inside the INSERT**: `COALESCE(MAX(seq), 0) + 1`, per project, atomically, no counter in Python. Numbering lives in the table because the table is the only thing that survives a restart: a backend that boots fresh and appends to an old project continues the count at 1373 instead of starting a second seq 1, and you'll watch exactly that happen in the break-it section. State that must survive the process must not live in the process; this line is that rule at its smallest scale.
+
+Second, what happens after the commit: `condition_for(project_id)` fetches a per-project `asyncio.Condition` and the publisher knocks on it with `notify_all()`. The sibling built a broadcast hub for this, a dict of queues with `publish` fanning out copies. We don't need one, and the distinction is worth keeping. A hub *carries the events*; if it drops one, the subscriber needs the log anyway. Our condition carries **nothing**. It's a doorbell. Viewers sleep on it, wake when it rings, and re-read the log past their own cursor. The log is the source of truth; the wakeup is a courtesy. A viewer that misses a knock recovers by reading, same as a viewer that wasn't born yet, and there's no second data path to keep consistent with the first.
+
+<Callout type="info" title="Why the app-server process is not the durability layer">
+It's tempting to point at the engine and say "it persists threads, let it persist this too." It does persist threads: the rollout survives anything short of deleting `~/.codex/sessions`, and `thread/read` will replay the conversation from a cold start. But the rollout stores what was *said*, not what was *delivered*: it has no concept of your SSE envelope, your sequence numbers, your approval cards, or which of your tabs saw which frame. Lean on it for what it owns (the conversation; it stays our cold backstop) and own what it doesn't. The engine keeps the minutes of the meeting. Your product promised people a live broadcast, and the tape of that broadcast is yours to keep.
+</Callout>
+
+One more honesty note, because the sibling made the opposite choice and both are right: this backend uses stdlib `sqlite3`, synchronously, no `aiosqlite`. Appends are single-row inserts on a database in WAL mode (write-ahead logging: readers and the writer stop blocking each other, which is the point of a log with many viewers), they take microseconds, and one uvicorn worker has been the explicit deal of this series [since Part 5](/blog/codex-5-threads). Shard across workers and both the doorbell (in-process memory) and the blocking writes need upgrades; the path is the one the sibling names: Postgres for the log, LISTEN/NOTIFY or Redis for the knock, replay-then-follow untouched.
+
+Checkpoint. Right now you have: a durable, per-project, monotonically numbered event log with a doorbell, and nothing writing to it.
+
+## The consumer task owns the turn
+
+Since Part 2, the heart of the backend has been a `while True` loop that drains the thread's notification queue, translates each protocol notification into [the event vocabulary](/blog/codex-2-fastapi-bridge#designing-the-envelope), and yields it into an HTTP response. Part 9's move is almost embarrassingly small: keep the loop, change where it lives and where it writes. It becomes `consume_turn`, a background task, one per turn, and its destination stops being "whoever is on the other end of this response" and becomes the log:
+
+```python filename="backend/app/main.py" repo="part-09-durable-streams/backend/app/main.py" lines="356-358,384,396-397,401,406-408"
+            event = translate(note)
+            if event is None:
+                continue
+            await eventlog.publish(project_id, event)
+            if event["type"] in ("complete", "error"):
+                return
+    finally:
+        turns.end(project_id, turn_id)
+        eventlog.finish_turn(turn_id, outcome)
+        CONSUMERS.pop(turn_id, None)
+```
+
+That's the skeleton; the full file shows everything riding inside it unchanged from Part 8: the `turnId` filter, the per-turn usage delta, the fileChange join that enriches approval cards with their patches. What changed is that nobody holds a pipe to it. The turn now outlives every viewer, which is the sentence this whole part exists to make true.
+
+The `finally` stamps the ending twice, deliberately: `turns.end` clears the in-memory active-turn ledger (Part 8's, unchanged, still what Stop and steer consult), while `eventlog.finish_turn` writes the ending into the **turns table** with the wire's own word for it: `completed`, `interrupted`, or `failed`. In-memory state for the questions only this process can answer, durable state for the questions the *next* process will ask. Hold that thought for the break-it section.
+
+One familiar trap travels with any backgrounded task, and the sibling [taught it with the appropriate fear](/blog/agent-sdk-9-durable-streams#the-worker-owns-the-run): asyncio holds only weak references to tasks, so a fire-and-forgotten `create_task()` result can be garbage-collected mid-build, silently, on no schedule you can reproduce. The fix costs a dict we wanted anyway:
+
+```python filename="backend/app/main.py" repo="part-09-durable-streams/backend/app/main.py" lines="312-316"
+# Every consumer task currently in flight, keyed by turn_id. This dict
+# is doing invisible, load-bearing work: asyncio keeps only WEAK
+# references to tasks, so a create_task() result nobody stores can be
+# garbage-collected mid-run. Holding it here is what keeps it alive.
+CONSUMERS: dict[str, asyncio.Task] = {}
+```
+
+And now the endpoint that has anchored every part since Part 2 stops streaming. Same URL, same steer-router at the top (a message that arrives mid-turn still becomes a [`turn/steer`](/blog/codex-8-stop-steer-usage#shouting-through-the-hatch), exactly as in Part 8, except the `steered` event now lands in the log where every tab reads it). What changes is the ending:
+
+```python filename="backend/app/main.py" repo="part-09-durable-streams/backend/app/main.py" lines="464,467-468,472-475,481-484"
+    turn_id = started["turn"]["id"]
+    turns.begin(project_id, thread_id, turn_id)
+    eventlog.begin_turn(project_id, turn_id)
+    await eventlog.publish(project_id, {
+        "type": "session_start", "session_id": thread_id,
+        "project_id": project_id, "mode": mode, "turn_id": turn_id,
+        "message": req.message, "started_at_ms": int(time.time() * 1000)})
+    CONSUMERS[turn_id] = asyncio.create_task(consume_turn(
+        project_id, thread_id, turn_id, req.message, workspace, queue))
+    return {"turn_id": turn_id, "thread_id": thread_id,
+            "stream_url": f"/projects/{project_id}/stream"}
+```
+
+`POST /chat` answers in milliseconds with a **claim ticket**: the turn's name and the address where its events will be available to anyone, forever. And read the `session_start` it logs, because it carries two fields the wire never needed before: `message` and `started_at_ms`. Until today, the user's own words never rode the stream; the tab that sent them already had them on screen. That assumption dies the moment every tab is a viewer of the log, *including the one that typed*. If the question isn't in the log, a second tab renders an answer to nothing. The timestamp gets cashed in on the frontend: it's what lets a refreshed tab show the turn's true elapsed time instead of restarting a stopwatch and lying.
+
+Note what this part does **not** keep: no inline-streaming fallback, no compatibility mode, no dual code path. The old architecture is gone, not deprecated. One architecture, one source of truth, or you spend the rest of the series debugging the disagreements between two.
+
+Checkpoint. Sending a message now starts a build that talks to nobody, writes everything down, and returns a ticket. Time to spend the ticket.
+
+## Replay, then follow
+
+The new `GET /projects/{id}/stream` is the endpoint the series has been quietly designing toward since the SSE envelope first appeared, and it is proudly, deliberately dumb. It knows nothing about turns, agents, approvals, or Codex. It reads a table and waits by a doorbell:
+
+```python filename="backend/app/main.py" repo="part-09-durable-streams/backend/app/main.py" lines="497-505,509"
+    header = request.headers.get("last-event-id", "")
+    if header.isdigit():
+        after = int(header)
+
+    async def frames(last: int):
+        # Replay: the past, straight from the table.
+        for seq, event in eventlog.replay(project_id, last):
+            last = seq
+            yield sse(event, event_id=seq)
+        yield sse({"type": "caught_up", "last_seq": last})
+```
+
+Replay is a SELECT: everything past the caller's bookmark, in order. A fresh tab has no bookmark and gets the whole tape from seq 1; a reconnecting browser sends `Last-Event-ID` and gets only its gap; `?after=` offers the same bookmark to curl and tests. Then one marker frame, and then the follow phase, which is the doorbell from the eventlog section finally answering:
+
+```python filename="backend/app/main.py" repo="part-09-durable-streams/backend/app/main.py" lines="514-532"
+        cond = eventlog.condition_for(project_id)
+        while True:
+            rows = eventlog.replay(project_id, last)
+            for seq, event in rows:
+                last = seq
+                yield sse(event, event_id=seq)
+            if rows:
+                continue
+            async with cond:
+                # Re-check under the lock: an append between our read
+                # and this line must not become a missed wakeup.
+                if eventlog.tail_seq(project_id) > last:
+                    continue
+                try:
+                    await asyncio.wait_for(cond.wait(), timeout=15)
+                    continue
+                except TimeoutError:
+                    pass
+            yield ": keepalive\n\n"
+```
+
+Read the loop's rhythm: read past the cursor, emit, and only when a read comes back empty go to sleep on the condition. The commented re-check is the one concurrency subtlety in the file, and it's the doorbell pattern's classic: between "my read found nothing" and "I started waiting," an append can land and knock on a door nobody was behind yet; re-checking the tail under the lock turns that lost wakeup into a `continue`. Fifteen silent seconds become a keepalive comment, the same dead-socket insurance [Part 7 bought for hanging approvals](/blog/codex-7-approvals#the-card-at-the-window). And because every viewer re-reads *the log* rather than draining a private queue, a slow tab, a stalled tab, or a tab on a train can fall arbitrarily far behind and recover by itself. Nothing waits for it, nothing buffers per-subscriber, nothing bursts.
+
+Where does the browser's bookmark come from? From SSE itself. The wire format has always had a second line we never used: `id:`, riding *outside* the JSON payload, at the protocol layer. Browsers remember the last `id:` they saw and send it back as `Last-Event-ID` when they reconnect, unprompted, as standard behavior. So the envelope grows one line and the vocabulary grows zero event types:
+
+```python filename="backend/app/events.py" repo="part-09-durable-streams/backend/app/events.py" lines="50,56-58"
+def sse(event: dict, event_id: int | None = None) -> str:
+    if event_id is None:
+        return f"data: {json.dumps(event)}\n\n"
+    return f"id: {event_id}\ndata: {json.dumps(event)}\n\n"
+```
+
+Here's the whole contract on the wire, verbatim from the captures, ids and all:
+
+<Figure
+  src="/images/series/codex/part-9/term-replay.svg"
+  alt="A dark terminal showing curl replaying a project's log. A fresh curl with no bookmark receives id 1 with the session_start carrying the Sunny Sips build prompt, a note that 687 more frames follow each wearing its seq as the SSE id, then id 689 with the complete event showing 83,034 total tokens, then a caught_up frame with last_seq 689 and a comment pointing out it has no id line. A second curl sends the header Last-Event-ID: 685 and receives exactly ids 686, 687, 688, and 689 followed by caught_up. A final comment notes that mid-turn it is the same sentence: a viewer that died at 730 reconnected, got id 731 first, then followed the live doorbell to the receipt at id 925."
+  caption="The Sunny Sips project's tape, interrogated twice. A fresh viewer gets 689 frames; a viewer that saw 685 gets exactly four. Same endpoint, same code path, different bookmark."
+  width={1040}
+  height={564}
+/>
+
+Now the small frame that carries the sharpest design lesson of the part. `caught_up` marks the seam between replay and live tail, and the frontend genuinely needs that seam (it's how the UI knows "redrawing the past" has become "watching the present"). But look again at the capture: **`caught_up` is the one frame with no `id:` line**, and that is not laziness.
+
+<Figure
+  src="/images/series/codex/part-9/fig-replay-light.svg"
+  srcDark="/images/series/codex/part-9/fig-replay-dark.svg"
+  alt="Sequence diagram of one reconnect, verbatim. The browser, after a drop, sends Last-Event-ID 685; the dumb pipe runs SELECT seq, payload FROM events WHERE project_id = ? AND seq greater than 685 ORDER BY seq. Four frames return, ids 686 and 687 as text deltas, 688 as a fileChange item_done, 689 as the complete event, and then a highlighted frame labeled no id carrying caught_up with last_seq 689. A callout box explains why caught_up carries no id: the browser bookmarks the last id it saw, whatever frame carried it; caught_up is ephemeral and never logged, so giving it an id could move the bookmark past rows that exist, at frames that were never written down; only logged rows may move the bookmark. Below, the follow phase waits on the project's asyncio.Condition, re-reads the log past the cursor, and turns fifteen quiet seconds into a keepalive comment, with a note that a mid-turn viewer that died at 730 resumed at id 731. The footer reads: the whole contract is one header and one WHERE clause; the browser already speaks its half."
+  caption="One reconnect, every number real. The rule under the highlighted frame is the part's design lesson: only logged rows may move the browser's bookmark."
+  width={1240}
+  height={880}
+/>
+
+Work the failure through, because it's the kind that ships and then bites in month three. The browser's bookmark is *the last `id:` it saw, on whatever frame carried it*. `caught_up` is ephemeral: never written to the log, describing the stream rather than the build. Give it an id (a counter, a timestamp, anything not a logged seq) and a connection that drops right after the seam reconnects with a bookmark pointing at a row that does not exist, and the replay silently skips real events. The rule that falls out is worth engraving: **only logged rows may move the bookmark.** If a frame isn't in the table, it doesn't get an id; if it doesn't get an id, losing it costs nothing, which is exactly what ephemeral should mean.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 2 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 3-panel comic strip, panels in a single row separated by thin vertical black dividers, about a power cut that does not stop a robot builder because a flight recorder keeps the record. Panel 1: a cozy workshop; a friendly little robot builder in a yellow hard hat hammers on a small half-built model storefront house standing on a workbench, hammer raised mid-swing with motion lines; Yad stands to the left watching and writing in a small paper notepad; on the workbench beside the storefront sits a small bright orange box labeled "FLIGHT RECORDER"; a ceiling lamp glows above. Panel 2: the entire panel is almost fully black, a power cut; a small jagged lightning sound effect at the top reads "ZZAP!"; in the darkness two glowing robot eyes remain calm, and hand-lettered sound effects read "TAP TAP TAP" beside faint motion lines, the building never stopped; a startled pair of human eyes blinks wide on the left. Panel 3: lights back on; the model storefront is now visibly FINISHED with a little awning and door; the robot calmly taps the bright orange "FLIGHT RECORDER" box with one finger, a paper tape sticking out of it, and says "SEQ 689."; Yad frantically flips through his messy paper notepad with loose pages flying and says "WHERE WAS I?". Clean readable hand-lettered speech bubbles and labels, short ALL-CAPS text, minimal text: only "FLIGHT RECORDER", "ZZAP!", "TAP TAP TAP", "SEQ 689.", "WHERE WAS I?". No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/codex/part-9/comic-blackout.png"
+  alt="Comic in three panels. Panel one: in a cozy workshop, a robot builder in a yellow hard hat hammers a half-built model storefront while Yad, a bearded developer with headphones, takes notes on a paper notepad; a bright orange box labeled flight recorder sits on the bench. Panel two: total blackout with a ZZAP sound effect; in the dark, the robot's calm glowing eyes and the sound tap tap tap show the building never stopped, while a pair of startled human eyes goes wide. Panel three: lights back on; the storefront is finished with an awning, the robot calmly taps the flight recorder box, its paper tape sticking out, and says seq 689, while Yad flips frantically through his notepad asking where was I."
+  caption="The lights are the stream; the building is the build. When they came back on, one of the two parties in this workshop knew exactly where it was. The number on the tape is this part's real capture."
+  width={1536}
+  height={1024}
+/>
+
+## The browser's half: EventSource, and one guard
+
+Since [Part 3](/blog/codex-3-builder-ui#reading-the-stream-three-rules-and-a-shrug) the frontend has parsed SSE by hand with a fetch-reader, for the honest reason the sibling had too: the stream came from a POST with a body, and the browser's built-in SSE client, [`EventSource`](/blog/codex-concepts#event-source), only speaks GET. That constraint evaporated the moment `/stream` became a GET, so the fetch-reader retires and its replacement brings the feature this part is named after: **automatic reconnection, with the bookmark sent back for free**. When the connection drops, the browser retries by itself, attaches `Last-Event-ID`, and our replay does the rest. The reconnect path on the client is zero lines of code. It is not, however, zero lines of *care*:
+
+```tsx filename="frontend/app/page.tsx" repo="part-09-durable-streams/frontend/app/page.tsx" lines="363-386"
+      es.onmessage = (e) => {
+        const event = JSON.parse(e.data) as AgentEvent;
+        if (event.type === "caught_up") {
+          // The seam between past and present. Side effects held back
+          // during replay happen once, here: the files pane and the
+          // preview catch up to everything the replay described.
+          if (!liveRef.current) {
+            liveRef.current = true;
+            loadFiles(projectId);
+            setPreviewVersion((v) => v + 1);
+          }
+          return;
+        }
+        // The dedup guard. Replay-then-follow delivers at least once;
+        // the seq in the SSE id field makes it exactly-once where it
+        // matters. (caught_up is handled above the guard: it carries no
+        // id, so e.lastEventId would hold the PREVIOUS event's seq.)
+        const seq = Number(e.lastEventId);
+        if (seq) {
+          if (seq <= lastSeq) return;
+          lastSeq = seq;
+        }
+        handleEvent(event, projectId);
+      };
+```
+
+Two ideas, both consequences of the server's design. The `caught_up` branch is the seam becoming product behavior: during replay, side effects that only make sense once (refetch the file tree, bump the preview's cache-buster) are held back, then done a single time when the past ends. Without that, replaying a 900-event log would hammer the files endpoint hundreds of times to reach the same final state.
+
+The guard below it is the client's half of the at-least-once bargain. Replay-then-follow can hand you an event twice at the seams; every logged event wears its seq; drop what you've already seen. Note the parenthetical, too: because `caught_up` has no id, the browser reports the previous frame's id alongside it, and handling it above the guard keeps the marker from being swallowed as a duplicate. The no-id decision on the server and this ordering on the client are one design, split across two files.
+
+## The conversation is built from the log
+
+Here is the change that makes N tabs agree, and it's a deletion. `send()` used to be the frontend's biggest function: append the user bubble optimistically, open a fetch-reader on the response, drive the whole event switch, clean up in a `finally`. Now:
+
+```tsx filename="frontend/app/page.tsx" repo="part-09-durable-streams/frontend/app/page.tsx" lines="539-557"
+  async function send(text: string) {
+    const prompt = text.trim();
+    if (!prompt || !activeId || sendingRef.current) return;
+    setInput("");
+    sendingRef.current = true;
+    try {
+      const res = await fetch(`${API_BASE}/projects/${activeId}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: prompt }),
+      });
+      if (!res.ok) throw new Error(`The server said ${res.status}.`);
+    } catch {
+      setToast("Could not send the message. Is the backend running?");
+      setInput(prompt); // hand the words back instead of eating them
+    } finally {
+      sendingRef.current = false;
+    }
+  }
+```
+
+It POSTs. That's the function. No bubble is drawn, no stream is opened, no state is touched beyond clearing the input. The words appear when `session_start` comes back *through the log*, in the same instant they appear in every other tab, because there is **no optimistic rendering left in the app**. That discipline is what makes the two-tab screenshot boring to explain: the tab that typed has no private, earlier, slightly different version of events to reconcile. Everyone renders the broadcast; nobody renders their intentions.
+
+The receiving side is the `handleEvent` switch that has grown since Part 3, with the message bookkeeping moved in. A new turn enters the log and every tab does identical things with it:
+
+```tsx filename="frontend/app/page.tsx" repo="part-09-durable-streams/frontend/app/page.tsx" lines="228-246"
+      if (event.type === "session_start") {
+        // A new turn enters the log. The badges and the diff describe
+        // ONE turn; a new turn starts clean (this was send()'s job when
+        // the sender owned the stream).
+        setBadges({});
+        setDiff("");
+        setWorking(true);
+        setMessages((all) => {
+          const next: ChatMessage[] = [...all];
+          if (event.message !== undefined) next.push({ role: "user", text: event.message });
+          next.push({
+            role: "assistant",
+            blocks: [],
+            status: "working",
+            turnId: event.turn_id,
+            startedAtMs: event.started_at_ms ?? Date.now(),
+          });
+          return next;
+        });
+```
+
+Every load-bearing scrap of UI state is now *computed from the log*. `working` is not "am I holding a stream open"; it's "did I see a `session_start` without its receipt yet," so a refreshed tab and a second tab conclude "a build is running" as easily as the sender. The Stop button renders wherever `working` is true; the approval-waiting chip derives from an unresolved card in the blocks; and the working timer starts from `started_at_ms`, the wire timestamp, not `Date.now()`, so after a mid-build refresh it reads the turn's true age. Small thing; it's the difference between "the app recovered" and "the app never noticed," and users can feel which one they're using.
+
+Opening a project completes the deletion story. Part 5 gave the UI a history endpoint (`thread/read`, the engine's cold archive), Part 8 a usage endpoint; selecting a project called both, then started watching. All of that is gone from the open path:
+
+```tsx filename="frontend/app/page.tsx" repo="part-09-durable-streams/frontend/app/page.tsx" lines="395-406,411-412"
+  const selectProject = useCallback(
+    (id: string) => {
+      setActiveId(id);
+      setMessages([]);
+      setBadges({});
+      setDiff("");
+      setDiffOpen(false);
+      setFiles([]);
+      setUsage(null);
+      setWorking(false);
+      setPreviewVersion((v) => v + 1);
+      loadFiles(id);
+      followStream(id);
+    },
+```
+
+Reset, follow the stream, done. The replay *is* the history, and a richer one than `thread/read` ever offered: command badges with their output, approval cards with their decisions, receipts, the meter refilled from replayed `usage_update`s. Both old endpoints survive in the backend as cold backstops (the rollout outlives even a deleted `events.db`, and that's a real disaster the archive should answer), but the UI no longer calls them. One code path builds the conversation, whether the events are a month old or a millisecond old. One code path, two tenses.
+
+## Stop from anywhere, approve from anywhere
+
+Now collect the dividend the dessert shot promised, and notice that this section adds **no new machinery**. That's the point of it.
+
+Why does Stop work from a tab that never sent the message? Because [Part 8's interrupt](/blog/codex-8-stop-steer-usage#the-stop-button-and-what-stopping-means) was never wired to a stream: `POST /projects/{id}/interrupt` names the *project*, the active-turn ledger supplies the `turnId`, and the outcome arrives as `turn/completed` status `"interrupted"`, into the log, where every tab renders the same red receipt. Why do approvals work from either tab? Because [Part 7's bridge](/blog/codex-7-approvals#the-bridge-a-future-in-the-foremans-inbox) parks each pending question as an `asyncio.Future` in server memory, and the decision endpoint names the project and the approval id, nothing else. The Future never knew which tab it was waiting for. Both were cross-tab controls all along, waiting for a second tab to exist.
+
+The e2e run behind the hero screenshot exercised exactly this: tab 2 (which never typed) rendered tab 1's message via the log, showed the working timer for a turn it didn't start, offered Stop, clicked it at the six-second mark, and **both** tabs printed `stopped by you · 6s`. Then a turn that needed the network raised its approval card in both tabs, tab 2 clicked Approve, tab 1 watched the card flip to `Approved by you · 10:41:22`, and the turn completed with its `HTTP/2 200` and a 31,149-token receipt in both transcripts. They match because they cannot do otherwise: two renderings of one table.
+
+Say the shape plainly, because it's the takeaway of three parts: control flows through **endpoints that name the work**, results flow through **a log anyone can read**, and the pipes in between carry no authority at all. Once that's true, "which tab?" stops being an architectural question, the same way "which waiter took your order" stops mattering once the kitchen keeps the tickets.
+
+## Break it on purpose: kill -9 mid-build
+
+Act II closes the way Act II should: by murdering the backend and auditing what the design actually guarantees. Not Ctrl-C, which would let cleanup run. `kill -9`, mid-turn, with a tab watching and a shell loop echoing `boom` every two seconds.
+
+Here's the capture, and the numbers deserve slow reading. At the moment of death, the project's log ended at **seq 1372**, a `reasoning_delta` whose text was, fittingly, `" Let's"`. The turns table held three completed rows and one `running`. The tab's stream went silent; within seconds its header showed an amber `reconnecting…` chip, which is `EventSource` retrying and the UI declining to pretend otherwise.
+
+Then the backend comes back, and before it serves a single request, the lifespan runs the reckoning:
+
+```python filename="backend/app/eventlog.py" repo="part-09-durable-streams/backend/app/eventlog.py" lines="138,146-154"
+def sweep_orphans() -> list[dict]:
+    rows = _conn.execute(
+        "SELECT turn_id, project_id FROM turns WHERE status = 'running'"
+    ).fetchall()
+    _conn.execute(
+        "UPDATE turns SET status = 'orphaned', "
+        "completed_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') WHERE status = 'running'"
+    )
+    _conn.commit()
+    return [{"turn_id": turn_id, "project_id": project_id} for turn_id, project_id in rows]
+```
+
+A turn still marked `running` in a table that outlived its process is a turn the old process took to its grave. Nothing will ever finish it. The sweep stamps it `orphaned` (this is why `finish_turn` writes endings durably: so the *absence* of an ending means something) and hands the rows to the lifespan, which writes each affected project a tombstone:
+
+```python filename="backend/app/main.py" repo="part-09-durable-streams/backend/app/main.py" lines="103-106,111"
+    for orphan in eventlog.sweep_orphans():
+        await eventlog.publish(orphan["project_id"], {
+            "type": "backend_restarted",
+            "turn_id": orphan["turn_id"],
+        })
+```
+
+The full fence carries a human-readable `message` too, and look at what `publish` gives this moment for free: the tombstone landed as **seq 1373**. Not seq 1 of a new era; 1373, because the sequence lives in the table and the table survived. The reconnecting tab sends `Last-Event-ID: 1372`, the replay returns exactly one row, and the tab that watched a build die now renders, with zero user action: the spinner badge frozen where the stream stopped, the orphaned turn's receipt reading `backend restarted mid-build`, and an amber notice saying the files and the conversation survived. The e2e drove this whole arc headlessly, five checks, five passes, including the chip appearing and then clearing itself.
+
+<Figure
+  src="/images/series/codex/part-9/browser-restart-light.svg"
+  srcDark="/images/series/codex/part-9/browser-restart-dark.svg"
+  alt="Pagewright after the backend was killed and restarted mid-build. The header shows an amber reconnecting chip, annotated as what shows while the backend is down. In the chat, an earlier turn ends with the agent linking to another project's index.html found on the readable disk, offering to patch that file instead, with a receipt of 134,810 tokens in 41 seconds. Below, the boom-loop turn shows its user message, a thinking row, a command badge still spinning because its item_done never arrived, a receipt line reading backend restarted mid-build, and an amber notice pill saying the backend restarted mid-build, the files and the conversation survived, send the next message to continue. The preview pane on the right shows nothing to preview yet and an empty files panel."
+  caption="The honest afterlife, from the real e2e (5/5 checks). The spinner badge is the truth (no item_done ever came), the tombstone is seq 1373 of the same tape, and the notice tells the user exactly what survived. Above it, the previous turn's out-of-workspace discovery, which the next section unpacks."
+  width={1120}
+  height={900}
+/>
+
+Now the audit. What did `kill -9` actually cost?
+
+- **The workspace: nothing.** The site directory's md5 before the kill and after the restart is the same hash, `903c4892…`, byte for byte. Files are written by the agent's own commands as they land; [the workspace was always truth](/blog/codex-5-threads#break-it-on-purpose-shred-the-bookmark).
+- **The conversation: nothing.** The thread lives in the engine's rollout, on disk. The capture's next chat message resumed the *same* thread id through the ordinary `ensure_thread` path (`thread/resume`, no special recovery code) and its turn completed normally.
+- **The delivered story: nothing.** All 1372 events were committed before anyone saw them; the log replays them to any tab forever.
+- **The in-flight turn: gone, and we say so.** Whatever the agent was about to stream after `" Let's"` died with the process. Pagewright does *not* resurrect it, re-run it, or splice a new turn onto its stump; the app-server that ran it no longer exists, and anything but a tombstone would be the UI inventing a happy ending. Durability means **never losing what happened and never lying about what didn't finish.** Different promises, and the second is the one users learn to trust you for.
+
+## The read that found another client's site
+
+One more thing rode along in that restart capture, unplanned, and it's too good a callback to leave in the drawer. The `twotabs` project's workspace was empty (its turns had been stopped or spent on curl), so when a prompt asked the agent to "add a press section," it went looking for a site file. And found one. In *another project's workspace*: the Sunny Sips `index.html` from the replay tests, located by searching the readable disk, cited by absolute path, with a polite offer: "If you want, I can patch that file instead." The receipt for the expedition: 134,810 tokens, 41 seconds.
+
+If that made your eyebrows move, [Part 6 is proud of you](/blog/codex-6-sandbox#how-the-box-is-built): `workspaceWrite` walls off **writes** and network, and deliberately leaves **reads** open; the wristband stops the pen, not the eyes. The agent could see the neighbor's site; it could not have written a byte there without [an approval card asking you first](/blog/codex-7-approvals#the-request-that-turns-the-desk-around). On your laptop, a cross-project read is a curiosity. In a multi-tenant product, it's the reason [`readOnlyAccess` roots and stricter postures exist](/blog/codex-concepts#sandbox-policies), and the reason Part 13 re-tests the sandbox on a production kernel. The grid holds; this is what its read column looks like in the wild.
+
+<Callout type="warning" title="The debt from Part 2, formally repaid">
+Part 2's confession, on the wall since the day the engine first died mid-turn: on a one-way wire, silence and thinking are indistinguishable, and a client that missed a frame has no way to say so. Both halves are now paid. Liveness: a viewer that hears nothing for fifteen seconds gets a keepalive, and a viewer whose socket dies reconnects with a bookmark. Delivery: every event is committed to the log before anyone sees it, so "what did I miss" is a WHERE clause, not a guess. The wire is still one-way; the difference is that nothing important lives only on the wire anymore. The note comes off the wall the way Part 1's scissors warning did in Part 6.
+</Callout>
+
+## The meter ritual, tape edition
+
+Every row a real run from building this part, per-turn deltas as Part 8 taught:
+
+| Run | Receipt |
+|---|---|
+| Sunny Sips build (the replay-test tape, seq 1 to 689) | 83,034 tokens · 17.9s |
+| The footer turn, watched by a viewer that died at 730 and resumed at 731 | 75,861 tokens · 20.4s |
+| Replaying either of those, any number of times | 0 tokens, and that's the product |
+| The two-tab curl turn, approved from the tab that didn't send it | 31,149 tokens · 7s |
+| The tick loop, stopped from tab 2 | stopped by you · 6s |
+| The out-of-workspace scavenger hunt (found the neighbor's site) | 134,810 tokens · 41s |
+| The boom loop, orphaned by kill -9 | no receipt; tombstone at seq 1373, and that's honest |
+
+Read the third row and the last row together and you have the part: replays are free because the model already spoke, and the one turn with no receipt is the one turn whose ending nobody witnessed, recorded as exactly that.
+
+<DemoVideo
+  src="/videos/codex/part-9-demo.mp4"
+  poster="/videos/codex/part-9-poster.jpg"
+  caption='Durability on camera, against the real app: a bakery build starts, the tab is refreshed mid-turn and the conversation, badges, and running timer rebuild themselves from replay while the build carries on to its 174k-token receipt; then a slow turn starts and the page becomes two side-by-side tabs of the same project, both rebuilt from the same log, and Stop clicked in tab 2 lands the red "stopped by you" receipt in both.'
+  label="Screen recording of Part 9: a mid-build page refresh that restores the running conversation from replay and continues to completion, then two side-by-side tabs of one project where Stop pressed in the second tab stops the build in both"
+/>
+
+<Recap
+  part={9}
+  items={[
+    "The split: POST /chat answers in milliseconds with a claim ticket ({turn_id, stream_url}), a background consumer task drains the notification queue into the log (held in CONSUMERS, because asyncio keeps only weak references to tasks), and the inline-streaming path is gone, not deprecated.",
+    "The log: one SQLite file in WAL mode, events keyed (project_id, seq) with the seq computed as MAX+1 inside the INSERT so a restarted backend continues the tape (seq 1373, not a second seq 1), plus a turns table whose unfinished rows are exactly the turns a dead process orphaned.",
+    "Replay-then-follow: GET /projects/{id}/stream replays rows past the Last-Event-ID bookmark, marks the seam with an id-less caught_up (only logged rows may move the browser's bookmark), then follows a per-project asyncio.Condition doorbell; EventSource reconnects with the bookmark for free and an idempotent-by-seq guard makes delivery exactly-once where it matters.",
+    "The log-built conversation: session_start carries the user's message and started_at_ms, send() only POSTs, and no tab renders anything optimistically, so a refreshed tab, a second tab, and the sender agree pixel for pixel, and Stop and approvals (already project-scoped POSTs since Parts 7 and 8) work from any of them.",
+    "The honest crash: kill -9 mid-turn costs the in-flight turn and nothing else. The startup sweep stamps it orphaned and appends a backend_restarted tombstone; the workspace hash is unchanged, thread/resume continues the same conversation, and the UI says what died instead of pretending nothing did.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "Part 9's POST /chat returns {turn_id, stream_url} instead of a stream. What problem does that solve?",
+      options: [
+        "It reduces the response payload size",
+        "The consumer loop used to live inside one HTTP response, so the sender's tab held the only pipe and a refresh orphaned the events; now the turn belongs to a background task and any number of disposable viewers can watch via the log",
+        "It lets multiple turns run in parallel on one thread",
+        "FastAPI cannot stream from a POST endpoint",
+      ],
+      answer: 1,
+      explain: "The claim-ticket shape decouples running from watching. The consumer task writes every translated event to the log whether anyone is watching or not, and GET /projects/{id}/stream serves any viewer, including the tab that typed.",
+    },
+    {
+      q: "Why is the event's seq computed as COALESCE(MAX(seq), 0) + 1 inside the INSERT, rather than kept as a counter in Python?",
+      options: [
+        "SQLite requires primary keys to be computed in SQL",
+        "It is faster than incrementing a Python integer",
+        "Numbering must survive the process: a counter in memory dies with a restart and would start a second seq 1, while the table-computed seq let the real capture's tombstone land as seq 1373 of the same tape",
+        "It prevents two projects from sharing sequence numbers",
+      ],
+      answer: 2,
+      explain: "State that must survive the process must not live in the process. The reconnecting tab sent Last-Event-ID: 1372 and received exactly one row, the tombstone at 1373, because the restarted backend continued the count.",
+    },
+    {
+      q: "The caught_up frame is the only one sent without an SSE id. Why?",
+      options: [
+        "Its JSON payload already contains last_seq, so an id would be redundant",
+        "The browser bookmarks the last id it saw on any frame; caught_up is ephemeral and never logged, so an id on it could move the bookmark past rows that exist and make a later replay silently skip real events. Only logged rows may move the bookmark",
+        "EventSource treats frames with ids as retryable and would duplicate it",
+        "Ephemeral frames are sent as SSE comments, which cannot carry ids",
+      ],
+      answer: 1,
+      explain: "The bookmark must only ever name a logged row. The frontend cooperates by handling caught_up above its dedup guard, since e.lastEventId would hold the previous frame's seq.",
+    },
+    {
+      q: "You open the same project in a second tab and click Stop there while the first tab's build is running. Why does this need no new code?",
+      options: [
+        "The second tab shares the first tab's EventSource via a service worker",
+        "The backend broadcasts Stop clicks to every open stream",
+        "Both tabs poll the turns table for status changes",
+        "POST /interrupt was already project-scoped (Part 8's ledger supplies the turnId), the outcome arrives as a logged complete event with status interrupted, and every tab computes its UI from the log, so both render stopped by you",
+      ],
+      answer: 3,
+      explain: "Control flows through endpoints that name the work; results flow through the log anyone can read. Part 7's approval Futures work across tabs for the same reason: verified live, Approve clicked in tab 2 resolved the card in tab 1.",
+    },
+    {
+      q: "After kill -9 mid-turn, which of these does Pagewright deliberately NOT do?",
+      options: [
+        "Mark the dead turn orphaned and append a backend_restarted tombstone to the project's log",
+        "Resume the same thread on the next message via thread/resume",
+        "Resurrect the in-flight turn and continue streaming it as if nothing happened",
+        "Replay everything up to seq 1372 to any tab that asks",
+      ],
+      answer: 2,
+      explain: "The app-server that ran the turn is gone, so pretending to continue it would be a lie in the UI. Durability means never losing what happened and never lying about what didn't finish; the workspace (md5-identical) and the thread survive, and the tombstone tells the truth about the rest.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 9: durable streams - event log, replay-then-follow, any-tab control"
+```
+
+And that's Act II, complete. Look at the ladder it climbed: OS walls around what the builder may touch (Part 6), a human stamp on anything that steps past them (Part 7), live control over a turn in flight (Part 8), and now delivery that survives refreshes, second tabs, and a murdered backend (Part 9). Act I built a builder; Act II put you in control of it: contained, consented, interruptible, honest about its own failures. Act III gives the builder opinions, an inspector, and a launch day: it will propose a blueprint before swinging, ask you [structured questions](/blog/codex-concepts#request-user-input) instead of guessing, turn its [reasoning depth into a dial](/blog/codex-concepts#reasoning-effort), face a reviewer with its own clipboard before anything earns the Publish button, and end up on a real server handing out real URLs.
+
+The complete, tested code for this part lives in [`part-09-durable-streams`](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-09-durable-streams) in the [companion repo](https://github.com/yadneshSalvi/codex-app-server-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's lines highlighted.
