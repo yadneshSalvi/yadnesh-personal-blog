@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="508" viewBox="0 0 1040 508" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="508" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">curl -N &#183; the stream during an interrupt (project 5dec474b)</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># the agent starts a sleepy loop; its output ticks in every 2 seconds:</tspan></text>
+    <text x="32" y="116" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"item_start"</tspan>, "item_id": <tspan fill="#dcae62">"call_E7wW…"</tspan>, "kind": "commandExecution",</text>
+    <text x="32" y="144" xml:space="preserve">       "detail": {"command": "/bin/zsh -lc 'for i in $(seq 1 10); do</text>
+    <text x="32" y="172" xml:space="preserve">                  echo \"&lt;h2&gt;Section $i&lt;/h2&gt;\" &gt;&gt; index.html;</text>
+    <text x="32" y="200" xml:space="preserve">                  echo \"wrote section $i\"; <tspan fill="#6fa8dc">sleep 2</tspan>; done'", "exit_code": null}}</text>
+    <text x="32" y="228" xml:space="preserve">data: {"type": "command_output_delta", "item_id": <tspan fill="#dcae62">"call_E7wW…"</tspan>, "chunk": "wrote section 5\n"}</text>
+    <text x="32" y="256" xml:space="preserve">data: {"type": "command_output_delta", "item_id": <tspan fill="#dcae62">"call_E7wW…"</tspan>, "chunk": "wrote section 6\n"}</text>
+    <text x="32" y="284" xml:space="preserve"><tspan fill="#756d62"># ↑ Stop is clicked: POST /projects/5dec474b/interrupt → {"interrupted": true}</tspan></text>
+    <text x="32" y="312" xml:space="preserve">data: {"type": <tspan fill="#e5825a">"complete"</tspan>, "status": <tspan fill="#d97676">"interrupted"</tspan>, "duration_ms": <tspan fill="#6fa8dc">14004</tspan>, …}</text>
+    <text x="32" y="340" xml:space="preserve"></text>
+    <text x="32" y="368" xml:space="preserve"><tspan fill="#756d62"># the stream is over, and call_E7wW… never got an item_done: abandoned mid-lifecycle.</tspan></text>
+    <text x="32" y="396" xml:space="preserve"><tspan fill="#756d62"># the workspace, read after the loop's own arithmetic ran out:</tspan></text>
+    <text x="32" y="424" xml:space="preserve"><tspan fill="#8fb573">$</tspan> grep -c '&lt;h2&gt;Section' projects/5dec474b/site/index.html</text>
+    <text x="32" y="452" xml:space="preserve"><tspan fill="#dcae62">10</tspan>   <tspan fill="#756d62"># all ten. The agent stopped listening at section 6; the shell kept writing.</tspan></text>
+  </g>
+</svg>

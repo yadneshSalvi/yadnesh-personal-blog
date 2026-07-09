@@ -1,0 +1,458 @@
+---
+title: "Codex App Server in Production, Part 8: Stop, Steer, and the Meter"
+subtitle: "Live control over a running turn. A Stop button wired to the truth (the agent halts, the shell finishes, the files stay), a composer that redirects a build mid-swing without restarting it, and a token meter that finally answers what this turn cost."
+image: "/images/series/codex/part-8/cover-light.svg"
+imageDark: "/images/series/codex/part-8/cover-dark.svg"
+createdAt: "2026-07-09T00:00:00.000Z"
+updatedAt: "2026-07-09T00:00:00.000Z"
+tags: ["codex", "openai", "fastapi", "nextjs", "tutorial"]
+series: "codex-app-server-fastapi-nextjs"
+seriesPart: 8
+---
+
+The turn is dead. The stream said so, in writing: `"status": "interrupted"`, 14.0 seconds, receipt stamped. The last thing it heard was a shell loop reporting `wrote section 6`. Now open the workspace and count the sections that loop was writing: ten. Four of them landed *after* the stop. The Stop button you'll build in this part works, provably, and the first thing it teaches you is what "stop" actually means to an agent running real processes on a real machine.
+
+That's one of three controls this part adds to Pagewright, and it's the least interesting one. By the end of this page: a **Stop** button that ends a turn honestly, a composer that stays live mid-build so that *"actually, make the header terracotta"* lands inside the running turn (no restart, no waiting, a small chip marking where it landed), and a **live token meter** in the header that finally answers the question every part since [Part 1's meter ritual](/blog/codex-1-first-thread#the-meter-ritual) has quietly dodged: what did *this turn* cost? All three hang off one protocol fact the backend has been throwing away since Part 2.
+
+<Figure
+  src="/images/series/codex/part-8/browser-steer-light.svg"
+  srcDark="/images/series/codex/part-8/browser-steer-dark.svg"
+  alt="Pagewright nine seconds into building a bookshop site. The chat shows the build brief, a thinking drawer, one command badge that succeeded and one that failed with exit 1, and a Building timer. Below them sits a new user message, sent while the turn is still running: Also add a footer that says STEERED BY HUMAN. Under that message is a small accent-colored chip reading steering, absorbed mid-turn. The composer at the bottom is still usable, its placeholder now reads Steer the build, it lands mid-turn, and a Stop button sits beside Send. A token gauge in the header reads 15.5k this turn."
+  caption="The dessert, from the real run. The turn is 9 seconds old and still hammering; the second message did not queue, did not cancel anything, and did not start a turn. It went inside."
+  width={1120}
+  height={780}
+/>
+
+Look at the composer in that screenshot. Every chat UI you've built in this series so far, and honestly most agent UIs anywhere, treats a running turn as a locked door: input disabled or hijacked into a Stop button, the human demoted to spectator until the receipt prints. The engine never demanded that. `codex app-server` will accept new instruction *into a running turn* over a method called `turn/steer`, and no sibling series has an equivalent to point at, because neither the [LangGraph engine you built by hand](/blog/langgraph-3-first-graph) nor the [Claude Agent SDK](/blog/agent-sdk-1-first-agent) exposes anything like it. This one is a Codex distinctive, and it's the reason the input field in Pagewright never goes gray again.
+
+## One fact, three controls
+
+Start with what the two new protocol verbs demand. From the [generated schema](/blog/codex-concepts#protocol-versioning), verified live in 0.142.4:
+
+- `turn/interrupt` takes `{threadId, turnId}`. **Both required.**
+- `turn/steer` takes `{threadId, expectedTurnId, input}`. And `expectedTurnId` is not a polite hint; it's a **precondition**. If it doesn't name the turn that is live *right now*, the request fails.
+
+Both verbs name a specific turn. And here's the embarrassing part: the backend has known every turn's name all along. `turn/start` answers with `{turn: {id, status: "inProgress", ...}}`, and Part 7's `run_turn` awaited that response and threw it away, [line 290](https://github.com/yadneshSalvi/codex-app-server-in-production/blob/main/part-07-approvals/backend/app/main.py#L290), because nothing needed it. Live control is what needs it. So Part 8's first change is the smallest file in the series, `app/turns.py`, an in-memory ledger of who's on the shop floor:
+
+```python filename="backend/app/turns.py" repo="part-08-stop-steer-usage/backend/app/turns.py" lines="20-29"
+_active: dict[str, dict] = {}
+_usage: dict[str, dict] = {}
+
+
+def begin(project_id: str, thread_id: str, turn_id: str) -> None:
+    _active[project_id] = {
+        "thread_id": thread_id,
+        "turn_id": turn_id,
+        "started_at": time.time(),
+    }
+```
+
+`run_turn` now calls `turns.begin(...)` on the line after `turn/start` answers, and calls `turns.end(project_id, turn_id)` in a `finally`, so the entry dies with the turn no matter how the turn dies. The `end()` call is *named*: it clears the entry only if it still points at the caller's turn, because a stream that lingers past its own turn (you'll meet one in the race section) must not erase the entry a newer turn wrote. And the whole thing is deliberately in-memory: a backend restart forgets the ledger, which is honest, because after a restart the turn really is gone. Durability is Part 9's job.
+
+Checkpoint. Right now you have: a backend that can point at the live turn on any project, and nothing that uses the pointer. Three features are about to.
+
+## The Stop button, and what stopping means
+
+The endpoint is short because the ledger did the hard part:
+
+```python filename="backend/app/main.py" repo="part-08-stop-steer-usage/backend/app/main.py" lines="449-460"
+    if projects.get_project(project_id) is None:
+        raise HTTPException(status_code=404, detail="no such project")
+    active = turns.active(project_id)
+    if active is None:
+        raise HTTPException(status_code=409, detail="no active turn to interrupt")
+    try:
+        await client.request("turn/interrupt", {
+            "threadId": active["thread_id"], "turnId": active["turn_id"]})
+    except CodexError as exc:
+        # Same race as steer: the turn ended on its own first.
+        raise HTTPException(status_code=409, detail=str(exc))
+    return {"interrupted": True, "turn_id": active["turn_id"]}
+```
+
+Notice what the response *doesn't* contain: the outcome. `turn/interrupt` returns almost immediately, and the truth arrives where truth always arrives in this app, on the stream, as the same `turn/completed` every turn ends with, status `"interrupted"` instead of `"completed"`. That's a gift for the frontend, because stopping needs no new event type at all. The Stop button POSTs and forgets; `consumeStream` maps the status it was already reading:
+
+```tsx filename="frontend/app/page.tsx" repo="part-08-stop-steer-usage/frontend/app/page.tsx" lines="382-389,393-395"
+      if (event.type === "complete") {
+        patchLastTurn({
+          status:
+            event.status === "completed"
+              ? "done"
+              : event.status === "interrupted"
+                ? "stopped"
+                : "error",
+          totalTokens: event.usage?.totalTokens,
+          durationMs: event.duration_ms,
+        });
+```
+
+The `"stopped"` status renders a receipt line under the turn: **stopped by you**, in red, next to the tokens and seconds. Hold on to those two `usage` lines; they're the meter section's story. First, the part of stopping nobody puts in the docs.
+
+### Stop the agent, not the world
+
+Ask Pagewright to run a slow loop, ten iterations, two seconds of sleep each, one line appended to `index.html` per pass. Let it get to section six, then click Stop. Here is the stream, verbatim from the capture:
+
+<Figure
+  src="/images/series/codex/part-8/term-interrupt.svg"
+  alt="A dark terminal showing the SSE stream during an interrupt. An item_start opens a commandExecution running a shell loop that appends ten section headings to index.html with a two-second sleep between each. Output deltas report wrote section 5 and wrote section 6. A comment marks the moment Stop is clicked, POST interrupt returning interrupted true. Then complete arrives with status interrupted at 14 seconds, and a comment notes the command item never got an item_done, abandoned mid-lifecycle. Below, grep counts the section headings in the workspace file: ten. All ten sections landed even though the stream stopped listening at section six."
+  caption="The whole lesson in one capture. The turn ended at 14.0s with the loop at section 6. The file ends with section 10."
+  width={1040}
+  height={508}
+/>
+
+Three facts, all verified live, all worth internalizing before you ship a Stop button anywhere:
+
+1. **The turn ends immediately.** `turn/completed` with status `"interrupted"` arrived the moment the interrupt was processed, and the agent made no further model calls. The taxi meter stopped.
+2. **The in-flight item is abandoned, not closed.** The command's `item_start` never got an `item_done`. Its badge in the UI is still spinning in the screenshot below, and that's the protocol telling the truth: the item's lifecycle genuinely never completed.
+3. **The OS process was not killed.** The shell loop kept running for roughly nine more seconds, on its own schedule, to its natural end, and every write landed. The stream stopped *listening* at section six; the shell kept *writing* through section ten.
+
+Interrupt is cooperative at the agent level. It says "stop orchestrating", not `kill -9`. And once you know [the workspace is truth](/blog/codex-5-threads#break-it-on-purpose-shred-the-bookmark), the right UI follows: after any stop, refresh the file list and the preview from disk, because the files, not the stream, know what actually happened. Pagewright already does a catch-all refresh on every `complete`, so the stopped turn's half-built (or, as here, fully-built) reality shows up on its own.
+
+<Figure
+  src="/images/series/codex/part-8/browser-stop-light.svg"
+  srcDark="/images/series/codex/part-8/browser-stop-dark.svg"
+  alt="Pagewright after a stopped turn. The user asked for a twelve-iteration shell loop writing ticks to a file. The command badge is still showing its spinner, with a small annotation reading: still spinning, its item_done never came. Below the agent's narration sits the receipt line in red: stopped by you, 31,065 tokens this turn, 9 seconds. The token gauge in the header reads 31.1k, and the files pane on the right shows ticks.txt at 21 bytes."
+  caption="The stopped state from the real e2e run. The spinner badge is not a bug; no item_done ever arrived for it. The red receipt below it is the component telling the truth."
+  width={1120}
+  height={780}
+/>
+
+<Callout type="warning" title="Interrupt is not kill -9">
+The command your Stop click abandons will finish on its own terms, and its writes will land. That's fine for a sleepy loop building HTML; it's worth a beat of thought for anything destructive. Stop is not the safety mechanism in this stack and was never meant to be: the [sandbox](/blog/codex-6-sandbox) bounds what a runaway command can touch, walls that hold whether or not anyone clicks anything. Stop manages attention and money. The sandbox manages blast radius. Don't ask one to do the other's job.
+</Callout>
+
+## Shouting through the hatch
+
+Now the good one. You know the moment: the build is forty seconds in, sections are landing, and you spot it, the wrong accent color, the missed requirement, the header that should have been terracotta. Until this part you had two options, both bad. Stop everything and restart with a corrected prompt, paying for the cold start and losing the finished sections' momentum. Or wait politely for the receipt and send a follow-up turn, watching the wrong color spread to three more sections while you wait. Steering is the third option the protocol was hiding: append the correction *to the running turn* and let the build absorb it without breaking stride.
+
+The frontend's half is almost insultingly small. Send stopped yielding to Stop (both render during a run), and `send()` grew one routing line:
+
+```tsx filename="frontend/app/page.tsx" repo="part-08-stop-steer-usage/frontend/app/page.tsx" lines="491-497"
+  async function send(text: string) {
+    const prompt = text.trim();
+    if (!prompt || !activeId) return;
+    setInput("");
+    // The composer stays live during a run: sending mid-turn steers the
+    // running build instead of queueing a new one.
+    if (working) return steer(prompt, activeId);
+```
+
+The backend's half is where the design lives. The chat endpoint becomes a router with two verbs, and the ledger from section one is the switch:
+
+```python filename="backend/app/main.py" repo="part-08-stop-steer-usage/backend/app/main.py" lines="407-411,415-419,423-424,430-435"
+    active = turns.active(project_id)
+    if active is not None:
+        try:
+            await client.request("turn/steer", {
+                "threadId": active["thread_id"],
+                "expectedTurnId": active["turn_id"],
+                "input": [{"type": "text", "text": req.message}],
+            })
+        except CodexError:
+            # The turn finished a beat before the message landed
+            turns.end(project_id, active["turn_id"])
+        else:
+            await client.queue_for(active["thread_id"]).put(
+                {"method": "steer/accepted",
+                 "params": {"text": req.message, "turn_id": active["turn_id"]}})
+            return {"steered": True, "turn_id": active["turn_id"]}
+    return StreamingResponse(run_turn(project_id, req.message),
+                             media_type="text/event-stream")
+```
+
+Read the two return shapes, because they're the router made visible to the client. A steered message answers in **plain JSON**: there is no new stream, because the events keep riding the original turn's stream, which is already open in another request. A normal message streams, as it has since [Part 2](/blog/codex-2-fastapi-bridge#the-agent-behind-a-url). The frontend tells them apart by content type and nothing else.
+
+Two wire details deserve staring at. First, `expectedTurnId`. The protocol could have accepted a bare "steer whatever's running" and silently dropped the message if nothing was. Instead it demands you name the turn you *believe* is live, and fails loudly when you're wrong. That requirement is the protocol enforcing the router you'd have needed anyway, and the failure case is the next section's whole subject.
+
+Second, the synthetic note. The steer's acknowledgment carries `{"turnId": ...}` and nothing else; no notification announces "a steer landed here" on the stream. Verified live: the steered text *does* resurface, about three seconds later in our raw trace, as a plain `userMessage` item at the model's next inference boundary, indistinguishable on the wire from any other user message. Which is exactly why the `else:` branch above injects `steer/accepted` onto the thread's own queue (the same trick [Part 7's approvals](/blog/codex-7-approvals) played): it becomes a `steered` event on the stream, at the exact position the steer arrived, and the UI renders the chip. The chip is not decoration. Steer-vs-new-turn is invisible routing, and invisible routing is how users stop trusting an app; the chip makes the difference legible in one glance.
+
+<Figure
+  src="/images/series/codex/part-8/fig-steer-router-light.svg"
+  srcDark="/images/series/codex/part-8/fig-steer-router-dark.svg"
+  alt="Flow diagram of the chat router. A message sent mid-turn hits POST chat, then the active-turn ledger check, turns.active. If a turn is live, the left lane sends turn/steer with threadId, expectedTurnId from the ledger, and the input; the ack carries the turnId, the endpoint answers plain JSON with steered true, events keep riding the original stream, the chip renders, and a note says the text resurfaces about three seconds later as a plain userMessage item. If idle, the right lane starts a normal turn whose response is an SSE stream. A dashed red lane leaves the steer box for the error case: minus 32600, no active turn to steer, where the backend clears the stale ledger line and falls back to turn/start. A footer notes the protocol referees the race, and the only visible difference is the chip staying on or coming off."
+  caption="One endpoint, two verbs, and the expectedTurnId precondition refereeing which one is legal at this instant."
+  width={1240}
+  height={900}
+/>
+
+Here's the absorbed-steer run from the captures, end to end. A bookshop build starts (four sections, save after each). Six seconds in, with the turn very much alive, a second message goes up: *"Also add a footer that says STEERED BY HUMAN."* The POST answers `{"steered": true}` in milliseconds, the chip renders, and the build keeps hammering, same turn, same stream, same receipt at the end, and when that receipt printed, the footer was in the file and in the preview, delivered by the very turn that started without it. In the raw stdio probe of the same flow (a nine-section studio site that time), the steer was acknowledged at t=5.2s, the text resurfaced as a `userMessage` item at t=8.2s, and the agent's final message listed its work like a proud contractor: hero, about, menu, gallery, and, closing the list, *"Footer with STEERED BY HUMAN"*. One turn, one mid-flight correction, absorbed.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 2 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 2-panel comic strip, panels side by side separated by a thin vertical black divider, about steering a robot builder mid-job without the work ever stopping. Panel 1: a workshop wall with a small open serving hatch; Yad leans into the hatch from the left, hands cupped around his mouth, shouting a speech bubble that reads "MAKE THE DOOR BLUE!"; through the hatch we see a friendly little robot builder in a hard hat hammering on a small model storefront house, hammer raised mid-swing, motion lines, the storefront's little front door is plain gray; on the workshop wall hangs an old-fashioned taxi meter with a small flag lever, its display reads "26.5k" with a small label "TOKENS" under it. Panel 2: the exact same scene one beat later; the robot has never turned around and is still hammering, hammer again mid-swing with motion lines, but the little front door is now freshly painted bright blue with a wet drip and the robot's other hand holds a dripping blue paintbrush; the taxi meter on the wall now reads "53.2k" with the same "TOKENS" label and tick marks flying off it; Yad watches through the hatch giving a thumbs up, small sweat drop of amazement. Clean readable hand-lettered text, very little text: only "MAKE THE DOOR BLUE!", "TOKENS", "26.5k", "53.2k". No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/codex/part-8/comic-steer.png"
+  alt="Comic in two panels. Panel one: Yad, a bearded developer with headphones, shouts Make the door blue! through a serving hatch in a workshop wall, while inside a robot builder in a hard hat hammers on a model storefront with a plain gray door; a taxi meter on the wall reads 26.5k tokens. Panel two: the robot has never turned around and is still hammering mid-swing, but the little door is now freshly painted blue with a wet drip, a blue paintbrush in the robot's other hand; the taxi meter now reads 53.2k tokens and Yad gives a thumbs up through the hatch."
+  caption="turn/steer, illustrated. The hammering never stops, the door is blue mid-swing, and the meter on the wall kept ticking the whole time. Those meter numbers are this part's real capture, by the way."
+  width={1536}
+  height={1024}
+/>
+
+<Callout type="info" title="Steer it, or queue a follow-up?">
+Two honest tools, two jobs. **Steer** when the correction belongs to the work in flight: a wrong color, a missed requirement, a "while you're in there". The context is hot, nothing restarts, and the fix lands before the wrongness compounds. Know its texture, though: a steer is absorbed at the model's next inference boundary (seconds, not milliseconds), and it lands mid-narrative, so its effect blends into the same turn's diff and receipt. **Queue a follow-up** (wait for the receipt, then send) when you want a clean boundary: a separate diff to review, a separate receipt to compare, or a change that contradicts what's currently mid-swing badly enough that you'd rather Stop and rephrase than argue with a moving hammer.
+</Callout>
+
+## Break it on purpose: steer a turn that ended
+
+The router keys off the ledger, and the ledger can lie. Not through a bug; through physics. Here's the probe that proves it: open a build, let a viewer read its stream, then have the viewer *stall*, reading nothing, while the turn finishes underneath it. The backend's `turn/completed` handling lives in the stream consumer, and the consumer is stalled with the viewer, so `turns.end` never runs. One hundred seconds later, the ledger still swears turn `019f3917-8ff9…` is live. Now send a message. The router believes the ledger, fires `turn/steer`, and:
+
+<Figure
+  src="/images/series/codex/part-8/term-steer-race.svg"
+  alt="A dark terminal showing raw stdio traffic. Our turn/steer request goes up with id 5 and an expectedTurnId. In the same logged instant, two messages come back in order: the turn/completed notification for that exact turn with status completed after 93 seconds, and then the JSON-RPC error for id 5 with code minus 32600 and the message no active turn to steer. Comments note the turn finished under the steer in flight, the precondition failed loudly instead of eating the message, and the backend catches the error, clears the stale ledger line, and falls back to a plain turn/start which the user never sees."
+  caption="The race, captured raw. Our steer (id 5) and the turn's own completion crossed on the wire; the engine chose the turn, and told us so with a typed error instead of a shrug."
+  width={1040}
+  height={452}
+/>
+
+`-32600`, `"no active turn to steer"`. This is the failure mode the `expectedTurnId` precondition exists to force, and it's worth appreciating what the protocol is refusing to do here: it will not silently absorb your message into nothing. The worst version of this race, the one users would actually hit, is a message typed in the final second of a build, swallowed without a trace, and a user who now believes steering is unreliable. The precondition converts that into an error you can catch, and the `except CodexError` branch you already saw converts the error into the obvious fallback: clear the stale ledger line, fall through, start a normal turn. The user's message never bounces; it arrives as the next turn instead of a whisper into the void.
+
+The frontend's job is to keep the routing legible when the fallback fires. `steer()` sent the message optimistically chipped; if the response turns out to be a stream instead of `{"steered": true}`, the chip comes off and the stream gets consumed like any other turn's:
+
+```tsx filename="frontend/app/page.tsx" repo="part-08-stop-steer-usage/frontend/app/page.tsx" lines="467-483"
+      const contentType = res.headers.get("content-type") ?? "";
+      if (contentType.includes("text/event-stream")) {
+        setMessages((all) => {
+          const unchipped = all.map((m, i) =>
+            i === all.length - 1 && m.role === "user" ? { ...m, steered: false } : m,
+          );
+          return [...unchipped, { role: "assistant", blocks: [], status: "working" }];
+        });
+        beginStream(Date.now());
+        setBadges({});
+        setDiff("");
+        try {
+          await consumeStream(res, projectId);
+        } finally {
+          endStream();
+        }
+      }
+```
+
+In the live race test, the fallback turn streamed 166 events in four seconds and completed cleanly, under a different turn id than the ledger's stale one. And that stale-viewer scenario surfaces one more production wrinkle worth its four lines: the stalled viewer's unread backlog is still sitting in the thread's queue when the *next* turn's stream starts reading. Without a guard, turn N+1 would replay turn N's abandoned events as its own. Every turn-scoped notification names its turn, so `run_turn` filters:
+
+```python filename="backend/app/main.py" repo="part-08-stop-steer-usage/backend/app/main.py" lines="337-338,345-348"
+        while True:
+            note = await queue.get()
+            named = ((note.get("params") or {}).get("turnId")
+                     or ((note.get("params") or {}).get("turn") or {}).get("id"))
+            if named is not None and named != turn_id:
+                continue
+```
+
+One turn's stream carries one turn's events. Boring sentence, production sentence.
+
+## The meter stops rounding to a feeling
+
+Since Part 1, every part has ended runs by quoting token counts, and since [Part 6](/blog/codex-6-sandbox#the-meter-ritual-wall-tax-edition) you've known an uncomfortable fact about where those numbers come from: `thread/tokenUsage/updated` carries a `total` that is **thread-cumulative** (Part 6 watched it hit 1.09M across a few font-hunting turns). This part builds the live gauge, so this is where the accounting finally has to be done right, and the wire makes that harder than it looks. The notification carries two readings, and neither one means "this turn":
+
+<Figure
+  src="/images/series/codex/part-8/fig-meter-light.svg"
+  srcDark="/images/series/codex/part-8/fig-meter-dark.svg"
+  alt="Diagram of one real turn's token accounting. A dashed baseline card says the thread's odometer read 215,976 before this turn, computed as the first update's total minus its last. Update one carries last 26,597 and total 242,573, so the computed turn figure is 26,597. Update two carries last 26,691 and total 269,264, so the turn figure is 53,288. The receipt card shows the complete event with usage 53,288 tokens this turn and thread total 269,264. A line notes that 242,573 plus 26,691 equals 269,264: total grows by exactly last on every update. Below, three definition cards: .last is one model request, a sliver; .total is the thread's lifetime odometer; and turn is ours, computed as total now minus total when the turn began, the only number that means this turn."
+  caption="One real two-request turn, every number verbatim from the capture. The odometer and the sliver are both true; neither is the fare."
+  width={1240}
+  height={860}
+/>
+
+`.last` is the most recent **model request**. A build turn makes many of them (every tool call round-trip is another request), and `total` grows by exactly `last` on each update, verified across every trace this part produced. So a receipt built on `.last` under-bills the turn down to one request's sliver, and a receipt built on `.total` charges the customer for the thread's entire life. The number a receipt owes the user, "what did the work order I signed cost", is on the wire nowhere. It has to be computed, and the computation is a delta of totals, with the baseline falling out of the *first* update of the turn (that update's `last` is already this turn's spend, so the pre-turn odometer is its `total - last`):
+
+```python filename="backend/app/main.py" repo="part-08-stop-steer-usage/backend/app/main.py" lines="352-368"
+            if event["type"] == "usage_update":
+                if baseline is None:
+                    baseline = {k: event["total"].get(k, 0) - event["last"].get(k, 0)
+                                for k in event["total"]}
+                turn_usage = {k: v - baseline.get(k, 0)
+                              for k, v in event["total"].items()}
+                event["turn"] = turn_usage
+                usage_total = event["total"]
+                turns.record_usage(project_id, {k: v for k, v in event.items()
+                                                if k != "type"})
+            if event["type"] == "complete":
+                # The receipt: what THIS turn cost (the computed delta).
+                # The thread's lifetime bill rides along under its true
+                # name.
+                event["usage"] = turn_usage
+                event["thread_total"] = usage_total
+                await finish_turn(project_id, thread_id, message)
+```
+
+Run the arithmetic on the real capture from the figure, because it's satisfying: first update, `last` 26,597, `total` 242,573, so the baseline is 215,976 and the turn so far is 26,597. Second update, `last` 26,691, `total` 269,264, turn = 53,288, which is exactly 26,597 + 26,691. Receipt: **53,288 tokens this turn**, with the thread's 269,264 riding along under its true name as `thread_total`. Those are the two `usage` lines from the Stop section, cashed out.
+
+On the wire, this is the event vocabulary's fifteenth type, `usage_update`, and the translation is the thinnest in `events.py` because honesty here means mostly *not* renaming things:
+
+```python filename="backend/app/events.py" repo="part-08-stop-steer-usage/backend/app/events.py" lines="58-67"
+def usage_event(token_usage: dict) -> dict:
+    """thread/tokenUsage/updated, passed through under its true names:
+    `last` is the most recent model request, `total` is the thread's
+    lifetime count. The per-turn `turn` reading is computed state, so
+    main.run_turn attaches it (same shape on the stream and on
+    GET /usage)."""
+    return {"type": "usage_update",
+            "last": token_usage.get("last") or {},
+            "total": token_usage.get("total") or {},
+            "context_window": token_usage.get("modelContextWindow")}
+```
+
+The gauge itself is a header button: the big number is this turn (the computed delta), the quieter one is the thread's odometer, labeled as such. Click it for the breakdown of all three readings:
+
+```tsx filename="frontend/components/TokenGauge.tsx" repo="part-08-stop-steer-usage/frontend/components/TokenGauge.tsx" lines="32-49"
+export function TokenGauge({ usage }: { usage: UsageReading | null }) {
+  const [open, setOpen] = useState(false);
+  if (!usage?.total?.totalTokens) return null;
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        data-testid="token-gauge"
+        onClick={() => setOpen((v) => !v)}
+        title="Tokens this turn · this thread (click for the breakdown)"
+        className="flex items-center gap-1.5 rounded-lg border border-stone-200 px-2.5 py-1 font-mono text-xs text-stone-500 hover:border-accent hover:text-accent dark:border-stone-800 dark:text-stone-400"
+      >
+        <span data-testid="gauge-turn">{compact((usage.turn ?? usage.last)?.totalTokens)}</span>
+        <span className="text-stone-300 dark:text-stone-600">·</span>
+        <span data-testid="gauge-thread" className="text-stone-400 dark:text-stone-500">
+          {compact(usage.total?.totalTokens)} thread
+        </span>
+      </button>
+```
+
+Watch it during a build and the ritual becomes a live instrument: in the e2e run it climbed through eight distinct readings, 15.5k to 163.3k, while the pottery site assembled itself. And the second turn on that thread is the whole lesson in one screenshot: a one-line heading edit whose receipt says **52,641 tokens this turn** while the gauge's quieter number says the thread has consumed 216.0k lifetime. Before this part, that receipt would have quoted the 216.0k and quietly taught you that small edits cost a fortune. (52k for one line is still real money at scale, and most of it is cached input, which the breakdown panel itemizes; the cost dials, `effort` among them, are Part 10's subject.)
+
+<Figure
+  src="/images/series/codex/part-8/browser-gauge-light.svg"
+  srcDark="/images/series/codex/part-8/browser-gauge-dark.svg"
+  alt="Pagewright with the token gauge breakdown open. The header gauge reads 52.6k this turn and 216.0k thread, and its panel shows three rows with in, cached, out, and total columns: this turn 52.5k in, 40.7k cached, 172 out, 52.6k total; last request 26.3k in, 26.0k cached, 58 out, 26.4k total; this thread 209.1k in, 175.5k cached, 6.9k out, 216.0k total; plus a context window line reading 258.4k tokens. In the chat, the first build's receipt reads 163,335 tokens this turn in 40 seconds, and a one-line heading edit below it reads 52,641 tokens this turn in 3 seconds. The preview shows the pottery studio site with its hero heading changed to Glaze and Kiln."
+  caption="The breakdown from the real run: this turn, last request, this thread, all three under their true names. The receipt bills the turn; the odometer keeps the thread."
+  width={1120}
+  height={840}
+/>
+
+## /usage for the grown-ups
+
+Tokens measure spend; rate limits measure runway. The protocol has a method for the second one, `account/rateLimits/read`, and Pagewright proxies it at `GET /usage/limits` for the Part 13 status page to use:
+
+```python filename="backend/app/main.py" repo="part-08-stop-steer-usage/backend/app/main.py" lines="485-493"
+@app.get("/usage/limits")
+async def usage_limits():
+    """account/rateLimits/read, proxied for the grown-ups: how much of
+    the account's rate windows this machine has burned. Part 13 puts
+    this on a status page next to the server's own vitals."""
+    try:
+        return await client.request("account/rateLimits/read", {})
+    except CodexError as exc:
+        raise HTTPException(status_code=502, detail=str(exc))
+```
+
+And here's the honest capture of what it returns in this series' setup:
+
+```text
+HTTP/1.1 502 Bad Gateway
+content-type: application/json
+
+{"detail":"chatgpt authentication required to read rate limits"}
+```
+
+Not a bug; a boundary. This method is **auth-mode dependent**: it answers under ChatGPT-plan login, and this series [deliberately runs on API-key auth](/blog/codex-1-first-thread#setup-checklist-style), where usage is billed per token and the "rate limits" it would report don't govern you the same way. Under plan auth, the schema's response is a proper gauge cluster: `rateLimits` with `primary` and `secondary` windows carrying `usedPercent`, `resetsAt`, and `windowDurationMins`, plus credit balances. Pagewright keeps the endpoint, surfaces the 502 truthfully, and treats it as what it is: a status-page tile that lights up for plan-auth deployments and says "not applicable on this box" for key-auth ones. If you take one operational habit from this section, take the token gauge; it's the meter that always answers.
+
+## The meter ritual, receipt edition
+
+Every row a real run from building this part, and for the first time in the series, every number is a per-turn delta rather than a thread bill:
+
+| Run | Receipt |
+|---|---|
+| The pottery build, first turn on the thread | 163,335 tokens this turn · 40s |
+| "Change the hero heading to say Glaze & Kiln." | 52,641 tokens this turn · 3s (thread odometer: 216.0k) |
+| The footer edit from the wire trace, two model requests | 53,288 tokens this turn · 2.8s (26,597 + 26,691, exactly) |
+| The bookshop build that absorbed a steer mid-turn | 43,010 tokens this turn · 112.5s, footer included |
+| The sleepy loop, stopped at section six | stopped by you · 31,065 tokens this turn · 9s |
+
+The stopped run's receipt deserves its sentence: 31,065 tokens is what nine seconds of orchestration cost before you pulled the plug, and not a token followed the interrupt, because ending the turn ended the model calls. The shell loop that kept writing afterwards cost nothing; sleep is free, inference isn't. Stop protects exactly the resource the meter measures, which is why they shipped in the same part.
+
+<DemoVideo
+  src="/videos/codex/part-8-demo.mp4"
+  poster="/videos/codex/part-8-poster.jpg"
+  caption='Live control, recorded against the real app: a florist build starts, a mid-turn steer ("make the header background terracotta orange instead") gets the chip and repaints the header inside the same turn, and a second run gets stopped mid-loop, with the red "stopped by you" receipt and the token gauge ticking in the header throughout.'
+  label="Screen recording of Part 8: a build being steered mid-turn with the steering chip appearing and the header changing color without a restart, then a second turn being stopped with the stopped-by-you receipt, while the token gauge updates live"
+/>
+
+<Recap
+  part={8}
+  items={[
+    "The active-turn ledger: turn/interrupt needs {threadId, turnId} and turn/steer needs expectedTurnId as a protocol-enforced precondition, so the backend finally keeps the name that turn/start has been answering with all along, written on begin, erased (by name) on any ending.",
+    "A Stop button wired to the truth: POST /interrupt sends turn/interrupt, the outcome arrives on the stream as turn/completed status interrupted, and the receipt says stopped by you. Cooperative semantics, verified: the abandoned item never gets item_done, the running shell finishes and its writes land, and the workspace stays the source of truth.",
+    "Steering: the composer never locks, a mid-turn message routes to turn/steer and is absorbed by the running build (resurfacing as a plain userMessage at the next inference boundary), and a synthetic steered event drives the chip that keeps the routing legible.",
+    "The race, refereed by the protocol: a steer against a turn that finished fails loudly with -32600 no active turn to steer, and the backend converts that into the fallback the user expects: clear the stale ledger line, start a normal turn, take the chip off. No message is ever eaten.",
+    "An honest meter: neither tokenUsage field means this turn (.last is one model request, .total is the thread's odometer), so the receipt is a computed delta of totals, the gauge shows turn and thread under their true names, and account/rateLimits/read is a plan-auth-only instrument that this API-key series surfaces truthfully as a 502.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "Why does Part 8's backend suddenly need to remember which turn is live on each project?",
+      options: [
+        "To prevent two turns from running at once on one thread",
+        "Because turn/interrupt requires {threadId, turnId} and turn/steer requires expectedTurnId, and both ids come from the turn/start response the backend used to throw away",
+        "Because the engine stops sending threadId on notifications mid-turn",
+        "To compute token usage, which is keyed by turn id",
+      ],
+      answer: 1,
+      explain: "Both live-control verbs name a specific turn; interrupt takes both ids and steer's expectedTurnId is a precondition that must match the currently active turn. The response of turn/start carries turn.id, so the ledger writes it the moment the turn begins.",
+    },
+    {
+      q: "You click Stop while the agent's shell loop is mid-run. Which of these is TRUE, per the live captures?",
+      options: [
+        "The loop's process is killed and its partial writes are rolled back",
+        "The turn keeps running until the loop finishes, then reports interrupted",
+        "The turn ends at once (status interrupted), the command item never gets item_done, and the loop keeps running to completion with every write landing",
+        "The engine pauses the loop and resumes it on the next turn",
+      ],
+      answer: 2,
+      explain: "Interrupt is cooperative at the agent level: turn/completed (interrupted) arrived at 14.0s with the loop at section six, no item_done ever came for the command item, and the file ended with all ten sections. Stop halts the agent, not the machine.",
+    },
+    {
+      q: "A message arrives, the ledger says a turn is active, but the turn actually finished a beat earlier. What happens?",
+      options: [
+        "turn/steer silently discards the message since there is nothing to steer",
+        "The backend blocks until the next turn starts, then delivers it",
+        "The engine queues the steer for the next turn automatically",
+        "turn/steer fails with -32600 no active turn to steer; the backend catches it, clears the stale ledger entry, and falls back to a normal turn/start, so the message runs anyway",
+      ],
+      answer: 3,
+      explain: "The expectedTurnId precondition makes the race fail loudly instead of eating the message. Captured raw: the turn's completion and the -32600 landed in the same logged instant, and the fallback turn streamed like any other. The UI removes the steering chip when the response turns out to be a stream.",
+    },
+    {
+      q: "thread/tokenUsage/updated carries .last and .total. What number belongs on a per-turn receipt?",
+      options: [
+        "Neither: the receipt is a computed delta, total now minus total when the turn began, with the baseline derived from the first update's total minus its last",
+        ".last, because it is the most recent measurement",
+        ".total, because it is the authoritative cumulative count",
+        ".total divided by the number of turns so far",
+      ],
+      answer: 0,
+      explain: ".last is one model request (a build turn makes many; total grows by exactly last each update) and .total is thread-cumulative (Part 6 saw 1.09M). Verified live: a two-request turn read 26,597 then 26,691, and the honest receipt was their sum, 53,288, computed as a delta of totals.",
+    },
+    {
+      q: "GET /usage/limits returns 502 with 'chatgpt authentication required to read rate limits'. Why?",
+      options: [
+        "The backend forgot to send the API key with the request",
+        "account/rateLimits/read is auth-mode dependent: it answers under ChatGPT-plan login, and this series runs API-key auth, so the engine's error is surfaced truthfully as a 502",
+        "Rate limits exist only on the Part 13 production server",
+        "The method needs experimentalApi: true in the handshake",
+      ],
+      answer: 1,
+      explain: "Captured live in 0.142.4: under API-key auth the method errors with exactly that message, while plan auth returns the full rateLimits shape (usedPercent, resetsAt, windowDurationMins, credits). Pagewright keeps the endpoint honest instead of faking a gauge.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend
+git commit -m "part 8: stop, steer, and the meter"
+```
+
+Pagewright now takes orders mid-swing, stops when told (and is honest about what stopping means), and bills by the work order instead of the lifetime. But every one of those powers rides a single fragile pipe: one SSE response, held open by one browser tab. Refresh mid-build and the stream is gone. The build isn't. Next: [durability](/blog/codex-concepts#event-source).
+
+The complete, tested code for this part lives in [`part-08-stop-steer-usage`](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-08-stop-steer-usage) in the [companion repo](https://github.com/yadneshSalvi/codex-app-server-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's lines highlighted.

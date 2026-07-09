@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="900" viewBox="0 0 1240 900" role="img">
+  <rect width="1240" height="900" fill="#151311"/>
+  <text x="48" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#756d62">THE ROUTER &#183; ONE ENDPOINT, TWO VERBS, AND A REFEREE</text>
+  <line x1="48" y1="66" x2="1192" y2="66" stroke="#2b2723" stroke-width="1.5"/>
+
+  <!-- the message -->
+  <rect x="330" y="92" width="580" height="74" rx="12" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="620" y="122" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" fill="#ebe7df" text-anchor="middle">"Also add a footer that says STEERED BY HUMAN" &#183; Send</text>
+  <text x="620" y="148" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#756d62" text-anchor="middle">the composer stays live during a run &#183; POST /projects/{id}/chat</text>
+
+  <line x1="620" y1="166" x2="620" y2="200" stroke="#756d62" stroke-width="1.5" />
+     <path d="M 620 200 l -5 -8 l 10 0 z" fill="#756d62" transform="rotate(0 620 200)"/>
+
+  <!-- the ledger check -->
+  <rect x="330" y="200" width="580" height="104" rx="12" fill="#1d1a17" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="620" y="230" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#ebe7df" text-anchor="middle">turns.active(project_id) ?</text>
+  <text x="620" y="258" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="middle">the active-turn ledger: {"thread_id": "019f3917&#8230;", "turn_id": "019f3917-8ff9&#8230;"}</text>
+  <text x="620" y="280" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#756d62" text-anchor="middle">written when turn/start answers with turn.id &#183; erased when turn/completed arrives</text>
+
+  <!-- branch labels -->
+  <line x1="420" y1="304" x2="330" y2="356" stroke="#e5825a" stroke-width="1.5" />
+     <path d="M 330 356 l -5 -8 l 10 0 z" fill="#e5825a" transform="rotate(59.98163257239091 330 356)"/>
+  <text x="300" y="338" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#e5825a" text-anchor="middle">a turn is LIVE</text>
+  <line x1="820" y1="304" x2="910" y2="356" stroke="#756d62" stroke-width="1.5" />
+     <path d="M 910 356 l -5 -8 l 10 0 z" fill="#756d62" transform="rotate(-59.98163257239092 910 356)"/>
+  <text x="950" y="338" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#a49c90" text-anchor="middle">idle: no entry</text>
+
+  <!-- steer lane -->
+  <rect x="80" y="356" width="500" height="128" rx="12" fill="#2a201a" stroke="#5e463a" stroke-width="2"/>
+  <text x="330" y="386" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#e5825a" text-anchor="middle">turn/steer</text>
+  <text x="330" y="412" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#ebe7df" text-anchor="middle">{"threadId": &#8230;, "expectedTurnId": "019f3917-8ff9&#8230;",</text>
+  <text x="330" y="434" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#ebe7df" text-anchor="middle">"input": [{"type": "text", "text": &#8230;}]}</text>
+  <text x="330" y="464" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#a49c90" text-anchor="middle">expectedTurnId is a PRECONDITION: it must name the live turn</text>
+
+  <line x1="330" y1="484" x2="330" y2="520" stroke="#a3c57d" stroke-width="1.5" />
+     <path d="M 330 520 l -5 -8 l 10 0 z" fill="#a3c57d" transform="rotate(0 330 520)"/>
+  <text x="200" y="506" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#a3c57d" text-anchor="middle">ack: {"turnId": &#8230;}</text>
+  <rect x="80" y="520" width="500" height="96" rx="12" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="330" y="548" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#ebe7df" text-anchor="middle">the endpoint answers plain JSON: {"steered": true}</text>
+  <text x="330" y="572" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="middle">events keep riding the ORIGINAL turn's stream &#183; the chip renders</text>
+  <text x="330" y="594" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#756d62" text-anchor="middle">&#126;3s later the text resurfaces as a plain userMessage item</text>
+
+  <!-- new-turn lane -->
+  <rect x="720" y="356" width="380" height="128" rx="12" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="910" y="392" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="16" fill="#ebe7df" text-anchor="middle">turn/start</text>
+  <text x="910" y="420" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a49c90" text-anchor="middle">a brand-new turn, exactly as</text>
+  <text x="910" y="442" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a49c90" text-anchor="middle">every message since Part 2</text>
+  <line x1="910" y1="484" x2="910" y2="520" stroke="#756d62" stroke-width="1.5" />
+     <path d="M 910 520 l -5 -8 l 10 0 z" fill="#756d62" transform="rotate(0 910 520)"/>
+  <rect x="720" y="520" width="380" height="96" rx="12" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="910" y="552" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#ebe7df" text-anchor="middle">the response is an SSE stream</text>
+  <text x="910" y="576" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="middle">session_start &#8594; deltas &#8594; complete</text>
+
+  <!-- the race lane -->
+  <path d="M 580 440 C 680 460, 680 620, 670 662" fill="none" stroke="#e08585" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <path d="M 670 662 l -11 -3 l 7 -9 z" fill="#e08585"/>
+  <rect x="680" y="640" width="460" height="100" rx="12" fill="#2a1717" stroke="#6b3838" stroke-width="1.5"/>
+  <text x="910" y="668" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" fill="#e08585" text-anchor="middle">-32600 &#183; "no active turn to steer"</text>
+  <text x="910" y="694" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="middle">the turn finished a beat before the steer landed: catch it,</text>
+  <text x="910" y="716" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="middle">clear the stale ledger line, fall back to turn/start above</text>
+
+  <!-- footer band -->
+  <rect x="48" y="778" width="1144" height="74" rx="10" fill="#1d1a17" stroke="#2b2723"/>
+  <text x="68" y="806" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="start">The protocol referees the race, not our bookkeeping: the ledger can be honestly stale (a stalled viewer held</text>
+  <text x="68" y="828" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="start">it for 100s in our probe), but a steer against a finished turn fails LOUDLY. Either verb runs the message;</text>
+  <text x="68" y="850" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#e5825a" text-anchor="start">the only visible difference is the chip: it stays when the steer was absorbed, it comes off on the fallback.</text>
+</svg>

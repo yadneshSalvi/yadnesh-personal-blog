@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="452" viewBox="0 0 1040 452" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="452" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">stdio &#183; the steer that lost the race (raw probe, id 5)</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># 93 seconds into a build, we send turn/steer while turn 019f390a-d23b… is (was) live:</tspan></text>
+    <text x="32" y="116" xml:space="preserve"><tspan fill="#756d62">→</tspan> {"id": <tspan fill="#e5825a">5</tspan>, "method": <tspan fill="#e5825a">"turn/steer"</tspan>, "params": {"threadId": "019f390a-d1e1…",</text>
+    <text x="32" y="144" xml:space="preserve">      "expectedTurnId": <tspan fill="#dcae62">"019f390a-d23b…"</tspan>, "input": [{"type": "text", "text": "…"}]}}</text>
+    <text x="32" y="172" xml:space="preserve"></text>
+    <text x="32" y="200" xml:space="preserve"><tspan fill="#756d62"># the same logged instant, t=93.33s, in this order:</tspan></text>
+    <text x="32" y="228" xml:space="preserve"><tspan fill="#756d62">←</tspan> {"method": <tspan fill="#e5825a">"turn/completed"</tspan>, "params": {"turn": {"id": <tspan fill="#dcae62">"019f390a-d23b…"</tspan>,</text>
+    <text x="32" y="256" xml:space="preserve">      "status": <tspan fill="#8fb573">"completed"</tspan>, "durationMs": 93157, …}}}</text>
+    <text x="32" y="284" xml:space="preserve"><tspan fill="#756d62">←</tspan> {"error": {"code": <tspan fill="#d97676">-32600</tspan>, "message": <tspan fill="#d97676">"no active turn to steer"</tspan>}, "id": <tspan fill="#e5825a">5</tspan>}</text>
+    <text x="32" y="312" xml:space="preserve"></text>
+    <text x="32" y="340" xml:space="preserve"><tspan fill="#756d62"># the turn finished under our steer, in flight. The precondition failed LOUDLY:</tspan></text>
+    <text x="32" y="368" xml:space="preserve"><tspan fill="#756d62"># no silent absorption, no eaten message. Catch the CodexError, clear the stale</tspan></text>
+    <text x="32" y="396" xml:space="preserve"><tspan fill="#756d62"># ledger line, fall back to a plain turn/start. The user never sees -32600.</tspan></text>
+  </g>
+</svg>
