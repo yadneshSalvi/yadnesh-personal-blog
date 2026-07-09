@@ -1,0 +1,601 @@
+---
+title: "Codex App Server in Production, Part 11: Trust but Verify: Review Mode, Structured Outputs, and the Publish Gate"
+subtitle: "The series' longest setup pays off: review/start catches a brand contradiction planted seven parts ago, outputSchema turns a final answer into a validated site manifest, a page of smoke evals runs on ephemeral threads, and the Publish button has to earn its click."
+image: "/images/series/codex/part-11/cover-light.svg"
+imageDark: "/images/series/codex/part-11/cover-dark.svg"
+createdAt: "2026-07-09T00:00:00.000Z"
+updatedAt: "2026-07-09T00:00:00.000Z"
+tags: ["codex", "openai", "fastapi", "nextjs", "tutorial"]
+series: "codex-app-server-fastapi-nextjs"
+seriesPart: 11
+---
+
+Nobody told the inspector about the logo. It read the brief, opened the client's own SVG, compared the fill colors against the brand rules, and wrote this into the record:
+
+> The brief makes `#2F5233` the house color, but the logo asset shown in the hero and footer (`assets/logo.svg`) uses `#1E3A5F` for both the mark and the wordmark, and the client-supplied copy in `brief/assets/logo.svg` matches that blue version. Because the live page ships the blue logo unchanged, the site presents a brand color that conflicts with the brief; the client needs to choose whether to recolor the logo or update the brand rule before publishing.
+
+That contradiction is not an accident, and it is not new. It was planted in this series' [brief bank](/blog/codex-4-live-preview#the-brief-bank) back in Part 4: Harbor & Vine, the dockside wine bar, whose brief demands deep forest green while the logo the client supplied is navy. Seven parts it sat there, waiting for the builder to inherit it, and for this page, where Pagewright stops taking the builder's word for anything. By the end, Publish is a button that has to be earned: a fresh-eyes inspection with no blockers, a schema-validated manifest, and one deterministic check that exists because a real bug demanded it.
+
+<Figure
+  src="/images/series/codex/part-11/browser-report-light.svg"
+  srcDark="/images/series/codex/part-11/browser-report-dark.svg"
+  alt="Pagewright after inspecting the Harbor and Vine site. The chat shows a build receipt of 224,574 tokens in 67 seconds, then an inspector's report card with a red border reading 1 blocker, 0 should-fix, 0 minor. The single P1 finding is titled Resolve the logo's blue/green brand clash before launch, explains that the brief makes #2F5233 the house color while the logo uses #1E3A5F, and carries the location chip assets/logo.svg:2, with a Fix findings button below. Under the card a receipt reads inspection (fresh eyes), 32s. A bar above the composer says Publish is blocked: 1 blocker finding to fix, with the Publish button greyed out. The preview pane shows the finished green Harbor and Vine site whose logo mark is visibly navy."
+  caption="The dessert, from the real e2e run. The reviewer found the navy logo on the green site, filed it as a blocker, and the Publish button refuses to arm. Note the logo mark in the preview: that blue is the whole story."
+  width={1120}
+  height={900}
+/>
+
+Three protocol features carry this part: `review/start` (the engine's built-in reviewer, which no sibling series has anything like), `outputSchema` (structured final answers), and `ephemeral` threads from [Part 5](/blog/codex-5-threads#fork-two-drafts-of-one-site), finally cashing the IOU. But the part opens with none of them. It opens with a button that works perfectly and feels wrong.
+
+## The button that ships anything
+
+Publishing a static site is not a hard problem. Pagewright's workspaces already hold a finished `site/` directory; "publish" means copying it somewhere public and serving it. The whole feature is one function and two mounts:
+
+```python filename="backend/app/publish.py" repo="part-11-review-publish/backend/app/publish.py" lines="205-223"
+    target = site_path(slug)
+    if target.exists():
+        shutil.rmtree(target)
+    shutil.copytree(projects.site_dir(project_id), target,
+                    ignore=shutil.ignore_patterns("brief"))
+    entry = {
+        "slug": slug,
+        "project_id": project_id,
+        "name": name,
+        "url": f"/p/{slug}/",
+        "published_at_ms": int(time.time() * 1000),
+        "manifest": manifest.model_dump() if manifest else None,
+        "forced": forced,
+    }
+    entries = [e for e in entries if e["project_id"] != project_id] + [entry]
+    save_registry(entries)
+    projects.update_project(project_id, published={
+        "slug": slug, "url": entry["url"], "at_ms": entry["published_at_ms"]})
+    return entry
+```
+
+Copy the files (minus `brief/`, the client's paperwork; hold that thought, it returns with teeth), write a line into `published/published.json`, mount the folder at `/p/{slug}/` with the same `StaticFiles` pattern the preview has used since [Part 4](/blog/codex-4-live-preview#serving-the-site-through-the-glass). A slug is derived from the project name; republishing reuses it, and a different project claiming a taken slug gets a numbered suffix instead of someone else's URL. In Part 13 this exact `/p/` path goes onto a public server, which is why the shape is worth getting right now.
+
+Wire a Publish button to that and you have a working product. Click, and the client's site is live at a URL you can text to a friend. It works on the first try.
+
+And it feels reckless. Name the feeling precisely, because the feeling is the spec for the rest of this part: **nothing stands between "the agent stopped typing" and "this is on the internet."** Not a second pair of eyes, not a link check, not a glance at whether the thing even matches the brief. You have spent ten parts building trust in this builder, watching it stream, steer, survive restarts, and plan. Trust is not the problem. The problem is that trust is not a release process.
+
+Checkpoint. Right now you have: a fifteen-line copy, a registry, and a `/p/{slug}/` mount that serves anything the builder last wrote. The rest of this part is the word *earned*.
+
+## The inspector takes the case
+
+Codex ships a built-in reviewer. Not a prompt template, a **protocol method**: `review/start` runs a dedicated review pass as a turn on your thread, with its own item vocabulary to bracket the work. The [concepts page](/blog/codex-concepts#review-mode) calls it the building inspector, a different clipboard from the builder's, and this section wires the inspection into Pagewright as the pre-publish check.
+
+The request shape is `{threadId, target, delivery?}`. Three of the four target types (`uncommittedChanges`, `baseBranch`, `commit`) assume a git repo, and a client workspace has none. The fourth is the product lane: `{type: "custom", instructions}`, free-form instructions, no git anywhere:
+
+```python filename="backend/app/main.py" repo="part-11-review-publish/backend/app/main.py" lines="865-868,870-876,880-887"
+    thread_id, _ = await ensure_thread(entry, workspace)
+    queue = client.queue_for(thread_id)
+    started = await client.request("review/start", {
+        "threadId": thread_id,
+        # the other targets (uncommittedChanges, baseBranch, commit) all
+        # assume a repo, and a client workspace has none.
+        "target": {"type": "custom", "instructions": review.INSTRUCTIONS},
+    })
+    turn_id = started["turn"]["id"]
+    turns.begin(project_id, thread_id, turn_id)
+    eventlog.begin_turn(project_id, turn_id)
+    await eventlog.publish(project_id, {
+        "type": "session_start", "session_id": thread_id,
+        "project_id": project_id, "mode": entry.get("mode", "standard"),
+        "turn_id": turn_id, "started_at_ms": int(time.time() * 1000),
+        "review": True})
+    CONSUMERS[turn_id] = asyncio.create_task(consume_turn(
+        project_id, thread_id, turn_id, "", workspace, queue,
+        review_turn=True))
+```
+
+Read the bottom half again: it is the `/chat` endpoint's rhythm, unchanged. The inspection runs through the same consumer, lands in [Part 9's event log](/blog/codex-9-durable-streams), and replays into every tab. The `session_start` carries no `message` because nobody typed one; the `review: True` flag is how the UI knows to render this turn as the inspector at work rather than a conversation. Delivery defaults to `inline` (the review runs as a turn on your thread); `detached` would spin up a fresh thread and hand back a `reviewThreadId`. Pagewright stays inline: one project, one transcript, the inspection on the record next to the build it judged.
+
+`review.INSTRUCTIONS` is the inspection itself, and it is deliberately generic: check the site against `brief/brief.md` for required sections, voice, and every explicit brand rule, **including opening each file in `brief/assets/` and reading its real contents** (for an SVG, the actual fills and strokes inside it); check accessibility basics; check that every internal reference resolves. Nothing in the instructions names a client, a color, or a file. The inspector has to earn its findings.
+
+What comes back brackets the investigation with two new item types. `enteredReviewMode` opens the pass (its `review` field echoes your instructions back); then real work: `commandExecution` items you have rendered since [Part 3](/blog/codex-3-builder-ui#two-new-parcels-on-the-same-belt), the inspector running `find`, reading the brief, catting the logo. Then `exitedReviewMode` closes it, and its `review` field is the payload: the findings. The consumer translates the bookends at the same seam every other event crosses:
+
+```python filename="backend/app/main.py" repo="part-11-review-publish/backend/app/main.py" lines="511-532"
+            if (event["type"] in ("item_start", "item_done")
+                    and event["kind"] in ("enteredReviewMode",
+                                          "exitedReviewMode")):
+                item = note["params"].get("item", {})
+                if (event["type"] == "item_start"
+                        and event["kind"] == "enteredReviewMode"):
+                    await eventlog.publish(project_id, {
+                        "type": "review_state", "phase": "entered",
+                        "instructions": item.get("review", "")})
+                if (event["type"] == "item_done"
+                        and event["kind"] == "exitedReviewMode"):
+                    raw = item.get("review") or ""
+                    findings = review.parse_findings(raw)
+                    report = review.save(project_id, turn_id, raw, findings)
+                    for finding in findings:
+                        await eventlog.publish(project_id, {
+                            "type": "review_finding", **finding})
+                    await eventlog.publish(project_id, {
+                        "type": "review_state", "phase": "exited",
+                        "counts": report["counts"], "raw": raw,
+                        "at_ms": report["at_ms"]})
+                continue
+```
+
+Two new event types on the [Part 2 envelope](/blog/codex-2-fastapi-bridge#designing-the-envelope), nine parts old and still absorbing: `review_state` brackets the pass, `review_finding` carries one parsed finding each. Because they ride the log, the report card renders in every tab, survives a refresh, and replays for a tab opened tomorrow.
+
+<Figure
+  src="/images/series/codex/part-11/fig-inspector-light.svg"
+  srcDark="/images/series/codex/part-11/fig-inspector-dark.svg"
+  alt="Flow diagram titled the inspector, a different clipboard from the builder's. POST /projects/id/review becomes review/start with a custom target carrying free-form instructions and no git required. A side box titled the model truth notes review/start takes no model param, extras are silently ignored, and the lever is the review_model config key on thread/start, proven by a bogus value failing with model_not_found. The flow continues through the enteredReviewMode item, a real investigation of commands including cat assets/logo.svg, and the exitedReviewMode item whose review field carries tagged prose findings. A latency box quotes 32 and 21 seconds from the canonical run, an A/B of 30 versus 26 to 28 seconds, a measured range of 20 to 90 seconds, and the spike's four minutes. The parser box regexes the tags into severity, title, body, and location while keeping the raw text, feeding review_state and review_finding events to every tab. A green footer explains fresh context is the point: the builder's thread defends its own decisions, while review/start reads the files with a clean slate."
+  caption="The whole inspection, wire to report card. Every number and command from live runs. The amber box is the fact nobody documents: the reviewer's model is chosen by config, not by the request."
+  width={1240}
+  height={1040}
+/>
+
+Two honesty beats before the payoff, both verified live because the docs would not commit to either.
+
+**Latency.** When this series first spiked `review/start`, a one-file review took 3 minutes 45 seconds, and that number went into the concepts page with a warning. Building this part, that never reproduced: inspections of the one-page Harbor & Vine site measured 20 to 90 seconds across every capture (32s and 21s in the run on this page). Both numbers are true; review latency depends on the workspace and, apparently, the weather. So the UI does not guess: the bar shows "the inspector is reading the site, this takes a minute or two" with a live elapsed clock, and the report card explains that the commands streaming past are the inspector working. Set expectations honestly and slow features survive contact with users.
+
+**The model.** You might reasonably want the reviewer on a different model than the builder. `review/start` takes no `model` param; send one and it is **silently ignored** (verified: the request is accepted, nothing changes). The real lever lives one level up, and it is a config key:
+
+```python filename="backend/app/main.py" repo="part-11-review-publish/backend/app/main.py" lines="401-405,411-413,424-425"
+    started = await client.request("thread/start", {
+        "cwd": str(workspace),
+        "sandbox": "workspace-write",
+        "approvalPolicy": "never",
+        "model": MODEL,
+        "config": {
+            "include_plan_tool": True,
+            "features.default_mode_request_user_input": True,
+            "review_model": MODEL,
+        },
+```
+
+How do you prove a config key routes anything when the output looks the same either way? Break it. Set `review_model` to `no-such-model-xyz` and the review turn fails with `model_not_found` naming exactly that string. The key is live. Pagewright pins the inspector to the series model, `gpt-5.4-mini`: one model to reason about, one bill to read, and the A/B showed no accuracy difference on this workload (both the default review model and mini caught the planted flaw, 30s versus 26 to 28s).
+
+<Callout type="info" title="Why not ask the builder to check its own work?">
+Because it wrote the site, and its thread remembers writing it. Every choice it made sits in its context as something it already justified; ask "review this" on the same thread and you invite it to defend its own decisions, not inspect them. `review/start` runs the pass with fresh context against the files on disk. That distance is the entire feature, and it rhymes with the sibling series' subagent lesson: [a colleague who reads only the evidence outperforms the author proofreading their own work](/blog/agent-sdk-11-subagents-skills#why-double-check-your-work-doesnt-work), and [fresh context cuts both ways](/blog/agent-sdk-11-subagents-skills#fresh-context-cuts-both-ways): the inspector knows nothing you do not put in the instructions or the workspace. (The protocol also routes *approvals* to an auto-reviewer via `approvalsReviewer`; one sentence, not built here.)
+</Callout>
+
+## The planted flaw pays off
+
+Time to collect on a seven-part-old setup. Create a Harbor & Vine project, send *"Read brief/brief.md and build the site it describes."*, and the builder does what it has always done: a faithful, handsome, forest-green page, 224,574 tokens, 67 seconds. It copies the client's logo into `assets/` and ships it in the hero and the footer, exactly as the brief instructs. The preview looks great. Every part before this one would call that done.
+
+Click **Inspect site**. The card opens in its running phase, the inspector's commands stream past (it reads the brief, then the page, then *opens the logo file itself*), and 32 seconds later the report card seals with the finding this page opened with. Here is the raw text, verbatim from the wire:
+
+<Figure
+  src="/images/series/codex/part-11/term-finding.svg"
+  alt="A dark terminal showing the exitedReviewMode review field from the canonical run. The summary reads: the page is mostly compliant, but it ships a logo whose colors conflict with the brief's stated brand palette, and that contradiction is visible in both the hero and footer; that is a publish-blocking brand issue under the review rules. Below, a bullet tagged P1 titled Resolve the logo's blue/green brand clash before launch at assets/logo.svg lines 2 to 8, explaining that the brief makes #2F5233 the house color but the logo uses #1E3A5F for both mark and wordmark, the client-supplied copy matches that blue version, and the client needs to choose whether to recolor the logo or update the brand rule before publishing."
+  caption="exitedReviewMode.review, canonical run. The reviewer names all three sides: the brief's rule, the asset's actual fill, and the fact that the page ships the contradiction. (The reviewer letters its title/path seam with a long dash; drawn here as a middot.)"
+  width={1040}
+  height={564}
+/>
+
+Sit with what had to go right. The brief says `#2F5233` in prose. The logo's navy lives inside an SVG as `stroke="#1E3A5F"`, in a file the builder copied without comment, because copying it was literally the instruction. No diff shows a conflict; both files are "correct". The only way to catch it is to read the brief *and* the asset *and* the page, and hold all three in mind at once, which is precisely what generic instructions ("check brand colors against the client's own assets; open each file") made the inspector do. Fresh eyes, told where to look but not what to find.
+
+One wrinkle the protocol hands you: the findings are **tagged prose, not JSON**. A summary paragraph, then markdown bullets tagged `[P1]`/`[P2]`/`[P3]` with `path:line` references, repeated in a final `agentMessage`. Your product either renders the markdown or parses the tags. Pagewright parses, humbly:
+
+```python filename="backend/app/review.py" repo="part-11-review-publish/backend/app/review.py" lines="88-96"
+# One finding = a [P*] tag and everything until the next tag (re.S so a
+# finding may span lines). The reviewer writes markdown bullets; the
+# stray "- " left at a segment's end belongs to the NEXT bullet.
+_FINDING = re.compile(r"\[(P[123])\]\s*(.*?)(?=\[P[123]\]|\Z)", re.S)
+# A path-looking token, optionally with :line. Anchored to known static
+# site extensions so prose like "e.g." never becomes a location.
+_LOCATION = re.compile(
+    r"\b((?:[\w.-]+/)*[\w.-]+\.(?:html?|css|js|svg|md|png|jpe?g|webp|ico|txt))"
+    r"(?::(\d+))?\b")
+```
+
+```python filename="backend/app/review.py" repo="part-11-review-publish/backend/app/review.py" lines="114-133"
+    for match in _FINDING.finditer(text or ""):
+        severity = match.group(1)
+        segment = match.group(2).strip().rstrip("-*• \n").strip()
+        segment = _ABS_WORKSPACE.sub("", segment)
+        if not segment:
+            continue
+        parts = _TITLE_SPLIT.split(segment, maxsplit=1)
+        title = parts[0].strip().lstrip("*").strip()
+        body = parts[1].strip() if len(parts) > 1 else ""
+        if "\n" in title:  # no dash seam: first line is the title
+            title, _, rest = title.partition("\n")
+            body = (rest + "\n" + body).strip()
+        if len(title) > 90:
+            title, body = title[:90].rsplit(" ", 1)[0] + "…", segment
+        location_match = _LOCATION.search(segment)
+        location = None
+        if location_match:
+            location = location_match.group(1)
+            if location_match.group(2):
+                location += f":{location_match.group(2)}"
+```
+
+The design rule in that code: **the raw text is the truth; the rows are a convenience.** Unparseable segments become findings whose body is the whole segment, so nothing the reviewer said can silently vanish, and the card keeps "the reviewer's words, unparsed" behind a fold. One field-note baked into `_ABS_WORKSPACE`: reviewers write absolute machine paths no matter how firmly the instructions say workspace-relative. Every project workspace ends in `/site/`, so the parser relativizes display text past that marker and leaves the raw findings untouched. Plan for the model to miss formatting instructions; never let that cost you the content.
+
+## Three drafts of a severity rubric
+
+Here is the section that earns this part's place in Act III, because the hard part was not catching the flaw. The first rubric caught it fine. The hard part was deciding **how much it should matter**, and that took three drafts against the live reviewer, each failure a real capture.
+
+**Draft one** said the obvious thing: tag findings P1, P2, P3 by importance. The reviewer caught the contradiction and filed it as `[P2]`, "should fix soon", with this hedge, verbatim: *"the brand palette is inconsistent unless the client explicitly wants the blue mark."* Reasonable! Maybe the client does want a navy logo on a green site. But a P2 does not block publishing, so the naive gate would have shipped the contradiction while politely noting it. A reviewer that hedges everything below the blocking line is a reviewer your gate cannot use.
+
+**Draft two** overcorrected: any conflict between the brief and a client asset is `[P1]`, no exceptions. The reviewer obliged, and filed the P1 *against `brief/assets/logo.svg`*, the client's own paperwork. Follow that to its end: the builder fixes the site by recoloring its copy of the logo, green page, green logo, done, and the paperwork still disagrees with the brief, because the builder has no business editing the client's source files. Re-inspect: still P1. Forever. The fix loop cannot close, and a gate nothing can pass is not a gate; it is a wall with a doorknob painted on.
+
+**Draft three** is what ships, and its principle fits in a sentence: **judge what the site ships.** A contradiction the page inherits (a navy logo actually displayed on the green site) is P1; the client must decide before this goes live, and the rubric explicitly forbids downgrading it on a guess about what the client might have intended. The same contradiction surviving only inside the client's paperwork, after the page has consistently resolved it one way, drops to P2: worth flagging to the client, not worth blocking a page that is internally coherent. The A/B proof, live: the flawed site (ships the navy logo) draws `[P1]`; the fixed site (green copy in `assets/`, paperwork untouched and still navy) draws exactly one `[P2]` and no blockers. The loop closes.
+
+The full wording lives in [`app/review.py`](https://github.com/yadneshSalvi/codex-app-server-in-production/blob/main/part-11-review-publish/backend/app/review.py) with both failure modes documented above it. The lesson generalizes past Pagewright: with a working reviewer in hand, **severity policy is product work**. The model supplied judgment in every draft; deciding *whose problem each finding is* (the builder's, the client's, or nobody's) was never the model's call to make. If your review feature has one sentence of design effort in it, spend it on the severity rubric.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 2 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). Single wide panel, about a robot inspector catching a robot builder's mistake. Scene: a cozy workshop; in the center stands a finished miniature model storefront painted deep forest green with the sign "HARBOR & VINE" whose small hanging logo shield is clearly NAVY BLUE, clashing with the green paint. On the left, a friendly little robot builder in a yellow hard hat holds a paintbrush and slumps, deflated, shoulders down. On the right stands an IDENTICAL twin robot, same model, but wearing a white hard hat and a neat red necktie, holding a clipboard with a checklist, pointing at the navy logo. The inspector robot says in a speech bubble: "BRIEF SAYS FOREST GREEN. LOGO IS NAVY." The builder robot replies in a small speech bubble: "...REPAINTING." Yad stands behind them holding a coffee mug, watching with an amused raised eyebrow. Clean readable hand-lettered speech bubbles, short ALL-CAPS text, minimal text: only "HARBOR & VINE", "BRIEF SAYS FOREST GREEN. LOGO IS NAVY.", "...REPAINTING." No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/codex/part-11/comic-inspector.png"
+  alt="Comic, one wide panel. In a workshop, a finished miniature storefront painted forest green reads HARBOR & VINE, with a small hanging logo shield that is clearly navy blue. On the right, a robot inspector, the same model as the builder but in a white hard hat and red tie, points at the shield with a checklist and says: brief says forest green, logo is navy. On the left the builder robot in a yellow hard hat slumps with a dripping green paintbrush and replies: dot dot dot, repainting. Yad, a bearded developer with headphones, watches over the storefront with his coffee, amused."
+  caption="Same model, different clipboard. The inspector defends nothing because it built nothing, and that is the entire feature."
+  width={1536}
+  height={1024}
+/>
+
+## Fix findings, and the gate that goes stale
+
+The report card ends in a button: **Fix findings**. There is no special protocol for repair; the reviewer wrote prose, the builder reads prose, and the workspace is the medium between them:
+
+```tsx filename="frontend/app/page.tsx" repo="part-11-review-publish/frontend/app/page.tsx" lines="819-827"
+  // the reviewer wrote them, the builder reads them, the workspace is
+  // the medium. Sending it stales the gate (session_start does), which
+  // is exactly right: after a fix, the site needs fresh eyes again.
+  function fixFindings(raw: string) {
+    send(
+      `The pre-publish inspection found these issues:\n\n${raw}\n\n` +
+        "Fix every [P1] finding in the site files (and any lower-priority ones you can).",
+    );
+  }
+```
+
+One click, one ordinary turn (180,916 tokens, 21 seconds in the canonical run), and the builder recolors its copy of the logo to the house green while leaving `brief/` alone; the deflated "...repainting" from the comic, on the wire. Note what it does *not* do: it does not touch the client's paperwork, which is exactly why the rubric needed draft three.
+
+Now the bookkeeping question that makes the gate honest: after that fix turn, is the old inspection still valid? Of course not; it vouched for files that no longer exist. The registry tracks this with one timestamp: `finish_turn` stamps `built_at_ms` on **every completed non-review turn**, and the gate refuses whenever that stamp is newer than the last inspection. Deliberately conservative: a turn that changed nothing still stales the review, because "is the review older than the last turn" is cheap and honest, while "did that turn REALLY change a file" is a diff-parsing rabbit hole that buys excuses. And one turn must never stamp it: the inspection itself. The inspector looked; it did not touch. If a review turn stamped `built_at_ms`, every inspection would mark its own report stale, and the gate could never open. That is the whole meaning of the `review_turn=True` flag threaded through the consumer.
+
+The frontend mirrors the same rule from the log, so every tab agrees on whether the button is earned:
+
+```tsx filename="frontend/components/PublishBar.tsx" repo="part-11-review-publish/frontend/components/PublishBar.tsx" lines="49-52"
+  if (!hasSite) return null;
+
+  const blocked = gate !== null && gate.P1 > 0;
+  const armed = gate !== null && gate.P1 === 0 && !working && !publishing;
+```
+
+`gate` holds the latest inspection's counts; `review_state {phase: "exited"}` sets it, and any non-review `session_start` clears it back to null. Re-inspect after the fix: 21 seconds, zero findings, the card seals green, and the Publish button arms for the first time in this series honestly.
+
+Checkpoint. Right now you have: an inspection that catches a planted cross-file contradiction, a severity rubric that blocks what ships and only what ships, a repair loop that provably closes, and a staleness rule with one deliberate exception. The button is armed. Before it fires, the site needs paperwork of its own.
+
+## The manifest: a form instead of an essay
+
+When Pagewright publishes a site, the `/p/` index needs a card: a title, a one-line description, a page list, an accent color. Ask the agent to "describe the site" and you get a lovely paragraph you cannot render. You want [a form, not an essay](/blog/codex-concepts#output-schema), and the protocol has a first-class way to demand one: pass `outputSchema` (a JSON Schema) on `turn/start`, and the final `agentMessage.text` arrives as the schema-conformant JSON string. The shape Pagewright asks for:
+
+```python filename="backend/app/publish.py" repo="part-11-review-publish/backend/app/publish.py" lines="37-50,64-70"
+MANIFEST_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["title", "description", "pages", "accent"],
+    "properties": {
+        "title": {
+            "type": "string",
+            "description": "The site's name, as its hero or <title> states it.",
+        },
+        "description": {
+            "type": "string",
+            "description": "One sentence describing the site, plain text, "
+                           "suitable for an index card.",
+        },
+        "accent": {
+            "type": "string",
+            "description": "The site's dominant accent color as a CSS hex "
+                           "value, e.g. #2F5233.",
+        },
+    },
+}
+```
+
+Everything required, no extra properties: structured output rejects looser schemas, and a form with optional fields invites the model to skip the hard ones. The turn that fills it is deliberately boring, and boring is the point:
+
+```python filename="backend/app/main.py" repo="part-11-review-publish/backend/app/main.py" lines="599-610"
+    started = await client.request("turn/start", {
+        "threadId": thread_id,
+        "input": [{"type": "text", "text": text}],
+        "outputSchema": schema,
+        "sandboxPolicy": {"type": "readOnly"},
+        "approvalPolicy": "never",
+        "effort": "low",
+        "summary": "auto",
+    })
+    turn_id = started["turn"]["id"]
+    turns.begin(project_id, thread_id, turn_id)
+    final_text, status, error = None, "failed", None
+```
+
+Read-only wristband from [Part 6](/blog/codex-6-sandbox#two-dials-one-grid) because filling a form must not modify the site it describes; `effort: "low"` from [Part 10](/blog/codex-10-plans-questions#the-reasoning-dial-finally-on-the-composer) because this is reading, not judgment; and no event log, because the manifest is bookkeeping, not conversation (the publish flow narrates progress through `publish_state` events instead). `run_schema_turn` drains the queue to `turn/completed` and hands back the final text.
+
+Which your server then validates as if the schema had never existed:
+
+```python filename="backend/app/publish.py" repo="part-11-review-publish/backend/app/publish.py" lines="73-92"
+class Page(BaseModel):
+    path: str
+    title: str
+
+
+class Manifest(BaseModel):
+    """The pydantic side: the same shape, validated on OUR side of the
+    wire. The engine constrained the model's grammar; this is the
+    receiving dock checking the crate anyway."""
+    title: str
+    description: str
+    pages: list[Page]
+    accent: str
+
+    @field_validator("accent")
+    @classmethod
+    def accent_is_hex(cls, value: str) -> str:
+        if not re.fullmatch(r"#[0-9a-fA-F]{3,8}", value.strip()):
+            raise ValueError(f"accent must be a CSS hex color, got {value!r}")
+        return value.strip()
+```
+
+Two sharp edges, both cut us live. First, string *values* are free text inside the schema's grammar, and the model likes tucking markdown links into them ("[Beanline](https://beanline.example)" as a title value); a `_scrub` pass strips the brackets and keeps the words before validation. Second, `accent` reaching a stylesheet is an injection surface, which is why the validator insists on a hex color and the `/p/` index re-checks it before writing any CSS. Never let stored model output write style rules unchecked.
+
+Why so paranoid, when the engine promised schema-conformant output? Because of what happens next.
+
+## Break it on purpose: a schema is a request
+
+This part's deliberate break is quiet, and the quiet is what makes it dangerous. Hand the manifest turn a schema no answer can satisfy and watch what the wire does. Two probes, both captured:
+
+**Probe A**: a required string with `"enum": []`. The empty enum means no legal value exists; conformance is mathematically impossible. The turn runs for 34 seconds, investigates the workspace in good faith, and then: `turn/completed`, `status: "completed"`, no error anywhere, final text `{"title": "index.html", "impossible": ""}`. The empty string is not in the empty enum. **The turn completed successfully with JSON that violates the schema it was given.**
+
+**Probe B**: `"minLength": 10, "maxLength": 2` on one field, a shape no string can have. Forty-seven seconds, `status: "completed"` again, and this time the model abandons the shape entirely: free-form JSON with different keys, no trace of the schema you sent.
+
+<Figure
+  src="/images/series/codex/part-11/fig-schema-truth-light.svg"
+  srcDark="/images/series/codex/part-11/fig-schema-truth-dark.svg"
+  alt="Diagram titled outputSchema, a request, not a guarantee, two live probes. Probe A gives a required string an empty enum so no legal value exists; the wire completes the turn in 34 seconds with status completed and final text title index.html, impossible empty string, which violates the schema since the empty string is not in the empty enum. Probe B sets minLength 10 and maxLength 2, a shape no string can have; the wire completes in 47 seconds with free-form JSON using different keys. Both feed into a wall labeled validate on your side, always: Manifest.model_validate with a scrub pass that strips markdown links from string values. Below, the retry-or-surface policy: exactly one retry via publish_state manifest_retry, then HTTP 502 saying the manifest failed twice, with a note that zero retries turns every hiccup into a support ticket while silent loops hide real problems."
+  caption="Both probes verbatim from the wire. Nothing errors; the JSON is confidently wrong. The wall in the middle is the only thing standing between that and your database."
+  width={1240}
+  height={900}
+/>
+
+Rewrite your mental model accordingly: **`outputSchema` shapes the model's output; it does not guarantee it.** On the happy path (every real manifest in this part) the conformance is excellent. Off the happy path, nothing on the wire tells you that you left it; the failure signal only exists if *you* check. Hence the policy, written down where the next maintainer can read the reasoning:
+
+```python filename="backend/app/main.py" repo="part-11-review-publish/backend/app/main.py" lines="940-956"
+    manifest, failure = None, None
+    for attempt in (1, 2):
+        status, text, error = await run_schema_turn(
+            project_id, thread_id, queue, MANIFEST_PROMPT,
+            publish.MANIFEST_SCHEMA)
+        if status == "completed" and text:
+            try:
+                manifest = publish.parse_manifest(text)
+                break
+            except (ValueError, ValidationError) as exc:
+                failure = f"manifest did not validate: {exc}"
+        else:
+            failure = error or f"manifest turn ended with status {status!r}"
+        await eventlog.publish(project_id, {
+            "type": "publish_state",
+            "phase": "manifest_retry" if attempt == 1 else "manifest_failed",
+            "error": str(failure)})
+```
+
+Exactly one retry, then surface the failure with its reason. Zero retries turns every transient hiccup into a support ticket; unlimited retries is a silent loop that hides a real problem behind a spinner. One retry, then the truth, and the human decides. The sibling series arrived at the same policy from the other direction; this is the Codex-shaped spelling of it.
+
+## The bug this part's own tooling caught
+
+A story from building this exact part, and the best argument for it. During a live test run, a build shipped a page whose logo tag read `src="brief/assets/logo.svg"`. Look at that path slowly. The workspace *contains* `brief/assets/logo.svg`, so the preview served it and the page looked perfect. The LLM reviewer had no complaint in that run either; the reference resolved, after all. Then the publish copy ran, `copytree(..., ignore=shutil.ignore_patterns("brief"))` stripped the client's paperwork exactly as designed, and the *live* site, the one at the URL you text to a friend, had a broken logo. Preview fine, review clean, production broken: the exact failure taxonomy every deployment engineer eventually learns to fear, reproduced by an AI website builder at miniature scale.
+
+Three layers had a chance to catch it (the build prompt says to copy assets; the reviewer's instructions flag `brief/` references; the human looked at the preview) and all three let it through, because the break did not exist yet in the place any of them looked. The fix is not a smarter model. The fix is a check that looks at the published copy's reality, and it is nine lines of regex, not tokens:
+
+```python filename="backend/app/publish.py" repo="part-11-review-publish/backend/app/publish.py" lines="121,127-132"
+def brief_refs(site: Path) -> list[str]:
+    refs = []
+    for page in site.rglob("*.html"):
+        for target in _REF.findall(page.read_text(errors="replace")):
+            if target.lstrip("./").startswith("brief/"):
+                refs.append(f"{page.relative_to(site)} -> {target}")
+    return refs
+```
+
+Every `href` and `src` in every page, grepped for reaches into `brief/`. Deterministic, instant, zero tokens, and it cannot hedge. This check joins the gate in the next section, and the reviewer's instructions now name `brief/` references as broken too, so the LLM layer and the deterministic layer watch the same hole from both sides. Keep this pattern: **when a class of bug is mechanically checkable, check it mechanically**, and spend the model's judgment on the bugs that are not.
+
+## Smoke evals, kept to a page
+
+The gate protects one project at a time. A different question needs answering before you change a prompt or bump a model: does the *builder itself* still work, across the brief bank? That is an eval suite, and this series keeps it deliberately tiny: `scripts/smoke_eval.py`, one page, runnable from cron or CI.
+
+For each of the three briefs: build the site from scratch, run the deterministic checks, ask one judged question. The scaffolding is the Part 5 feature this section exists to cash in:
+
+```python filename="scripts/smoke_eval.py" repo="part-11-review-publish/scripts/smoke_eval.py" lines="148-160"
+        started = await client.request("thread/start", {
+            "cwd": str(workspace),
+            "sandbox": "workspace-write",
+            "approvalPolicy": "never",
+            "model": MODEL,
+            # The whole point: this thread is scaffolding. No rollout
+            # file, nothing to clean up, nothing to resume.
+            "ephemeral": True,
+        })
+        thread_id = started["thread"]["id"]
+        rows.append(("ephemeral thread (no rollout path)",
+                     started["thread"].get("path") in (None, ""),
+                     str(started["thread"].get("path"))))
+```
+
+`ephemeral: true` threads write no rollout at all: `thread.path` comes back null (the first PASS row asserts it), nothing lands in `CODEX_HOME/sessions`, and a hundred eval runs leave the archive exactly as clean as zero. The checks are the kind a shell script could do, so a script does them: `index.html` exists; every internal `href`/`src` resolves against the file tree *as the published copy will see it* (references into `brief/` count as broken, the bug from the last section now a permanent regression test); the manifest turn returns JSON that validates against the same pydantic model production uses. Then exactly one LLM-judged question, and note whose eyes it uses:
+
+```python filename="scripts/smoke_eval.py" repo="part-11-review-publish/scripts/smoke_eval.py" lines="184-197"
+        # The judge gets its own ephemeral thread: the builder grading
+        # its own homework is the failure mode, not the check.
+        judge = await client.request("thread/start", {
+            "cwd": str(workspace), "sandbox": "read-only",
+            "approvalPolicy": "never", "model": MODEL, "ephemeral": True,
+        })
+        status, text = await run_turn(client, judge["thread"]["id"],
+                                      JUDGE_PROMPT, schema=JUDGE_SCHEMA,
+                                      read_only=True)
+        try:
+            verdict = json.loads(text or "")
+            rows.append(("llm judge: page matches brief",
+                         verdict.get("pass") is True,
+                         verdict.get("reason", "")))
+```
+
+A second ephemeral thread, read-only, fresh context: the inspector pattern again, at eval scale, answering "does this page honor the brief?" through a two-field `outputSchema` (`{pass, reason}`). The same structured-output machinery from the manifest section, reused as an eval judge one section later. Here is the run from this part's final build, three briefs, eighteen checks:
+
+<Figure
+  src="/images/series/codex/part-11/term-smoke.svg"
+  alt="A dark terminal running uv run python ../scripts/smoke_eval.py. The header reads smoke eval, 3 briefs, model gpt-5.4-mini. The harbor-and-vine block shows six PASS rows: ephemeral thread with no rollout path, build turn completed in 44 seconds, index.html exists, internal references resolve, manifest validates with title Harbor and Vine and accent #2F5233, and llm judge page matches brief with a reason praising the forest green and off-white palette. A note says beanline and paper-crane run the same six checks. The footer reads all green, 183 seconds total, and echo dollar-question-mark prints 0, with a comment that it exits nonzero on any failure."
+  caption="The whole suite: three briefs built from scratch, checked, judged, 183 seconds, exit 0. The manifest column doubles as an assertion that the accent came out forest green."
+  width={1040}
+  height={564}
+/>
+
+Why stop here? Because the moment this grows a case format, a runner abstraction, and regression discipline, it stops being a smoke test and becomes an evaluation program, and that is a series-capstone topic of its own. The sibling series teaches the full methodology (graded cases, structured verdicts, [the driving test](/blog/agent-sdk-13-structured-evals#the-driving-test), catching regressions on purpose) in [Agent SDK Part 13](/blog/agent-sdk-13-structured-evals); everything there transfers to this stack through the same two primitives you have watched all part: ephemeral threads and `outputSchema`. This page keeps the Codex-shaped echo to a page on purpose.
+
+## The gate
+
+Everything assembles. `POST /projects/{id}/publish` runs the gate before anything else, and the gate is deliberately cheap: three registry reads and one grep, no protocol call, no tokens.
+
+```python filename="backend/app/main.py" repo="part-11-review-publish/backend/app/main.py" lines="918-923,926-929"
+    reasons = publish.gate_reasons(entry)
+    if reasons and not req.force:
+        await eventlog.publish(project_id, {
+            "type": "publish_state", "phase": "blocked", "reasons": reasons})
+        raise HTTPException(status_code=409, detail={"reasons": reasons})
+    if reasons:
+        LOG.warning("FORCED publish of project %s past the gate: %s",
+                    project_id, "; ".join(reasons))
+        await eventlog.publish(project_id, {
+            "type": "publish_state", "phase": "forced", "reasons": reasons})
+```
+
+Four reasons can appear in that 409, each captured live against the real server: the site has never been inspected (run the review first); the last inspection found `[P1]` blockers (fix them and re-inspect); the site changed after the last inspection (the `built_at_ms` staleness rule, re-run the review); and the site references the `brief/` folder, which does not ship (the earned grep from two sections ago). The refusal is honest by construction: a 409 always carries its reasons as data, the UI shows them, and the same event lands on the stream so every tab learns the gate held.
+
+<Figure
+  src="/images/series/codex/part-11/fig-gate-light.svg"
+  srcDark="/images/series/codex/part-11/fig-gate-dark.svg"
+  alt="Diagram titled the gate, POST /publish earns its 200. The request flows into gate_reasons, described as three registry checks and one grep with no protocol call. Four red cards show the live refusal reasons: never inspected, blockers found by the last inspection, stale because the site changed after the last inspection, and brief/ references that will not survive publishing. An amber strip notes the fourth check was earned, not designed: a live build hotlinked brief assets and only the published copy broke. The green lane shows reasons empty leading to the manifest turn with one retry then the fifteen-line copy, and the live 200 response with slug harbor-and-vine and accent #2F5233. A red-outlined lane shows force: true still copying but logging a WARNING of a forced publish, emitting publish_state forced to every tab, stamping forced true in the registry, and labeling the /p/ index card published with --force, with the moral that products need escape hatches and escape hatches need witnesses. A footer explains staleness is stamped conservatively by every completed non-review turn."
+  caption="The four refusals and both lanes through the gate, every string from live captures. The force lane is the part most gates get wrong: it exists, and it cannot be quiet."
+  width={1240}
+  height={980}
+/>
+
+Which leaves `force: true`, and a design position worth stating out loud. Gates are sometimes wrong: the reviewer hallucinates a blocker at 2am, the client screams for the page *now*, a human looks and decides to overrule. A product without an escape hatch teaches its users to route around the whole gate. So the hatch exists, and it is **loud**: a `WARNING` in the server log naming project and reasons, a `publish_state {phase: "forced"}` event every tab renders, `"forced": true` stamped permanently into the registry entry, and the `/p/` index card labeled "published with --force" for anyone browsing. Products need escape hatches; escape hatches need witnesses. The forced publish was exercised live too; its registry entry carries the stamp to this day.
+
+Past the gate: the manifest turn (with its one retry), then the same fifteen-line copy from the top of this page, now with every word of *earned* behind it. The published card lands in the transcript with the manifest's title, description, and accent swatch, and `/p/` renders a server-side index card per site, drawn from the manifests. That index is what the manifest was *for*.
+
+<Figure
+  src="/images/series/codex/part-11/browser-published-light.svg"
+  srcDark="/images/series/codex/part-11/browser-published-dark.svg"
+  alt="Pagewright after the full loop. The chat shows a fix findings receipt of 180,916 tokens in 21 seconds, two inspector commands, a green-bordered inspector's report reading no findings, the site matches the brief, the references resolve, and nothing blocks publishing, a receipt reading inspection (fresh eyes), 21s, and a published card with a forest green top border: PUBLISHED, Harbor and Vine, a one-sentence description, a dark link chip reading /p/harbor-and-vine/ and an index.html page chip. The publish bar reads inspection clean: ready to publish, with the Publish button fully armed. The preview shows the Harbor and Vine site with its logo now matching the forest green."
+  caption="The payoff frame: clean report, armed button, published card, and the logo in the preview finally the same green as the site. Compare the logo mark with the dessert shot."
+  width={1120}
+  height={900}
+/>
+
+## The meter ritual, verification edition
+
+Real numbers from the canonical run and the suite, per-turn deltas as [Part 8 taught](/blog/codex-8-stop-steer-usage#the-meter-stops-rounding-to-a-feeling):
+
+| Run | Receipt |
+|---|---|
+| Build Harbor & Vine from the brief | 224,574 tokens · 67s |
+| First inspection (catches the planted P1) | 32s |
+| Fix findings (one ordinary turn) | 180,916 tokens · 21s |
+| Re-inspection (clean, arms the gate) | 21s |
+| Review-model A/B, same flawed site | default 30s · mini 26 to 28s, both caught it |
+| Smoke evals: 3 briefs × 6 checks | all green · 183s total |
+
+One wire honesty note for the middle rows: in every capture, the inspection turns emitted no `thread/tokenUsage/updated` tagged with their turn id, and the thread total after the fix turn (405,490) is exactly the two build turns' sum. The reviewer's cost does not ride the thread meter in 0.142.4, so Pagewright's inspection receipts print elapsed time and skip the token column rather than print a zero it cannot vouch for.
+
+<DemoVideo
+  src="/videos/codex/part-11-demo.mp4"
+  poster="/videos/codex/part-11-poster.jpg"
+  caption="The whole arc on camera, against the real app: the Harbor & Vine build, Inspect catching the planted navy-logo blocker on the report card while Publish stays disarmed, Fix findings repainting the logo, the clean re-inspection arming the button, and the earned click ending on the live /p/harbor-and-vine/ site."
+  label="Screen recording of Part 11: building the Harbor and Vine site, an inspection that files the planted logo contradiction as a blocker and keeps Publish disarmed, a fix-findings turn, a clean re-inspection that arms Publish, and the published site loading at its /p/ URL"
+/>
+
+<Recap
+  part={11}
+  items={[
+    "The inspector: review/start {threadId, target, delivery?} runs the engine's built-in reviewer as a turn; the custom target takes free-form instructions with no git required, enteredReviewMode/exitedReviewMode bracket a real investigation, and findings arrive as [P1]/[P2]/[P3]-tagged prose you parse while keeping the raw text. It caught a brief-vs-asset contradiction planted seven parts ago.",
+    "The reviewer's model is config, not a param: review/start silently ignores a model field, but the review_model key on thread/start config routes it (proven via model_not_found). Latency measured 20 to 90 seconds on one-page sites, so the UI sets expectations with a progress row and a clock.",
+    "Severity rubrics are product work: v1 hedged the planted flaw to P2, v2 blocked on the client's own paperwork so the fix loop could never close, and v3 judges what the site ships: inherited contradictions block, paperwork-only ones do not.",
+    "outputSchema is a request, not a guarantee: unsatisfiable schemas complete with status 'completed' and schema-violating or free-form JSON, so pydantic validates at your edge, markdown links get scrubbed from string values, and the manifest gets exactly one retry before a 502 surfaces the failure.",
+    "The gate refuses with reasons (never inspected / P1 blockers / stale since built_at_ms outran the review / brief/ hotlinks caught by a deterministic grep that a real bug earned), review turns deliberately never stamp staleness, force:true exists but logs, streams, and stamps its use, and a one-page smoke eval builds every brief on ephemeral threads with a fresh-eyes judge.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "You want the reviewer to run on a different model than the builder. What works on 0.142.4?",
+      options: [
+        "Pass model on review/start next to the target",
+        "Set the review_model config key at thread/start; a model param on review/start is silently ignored",
+        "Pass effort: \"xhigh\" on review/start",
+        "It is impossible; the reviewer always uses the thread's model",
+      ],
+      answer: 1,
+      explain: "review/start's schema is {threadId, target, delivery} and nothing else; extras are accepted and ignored. The config key is live, proven the honest way: a bogus review_model fails the review turn with model_not_found.",
+    },
+    {
+      q: "Rubric draft two made every brief-vs-asset conflict a [P1]. Why did that break the product?",
+      options: [
+        "The reviewer started hallucinating extra blockers",
+        "P1 findings are not allowed on custom review targets",
+        "The P1 pointed at the client's own paperwork, which the builder rightly never edits, so no fix could ever clear it and the fix loop never closed",
+        "It made inspections take four minutes",
+      ],
+      answer: 2,
+      explain: "The builder can recolor its copy of the logo, but brief/assets/ belongs to the client. A blocker that survives every possible fix is a wall, not a gate. Draft three judges what the site ships: inherited contradictions block, paperwork-only ones drop to P2.",
+    },
+    {
+      q: "You pass an outputSchema containing a required string with enum: []. What does the wire do?",
+      options: [
+        "The turn fails with a schema_unsatisfiable error",
+        "turn/start is rejected with -32600",
+        "The turn completes with status 'completed' and JSON that violates the schema, so only client-side validation can catch it",
+        "The engine strips the impossible field and returns the rest",
+      ],
+      answer: 2,
+      explain: "Verified live: 34 seconds of honest work, then {\"title\": \"index.html\", \"impossible\": \"\"}, and \"\" is not in the empty enum. Contradictory bounds fare worse: the model abandons the shape entirely. Schemas shape output; pydantic at your edge is the guarantee.",
+    },
+    {
+      q: "Which turn must NOT stamp built_at_ms, and why?",
+      options: [
+        "The review turn, because the inspector only looked; stamping would mark its own fresh report as stale and the gate could never open",
+        "The manifest turn, because it runs read-only",
+        "The first build turn, because there is no review yet",
+        "Steered turns, because they share a turn id",
+      ],
+      answer: 0,
+      explain: "Every completed non-review turn stamps built_at_ms, conservatively including turns that changed nothing. The one exception is the inspection itself: review_turn=True skips finish_turn, so a clean report stays valid until something else runs.",
+    },
+    {
+      q: "Why does smoke_eval.py start a SECOND ephemeral thread for the judge instead of asking the build thread?",
+      options: [
+        "The build thread's context window is full after a build",
+        "The builder grading its own homework is the failure mode the check exists to avoid: the judge gets fresh, read-only eyes, and ephemeral means neither thread leaves a rollout behind",
+        "outputSchema only works on ephemeral threads",
+        "The judge needs workspace-write to read the files",
+      ],
+      answer: 1,
+      explain: "Same lesson as review/start, at eval scale: fresh context judges the artifact, not its author's memory of making it. And thread.path is null on ephemeral threads (asserted by the suite's first PASS row), so a hundred runs leave CODEX_HOME/sessions untouched.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend scripts
+git commit -m "part 11: the inspector, the manifest, and the earned publish gate"
+```
+
+Pagewright is a product now: it builds, it inspects with fresh eyes, it refuses with reasons, and what it publishes carries a validated manifest and a paper trail. But look at what the builder worked with this whole part: the files in the workspace, the brief the client wrote, and nothing else. No stock imagery, no house style guide, no standing rules about how a Pagewright site should be built. The builder works alone with what's in the room. Next: rented tools and the pattern book.
+
+The complete, tested code for this part lives in [`part-11-review-publish`](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-11-review-publish) in the [companion repo](https://github.com/yadneshSalvi/codex-app-server-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's lines highlighted.

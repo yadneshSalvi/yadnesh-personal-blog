@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="900" viewBox="0 0 1240 900" role="img">
+  <rect width="1240" height="900" fill="#faf9f6"/>
+  <text x="48" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#8f887a">OUTPUTSCHEMA &#183; A REQUEST, NOT A GUARANTEE (TWO LIVE PROBES)</text>
+  <line x1="48" y1="66" x2="1192" y2="66" stroke="#e7e3d9" stroke-width="1.5"/>
+
+  <text x="48" y="104" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#b3441a" text-anchor="start">PROBE A &#183; NO LEGAL VALUE EXISTS</text>
+  <text x="636" y="104" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#b3441a" text-anchor="start">PROBE B &#183; CONTRADICTORY BOUNDS</text>
+
+  <rect x="48" y="120" width="556" height="96" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="68" y="148" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">"impossible": {"type": "string", "enum": []}</text>
+  <text x="68" y="172" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">required, and the enum is empty: NOTHING</text>
+  <text x="68" y="190" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">the model writes can satisfy this schema.</text>
+
+  <rect x="636" y="120" width="556" height="96" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="656" y="148" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">"summary": {"minLength": 10, "maxLength": 2}</text>
+  <text x="656" y="172" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">at least ten characters AND at most two:</text>
+  <text x="656" y="190" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">a shape no string can have.</text>
+
+  <line x1="326" y1="216" x2="326" y2="252" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 326 252 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 326 252)"/>
+  <line x1="914" y1="216" x2="914" y2="252" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 914 252 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 914 252)"/>
+
+  <rect x="48" y="252" width="556" height="150" rx="12" fill="#fbeaea" stroke="#dfa3a3" stroke-width="1.6"/>
+  <text x="68" y="280" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b91c1c" text-anchor="start">WHAT THE WIRE DID (34s)</text>
+  <text x="68" y="306" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">turn/completed &#183; status: "completed"</text>
+  <text x="68" y="330" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">no error field, no complaint, and the final text:</text>
+  <text x="68" y="356" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#b91c1c" text-anchor="start">{"title": "index.html", "impossible": ""}</text>
+  <text x="68" y="384" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">"" is not in the (empty) enum: the JSON VIOLATES the schema</text>
+
+  <rect x="636" y="252" width="556" height="150" rx="12" fill="#fbeaea" stroke="#dfa3a3" stroke-width="1.6"/>
+  <text x="656" y="280" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b91c1c" text-anchor="start">WHAT THE WIRE DID (47s)</text>
+  <text x="656" y="306" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">turn/completed &#183; status: "completed"</text>
+  <text x="656" y="330" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">the model abandons the shape entirely: free-form</text>
+  <text x="656" y="356" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#b91c1c" text-anchor="start">{"file": "index.html", "document": {"type": "html"&#8230;</text>
+  <text x="656" y="384" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">different keys, no trace of the schema you sent</text>
+
+  <line x1="620" y1="402" x2="620" y2="442" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 620 442 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 620 442)"/>
+
+  <!-- the wall -->
+  <rect x="48" y="442" width="1144" height="130" rx="12" fill="#f6e7df" stroke="#dcb09a" stroke-width="2"/>
+  <text x="70" y="470" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b3441a" text-anchor="start">THE WALL: VALIDATE ON YOUR SIDE, ALWAYS</text>
+  <text x="70" y="498" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">Manifest.model_validate(_scrub(json.loads(text)))   # pydantic, at OUR edge</text>
+  <text x="70" y="526" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">the schema constrains the model's grammar; it does not constrain your trust. _scrub strips the markdown links</text>
+  <text x="70" y="546" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">the model tucks into string values ("[Beanline](https://&#8230;)" &#8594; "Beanline"): the other sharp edge, also live.</text>
+
+  <line x1="620" y1="572" x2="620" y2="612" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 620 612 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 620 612)"/>
+
+  <!-- the policy -->
+  <rect x="48" y="612" width="1144" height="156" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="70" y="640" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">THE RETRY-OR-SURFACE POLICY (written down, not improvised)</text>
+  <text x="70" y="668" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#1f1c19" text-anchor="start">for attempt in (1, 2):  # exactly one retry</text>
+  <text x="70" y="694" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">&#8230;turn errors OR the JSON fails validation &#8594; publish_state manifest_retry &#8594; try once more</text>
+  <text x="70" y="720" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">&#8230;still failing &#8594; HTTP 502 "the manifest failed twice: &#8230;" &#183; the human decides</text>
+  <text x="70" y="748" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#3f6212" text-anchor="start">zero retries turns every hiccup into a support ticket; silent loops hide real problems. One retry, then the truth.</text>
+
+  <rect x="48" y="800" width="1144" height="56" rx="10" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="68" y="826" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">The happy path is real too: with a satisfiable schema the final agentMessage.text IS the conformant JSON string,</text>
+  <text x="68" y="846" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#b3441a" text-anchor="start">verified on every manifest in this part. The probes exist so you design for the day it isn't.</text>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="564" viewBox="0 0 1040 564" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="564" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">exitedReviewMode.review &#183; the planted flaw, caught (canonical run)</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># the findings text, as the engine handed it back: summary first, then the bullet</tspan></text>
+    <text x="32" y="116" xml:space="preserve">The page is mostly compliant, but it ships a logo whose colors conflict with the</text>
+    <text x="32" y="144" xml:space="preserve">brief's stated brand palette, and that contradiction is visible in both the hero</text>
+    <text x="32" y="172" xml:space="preserve">and footer. That is a <tspan fill="#d97676">publish-blocking brand issue</tspan> under the review rules.</text>
+    <text x="32" y="200" xml:space="preserve"></text>
+    <text x="32" y="228" xml:space="preserve">Review comment:</text>
+    <text x="32" y="256" xml:space="preserve"></text>
+    <text x="32" y="284" xml:space="preserve">- <tspan fill="#d97676">[P1]</tspan> <tspan fill="#e5825a">Resolve the logo's blue/green brand clash before launch</tspan> &#183;</text>
+    <text x="32" y="312" xml:space="preserve">  <tspan fill="#6fa8dc">assets/logo.svg:2-8</tspan></text>
+    <text x="32" y="340" xml:space="preserve">  The brief makes <tspan fill="#8fb573">`#2F5233`</tspan> the house color, but the logo asset shown in the</text>
+    <text x="32" y="368" xml:space="preserve">  hero and footer (<tspan fill="#6fa8dc">`assets/logo.svg`</tspan>) uses <tspan fill="#6fa8dc">`#1E3A5F`</tspan> for both the mark and</text>
+    <text x="32" y="396" xml:space="preserve">  the wordmark, and the client-supplied copy in <tspan fill="#6fa8dc">`brief/assets/logo.svg`</tspan></text>
+    <text x="32" y="424" xml:space="preserve">  matches that blue version. Because the live page ships the blue logo</text>
+    <text x="32" y="452" xml:space="preserve">  unchanged, the site presents a brand color that conflicts with the brief;</text>
+    <text x="32" y="480" xml:space="preserve">  <tspan fill="#dcae62">the client needs to choose</tspan> whether to recolor the logo or update the</text>
+    <text x="32" y="508" xml:space="preserve">  brand rule before publishing.</text>
+  </g>
+</svg>

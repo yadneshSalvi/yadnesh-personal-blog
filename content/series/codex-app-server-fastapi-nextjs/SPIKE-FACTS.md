@@ -236,6 +236,26 @@ Order observed: `thread/started` → `thread/status/changed (active)` →
 - Slow: 3m45s for a one-file review on the default review model. Part 11
   should set expectations (and consider `model` override on the review turn).
 
+## Part-11-build findings (verified live)
+
+- `review/start` schema is `{threadId, target, delivery?}` ONLY; an extra
+  "model" param is SILENTLY IGNORED. The review model comes from the
+  `review_model` config key, overridable per-thread via thread/start config
+  (proven: bogus review_model → model_not_found on the review turn).
+- Review latency: the original spike's 3m45s did NOT reproduce; same-site A/B:
+  default review model 30s vs gpt-5.4-mini 26-28s; product inspections 20-90s.
+- Unsatisfiable outputSchema does NOT error on the wire: turns complete
+  status:"completed" with JSON that VIOLATES the schema (enum:[] → violating
+  value; minLength>maxLength → free-form JSON, different keys). Client-side
+  validation is mandatory; retry-or-surface is the product policy.
+- Review-rubric lesson (kept in part-11 code/README): severity must judge
+  what the SITE SHIPS (page inherits a brief-vs-asset contradiction = P1;
+  contradiction remaining only in the client's paperwork = P2), or the fix
+  loop never closes.
+- Publish-copy gotcha: sites can hotlink brief/assets/... which the publish
+  step strips → broken on the live copy only. Needs a deterministic gate
+  check (grep for brief/ refs), not just the LLM reviewer.
+
 ## Threads: resume / fork / list / errors
 
 - `thread/resume {threadId}` → same response shape as thread/start plus

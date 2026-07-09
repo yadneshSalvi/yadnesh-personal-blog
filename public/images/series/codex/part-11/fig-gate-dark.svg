@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="980" viewBox="0 0 1240 980" role="img">
+  <rect width="1240" height="980" fill="#151311"/>
+  <text x="48" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#756d62">THE GATE &#183; POST /publish EARNS ITS 200</text>
+  <line x1="48" y1="66" x2="1192" y2="66" stroke="#2b2723" stroke-width="1.5"/>
+
+  <rect x="48" y="90" width="1144" height="64" rx="12" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="70" y="118" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" fill="#ebe7df" text-anchor="start">POST /projects/{id}/publish {"force": false} &#8594; gate_reasons(entry)</text>
+  <text x="70" y="140" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">three registry checks and one grep: no protocol call, no model, no tokens. Every refusal below was captured live.</text>
+
+  <line x1="620" y1="154" x2="620" y2="200" stroke="#756d62" stroke-width="1.5"/>
+     <path d="M 620 200 l -5 -8 l 10 0 z" fill="#756d62" transform="rotate(0 620 200)"/>
+  <rect x="48" y="200" width="278" height="118" rx="12" fill="#2a1717" stroke="#6b3838" stroke-width="1.4"/><text x="64" y="226" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#e08585" text-anchor="start">NEVER INSPECTED</text><text x="64" y="250" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">“the site has never been</text><text x="64" y="268" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">inspected: run the review</text><text x="64" y="286" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">first”</text><text x="64" y="306" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#756d62" text-anchor="start">no review entry in the registry</text><rect x="346" y="200" width="278" height="118" rx="12" fill="#2a1717" stroke="#6b3838" stroke-width="1.4"/><text x="362" y="226" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#e08585" text-anchor="start">BLOCKERS</text><text x="362" y="250" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">“the last inspection found 1</text><text x="362" y="268" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">blocker finding(s) [P1]: fix</text><text x="362" y="286" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">them and re-inspect”</text><text x="362" y="306" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#756d62" text-anchor="start">review.P1 > 0</text><rect x="644" y="200" width="278" height="118" rx="12" fill="#2a1717" stroke="#6b3838" stroke-width="1.4"/><text x="660" y="226" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#e08585" text-anchor="start">STALE</text><text x="660" y="250" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">“the site changed after the</text><text x="660" y="268" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">last inspection: re-run the</text><text x="660" y="286" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">review”</text><text x="660" y="306" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#756d62" text-anchor="start">built_at_ms > review.at_ms</text><rect x="942" y="200" width="278" height="118" rx="12" fill="#2a1717" stroke="#6b3838" stroke-width="1.4"/><text x="958" y="226" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#e08585" text-anchor="start">BRIEF/ REFS</text><text x="958" y="250" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">“the site references the</text><text x="958" y="268" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">brief/ folder, which does</text><text x="958" y="286" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">not ship: copy those assets”</text><text x="958" y="306" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#756d62" text-anchor="start">one grep over href/src</text>
+
+  <text x="620" y="352" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#e08585" text-anchor="middle">any reason + force:false &#8594; HTTP 409 {&quot;detail&quot;: {&quot;reasons&quot;: [&#8230;]}} &#183; the UI never offers a click it knows will 409</text>
+
+  <!-- the earned check callout -->
+  <rect x="48" y="374" width="1144" height="62" rx="12" fill="none" stroke="#6b5426" stroke-width="1.3"/>
+  <text x="70" y="400" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#dcae62" text-anchor="start">THE FOURTH CHECK WAS EARNED, NOT DESIGNED</text>
+  <text x="70" y="420" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">A live build hotlinked brief/assets/logo.svg. The workspace preview served it fine; publishing strips brief/, so only the LIVE copy broke.</text>
+
+  <!-- the green lane -->
+  <line x1="620" y1="436" x2="620" y2="474" stroke="#756d62" stroke-width="1.5"/>
+     <path d="M 620 474 l -5 -8 l 10 0 z" fill="#756d62" transform="rotate(0 620 474)"/>
+  <rect x="48" y="494" width="560" height="150" rx="12" fill="#1d2314" stroke="#2b2723" stroke-width="1.4"/>
+  <text x="70" y="522" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a3c57d" text-anchor="start">REASONS EMPTY &#8594; THE MANIFEST TURN</text>
+  <text x="70" y="548" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#ebe7df" text-anchor="start">run_schema_turn(): read-only, effort low,</text>
+  <text x="70" y="572" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#ebe7df" text-anchor="start">outputSchema = the manifest &#183; pydantic validates</text>
+  <text x="70" y="596" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a49c90" text-anchor="start">one retry on any failure, then surface a 502</text>
+  <text x="70" y="622" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">then the fifteen-line copy: site/ &#8594; published/{slug}/ (minus brief/)</text>
+
+  <rect x="632" y="494" width="560" height="150" rx="12" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="654" y="522" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#756d62" text-anchor="start">THE 200 (live)</text>
+  <text x="654" y="548" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="start">{"slug": "harbor-and-vine", "url": "/p/harbor-and-vine/",</text>
+  <text x="654" y="572" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="start">"manifest": {"title": "Harbor &amp; Vine", &#8230;,</text>
+  <text x="654" y="596" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="start">"accent": "#2F5233"}, "forced": false}</text>
+  <text x="654" y="622" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#a49c90" text-anchor="start">mounted at /p/{slug}/ &#183; a card on the /p/ index</text>
+
+  <!-- the force lane -->
+  <rect x="48" y="676" width="1144" height="176" rx="12" fill="none" stroke="#6b3838" stroke-width="1.4"/>
+  <text x="70" y="704" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#e08585" text-anchor="start">THE ESCAPE HATCH: force: true (captured live)</text>
+  <text x="70" y="732" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#a49c90" text-anchor="start">The copy still happens: but nothing is quiet about it.</text>
+  <text x="70" y="760" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#ebe7df" text-anchor="start">server log:  WARNING &#8230; FORCED publish of project 77fddc5a past the gate: the last inspection found 1 blocker&#8230;</text>
+  <text x="70" y="786" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#ebe7df" text-anchor="start">the stream:  publish_state {"phase": "forced", "reasons": [&#8230;]} &#8594; every tab sees the overrule</text>
+  <text x="70" y="812" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#ebe7df" text-anchor="start">the record:  the registry entry is stamped "forced": true &#183; the /p/ index card says "published with --force"</text>
+  <text x="70" y="838" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#e08585" text-anchor="start">products need escape hatches; escape hatches need witnesses.</text>
+
+  <rect x="48" y="880" width="1144" height="56" rx="10" fill="#1d1a17" stroke="#2b2723"/>
+  <text x="68" y="906" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="start">Staleness is stamped conservatively: EVERY completed non-review turn sets built_at_ms, even one that changed nothing.</text>
+  <text x="68" y="926" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#e5825a" text-anchor="start">“Is the review older than the last turn” is cheap and honest; “did that turn REALLY change a file” is a rabbit hole.</text>
+</svg>

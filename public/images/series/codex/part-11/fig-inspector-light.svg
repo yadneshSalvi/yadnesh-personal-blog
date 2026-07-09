@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="1040" viewBox="0 0 1240 1040" role="img">
+  <rect width="1240" height="1040" fill="#faf9f6"/>
+  <text x="48" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#8f887a">THE INSPECTOR &#183; A DIFFERENT CLIPBOARD FROM THE BUILDER'S</text>
+  <line x1="48" y1="66" x2="1192" y2="66" stroke="#e7e3d9" stroke-width="1.5"/>
+
+  <!-- the request -->
+  <rect x="48" y="90" width="660" height="140" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="70" y="118" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13.5" fill="#1f1c19" text-anchor="start">POST /projects/{id}/review &#8594; review/start</text>
+  <text x="70" y="146" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#5b554c" text-anchor="start">{"threadId": "&#8230;", "target": {"type": "custom",</text>
+  <text x="70" y="168" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#5b554c" text-anchor="start">"instructions": "You are the pre-publish inspector&#8230;"}}</text>
+  <text x="70" y="198" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">custom = free-form instructions, NO git required. The other targets</text>
+  <text x="70" y="214" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">(uncommittedChanges, baseBranch, commit) all assume a repo.</text>
+
+  <!-- the model truth, alongside -->
+  <rect x="740" y="90" width="452" height="140" rx="12" fill="none" stroke="#e4c27e" stroke-width="1.4"/>
+  <text x="762" y="118" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#92600a" text-anchor="start">THE MODEL TRUTH (verified live)</text>
+  <text x="762" y="144" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">review/start takes NO model param: extras are</text>
+  <text x="762" y="162" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">silently ignored. The lever is one level up:</text>
+  <text x="762" y="186" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1f1c19" text-anchor="start">thread/start config {"review_model": "gpt-5.4-mini"}</text>
+  <text x="762" y="210" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#92600a" text-anchor="start">proof: a bogus review_model &#8594; model_not_found</text>
+
+  <line x1="378" y1="230" x2="378" y2="262" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 378 262 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 378 262)"/>
+
+  <!-- enteredReviewMode -->
+  <rect x="48" y="262" width="660" height="64" rx="12" fill="#e8f3fa" stroke="#9cc8e3" stroke-width="2"/>
+  <text x="70" y="288" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#0e6ea8" text-anchor="start">item: enteredReviewMode</text>
+  <text x="70" y="310" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">{"review": &lt;our instructions, echoed back&gt;} &#183; the report card opens "running"</text>
+
+  <line x1="378" y1="326" x2="378" y2="358" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 378 358 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 378 358)"/>
+
+  <!-- the investigation -->
+  <rect x="48" y="358" width="660" height="150" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="70" y="386" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">THE INVESTIGATION (real commands, canonical run)</text>
+  <text x="70" y="412" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">find . -maxdepth 3 -type f | sort</text>
+  <text x="70" y="436" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">sed -n '1,220p' brief/brief.md &#183; sed -n '1,260p' index.html</text>
+  <text x="70" y="460" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#3f6212" text-anchor="start">cat assets/logo.svg   # it reads the client's own SVG, fill by fill</text>
+  <text x="70" y="488" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">ordinary commandExecution items: the Part 3 badges render them unchanged</text>
+
+  <!-- latency strip, alongside -->
+  <rect x="740" y="262" width="452" height="246" rx="12" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="762" y="290" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">LATENCY, HONESTLY</text>
+  <text x="762" y="318" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1f1c19" text-anchor="start">canonical run: 32s (flawed), 21s (clean)</text>
+  <text x="762" y="342" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">A/B same site: default model 30s,</text>
+  <text x="762" y="364" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">review_model gpt-5.4-mini 26-28s</text>
+  <text x="762" y="390" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1f1c19" text-anchor="start">measured range on one-page sites: 20-90s</text>
+  <text x="762" y="416" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">(the spike once saw ~4 minutes on a busier</text>
+  <text x="762" y="432" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">workspace)</text>
+  <text x="762" y="462" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">So the UI sets expectations: a progress row,</text>
+  <text x="762" y="478" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">an elapsed clock, and no spinner lies.</text>
+
+  <line x1="378" y1="508" x2="378" y2="540" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 378 540 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 378 540)"/>
+
+  <!-- exitedReviewMode -->
+  <rect x="48" y="540" width="660" height="118" rx="12" fill="#f6e7df" stroke="#dcb09a" stroke-width="2"/>
+  <text x="70" y="568" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#b3441a" text-anchor="start">item: exitedReviewMode</text>
+  <text x="70" y="592" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">{"review": "The page is mostly compliant, but it ships a logo whose</text>
+  <text x="70" y="612" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">colors conflict&#8230; - [P1] Resolve the logo's blue/green brand clash&#8230;"}</text>
+  <text x="70" y="640" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#b3441a" text-anchor="start">the findings are TAGGED PROSE, not JSON: a summary + [P1]/[P2]/[P3] bullets</text>
+
+  <line x1="378" y1="658" x2="378" y2="690" stroke="#8f887a" stroke-width="1.5"/>
+     <path d="M 378 690 l -5 -8 l 10 0 z" fill="#8f887a" transform="rotate(0 378 690)"/>
+
+  <!-- the parser -->
+  <rect x="48" y="690" width="660" height="128" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="70" y="718" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#1f1c19" text-anchor="start">app/review.py &#183; parse_findings()</text>
+  <text x="70" y="744" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">regex the tags &#8594; {severity, title, body, location} &#183; counts {P1: 1}</text>
+  <text x="70" y="768" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#3f6212" text-anchor="start">keep the raw text: the prose is the truth, the rows are a convenience</text>
+  <text x="70" y="792" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">unparseable segments become whole-body findings: nothing silently vanishes</text>
+
+  <rect x="740" y="690" width="452" height="128" rx="12" fill="#f1efe9" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="762" y="718" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">ONTO THE WIRE (Part 9's log)</text>
+  <text x="762" y="744" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">review_state {phase: entered}</text>
+  <text x="762" y="768" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">review_finding &#215; N &#183; review_state {exited,</text>
+  <text x="762" y="792" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#5b554c" text-anchor="start">counts, raw} &#8594; the card in EVERY tab, replay too</text>
+
+  <!-- the fresh-clipboard footer -->
+  <rect x="48" y="846" width="1144" height="92" rx="12" fill="#f2f7e8" stroke="#e7e3d9" stroke-width="1.2"/>
+  <text x="70" y="874" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#3f6212" text-anchor="start">WHY NOT ASK THE BUILDER TO CHECK ITS OWN WORK?</text>
+  <text x="70" y="898" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">Fresh context is the point. The builder's thread carries every decision it already made; asked to re-check, it defends them.</text>
+  <text x="70" y="918" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">review/start runs with a clean slate against the FILES, the same lesson the sibling series taught with subagents.</text>
+
+  <rect x="48" y="964" width="1144" height="52" rx="10" fill="#f1efe9" stroke="#e7e3d9"/>
+  <text x="68" y="990" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">delivery: inline (default; the review runs as a turn on your thread, same consumer, same log) or detached (a fresh</text>
+  <text x="68" y="1008" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">thread, returned as reviewThreadId). Pagewright uses inline: one project, one transcript, the inspection on the record.</text>
+</svg>

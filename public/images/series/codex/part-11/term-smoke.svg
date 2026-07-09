@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="564" viewBox="0 0 1040 564" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="564" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">uv run python ../scripts/smoke_eval.py &#183; ephemeral threads, real turns</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve">smoke eval &#183; 3 brief(s) &#183; model gpt-5.4-mini</text>
+    <text x="32" y="116" xml:space="preserve"></text>
+    <text x="32" y="144" xml:space="preserve"><tspan fill="#756d62">── harbor-and-vine ───────────────────────────────────</tspan></text>
+    <text x="32" y="172" xml:space="preserve">  <tspan fill="#8fb573">PASS</tspan>  ephemeral thread (no rollout path)   None</text>
+    <text x="32" y="200" xml:space="preserve">  <tspan fill="#8fb573">PASS</tspan>  build turn completed                 44s</text>
+    <text x="32" y="228" xml:space="preserve">  <tspan fill="#8fb573">PASS</tspan>  index.html exists</text>
+    <text x="32" y="256" xml:space="preserve">  <tspan fill="#8fb573">PASS</tspan>  internal references resolve</text>
+    <text x="32" y="284" xml:space="preserve">  <tspan fill="#8fb573">PASS</tspan>  manifest validates                   'Harbor &amp; Vine' &#183; accent <tspan fill="#8fb573">#2F5233</tspan></text>
+    <text x="32" y="312" xml:space="preserve">  <tspan fill="#8fb573">PASS</tspan>  llm judge: page matches brief        The page includes all required</text>
+    <text x="32" y="340" xml:space="preserve">        sections, uses the requested forest green and off-white palette, keeps</text>
+    <text x="32" y="368" xml:space="preserve">        a system serif stack&#8230;</text>
+    <text x="32" y="396" xml:space="preserve"></text>
+    <text x="32" y="424" xml:space="preserve"><tspan fill="#756d62">── beanline &#8230; ──  ── paper-crane &#8230; ──   (the same six checks each)</tspan></text>
+    <text x="32" y="452" xml:space="preserve"></text>
+    <text x="32" y="480" xml:space="preserve"><tspan fill="#8fb573">all green</tspan> &#183; 183s total</text>
+    <text x="32" y="508" xml:space="preserve"><tspan fill="#756d62">$ echo $?</tspan>  0   <tspan fill="#756d62"># exits nonzero on any failure: cron-able, CI-able</tspan></text>
+  </g>
+</svg>
