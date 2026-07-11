@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="1100" viewBox="0 0 1240 1100" role="img">
+  <rect width="1240" height="1100" fill="#151311"/>
+  <text x="48" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#756d62">THE ELICITATION GATE &#183; EVERY MCP TOOL CALL, REGARDLESS OF APPROVALPOLICY</text>
+  <line x1="48" y1="66" x2="1192" y2="66" stroke="#2b2723" stroke-width="1.5"/>
+
+  <rect x="48" y="90" width="640" height="90" rx="12" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="70" y="118" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#ebe7df" text-anchor="start">the agent decides to call openverse:search_images</text>
+  <text x="70" y="142" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">mid-turn, like any tool use. Then, before the server is contacted&#8230;</text>
+  <text x="70" y="164" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="start">item/started &#183; mcpToolCall {server, tool, status: inProgress}</text>
+
+  <rect x="712" y="90" width="480" height="90" rx="12" fill="none" stroke="#6b5426" stroke-width="1.4"/>
+  <text x="734" y="118" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#dcae62" text-anchor="start">APPROVALPOLICY HAS NO SAY (verified)</text>
+  <text x="734" y="142" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">the gate fired under untrusted, on-request AND "never"</text>
+  <text x="734" y="164" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#756d62" text-anchor="start">(probe cases A and B: same request every time)</text>
+
+  <line x1="368" y1="180" x2="368" y2="214" stroke="#756d62" stroke-width="1.5"/>
+     <path d="M 368 214 l -5 -8 l 10 0 z" fill="#756d62" transform="rotate(0 368 214)"/>
+
+  <rect x="48" y="214" width="1144" height="118" rx="12" fill="#101c24" stroke="#2d4c60" stroke-width="2"/>
+  <text x="70" y="242" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#6fb3dd" text-anchor="start">SERVER REQUEST &#183; mcpServer/elicitation/request   (has an id: the turn WAITS for your answer)</text>
+  <text x="70" y="268" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="start">{"threadId", "turnId", "serverName": "openverse", "mode": "form",</text>
+  <text x="70" y="290" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="start">"_meta": {"codex_approval_kind": "mcp_tool_call", "persist": ["session", "always"], "tool_description", &#8230;},</text>
+  <text x="70" y="312" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="start">"message": "Allow the openverse MCP server to run tool \"search_images\"?", "requestedSchema": {&#8230;}}</text>
+
+  <line x1="240" y1="332" x2="160" y2="396" stroke="#e08585" stroke-width="1.5"/>
+     <path d="M 160 396 l -5 -8 l 10 0 z" fill="#e08585" transform="rotate(51.34019174590992 160 396)"/>
+  <line x1="620" y1="332" x2="700" y2="396" stroke="#a3c57d" stroke-width="1.5"/>
+     <path d="M 700 396 l -5 -8 l 10 0 z" fill="#a3c57d" transform="rotate(-51.340191745909905 700 396)"/>
+
+  <!-- left: the silent OFF -->
+  <rect x="48" y="396" width="500" height="240" rx="12" fill="#2a1717" stroke="#6b3838" stroke-width="1.6"/>
+  <text x="70" y="424" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#e08585" text-anchor="start">NO HANDLER (the default)</text>
+  <text x="70" y="450" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#ebe7df" text-anchor="start">the client auto-answers the polite empty {}</text>
+  <text x="70" y="476" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">&#8594; the engine scores it as a refusal:</text>
+  <text x="70" y="502" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#e08585" text-anchor="start">mcpToolCall {status: "failed", error:</text>
+  <text x="70" y="524" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#e08585" text-anchor="start">{"message": "user rejected MCP tool call"}}</text>
+  <text x="70" y="552" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">item fails in 0s &#183; the server is NEVER contacted</text>
+  <text x="70" y="578" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">no error surfaces anywhere else: the turn continues,</text>
+  <text x="70" y="598" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">the agent works around it, the demo still &#8220;works&#8221;.</text>
+  <text x="70" y="622" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#e08585" text-anchor="start">MCP IS SILENTLY OFF. This bit our own build (Part 12).</text>
+
+  <!-- right: the answer -->
+  <rect x="596" y="396" width="596" height="240" rx="12" fill="#1d2314" stroke="#2b2723" stroke-width="1.6"/>
+  <text x="618" y="424" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#a3c57d" text-anchor="start">A REAL ANSWER (the fix)</text>
+  <text x="618" y="452" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#ebe7df" text-anchor="start">{"action": "accept", "content": {}}</text>
+  <text x="618" y="478" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">or "decline" / "cancel" &#183; the shape is the elicitation's,</text>
+  <text x="618" y="498" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">NOT the command-approval's: answering {"decision":</text>
+  <text x="618" y="518" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">"accept"} counts as no answer and still rejects the call</text>
+  <text x="618" y="544" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#dcae62" text-anchor="start">(probe case A: the wrong dialect, refused)</text>
+  <text x="618" y="572" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">Pagewright routes it through the Part 7 inbox as the</text>
+  <text x="618" y="592" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">card kind "mcp_tool_call": approve / for session / deny,</text>
+  <text x="618" y="612" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">with a client-side timeout that declines honestly.</text>
+
+  <line x1="894" y1="636" x2="894" y2="678" stroke="#756d62" stroke-width="1.5"/>
+     <path d="M 894 678 l -5 -8 l 10 0 z" fill="#756d62" transform="rotate(0 894 678)"/>
+
+  <!-- the persist ladder -->
+  <rect x="48" y="678" width="1144" height="240" rx="12" fill="#211e1a" stroke="#2b2723" stroke-width="1.5"/>
+  <text x="70" y="706" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#756d62" text-anchor="start">THE PERSIST LADDER (probe cases C / D / E, live counts)</text>
+  <text x="70" y="736" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#ebe7df" text-anchor="start">plain {"action": "accept"}</text>
+  <text x="430" y="736" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">per CALL: the very next call asks again (2 calls = 2 asks)</text>
+  <text x="70" y="768" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#ebe7df" text-anchor="start">+ "_meta": {"persist": "session"}</text>
+  <text x="430" y="768" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">quiets THIS tool for the engine process (2 calls = 1 ask; our canonical run)</text>
+  <text x="70" y="800" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#ebe7df" text-anchor="start">+ "_meta": {"persist": "always"}</text>
+  <text x="430" y="800" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">the engine WRITES config.toml (2 calls = 1 ask now, 0 forever after):</text>
+  <text x="430" y="826" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#a3c57d" text-anchor="start">[mcp_servers.openverse.tools.search_images]  approval_mode = "approve"</text>
+  <text x="70" y="858" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#a49c90" text-anchor="start">an operator can declare that per-tool table up front &#183; it is PER-TOOL ONLY:</text>
+  <text x="70" y="882" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#dcae62" text-anchor="start">a server-level approval_mode = "approve" is silently ignored (probe F: 7 elicitations anyway)</text>
+
+  <rect x="48" y="960" width="1144" height="96" rx="10" fill="#1d1a17" stroke="#2b2723"/>
+  <text x="68" y="988" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="start">Why a second gate? approvalPolicy governs the agent's HANDS (commands, patches): the sandbox can contain those.</text>
+  <text x="68" y="1010" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="start">A rented tool runs outside the walls (next figure), so consent is collected per call, at the airlock,</text>
+  <text x="68" y="1032" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#a49c90" text-anchor="start">no matter how much you trust the agent itself.</text>
+</svg>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="676" viewBox="0 0 1040 676" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="676" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">the bug artifact &#183; Pagewright's stream BEFORE the elicitation handler</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># ask: find a latte-art photo with the openverse MCP tools, then curl it in</tspan></text>
+    <text x="32" y="116" xml:space="preserve">data: {"type": "item_start", "kind": <tspan fill="#e5825a">"mcpToolCall"</tspan>, "detail": {"server":</text>
+    <text x="32" y="144" xml:space="preserve">  "openverse", "tool": "search_images", "status": "inProgress"}}</text>
+    <text x="32" y="172" xml:space="preserve">data: {"type": "item_done",  "kind": "mcpToolCall", "detail": {&#8230; "status": <tspan fill="#d97676">"failed"</tspan>}}</text>
+    <text x="32" y="200" xml:space="preserve">data: {"type": "item_done",  "kind": "mcpToolCall", "detail": {&#8230; "status": <tspan fill="#d97676">"failed"</tspan>}}</text>
+    <text x="32" y="228" xml:space="preserve">data: {"type": "item_done",  "kind": "mcpToolCall", "detail": {"tool":</text>
+    <text x="32" y="256" xml:space="preserve">  "search_images_for_essay", "status": <tspan fill="#d97676">"failed"</tspan>}}</text>
+    <text x="32" y="284" xml:space="preserve">data: {"type": "item_done",  "kind": "mcpToolCall", "detail": {"tool":</text>
+    <text x="32" y="312" xml:space="preserve">  "get_image_stats", "status": <tspan fill="#d97676">"failed"</tspan>}}</text>
+    <text x="32" y="340" xml:space="preserve"></text>
+    <text x="32" y="368" xml:space="preserve"><tspan fill="#756d62"># zero rented-tool cards on screen. Then the agent routes around its own tools:</tspan></text>
+    <text x="32" y="396" xml:space="preserve">data: {"type": "approval_request", "kind": <tspan fill="#dcae62">"command"</tspan>, "command": "/bin/zsh -lc</text>
+    <text x="32" y="424" xml:space="preserve">  \"curl -L 'https://<tspan fill="#6fa8dc">api.openverse.engineering</tspan>/v1/images/?q=latte%20art&#8230;'\"",</text>
+    <text x="32" y="452" xml:space="preserve">  "reason": "Do you want to allow network access so I can query Openverse&#8230;"}</text>
+    <text x="32" y="480" xml:space="preserve"></text>
+    <text x="32" y="508" xml:space="preserve">data: {"type": "complete", "status": <tspan fill="#8fb573">"completed"</tspan>, "duration_ms": 532584,</text>
+    <text x="32" y="536" xml:space="preserve">  "usage": {"totalTokens": <tspan fill="#dcae62">630655</tspan>, &#8230;}}</text>
+    <text x="32" y="564" xml:space="preserve"></text>
+    <text x="32" y="592" xml:space="preserve"><tspan fill="#756d62"># the turn succeeded, the page got its photo, the demo looked fine.</tspan></text>
+    <text x="32" y="620" xml:space="preserve"><tspan fill="#756d62"># MCP was OFF the whole time, and nothing on screen said so.</tspan></text>
+  </g>
+</svg>

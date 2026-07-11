@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="592" viewBox="0 0 1040 592" font-family="'SF Mono', Menlo, Consolas, monospace">
+  <rect width="1040" height="592" fill="#1a1816"/>
+  <rect width="1040" height="48" fill="#211e1a"/>
+  <circle cx="28" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="52" cy="24" r="7" fill="#3a3530"/>
+  <circle cx="76" cy="24" r="7" fill="#3a3530"/>
+  <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">mcpServer/elicitation/request &#183; fired under approvalPolicy "never"</text>
+  <g font-size="14.5" fill="#d8d2c6">
+    <text x="32" y="88" xml:space="preserve"><tspan fill="#756d62"># thread/start ... "approvalPolicy": "never" ... turn asks for one MCP call</tspan></text>
+    <text x="32" y="116" xml:space="preserve"><tspan fill="#6fa8dc">SERVER REQUEST</tspan> method: mcpServer/elicitation/request</text>
+    <text x="32" y="144" xml:space="preserve">  params: {"threadId": "019f46b7-730b-&#8230;", "turnId": "019f46b7-7340-&#8230;",</text>
+    <text x="32" y="172" xml:space="preserve">    "serverName": <tspan fill="#8fb573">"openverse"</tspan>, "mode": "form",</text>
+    <text x="32" y="200" xml:space="preserve">    "_meta": {"codex_approval_kind": <tspan fill="#e5825a">"mcp_tool_call"</tspan>,</text>
+    <text x="32" y="228" xml:space="preserve">             "persist": ["session", "always"], "tool_description": "Get</text>
+    <text x="32" y="256" xml:space="preserve">             statistics about image providers and counts", &#8230;},</text>
+    <text x="32" y="284" xml:space="preserve">    "message": <tspan fill="#dcae62">"Allow the openverse MCP server to run tool</tspan></text>
+    <text x="32" y="312" xml:space="preserve">             <tspan fill="#dcae62">\"get_image_stats\"?"</tspan>, "requestedSchema": {&#8230;}}</text>
+    <text x="32" y="340" xml:space="preserve"></text>
+    <text x="32" y="368" xml:space="preserve">  <tspan fill="#756d62">-> responded {} (the unhandled-request default)</tspan></text>
+    <text x="32" y="396" xml:space="preserve"></text>
+    <text x="32" y="424" xml:space="preserve">mcpToolCall completed: {"server": "openverse", "tool": "get_image_stats",</text>
+    <text x="32" y="452" xml:space="preserve">  "status": <tspan fill="#d97676">"failed"</tspan>, "error": {"message": <tspan fill="#d97676">"user rejected MCP tool call"</tspan>}}</text>
+    <text x="32" y="480" xml:space="preserve"></text>
+    <text x="32" y="508" xml:space="preserve"><tspan fill="#756d62"># same request under "untrusted" and "on-request": approvalPolicy has no say.</tspan></text>
+    <text x="32" y="536" xml:space="preserve"><tspan fill="#756d62"># duration 0s. The openverse server was never contacted.</tspan></text>
+  </g>
+</svg>

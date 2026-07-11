@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="960" viewBox="0 0 1240 960" role="img">
+  <rect width="1240" height="960" fill="#faf9f6"/>
+  <text x="48" y="52" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" letter-spacing="2.5" fill="#8f887a">TWO NETWORKS, ONE TURN &#183; WHY THE RENTED TOOL REACHES THE INTERNET AND CURL ASKS</text>
+  <line x1="48" y1="66" x2="1192" y2="66" stroke="#e7e3d9" stroke-width="1.5"/>
+
+  <!-- the operator's machine -->
+  <rect x="48" y="96" width="1144" height="620" rx="12" fill="none" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="70" y="124" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">YOUR MACHINE &#183; the operator's side</text>
+
+  <!-- codex app-server -->
+  <rect x="80" y="148" width="520" height="180" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="102" y="176" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="13" fill="#1f1c19" text-anchor="start">codex app-server (the engine)</text>
+  <text x="102" y="202" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">reads config.toml &#183; launches each [mcp_servers.*]</text>
+  <text x="102" y="222" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">entry as ITS OWN CHILD PROCESS</text>
+  <rect x="102" y="244" width="340" height="60" rx="12" fill="#f6e7df" stroke="#dcb09a" stroke-width="1.4"/>
+  <text x="120" y="270" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#b3441a" text-anchor="start">openverse (npx mcp-openverse@0.1.1)</text>
+  <text x="120" y="292" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">an ordinary process: NO sandbox around it</text>
+
+  <!-- the internet -->
+  <rect x="920" y="168" width="240" height="120" rx="12" fill="#e8f3fa" stroke="#9cc8e3" stroke-width="1.6"/>
+  <text x="940" y="196" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#0e6ea8" text-anchor="start">THE INTERNET</text>
+  <text x="940" y="222" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1f1c19" text-anchor="start">api.openverse.org</text>
+  <text x="940" y="246" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#1f1c19" text-anchor="start">upload.wikimedia.org</text>
+  <text x="940" y="270" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#8f887a" text-anchor="start">fonts, CDNs, everything</text>
+
+  <line x1="442" y1="274" x2="920" y2="228" stroke="#b3441a" stroke-width="1.5"/>
+     <path d="M 920 228 l -5 -8 l 10 0 z" fill="#b3441a" transform="rotate(-95.49689250573556 920 228)"/>
+  <text x="660" y="240" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#b3441a" text-anchor="start">allowed search_images: straight out,</text>
+  <text x="660" y="258" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#b3441a" text-anchor="start">even with networkAccess: false</text>
+
+  <!-- the turn sandbox -->
+  <rect x="80" y="372" width="720" height="310" rx="12" fill="#f1efe9" stroke="#b3441a" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="102" y="400" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#b3441a" text-anchor="start">THE TURN SANDBOX &#183; workspaceWrite + networkAccess: false</text>
+  <text x="102" y="426" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">wraps the COMMANDS the agent runs, and only those</text>
+  <rect x="102" y="448" width="560" height="90" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="122" y="476" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1f1c19" text-anchor="start">curl -L "https://upload.wikimedia.org/&#8230;/Latte_art&#8230;.jpg"</text>
+  <text x="122" y="500" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1f1c19" text-anchor="start">-o assets/latte-art-hero.jpg</text>
+  <text x="122" y="524" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#5b554c" text-anchor="start">the agent's own hands, downloading INTO the workspace</text>
+  <line x1="662" y1="494" x2="920" y2="300" stroke="#92600a" stroke-width="1.5"/>
+     <path d="M 920 300 l -5 -8 l 10 0 z" fill="#92600a" transform="rotate(-126.94089609712904 920 300)"/>
+  <text x="676" y="526" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#92600a" text-anchor="start">blocked wall (Part 6): escalation =</text>
+  <text x="676" y="544" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#92600a" text-anchor="start">a Part 7 command approval card</text>
+  <text x="102" y="570" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#5b554c" text-anchor="start">the workspace: brief/ &#183; AGENTS.md &#183; assets/ &#183; index.html</text>
+  <text x="102" y="596" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#8f887a" text-anchor="start">writes land here and only here (writableRoots)</text>
+  <text x="102" y="646" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f1c19" text-anchor="start">The sandbox contains what the agent DOES. It cannot contain what a rented tool</text>
+  <text x="102" y="666" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f1c19" text-anchor="start">sees or fetches: that trust decision happens at the elicitation gate instead.</text>
+
+  <!-- the strip: both cards, one turn -->
+  <rect x="48" y="748" width="1144" height="150" rx="12" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
+  <text x="70" y="776" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#8f887a" text-anchor="start">BOTH CARD KINDS IN ONE TURN (p12-sse-mcp.txt, the canonical run)</text>
+  <rect x="70" y="794" width="540" height="84" rx="12" fill="#fdf3e0" stroke="#e4c27e" stroke-width="1.3"/>
+  <text x="88" y="820" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#92600a" text-anchor="start">APPROVAL NEEDED &#183; RENTED TOOL</text>
+  <text x="88" y="844" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f1c19" text-anchor="start">Allow the openverse MCP server to run tool</text>
+  <text x="88" y="862" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f1c19" text-anchor="start">"search_images"? &#8594; approve for session (1 ask, 2 calls)</text>
+  <rect x="630" y="794" width="540" height="84" rx="12" fill="#fdf3e0" stroke="#e4c27e" stroke-width="1.3"/>
+  <text x="648" y="820" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" fill="#92600a" text-anchor="start">APPROVAL NEEDED &#183; COMMAND</text>
+  <text x="648" y="844" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#1f1c19" text-anchor="start">curl -L &#8230;Latte_art&#8230;.jpg -o assets/latte-art-hero.jpg</text>
+  <text x="648" y="862" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#5b554c" text-anchor="start">the download is the agent's hands: the Part 6/7 grid governs it</text>
+
+  <rect x="48" y="920" width="1144" height="1" fill="none"/>
+  <text x="620" y="934" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#b3441a" text-anchor="middle">Rented tools widen what the agent can SEE. The walls still decide what it can DO.</text>
+</svg>

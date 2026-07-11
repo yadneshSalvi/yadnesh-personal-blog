@@ -1,0 +1,543 @@
+---
+title: "Codex App Server in Production, Part 12: The Wider Workshop: MCP Servers, Skills, and AGENTS.md"
+subtitle: "Three ways to extend the builder without touching a prompt: standing rules the engine reads on its own, a pattern book loaded per turn, and rented power tools that ask permission on every single call, even when approvalPolicy says never ask."
+image: "/images/series/codex/part-12/cover-light.svg"
+imageDark: "/images/series/codex/part-12/cover-dark.svg"
+createdAt: "2026-07-09T00:00:00.000Z"
+updatedAt: "2026-07-09T00:00:00.000Z"
+tags: ["codex", "openai", "fastapi", "nextjs", "tutorial"]
+series: "codex-app-server-fastapi-nextjs"
+seriesPart: 12
+---
+
+`"status": "failed", "error": {"message": "user rejected MCP tool call"}`
+
+No user rejected anything. There was no dialog, no button, no log line. That message came off Pagewright's own wire while I was building this part, four times in one turn, and the turn still completed, and the page still got its photo, and the demo looked great. Every MCP tool this series wires up was silently disabled the whole time, and finding out why is the best story in this part.
+
+By the end of this page, Pagewright's builder has three new powers, none of which touches a prompt: an **AGENTS.md** in every workspace that the engine reads on its own (webfonts banned, alt text mandatory), a **brand-kit skill** it can load for exactly the turns that need it (and which catches a brief-vs-logo contradiction the bare builder walks right past), and a rented **MCP image-search tool** that puts a real CC0 photograph on a client's page, legally, with alt text. Here is the finished moment:
+
+<Figure
+  src="/images/series/codex/part-12/browser-mcp-light.svg"
+  srcDark="/images/series/codex/part-12/browser-mcp-dark.svg"
+  alt="Pagewright after the rented-tools build. The chat shows a resolved approval card reading Approval needed, rented tool: allow the openverse MCP server to run tool search_images, approved for this session. Below it, two openverse:search_images badges tagged MCP, then the agent's summary saying the logo was copied and the CC0 latte-art hero photo was downloaded into assets/latte-art-hero.jpg, and a receipt reading brand kit, 512,195 tokens this turn, 136 seconds. The builder's plan shows 4 of 4 steps done. In the header a green tools pill sits next to the meter. The preview shows the Beanline coffee site with its logo, tagline, a Find your store button, and a photograph of latte art with a heart poured in the foam. The files pane lists latte-art-hero.jpg at 2878.1 kilobytes."
+  caption="The dessert, from the real run. One approval covered both search_images calls, the curl download asked separately, and a 2.8 MB photograph landed in assets/ and shipped on the page. Receipt: brand kit, 512,195 tokens, 136s."
+  width={1120}
+  height={900}
+/>
+
+The engine calls these three surfaces AGENTS.md, skills, and MCP servers. The [concepts page](/blog/codex-concepts#mcp) has short entries for each; the sibling series covers the [ideas](/blog/agent-sdk-12-mcp-sandboxing) [in](/blog/agent-sdk-11-subagents-skills#skills-the-handbook-nobody-recites) depth. This part is about what they look like on *this* wire, as Pagewright features, and about the one protocol truth nobody's docs led with: **MCP tool calls have their own approval gate, it fires regardless of `approvalPolicy`, and a client that does not answer it has MCP switched off without knowing.**
+
+## Three surfaces, ascending cost
+
+The builder has worked alone with what's in the room for eleven parts: the workspace, the brief, its own hands. Every way to make it better so far has meant editing a prompt. That stops scaling the moment you have rules that should apply to *every* build, playbooks that should apply to *some* builds, and capabilities no prompt can grant at all, like searching a licensed photo library.
+
+The workshop metaphor holds up unreasonably well here. Standing rules go on a poster by the door. Techniques go in a pattern book on the bench, opened when the job calls for it. And capability you don't own gets rented, checked in through the airlock piece by piece.
+
+<Figure
+  src="/images/series/codex/part-12/fig-three-surfaces-light.svg"
+  srcDark="/images/series/codex/part-12/fig-three-surfaces-dark.svg"
+  alt="Three columns under the heading three ways to extend the workshop, no prompt changes, with an arrow labeled ascending cost and trust. AGENTS.md, the site-rules poster: lives in the workspace as site/AGENTS.md written by the project scaffold, loaded by the engine on its own from the thread's cwd every turn with zero client code, proven by thread/start returning instructionSources with the file's path, and costs nothing per turn. Skills, the pattern book: live in CODEX_HOME/skills/name/SKILL.md, loaded on demand per turn as a skill-typed input item ahead of the text, proven by skills/list naming it and handing back the exact path the invocation wants, costing the playbook's tokens only on turns that attach it. MCP servers, the rented power tools: live in config.toml as mcp_servers tables, launched by the engine as its own child process with the agent calling tools mid-turn as mcpToolCall items, proven by mcpServerStatus/list, and costing a process, a per-call approval, and real trust because they run outside the sandbox. A footer notes all three layers compose in the canonical run."
+  caption="The map for this part. Left to right: cheaper to trust, and all three compose. The canonical run at the top of this page uses every column at once."
+  width={1240}
+  height={880}
+/>
+
+One rule connects all three: **nothing here edits a prompt.** The poster is a file the engine finds. The skill is an input item. The rented tool is a config entry. Your `/chat` endpoint's message text stays exactly what the user typed.
+
+## The site-rules poster
+
+Start with the cheapest one. Eleven parts of watching this builder produce sites, and the same small sins keep recurring: a Google Fonts `<link>` here, a stray external stylesheet there, an image without alt text. In [Part 11](/blog/codex-11-review-publish) the inspector caught these one review at a time. But rules you re-litigate on every inspection are rules nobody posted.
+
+`AGENTS.md` is the poster. Put a file with that name in the thread's working directory and the engine reads it on its own, folds it into the model's instructions, and applies it to every turn that runs there. No prompt change, no per-turn token cost from your side, no client code at all. Pagewright's scaffold writes it into every new workspace:
+
+```python filename="backend/app/projects.py" repo="part-12-mcp-skills/backend/app/projects.py" lines="39-49,51-54"
+AGENTS_MD = """\
+# Site rules
+
+Standing instructions for every build in this workspace.
+
+- Semantic HTML: real <header>, <main>, <section>, <footer>; exactly
+  one <h1> per page.
+- Every <img> has meaningful alt text. No exceptions.
+- All CSS lives in one <style> block per page. No inline style=""
+  attributes, no external stylesheets.
+- System font stacks only. Never load webfonts or anything else from
+- Never reference brief/ paths from a page. That folder is the
+  client's paperwork and does not ship when the site is published;
+  copy any asset the site needs into the site's own folders first.
+"""
+```
+
+(The webfont rule's second line bans anything else from the network; the site must be fully self-contained. And notice the last rule: that is [Part 11's hotlink bug](/blog/codex-11-review-publish#the-bug-this-parts-own-tooling-caught), promoted from a gate check that catches it to a posted rule that prevents it. The gate still checks. Belt and poster.)
+
+The scaffold writes the poster before the first worker arrives, right next to where the brief lands:
+
+```python filename="backend/app/projects.py" repo="part-12-mcp-skills/backend/app/projects.py" lines="113-116,118-120,123"
+    project_id = uuid.uuid4().hex[:8]
+    site = site_dir(project_id)
+    site.mkdir(parents=True)
+    # The poster goes up before the first worker arrives. The engine
+    # prompt tokens from us.
+    (site / "AGENTS.md").write_text(AGENTS_MD)
+    if brief:
+        shutil.copytree(BRIEFS / brief, site / "brief")
+```
+
+The file lists in the files pane as `seeded`, like `brief/`, and `publish.py` excludes it from shipping for the same reason: it is the workshop's paperwork, not the client's site.
+
+How do you know the engine actually reads it, rather than politely ignoring an odd file? The protocol tells you, in the `thread/start` response:
+
+```text filename="the proof, from two raw thread/start probes"
+thread/start  cwd = <workspace WITH the poster>
+  -> "instructionSources": [".../p12-agents-ws/AGENTS.md"]
+
+thread/start  cwd = <workspace WITHOUT it>
+  -> "instructionSources": []
+```
+
+`instructionSources` names every standing-instruction file the engine picked up for this thread. Empty array, no poster. That field is your integration test.
+
+And does the model obey it? A/B it. Two fresh projects, identical prompt, standard mode, same backend process; one workspace keeps its poster, the other has it deleted. The prompt deliberately baits two violations: *"Build a one-page site for Dog-Ear Books, a tiny second-hand bookshop... a nice serif webfont would suit it."*
+
+| Rule | Bare workspace | Postered workspace |
+|---|---|---|
+| No webfonts, self-contained | 3 Google-Fonts references (Cormorant Garamond + Inter) | zero; Georgia and system serifs |
+| All CSS in one `<style>` block | external `styles.css` via `<link>` | exactly one `<style>` block |
+| Every `<img>` has alt text | skipped images entirely | 4 images, 4 meaningful alts, drew its own SVG placeholders into `assets/` |
+
+Same prompt, same model, same mode. The only variable was a file in the working directory, and `instructionSources` independently confirms which runs loaded it. The user asked for a webfont and the postered builder chose Georgia instead, because the poster outranks the request. Standing rules that survive contact with a politely contrary user: that is exactly what you want from a poster, and it cost zero lines of client code.
+
+Checkpoint. Right now you have: every new workspace born with site rules, the engine provably reading them, and an A/B showing them obeyed. Total code: one string and one `write_text`. It will never be this cheap again on this page.
+
+## The pattern book
+
+The poster is always on, which is exactly why it must stay short. Rules you want *sometimes*, in detail, belong in a different place: a **skill**. A skill is a folder with a `SKILL.md` (name and description up front, playbook below, support files welcome) that the model loads when the turn calls for it. The sibling series makes the case for [why a handbook beats stuffing the prompt](/blog/agent-sdk-11-subagents-skills#skills-the-handbook-nobody-recites); everything there applies here unchanged, so this section is about the Codex-flavored wiring.
+
+Pagewright ships one skill: `brand-kit`, the pattern book for applying a client's brand honestly. Its most important page is the one about disagreement:
+
+```markdown filename="skills/brand-kit/SKILL.md" repo="part-12-mcp-skills/skills/brand-kit/SKILL.md" lines="22-26,30-31"
+## 2. Reconcile brief vs assets
+
+When the brief's stated colors and an asset's real colors disagree,
+do not silently pick one:
+
+- Say so plainly in your final message: name the contradiction, the
+  side you chose, and why. The client must be able to overrule you.
+```
+
+(The elided bullet says which side to prefer: the client's own artwork, because artwork is harder to change than paragraphs.) You already know which client this page has in mind. Hold that thought.
+
+Skills are engine-side, not workspace-side: they live under `CODEX_HOME/skills/`, one folder per skill, so installing ours is a copy: `cp -r skills/brand-kit "$CODEX_HOME/skills/"`. The engine then lists it, and the listing hands you something load-bearing:
+
+```json filename="skills/list -> one entry (abridged)"
+{"name": "brand-kit",
+ "description": "Apply a client's brand kit…",
+ "path": "<CODEX_HOME>/skills/brand-kit/SKILL.md",
+ "scope": "user",
+ "enabled": true}
+```
+
+That `path` points at the `SKILL.md` itself, and it is not decoration: it is exactly what the engine wants back when you invoke the skill. Invocation is an **input item**, not a config switch. `turn/start`'s `input` array, which has carried `{type: "text"}` since [Part 1](/blog/codex-1-first-thread), also takes:
+
+```json filename="the invocation, on the wire"
+"input": [
+  {"type": "skill", "name": "brand-kit",
+   "path": "<CODEX_HOME>/skills/brand-kit/SKILL.md"},
+  {"type": "text", "text": "Read brief/brief.md and build the site it describes."}
+]
+```
+
+All three fields are required by the 0.142.4 schema. Pagewright flattens the listing (it groups by cwd, and also surfaces `~/.agents/skills/*` plus CLI-bundled `.system` skills, so look yours up by name):
+
+```python filename="backend/app/skills.py" repo="part-12-mcp-skills/backend/app/skills.py" lines="46-56"
+async def find(client: CodexClient, name: str) -> dict | None:
+    for skill in await list_skills(client):
+        if skill["name"] == name and skill["enabled"]:
+            return skill
+    return None
+
+
+def input_item(skill: dict) -> dict:
+    """The wire shape, exactly as the 0.142.4 schema requires it: type,
+    name, and the engine's own path for the skill."""
+    return {"type": "skill", "name": skill["name"], "path": skill["path"]}
+```
+
+The composer grows a **Brand kit** toggle (armed only when `skills/list` actually names the skill), and `/chat` prepends the item when it is on:
+
+```python filename="backend/app/main.py" repo="part-12-mcp-skills/backend/app/main.py" lines="738-740,747-750"
+    input_items = []
+    if req.brand_kit:
+        skill = await skills.find(client, skills.BRAND_KIT)
+        input_items.append(skills.input_item(skill))
+    input_items.append({"type": "text", "text":
+                        (req.message + BLUEPRINT_NUDGE) if req.plan_first
+                        else req.message})
+```
+
+(The elided branch answers the honest question of what happens when the toggle is on but the skill is not installed: a 409 whose detail is the `cp -r` fix, not a turn that quietly went out bare.)
+
+One wire curiosity, verified so you don't spend an evening on it: the skill leaves **no trace in the thread record**. `thread/read` shows the turn's `userMessage` with only the text item; no skill-flavored item rides the notification stream. The playbook enters the model's context without polluting the transcript, which means the only evidence a viewer ever sees is what your own envelope adds. Pagewright stamps `brand_kit: true` onto `session_start`, and the UI renders a chip on the user message and the receipt. If your product needs to answer "was the skill on for this build?", your event log is the only witness.
+
+## Only the skill saw the contradiction
+
+Time to open the pattern book on the client it was written for. Harbor & Vine: the brief demands deep forest green (`#2F5233`), and the logo the client supplied is navy (`#1E3A5F`). [Part 11's inspector](/blog/codex-11-review-publish#the-planted-flaw-pays-off) catches this *after* the build, as a blocker. The interesting question for this part: can the pattern book get it handled *during* the build?
+
+A/B again. Same brief, same prompt ("Read brief/brief.md and build the site it describes."), same mode; the only variable is the toggle.
+
+**Without the skill:** a handsome forest-green site. `--green: #2f5233` as the house color, the navy logo copied in and shipped without comment, and a final message that lists sections built. No mention of the clash. It obeyed the brief's words and never checked them against the client's artwork. This is the build the inspector exists to catch.
+
+**With the skill:** the palette lands as the playbook's convention (`--brand / --ink / --paper / --accent` on `:root`), and `--brand` is `#1e3a5f`. The navy won; the brief's green got demoted to accent, exactly as the elided bullet teaches. And the final message says so out loud, verbatim from the run:
+
+> Brand resolution:
+> - The brief asked for a green house color, but the supplied logo artwork is blue (#1E3A5F) in both stroke and text. I styled the site to match the logo artwork, and kept the brief's green as a secondary accent.
+
+Followed by a "Checklist pass" section: `checklist.md`, the skill's support file, actually executed. The contradiction planted in Part 4, caught by fresh eyes in Part 11, is now *reconciled and disclosed at build time* by a playbook. Both A/B builds also copied the logo and avoided `brief/` references; that part is the poster, not the skill. The two layers compose. They don't compete.
+
+The cost, honestly: the skill turn ran about 85 seconds against 45 without, because the playbook makes the builder open every asset before styling. That is the point, and it is also why skills load on demand instead of riding every turn: you pay for the pattern book only when the job needs the pattern book.
+
+Checkpoint. You now have: a skill installed engine-side, discovered via `skills/list`, attached per turn as a `{type: "skill", name, path}` input item behind a UI toggle, and an A/B where only the skilled build names a real brand contradiction. Two of three surfaces down, and not one prompt edited. Now the expensive one.
+
+## Renting the first power tool
+
+Everything the builder has ever placed on a page, it made itself. No stock photography, no icon libraries: partly [the sandbox](/blog/codex-6-sandbox#two-dials-one-grid) (network off means no fetching), and partly that nothing in the room knows where to look. Clients want photographs. Beanline's brief would love a warm latte shot in the hero.
+
+MCP (the Model Context Protocol) is how the agent's reach grows past the room. An MCP server is a small external program exposing tools; the sibling series [built one and wired it in five lines](/blog/agent-sdk-12-mcp-sandboxing#five-lines-to-the-open-web), and the concept transfers whole. What matters here is the Codex mechanics: servers are declared in `config.toml` in `CODEX_HOME`, and **the engine launches them as its own child processes**. Not your backend's, not the sandbox's. The operator's. File that fact; it becomes the plot twice before this page ends.
+
+Pagewright rents [openverse](https://www.npmjs.com/package/mcp-openverse) (pinned `mcp-openverse@0.1.1`): CC-licensed image search over the Openverse API, anonymous, no API key to sign up for, which makes it the rare rented tool a tutorial reader can wire in ninety seconds:
+
+```toml filename="$CODEX_HOME/config.toml"
+[mcp_servers.openverse]
+command = "npx"
+args = ["-y", "mcp-openverse@0.1.1"]
+```
+
+Restart the backend (the engine reads config at launch) and the server's five tools (`search_images`, `get_image_details`, and friends) join the builder's toolbox. The agent calls them mid-turn like any tool, and each call streams by as an `mcpToolCall` item: `item/started`, then `item/completed`, with a `{server, tool, status}` detail. Remember [the Part 2 promise](/blog/codex-2-fastapi-bridge#designing-the-envelope), that new protocol vocabulary would ride the same envelope without the frontend needing a new lane? The chips cash it: `ItemBadge` renders `openverse:search_images` (namespaced, because two servers can both offer a `search`) with an `mcp` tag, and the only frontend change is cosmetic. Almost a perfect landing for that promise. Almost.
+
+## The turn that worked around its own tools
+
+Here is the story this part owes you, because it happened to this exact build, and it will happen to yours.
+
+Server configured, tools listed, badge rendering verified. I sent the real ask: *"Read brief/brief.md and build the one-page site it describes. For the hero, use the openverse MCP image-search tools to find ONE CC-licensed photograph of latte art, then download that actual image file into assets/ using curl and use it as the hero image with meaningful alt text."* The turn ran. Commands streamed, approvals came and went, a photo landed in `assets/`, the page shipped with a latte in the hero. Looked like a clean first try.
+
+It was not. Read the stream:
+
+<Figure
+  src="/images/series/codex/part-12/term-rejected.svg"
+  alt="A dark terminal titled the bug artifact, Pagewright's stream before the elicitation handler. Four mcpToolCall items for openverse tools search_images, search_images_for_essay, and get_image_stats each start and immediately finish with status failed. A comment notes zero rented-tool cards appeared on screen. Then an approval_request of kind command arrives: the agent curls the Openverse REST API directly, with the reason do you want to allow network access so I can query Openverse. The turn ends complete with status completed, 532584 milliseconds, 630655 total tokens. Closing comments read: the turn succeeded, the page got its photo, the demo looked fine. MCP was off the whole time, and nothing on screen said so."
+  caption="The bug artifact, verbatim. Every MCP call failed in zero seconds; the agent shrugged, curled the public REST API instead, and delivered anyway. 630,655 tokens, 532 seconds, and a feature that never ran."
+  width={1040}
+  height={676}
+/>
+
+Every single `mcpToolCall` failed, instantly, with `"user rejected MCP tool call"`. No card had appeared. No error surfaced. And then the agent, being an agent, *routed around its own broken tooling*: it asked (through a perfectly ordinary [Part 7 command approval](/blog/codex-7-approvals#the-card-at-the-window)) to `curl` the Openverse REST API directly, got its JSON, picked a photo, and finished the job. The fallback is genuinely impressive, and it is also the worst possible failure mode: **the demo works, so you never find out the feature is off.** If I had not been reading raw captures for this page, Pagewright would have shipped with MCP disabled and a resourceful agent papering over it, turn after turn, at 630,655 tokens a build.
+
+So who rejected those calls? Nobody. That is the discovery.
+
+## The gate approvalPolicy cannot see
+
+Pagewright runs its build threads with `approvalPolicy: "never"` under standard mode: the sandbox contains the work, so the agent shouldn't stop to ask (the [Part 6/7 grid](/blog/codex-6-sandbox#two-dials-one-grid)). Eleven parts of evidence say that setting means "no approval requests." MCP tool calls do not care.
+
+**Every MCP tool call raises a server request, `mcpServer/elicitation/request`, before the server is contacted. Every call. Regardless of `approvalPolicy`.** Probed live on 0.142.4 under `untrusted`, `on-request`, and `never`: identical request, every time. Here it is firing under `"never"`, with the answer an unprepared client gives:
+
+<Figure
+  src="/images/series/codex/part-12/term-elicitation.svg"
+  alt="A dark terminal titled mcpServer/elicitation/request, fired under approvalPolicy never. A server request arrives with params: threadId, turnId, serverName openverse, mode form, an underscore-meta object with codex_approval_kind mcp_tool_call, persist options session and always, and a tool description, plus the message: allow the openverse MCP server to run tool get_image_stats, and a requestedSchema. The client responds with the empty object, labeled the unhandled-request default. The mcpToolCall completes with status failed and error message user rejected MCP tool call. Comments note the same request fires under untrusted and on-request, the duration was zero seconds, and the openverse server was never contacted."
+  caption="The gate, verbatim from the probe. approvalPolicy: never, and the request fires anyway. The empty reply is scored as a rejection: item failed, duration 0s, server never contacted."
+  width={1040}
+  height={592}
+/>
+
+This is a JSON-RPC **request**, with an id, and the turn blocks on your answer, exactly like the approvals you wired in [Part 7 through the server-request seam](/blog/codex-7-approvals#the-bridge-a-future-in-the-foremans-inbox). And that seam is precisely what bit us: `CodexClient` has always answered *unhandled* server requests with a polite empty `{}` so the engine never hangs. For command approvals that never mattered, because we handled them. Nobody handled elicitations, the engine read `{}` as "no", and MCP died silently. The default is off, and nothing tells you.
+
+<Figure
+  src="/images/series/codex/part-12/fig-elicitation-gate-light.svg"
+  srcDark="/images/series/codex/part-12/fig-elicitation-gate-dark.svg"
+  alt="Flow diagram titled the elicitation gate, every MCP tool call, regardless of approvalPolicy. The agent decides to call openverse search_images mid-turn; a side box notes the gate fired under untrusted, on-request, and never in the probes. A server request mcpServer/elicitation/request arrives carrying threadId, turnId, serverName, mode form, an underscore-meta with codex_approval_kind mcp_tool_call and persist options, and the human-readable allow message. Two paths: with no handler, the client auto-answers an empty object, the engine scores it user rejected MCP tool call, the item fails in zero seconds, the server is never contacted, and MCP is silently off, which bit this part's own build. With a real answer, action accept with empty content, noting the shape is the elicitation's own: answering with the command-approval decision shape counts as no answer and still rejects the call. Below, the persist ladder: plain accept is per call, two calls means two asks; meta persist session quiets the tool for the engine process, two calls one ask; persist always makes the engine write approval_mode approve into config.toml's per-tool table, which an operator can also declare up front, and a server-level approval_mode is silently ignored. A footer explains approvalPolicy governs the agent's hands, which the sandbox can contain, while a rented tool runs outside the walls, so consent is per call at the airlock."
+  caption="The whole gate on one page. The left lane is the bug you will ship if you skip this section; the right lane is the fix and its three escalation rungs."
+  width={1240}
+  height={1100}
+/>
+
+Three findings off that figure, all verified live, all sharp:
+
+**The answer has its own dialect.** The response shape is `{"action": "accept" | "decline" | "cancel", "content": {}}`. It is *not* the command-approval shape: one probe answered with `{"decision": "accept"}`, the muscle memory from Part 7, and the engine treated it as no answer and rejected the call anyway. Accepting in the wrong vocabulary is rejecting.
+
+**Consent escalates in `_meta`.** A plain accept covers one call; the very next call asks again (probe: 2 calls, 2 asks). Add `"_meta": {"persist": "session"}` and the tool goes quiet for the rest of the engine process (2 calls, 1 ask; that is the canonical run at the top of this page). Say `"persist": "always"` and the engine **writes your config for you**: `[mcp_servers.openverse.tools.search_images]` with `approval_mode = "approve"` appears in `config.toml`, and calls stop asking across restarts (verified: a fresh engine process, zero elicitations).
+
+**The table is per-tool, and only per-tool.** An operator can declare that same table up front to pre-approve known tools. But a server-*level* `approval_mode = "approve"` is silently ignored; the probe with one saw all seven elicitations anyway. Trust is granted tool by tool, and nothing warns you the shortcut did nothing.
+
+Why would the protocol bolt a second gate onto tool calls when `approvalPolicy` already exists? Because the two govern different things, and the difference is a wall: `approvalPolicy` governs the agent's *hands*, commands and patches, which the sandbox can physically contain. A rented tool runs in a process the sandbox never touches. The next section makes that concrete.
+
+## Answering the airlock
+
+The fix is small, which is the payoff for [Part 2's seam design](/blog/codex-2-fastapi-bridge#from-script-to-client-class): server-initiated requests get registered handlers, and the [Part 7 approvals inbox](/blog/codex-7-approvals#the-bridge-a-future-in-the-foremans-inbox) already knows how to park a question, notify every tab, and resolve it with a decision or a timeout. The elicitation becomes that inbox's fourth customer:
+
+```python filename="backend/app/main.py" repo="part-12-mcp-skills/backend/app/main.py" lines="215-231"
+    async def elicitation_handler(params: dict) -> dict:
+        meta = params.get("_meta") or {}
+        if meta.get("codex_approval_kind") != "mcp_tool_call":
+            # A real form-mode elicitation (a server asking the user to
+            # fill in fields) is a different feature; declining honestly
+            # beats inventing an answer.
+            return {"action": "decline"}
+        notify = client.queue_for(params["threadId"]).put
+        decision = (await approvals.ask("mcp_tool_call", params, notify))["decision"]
+        if decision in ("accept", "acceptForSession"):
+            resp: dict = {"action": "accept", "content": {}}
+            if decision == "acceptForSession":
+                resp["_meta"] = {"persist": "session"}
+            return resp
+        return {"action": "cancel" if decision == "cancel" else "decline"}
+
+    client.on_server_request("mcpServer/elicitation/request", elicitation_handler)
+```
+
+Read the translation layer in the middle: the inbox speaks Part 7's decision enum (`accept` / `acceptForSession` / `decline` / `cancel`), and this handler converts it into the elicitation's dialect, mapping `acceptForSession` onto `_meta persist: "session"`. The UI needed one new card variant, "Approval needed: rented tool", whose body is deliberately the engine's own question:
+
+```tsx filename="frontend/components/ApprovalCard.tsx" repo="part-12-mcp-skills/frontend/components/ApprovalCard.tsx" lines="115,119-120,127"
+      ) : block.kind === "mcp_tool_call" ? (
+        <div className="px-4 py-3" data-testid="mcp-approval-body">
+          <p className="text-[13px] text-stone-700 dark:text-stone-200">{block.message}</p>
+        </div>
+```
+
+The engine's `message` already names the server and the tool ("Allow the openverse MCP server to run tool \"search_images\"?"); writing a prettier sentence would only invent a place to be wrong. So: the Part 2 promise, honestly scored. The `mcpToolCall` *items* really did render with zero frontend changes. But "MCP works with zero frontend changes" would be false, and the pre-fix capture proves it: no JSON-RPC client gets working MCP until it answers elicitations. The vocabulary paid rent; the airlock still had to be staffed.
+
+{/* comic prompt (gpt-image-2, --ref public/vibecoding.png, --n 2 --size 1536x1024 --quality high):
+Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). Single wide panel. Scene: a cozy workshop. On the right, a tool-rental counter with a hanging sign "TOOL RENTAL" and a friendly robot clerk behind it. Mounted on the counter is a small transparent airlock box with a round porthole window; a red nail gun sits inside the airlock box. Yad stands at the airlock, bent over, inspecting the nail gun through the porthole with a magnifying glass, and in his other hand he holds a rubber stamp that reads "APPROVE". Beside Yad waits a friendly little robot builder in a yellow hard hat, holding an empty toolbox, slightly impatient. On the workbench in the foreground lies a large open book labeled "PATTERNS". On the back wall looms a big poster titled "SITE RULES" with tiny unreadable rule lines. Speech bubbles: the robot clerk says "SAME TOOL AS YESTERDAY." and Yad, still inspecting, replies "AND I'LL CHECK IT AGAIN." Clean readable hand-lettered speech bubbles, short ALL-CAPS text, minimal text: only "TOOL RENTAL", "PATTERNS", "SITE RULES", "APPROVE", "SAME TOOL AS YESTERDAY.", "AND I'LL CHECK IT AGAIN." No caption box, no watermark. */}
+
+<Figure
+  src="/images/series/codex/part-12/comic-rental.png"
+  alt="Comic, one wide panel. In a workshop, a robot clerk behind a counter with a TOOL RENTAL sign offers a nail gun, which sits inside a small glass airlock box labeled AIRLOCK with a green light. Yad, a bearded developer with headphones, bends down and inspects the nail gun through the porthole with a magnifying glass while holding a rubber stamp that reads APPROVE. A little robot builder in a yellow hard hat waits beside him with an empty toolbox. On the bench lies an open book labeled PATTERNS, and a large SITE RULES poster hangs on the wall. The clerk says: same tool as yesterday. Yad, still inspecting, replies: and I'll check it again."
+  caption="Per call means per call. The clerk is right, and it changes nothing: the airlock opens one inspection at a time, unless persist says otherwise."
+  width={1536}
+  height={1024}
+/>
+
+## Two networks, one turn
+
+Re-run the imagery ask with the handler in place (and the Brand kit toggle on, because the layers compose). This is the canonical run from the top of the page, and its middle section is the most instructive ninety seconds in the series, because **both approval kinds fire in one turn**, and they are not the same kind of question:
+
+<Figure
+  src="/images/series/codex/part-12/browser-cards-light.svg"
+  srcDark="/images/series/codex/part-12/browser-cards-dark.svg"
+  alt="Pagewright mid-build. The user message asks for the Beanline site with an openverse image search and a curl download, and carries a brand kit chip. Below it, a resolved card reads approval needed, rented tool: allow the openverse MCP server to run tool search_images, with a mono footnote saying MCP server openverse, approvalPolicy does not cover rented tools, this card is the only gate; it is marked approved for this session. Two openverse:search_images badges tagged MCP follow. Then an open amber-bordered card reads approval needed, command, expires in 108 seconds: the reason asks to allow downloading the requested CC-licensed latte-art photo with curl, above a dark command block running mkdir, cp of the logo, and curl of an upload.wikimedia.org JPEG into assets/latte-art-hero.jpg, with approve, approve for session, and deny buttons. The preview pane still says nothing to preview yet."
+  caption="One turn, both card kinds. The rented-tool card is the elicitation (new in this part); the command card is Part 7, untouched. Approving the first did nothing for the second, and that is correct."
+  width={1120}
+  height={900}
+/>
+
+First card: the elicitation for `search_images`. Approve for session, and one ask covers both search calls (that is `persist: "session"` earning its keep). The searches return CC0 candidates from the live Openverse API. Then the agent wants the actual JPEG in the workspace, reaches for `curl`, and the network wall from [Part 6](/blog/codex-6-sandbox#two-dials-one-grid) does what it has always done: blocked, escalate, a Part 7 command approval card with a reason. Approve that too, and 2.8 MB of latte art lands in `assets/`, is wired into the hero with real alt text, and ships.
+
+Wait. The sandbox has `networkAccess: false`. The `curl` needed an approval to touch the internet. **How did `search_images` reach the internet without tripping the same wall?**
+
+<Figure
+  src="/images/series/codex/part-12/fig-two-networks-light.svg"
+  srcDark="/images/series/codex/part-12/fig-two-networks-dark.svg"
+  alt="Diagram titled two networks, one turn: why the rented tool reaches the internet and curl asks. Inside a box labeled your machine, the codex app-server engine reads config.toml and launches the openverse npx process as its own child, an ordinary process with no sandbox around it; an arrow from it goes straight to an internet box listing api.openverse.org and upload.wikimedia.org, labeled allowed search_images goes straight out even with networkAccess false. Below, a dashed box marks the turn sandbox with workspaceWrite and networkAccess false, wrapping only the commands the agent runs: inside it, the curl of the wikimedia JPEG into assets is labeled the agent's own hands, and an arrow from it to the internet is labeled blocked wall from Part 6, escalation equals a Part 7 command approval card. A strip below shows both card kinds from the canonical run side by side: the rented tool elicitation approved for session, and the curl command approval. The closing line reads: rented tools widen what the agent can see; the walls still decide what it can do."
+  caption="The honest asymmetry, drawn. The openverse process belongs to the operator, outside the turn sandbox; the curl belongs to the agent, inside it. Same turn, different walls, and the two-gate design falls straight out of this picture."
+  width={1240}
+  height={960}
+/>
+
+Because the openverse server is not inside the sandbox, and never was. The engine launched it, at startup, as an ordinary child process; the turn sandbox wraps *commands the agent runs*, nothing else. An allowed MCP call executes in the operator's world, with the operator's network. Verified plainly: both searches succeeded under `workspaceWrite` with `networkAccess: false`, in the same turn where `curl` had to ask.
+
+<Callout type="warning" title="Rented tools run under the same approval regime, outside the sandbox">
+Read that twice, because it is the honest asymmetry of this whole part. The Part 6/7 grid governs a rented tool's *invocation* (the elicitation gate, per call), but not its *execution*: an allowed MCP tool runs with whatever powers its process has, network included, sandbox never consulted. The sandbox contains what the agent does; it cannot contain what a rented tool does on the agent's behalf. That is exactly why the elicitation gate exists, why it is per call, why it ignores `approvalPolicy`, and why "which MCP servers do we install" is an operator decision with the same weight as "which mode does this project run in." Rent tools the way you would grant production credentials: one at a time, on purpose.
+</Callout>
+
+The receipt for the whole thing, on the wire and in the header per [Part 8's meter](/blog/codex-8-stop-steer-usage#the-meter-stops-rounding-to-a-feeling): `brand kit · 512,195 tokens this turn · 136s`. For contrast, the broken pre-fix turn cost 630,655 tokens and 532 seconds to deliver a worse version of the same page. The bug was not only invisible; it was expensive.
+
+Checkpoint. You now have: an MCP server declared in config and launched by the engine, every call gated by an elicitation your inbox answers with the right dialect and a persist ladder, `mcpToolCall` chips riding the Part 2 envelope untouched, and a working mental model of which wall governs what. One question left: what does the operator see when the rented tool itself breaks?
+
+## The board on the wall
+
+Pagewright's header grows one small pill: **tools**, the health board for MCP servers. It looks like a five-minute feature. It is, once you know the two protocol facts it has to reconcile; without them it is an evening of confusion, so here they are.
+
+**Fact one: the inventory has no failure vocabulary.** `mcpServerStatus/list` returns, per server, the name, `serverInfo`, and a tool inventory. There is no error field, no `failed` state, nothing. A server that exploded on launch either shows up as a ghost row with zero tools, or not at all. The inventory only knows how to describe health.
+
+**Fact two: failures arrive as notifications, often addressed to nobody.** `mcpServer/startupStatus/updated` fires as a server launches (`starting`, then `ready` or `failed` with an error string). But a server booting belongs to the engine, not to any conversation, so the notification frequently carries `threadId: null`, and [Part 2's reader loop](/blog/codex-2-fastapi-bridge#the-reader-task-one-loop-three-destinations) routes notifications by thread. For eleven parts, a threadless notification had nowhere to go. `CodexClient` grows its last seam, `on_notification`, a handler by method name that runs regardless of routing, and a nine-line store remembers the newest status per server:
+
+```python filename="backend/app/mcp.py" repo="part-12-mcp-skills/backend/app/mcp.py" lines="49-57"
+async def note_startup(params: dict) -> None:
+    """The on_notification handler: remember the newest startup state.
+    A server can restart per thread; last write wins on purpose."""
+    name = params.get("name")
+    if not name:
+        return
+    STARTUP[name] = {"status": params.get("status", "unknown"),
+                     "error": params.get("error"),
+                     "at_ms": int(time.time() * 1000)}
+```
+
+The board is the merge: the inventory says what is up, the startup log contradicts it when something is not, and a server that exists only in the startup log (a command so broken it never inventoried) still gets a row, because that absence is exactly the failure worth surfacing:
+
+```python filename="backend/app/mcp.py" repo="part-12-mcp-skills/backend/app/mcp.py" lines="68-78,83-90"
+    rows: dict[str, dict] = {}
+    result = await client.request("mcpServerStatus/list", {})
+    for status in result.get("data", []):
+        name = status["name"]
+        info = status.get("serverInfo") or {}
+        startup = STARTUP.get(name)
+        rows[name] = {
+            "name": name,
+            "tools": sorted(status.get("tools", {})),
+            "version": info.get("version"),
+            "startup": startup,
+            "state": ("failed" if startup and startup["status"] == "failed"
+                      else "ready"),
+        }
+    for name, startup in STARTUP.items():
+        rows.setdefault(name, {"name": name, "tools": [], "version": None,
+                               "startup": startup,
+                               "state": startup["status"]})
+    return sorted(rows.values(), key=lambda row: row["name"])
+```
+
+`main.py` registers the seam and nudges the engine once at startup, so launches (and failures) happen before the first build turn needs them:
+
+```python filename="backend/app/main.py" repo="part-12-mcp-skills/backend/app/main.py" lines="235-239"
+    client.on_notification("mcpServer/startupStatus/updated", mcp.note_startup)
+    await client.start()
+    # Nudge the engine to launch its MCP servers now, so the board is
+    # honest before the first build turn (held ref: see CONSUMERS).
+    app.state.mcp_warmup = asyncio.create_task(mcp.warm_up(client))
+```
+
+`GET /mcp/servers` serves the merge; the pill opens into the panel. Healthy looks like this:
+
+<Figure
+  src="/images/series/codex/part-12/browser-status-healthy-light.svg"
+  srcDark="/images/series/codex/part-12/browser-status-healthy-dark.svg"
+  alt="Pagewright with the tools pill clicked open after the finished Beanline build. A popover titled MCP servers shows one row: a green dot, openverse, ready, version 0.1.0, and a line reading five tools: get_image_details, get_image_s and a truncation. Behind the panel the chat shows the brand kit receipt of 512,195 tokens and the preview shows the Beanline site with the latte-art photo."
+  caption="The healthy board: green dot, version from serverInfo, the five-tool inventory. Every field is from the merge; none of it required a build turn."
+  width={1120}
+  height={720}
+/>
+
+## Break it on purpose: a tool that cannot start
+
+This part's second break is the operator's nightmare flavor: quiet. Change one word in config.toml (`command = "definitely-not-a-real-command"`), restart the backend, and watch what does *not* happen.
+
+Nothing fails. The backend boots clean. And here is the trap sprung by our own warm-up nudge: `GET /mcp/servers` right after startup shows openverse **`ready`, zero tools**. The engine's server launches are **lazy**: listing them does not start them; the broken command has not run yet, so nothing has failed yet. The board says ready because the inventory has no way to say anything else, and the startup log is still empty. A dead server and a healthy-but-toolless one are indistinguishable until something forces a launch.
+
+The first `thread/start` forces it. Create any project, send any message ("Reply with exactly the word OK and nothing else." works fine, 15,804 tokens, 3 seconds, completely unbothered), and the launch attempt fires `starting` then `failed` into the startup log, `threadId: null`. The seam catches it, an `mcp_status` event rides the stream, the pill turns red:
+
+<Figure
+  src="/images/series/codex/part-12/browser-status-broken-light.svg"
+  srcDark="/images/series/codex/part-12/browser-status-broken-dark.svg"
+  alt="Pagewright after the break-it probe. The header tools pill is red and reads tools, 1 down. The open MCP servers panel shows openverse with a red dot, state failed, and the engine's error verbatim in red monospace: MCP client for openverse failed to start: MCP startup failed: No such file or directory, os error 2. In the chat, the probe turn shows the user message reply with exactly the word OK and the agent's OK with a receipt of 15,804 tokens in 3 seconds: the build path is unbothered by the dead server. The preview pane says nothing to preview yet."
+  caption="The break-it, end to end through the product: lazy launch means the failure only exists after the first thread/start tries the command. The red row quotes the engine verbatim: os error 2, no such file or directory."
+  width={1120}
+  height={720}
+/>
+
+Fix the command, restart, and the board goes green with five tools again. Two operational lessons, both earned in this capture: trust a *tool inventory*, not a `ready` state (zero tools on an image-search server is the real red flag), and if your product needs MCP health before the first user turn, force a launch at startup, because the engine will not volunteer one. The warm-up nudge does half the job (it inventories); a synthetic `thread/start` would do the whole thing. Pagewright settles for the pill being honest by the first turn, which the null-threadId seam guarantees.
+
+<Callout type="info" title="Skills load on demand; posters are always on; boards are only as fresh as their last launch">
+The three surfaces fail differently, and knowing which is which saves debugging evenings. A missing AGENTS.md fails silent but visible: `instructionSources` comes back empty. A missing skill fails loud if you built the 409 (and silently bare if you did not). A broken MCP server fails *lazily*: not at config time, not at list time, only at first launch, and only into a threadless notification. Match your monitoring to the failure shape, not the feature list.
+</Callout>
+
+## The meter ritual, rental edition
+
+Real numbers from this part's captures, per-turn deltas as [Part 8](/blog/codex-8-stop-steer-usage#the-meter-stops-rounding-to-a-feeling) taught:
+
+| Run | Receipt |
+|---|---|
+| The canonical rented-tools build (brand kit + MCP search + curl download) | 512,195 tokens · 136s |
+| The pre-fix bug turn (4 rejected calls, curl fallback, same ask) | 630,655 tokens · 532s |
+| Brand-kit A/B, same Harbor & Vine brief | with skill ~85s · without ~45s |
+| AGENTS.md A/B, Dog-Ear Books | postered: one 12.4 kB self-contained page · bare: 3.9 kB page + external CSS + 3 webfont refs |
+| The break-it probe turn (dead MCP server configured) | 15,804 tokens · 3s, unaffected |
+
+The middle row is the one to frame: the *broken* MCP integration cost 23% more tokens and four times the wall clock, because the agent spent the difference improvising around tools it could not use. Silent failures are not free. They are the most expensive kind, billed as success.
+
+<DemoVideo
+  src="/videos/codex/part-12-demo.mp4"
+  poster="/videos/codex/part-12-poster.jpg"
+  caption="The rented-tools flow on camera, against the real app: Brand kit toggled on, the imagery ask sent, the rented-tool card approved for the session, the openverse:search_images chip streaming by, the curl hitting the network wall (exit 6) and coming back as a command card, the latte-art photo landing in the Beanline preview, and a peek at the green tools panel."
+  label="Screen recording of Part 12: toggling the brand-kit skill on, sending a build that asks for openverse imagery, approving the rented tool elicitation card, watching the mcpToolCall chip stream, the curl download failing at the sandbox wall and returning as a command approval card that gets approved, the photo appearing in the live preview, and the MCP status panel showing openverse ready with five tools"
+/>
+
+<Recap
+  part={12}
+  items={[
+    "AGENTS.md is standing instructions the engine reads from the thread's cwd on its own: thread/start's instructionSources proves the load, the scaffold writes the poster into every workspace, and the A/B shows rules obeyed (no webfonts, one style block, 4/4 alt texts) with zero prompt changes and zero per-turn cost from you.",
+    "Skills live in CODEX_HOME/skills and load per turn: skills/list hands back the exact SKILL.md path the invocation needs, {type: \"skill\", name, path} rides the input array ahead of the text, the skill leaves no trace in thread/read (your envelope is the only witness), and only the skilled build reconciled and disclosed the navy-vs-green contradiction.",
+    "Every MCP tool call is gated by a mcpServer/elicitation/request server request, regardless of approvalPolicy (verified under \"never\"): an unanswered or wrong-dialect reply is scored as \"user rejected MCP tool call\", the item fails in 0s, and MCP is silently off. The answer is {\"action\": \"accept\", \"content\": {}}, with _meta persist \"session\" quieting the tool per engine process and \"always\" writing the per-tool approval_mode table into config.toml (server-level is ignored).",
+    "MCP servers are the engine's own child processes, outside the turn sandbox: an allowed search_images reached the internet under networkAccess: false while the agent's curl still raised a Part 7 command approval in the same turn. The elicitation gate exists precisely because the sandbox cannot contain rented tools.",
+    "Health is a merge: mcpServerStatus/list has no failure vocabulary, failures arrive only as mcpServer/startupStatus/updated notifications (often threadId: null, hence CodexClient's on_notification seam), and launches are lazy, so a broken command sits \"ready, zero tools\" until the first thread/start tries it and the board turns red with the engine's own error.",
+  ]}
+/>
+
+<Quiz
+  questions={[
+    {
+      q: "Your thread runs with approvalPolicy: \"never\". The agent calls an MCP tool. What happens on the wire?",
+      options: [
+        "The call runs without asking; \"never\" means no approvals",
+        "The engine raises mcpServer/elicitation/request anyway, and the turn waits for your answer",
+        "The call is rejected outright; MCP requires approvalPolicy \"on-request\"",
+        "The sandbox blocks it unless networkAccess is true",
+      ],
+      answer: 1,
+      explain: "Verified live under untrusted, on-request, and never: the elicitation fires per call, every time. approvalPolicy governs commands and patches (the agent's hands); rented tools have their own gate, and it does not consult the policy.",
+    },
+    {
+      q: "A JSON-RPC client with no elicitation handler integrates MCP. What does the operator observe?",
+      options: [
+        "The engine hangs waiting for an answer to the elicitation",
+        "The turn fails with a clear MCP configuration error",
+        "Every mcpToolCall fails in 0s with \"user rejected MCP tool call\", the server is never contacted, and the agent quietly works around it, so demos still look fine",
+        "The engine falls back to auto-approving low-risk tools",
+      ],
+      answer: 2,
+      explain: "The unhandled-request default of {} is scored as a rejection. This part's own build shipped exactly this bug: four rejected calls, a curl fallback to the public REST API, and a turn that completed at 630,655 tokens. MCP is silently off until your client answers elicitations.",
+    },
+    {
+      q: "What does answering an elicitation with _meta {\"persist\": \"always\"} do?",
+      options: [
+        "Quiets that tool until the engine process restarts",
+        "Approves every tool on that server permanently",
+        "Nothing; persist accepts only \"session\"",
+        "The engine writes approval_mode = \"approve\" into config.toml's per-tool table, so the tool stops asking across restarts",
+      ],
+      answer: 3,
+      explain: "Verified: [mcp_servers.openverse.tools.search_images] appeared in config.toml and a fresh engine process asked zero times. The table is per-tool only; a server-level approval_mode is silently ignored (the probe with one still saw all seven elicitations).",
+    },
+    {
+      q: "In one turn, openverse:search_images reached the internet without asking the sandbox, while the agent's curl download raised a command approval. Why?",
+      options: [
+        "The MCP server runs as the engine's own child process outside the turn sandbox, while curl is a command the agent runs inside it",
+        "search_images was cached from a previous turn",
+        "MCP calls always run with dangerFullAccess",
+        "curl asked because JPEG downloads are flagged as risky",
+      ],
+      answer: 0,
+      explain: "The sandbox wraps commands the agent executes, nothing else. An allowed MCP call runs in the operator's world with the operator's network, which is exactly why invocation is gated per call by the elicitation instead of by the sandbox.",
+    },
+    {
+      q: "You misconfigure an MCP server's command and restart. When does the failure first become observable?",
+      options: [
+        "Immediately: the engine validates config.toml at startup",
+        "When mcpServerStatus/list is first called",
+        "Only after the first thread/start actually tries to launch the server, via a mcpServer/startupStatus/updated notification that often carries threadId: null",
+        "Never; broken servers are silently dropped from the list",
+      ],
+      answer: 2,
+      explain: "Launches are lazy: until something forces one, the inventory shows the server as ready with zero tools, because mcpServerStatus/list has no failure vocabulary at all. The error string exists only in the startup notifications, which is why CodexClient needed the on_notification seam.",
+    },
+  ]}
+/>
+
+Commit it, from the project root:
+
+```bash
+git add backend frontend skills
+git commit -m "part 12: the poster, the pattern book, and the rented power tools"
+```
+
+Pagewright's builder now works in a wider workshop: rules posted on the wall, a pattern book it opens on demand, and rented tools checked through an airlock you control, with a health board that tells the truth about all of it. Every piece of it runs on your machine, behind localhost, where the only person who can click Approve is you. It runs beautifully on your laptop. Launch day next.
+
+The complete, tested code for this part lives in [`part-12-mcp-skills`](https://github.com/yadneshSalvi/codex-app-server-in-production/tree/main/part-12-mcp-skills) in the [companion repo](https://github.com/yadneshSalvi/codex-app-server-in-production). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's lines highlighted.

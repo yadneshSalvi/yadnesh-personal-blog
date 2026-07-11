@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="900" viewBox="0 0 1120 900">
+  <rect width="1120" height="900" fill="#0c0a09"/>
+  <rect x="0" y="0" width="1120" height="56" fill="#211e1a"/>
+  <line x1="0" y1="56" x2="1120" y2="56" stroke="#2b2723" stroke-width="1.5"/>
+  <circle cx="30" cy="28" r="7" fill="#3a3530"/><circle cx="56" cy="28" r="7" fill="#3a3530"/><circle cx="82" cy="28" r="7" fill="#3a3530"/>
+  <rect x="320" y="13" width="420" height="30" rx="15" fill="#1a1816" stroke="#3a3530"/>
+  <text x="530" y="33" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#a49c90" text-anchor="middle">localhost:3000</text>
+  <line x1="0" y1="102" x2="1120" y2="102" stroke="#292524" stroke-width="1"/>
+  <circle cx="24" cy="79" r="5" fill="#4fb8b3"/>
+  <text x="38" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#e7e5e4">Pagewright</text>
+  <text x="150" y="84" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">the site builder</text>
+  <rect x="258" y="65" width="63" height="26" rx="13" fill="none" stroke="#292524" stroke-width="1.2"/>
+  <circle cx="273" cy="78" r="3" fill="#22c55e"/>
+  <text x="283" y="82" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#d6d3d1">tools</text>
+  <text x="668.8" y="83" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#78716c" text-anchor="end">Write inside this workspace; the network stays off.</text>
+  <rect x="680.8" y="65" width="171.2" height="28" rx="8" fill="none" stroke="#292524" stroke-width="1.3"/>
+  <text x="693.8" y="83" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#d6d3d1">512.2k</text>
+  <text x="740" y="83" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">&#183; 512.2k thread</text>
+  <rect x="864" y="64" width="240" height="30" rx="9" fill="#1c1917" stroke="#292524"/>
+  <text x="910" y="83" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">Read-only</text>
+  <rect x="951" y="68" width="78" height="22" rx="6" fill="#f5f5f4"/>
+  <text x="990" y="83" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#1c1917" text-anchor="middle">Standard</text>
+  <text x="1064" y="83" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">Trusted</text>
+  <line x1="200" y1="102" x2="200" y2="900" stroke="#292524" stroke-width="1"/><text x="18" y="133" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#e7e5e4">skill-with</text>
+  <text x="18" y="149" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c">Read brief/brief.md and build the site…</text>
+  <text x="18" y="167" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" fill="#78716c">4h ago</text>
+  <rect x="152" y="155" width="34" height="16" rx="3.5" fill="none" stroke="#292524"/>
+  <text x="169" y="166.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" fill="#d6d3d1" text-anchor="middle">Fork</text><text x="18" y="205" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#e7e5e4">Beanline (MCP imagery)</text>
+  <text x="18" y="221" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c">Read brief/brief.md and build the one…</text>
+  <text x="18" y="239" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" fill="#78716c">19m ago</text>
+  <rect x="152" y="227" width="34" height="16" rx="3.5" fill="none" stroke="#292524"/>
+  <text x="169" y="238.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" fill="#d6d3d1" text-anchor="middle">Fork</text><rect x="8" y="258" width="184" height="64" rx="8" fill="#4fb8b3" opacity="0.07"/>
+  <rect x="8" y="258" width="184" height="64" rx="8" fill="none" stroke="#4fb8b3" stroke-opacity="0.4"/><text x="18" y="277" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#4fb8b3">Beanline (rented tools)</text>
+  <text x="18" y="293" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c">Read brief/brief.md and build the one…</text>
+  <text x="18" y="311" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10" fill="#78716c">3m ago</text>
+  <rect x="152" y="299" width="34" height="16" rx="3.5" fill="none" stroke="#292524"/>
+  <text x="169" y="310.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" fill="#d6d3d1" text-anchor="middle">Fork</text><line x1="0" y1="816" x2="200" y2="816" stroke="#292524" stroke-width="1"/>
+  <rect x="12" y="826" width="176" height="26" rx="7" fill="#1c1917" stroke="#292524"/>
+  <text x="22" y="843" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#d6d3d1">beanline brief</text>
+  <path d="M 170 837 l 4.5 5 l 4.5 -5" fill="none" stroke="#78716c" stroke-width="1.4"/>
+  <rect x="12" y="860" width="176" height="28" rx="7" fill="#4fb8b3"/>
+  <text x="100" y="878" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#ffffff" text-anchor="middle">New project</text>
+  <line x1="200" y1="136" x2="640" y2="136" stroke="#292524" stroke-width="1"/>
+  <text x="216" y="124" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#e7e5e4">Beanline (rented tools)</text>
+  <rect x="553.2" y="109" width="70.8" height="20" rx="10" fill="none" stroke="#292524"/>
+  <text x="588.6" y="123" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c" text-anchor="middle">standard</text>
+  <rect x="216" y="150" width="398" height="138" rx="10" fill="#1c1917"/>
+  <clipPath id="ac-dark-150"><rect x="216" y="150" width="398" height="138" rx="10"/></clipPath>
+  <g clip-path="url(#ac-dark-150)"><rect x="216" y="150" width="398" height="28" fill="#1c1917"/><text x="230" y="168" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="9.5" letter-spacing="1.2" fill="#78716c">APPROVAL NEEDED &#183; RENTED TOOL</text><text x="230" y="196" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e7e5e4">Allow the openverse MCP server to run tool</text><text x="230" y="213" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e7e5e4">"search_images"?</text><text x="230" y="230" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c">MCP server: openverse &#183; approvalPolicy does not cover</text>
+  <text x="230" y="245" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c">rented tools: this card is the only gate</text><line x1="216" y1="254" x2="614" y2="254" stroke="#292524"/><text x="230" y="276" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#4ade80">Approved for this session by you, just now</text></g>
+  <rect x="216" y="150" width="398" height="138" rx="10" fill="none" stroke="#292524" stroke-width="1.6"/>
+  <rect x="216" y="296" width="388" height="34" rx="8" fill="#1c1917" stroke="#292524"/>
+  <text x="230" y="317.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#4ade80">&#x2713;</text>
+  <text x="246" y="317.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#e7e5e4">openverse:search_images</text>
+  <text x="558" y="317" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" letter-spacing="1" fill="#78716c">MCP</text>
+  <rect x="216" y="338" width="388" height="34" rx="8" fill="#1c1917" stroke="#292524"/>
+  <text x="230" y="359.5" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#4ade80">&#x2713;</text>
+  <text x="246" y="359.5" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#e7e5e4">openverse:search_images</text>
+  <text x="558" y="359" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" letter-spacing="1" fill="#78716c">MCP</text>
+  
+  <text x="216" y="398" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">Also:</text>
+  <rect x="216" y="407" width="112" height="17" rx="4" fill="#292524"/>
+  <text x="220" y="419" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1">assets/logo.svg</text>
+  <text x="331" y="419" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4"> copied; the CC0 latte-art hero</text>
+  <text x="216" y="440" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">photo downloaded into </text>
+  <rect x="356" y="428" width="181" height="17" rx="4" fill="#292524"/>
+  <text x="360" y="440" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#d6d3d1">assets/latte-art-hero.jpg</text>
+  <text x="540" y="440" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">.</text>
+  <text x="216" y="461" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">What's in the page: one semantic header, main,</text>
+  <text x="216" y="482" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">sections, and footer; exactly one h1; the hero with</text>
+  <text x="216" y="503" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">the logo, tagline, CTA, and the downloaded latte-art</text>
+  <text x="216" y="524" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#e7e5e4">image; menu and stores from the brief copy.</text>
+  
+  <text x="216" y="549" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#34d399">brand kit</text>
+  <text x="282" y="549" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">&#183;</text>
+  <text x="295" y="549" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">512,195 tokens this turn</text>
+  <text x="460" y="549" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">&#183;</text>
+  <text x="473" y="549" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#78716c">136s</text>
+  <rect x="201" y="567" width="439" height="160" fill="#1c1917" opacity="0.5"/><rect x="200" y="567" width="440" height="1" fill="#292524"/>
+  <text x="218" y="591" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" letter-spacing="1.5" fill="#78716c">THE BUILDER'S PLAN</text>
+  <text x="376" y="591" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c">4/4</text>
+  <path d="M 612 589 l 4.5 -5 l 4.5 5" fill="none" stroke="#78716c" stroke-width="1.3"/><circle cx="225" cy="609" r="7" fill="#4fb8b3"/>
+  <path d="M 221.5 609 l 2.6 2.8 l 4.6 -5.4" fill="none" stroke="#ffffff" stroke-width="1.6"/>
+  <text x="240" y="613" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#78716c" text-decoration="line-through">Read brief and inventory shipped assets</text><circle cx="225" cy="633" r="7" fill="#4fb8b3"/>
+  <path d="M 221.5 633 l 2.6 2.8 l 4.6 -5.4" fill="none" stroke="#ffffff" stroke-width="1.6"/>
+  <text x="240" y="637" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#78716c" text-decoration="line-through">Find and download a CC-licensed latte-art hero</text><circle cx="225" cy="657" r="7" fill="#4fb8b3"/>
+  <path d="M 221.5 657 l 2.6 2.8 l 4.6 -5.4" fill="none" stroke="#ffffff" stroke-width="1.6"/>
+  <text x="240" y="661" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#78716c" text-decoration="line-through">Build the one-page Beanline site in index.html</text><circle cx="225" cy="681" r="7" fill="#4fb8b3"/>
+  <path d="M 221.5 681 l 2.6 2.8 l 4.6 -5.4" fill="none" stroke="#ffffff" stroke-width="1.6"/>
+  <text x="240" y="685" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#78716c" text-decoration="line-through">Verify structure, copy fidelity, brief compliance</text><text x="218" y="713" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-style="italic" fill="#78716c">Build completed after brief review, asset download, authoring, and checks.</text>
+  <rect x="201" y="762" width="439" height="42" fill="#1c1917" opacity="0.6"/>
+  <line x1="200" y1="762" x2="640" y2="762" stroke="#292524"/>
+  <text x="218" y="788" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#d6d3d1">Publishing starts with an inspection.</text>
+  <rect x="476" y="770" width="82" height="26" rx="8" fill="none" stroke="#292524"/>
+  <text x="517" y="787" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="500" fill="#d6d3d1" text-anchor="middle">Inspect site</text>
+  <rect x="566" y="770" width="58" height="26" rx="8" fill="#4fb8b3" opacity="0.4"/>
+  <text x="595" y="787" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#ffffff" text-anchor="middle">Publish</text>
+  <line x1="200" y1="804" x2="640" y2="804" stroke="#292524" stroke-width="1"/><rect x="216" y="814" width="78" height="22" rx="11" fill="none" stroke="#292524"/>
+  <circle cx="229" cy="825" r="2.5" fill="#57534e"/>
+  <text x="238" y="829" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="500" fill="#d6d3d1">Plan first</text><rect x="302" y="814" width="82" height="22" rx="11" fill="none" stroke="#34d399" stroke-width="1.4"/>
+  <circle cx="315" cy="825" r="2.5" fill="#10b981"/>
+  <text x="324" y="829" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="500" fill="#34d399">Brand kit</text><rect x="400" y="813" width="224" height="24" rx="8" fill="none" stroke="#292524"/><text x="428" y="829" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">Quick</text><rect x="452" y="816" width="64" height="18" rx="6" fill="#f5f5f4"/><text x="484" y="829" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#1c1917" text-anchor="middle">Standard</text><text x="549" y="829" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">Thorough</text><text x="601" y="829" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="600" fill="#d6d3d1" text-anchor="middle">Max</text><rect x="216" y="850" width="336" height="36" rx="10" fill="#1c1917" stroke="#292524" stroke-width="1.5"/>
+  <text x="229" y="873" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#78716c">Describe the site you want&#8230;</text>
+  <rect x="562" y="850" width="62" height="36" rx="10" fill="#4fb8b3" opacity="0.45"/>
+  <text x="593" y="873" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#ffffff" text-anchor="middle">Send</text>
+  <line x1="640" y1="102" x2="640" y2="900" stroke="#292524" stroke-width="1"/>
+  <text x="656" y="124" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" fill="#78716c">/preview/5b577826/</text>
+  <rect x="1002" y="108" width="56" height="22" rx="6" fill="none" stroke="#292524"/>
+  <text x="1030" y="123" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#d6d3d1" text-anchor="middle">Reload</text>
+  <rect x="1064" y="108" width="40" height="22" rx="6" fill="none" stroke="#292524" opacity="0.55"/>
+  <text x="1087" y="123" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#78716c" text-anchor="middle" opacity="0.9">Diff</text>
+  <line x1="640" y1="136" x2="1120" y2="136" stroke="#292524" stroke-width="1"/>
+  <rect x="654" y="148" width="452" height="540" rx="10" fill="#FAF6F0" stroke="#292524"/>
+  <defs><linearGradient id="wood-dark" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#a06a42"/><stop offset="1" stop-color="#6f4426"/>
+  </linearGradient></defs>
+  <g transform="translate(678,168)">
+    <ellipse cx="12" cy="14" rx="10" ry="13" fill="none" stroke="#B3441A" stroke-width="2.2"/>
+    <path d="M 12 2 C 8 8, 16 20, 12 27" fill="none" stroke="#B3441A" stroke-width="2"/>
+  </g>
+  <text x="710" y="190" font-family="Georgia, 'Times New Roman', serif" font-size="19" fill="#2B2B2B">Beanline</text>
+  <text x="680" y="232" font-family="Georgia, 'Times New Roman', serif" font-size="10.5" letter-spacing="2.2" fill="#B3441A">SPECIALTY COFFEE, SIX STORES, ONE STEADY PACE</text>
+  <text x="678" y="282" font-family="Georgia, 'Times New Roman', serif" font-size="44" font-weight="700" fill="#2B2B2B">Beanline</text>
+  <text x="680" y="310" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#2B2B2B">Slow coffee for fast mornings</text>
+  <rect x="680" y="326" width="126" height="34" fill="#B3441A"/>
+  <text x="743" y="348" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#ffffff" text-anchor="middle">Find your store</text>
+  <clipPath id="photo-dark"><rect x="678" y="372" width="404" height="306" rx="4"/></clipPath>
+    <g clip-path="url(#photo-dark)">
+      <rect x="678" y="372" width="404" height="306" fill="url(#wood-dark)"/>
+      <ellipse cx="880" cy="598.899" rx="146.421" ry="55.53900000000001" fill="#e8dcc6"/>
+      <circle cx="880" cy="543.36" r="100.98" fill="#f3ead9"/>
+      <circle cx="880" cy="543.36" r="82.8036" fill="#b97a4b"/>
+      <path d="M 880 528.213 C 829.51 467.625, 789.1179999999999 533.2620000000001, 880 598.899 C 970.8820000000001 533.2620000000001, 930.49 467.625, 880 528.213 Z" fill="#f3ead9"/>
+    </g>
+    <rect x="678" y="372" width="404" height="306" rx="4" fill="none" stroke="#B3441A" stroke-opacity="0.7"/>
+  <line x1="640" y1="700" x2="1120" y2="700" stroke="#292524" stroke-width="1"/>
+  <rect x="641" y="701" width="479" height="199" fill="#1c1917" opacity="0.35"/>
+  <text x="656" y="724" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" fill="#78716c">FILES</text>
+  <text x="1104" y="724" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" fill="#78716c" text-anchor="end">7</text>
+  <text x="656" y="746" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#d6d3d1">AGENTS.md</text><text x="1104" y="746" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end">644 B</text><text x="656" y="766" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#d6d3d1">assets/</text><text x="1104" y="766" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end"></text><text x="670" y="786" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#4ade80">latte-art-hero.jpg</text><text x="1104" y="786" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end">2878.1 kB</text><text x="670" y="806" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#d6d3d1">logo.svg</text><text x="1104" y="806" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end">417 B</text><text x="656" y="826" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#d6d3d1">brief/</text><text x="1104" y="826" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end"></text><text x="670" y="846" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#d6d3d1">brief.md</text><text x="1104" y="846" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end">1.0 kB</text><text x="656" y="866" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" fill="#d6d3d1">index.html</text><text x="1104" y="866" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#78716c" text-anchor="end">13.9 kB</text>
+</svg>

@@ -256,6 +256,61 @@ Order observed: `thread/started` → `thread/status/changed (active)` →
   step strips → broken on the live copy only. Needs a deterministic gate
   check (grep for brief/ refs), not just the LLM reviewer.
 
+## Part-12-build findings (verified live)
+
+- AGENTS.md: the engine reads it from the thread's cwd on its own.
+  thread/start returns `instructionSources: [<abs path>/AGENTS.md]` (and `[]`
+  without the file). A/B builds with identical prompts: the postered
+  workspace obeys every rule (no webfonts, one <style> block, 4/4 imgs with
+  alt); the bare one ships Google Fonts + an external stylesheet
+  (p12-agentsmd-ab.txt).
+- Skills: folders with SKILL.md under CODEX_HOME/skills (user scope);
+  `skills/list` groups by cwd and reports the path TO SKILL.MD — the same
+  path the invocation wants back: turn/start input item
+  `{type: "skill", name, path}` (all three required by the schema). It also
+  surfaces ~/.agents/skills/* and CLI-bundled .system skills — look yours up
+  by name. The skill leaves NO trace in thread/read (only the text item) and
+  no skill-flavored notification; with/without A/B shows the playbook obeyed
+  and the planted brief-vs-logo contradiction reconciled out loud
+  (p12-skill-ab.txt).
+- **MCP tool calls are approval-gated per call, and approvalPolicy has NO say
+  in it.** Every call raises server request `mcpServer/elicitation/request`
+  (`_meta.codex_approval_kind: "mcp_tool_call"`, mode "form", message
+  'Allow the openverse MCP server to run tool "…"?') — even under
+  approvalPolicy "never" (p12-mcp-approval-probe.txt). An unanswered/empty
+  reply = "user rejected MCP tool call": the item fails with duration 0, the
+  server never called. This is what silently broke the first live turn
+  (p12-sse-mcp-unhandled.txt) — a client without an elicitation handler has
+  MCP disabled without knowing it.
+- Elicitation answer: `{"action": "accept"|"decline"|"cancel", "content": {}}`.
+  Plain accept is per-call (the next call re-asks); `_meta {"persist":
+  "session"}` quiets the tool for the engine process (one ask covered both
+  search_images calls of the real turn, p12-sse-mcp.txt); `"persist":
+  "always"` WRITES `[mcp_servers.<name>.tools.<tool>] approval_mode =
+  "approve"` into config.toml. That per-tool table can be declared up front;
+  a server-LEVEL approval_mode is ignored (p12-mcp-elicit-probe.txt,
+  p12-mcp-serverlevel-probe.txt).
+- MCP servers live OUTSIDE the turn sandbox: once allowed, get_image_stats /
+  search_images reach the internet under workspaceWrite +
+  networkAccess: false. The agent's own `curl` to download a found image
+  still raises the Part 7 command approval in standard mode — both cards in
+  one turn on p12-sse-mcp.txt, photo landed and shipped on the page.
+- mcpToolCall items ride the Part 2 vocabulary untouched: item/started →
+  item/completed with `server`, `tool`, `status` fields (status
+  inProgress → completed | failed; failures carry `error.message`).
+- Health is two sources merged: `mcpServerStatus/list` → `{data: [{name,
+  serverInfo, tools: {name: {inputSchema...}}, resources, authStatus}]}` with
+  NO failure vocabulary; failures arrive only as
+  `mcpServer/startupStatus/updated` (starting → ready|failed + error string),
+  frequently with threadId null — an engine-level notification, not a thread
+  one. And launches are LAZY: a broken command sits "listed, zero tools" until
+  the first thread/start actually tries it (p12-mcp-broken.txt,
+  p12-broken-probe.txt).
+- mcp-openverse@0.1.1 quirk: the server itself works (standalone stdio call
+  verified) but its own docs-visible tools differ — search_images takes
+  {query, page_size, ...}; the deprecated api.openverse.engineering host the
+  model curls still redirects to api.openverse.org and works.
+
 ## Threads: resume / fork / list / errors
 
 - `thread/resume {threadId}` → same response shape as thread/start plus
