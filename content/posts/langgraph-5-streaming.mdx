@@ -1,6 +1,6 @@
 ---
 title: "LangGraph from Scratch, Part 5: Streaming Responses"
-subtitle: "Replace the 'Thinking...' pause with words that appear as the model writes them. Server-Sent Events, a tiny wire format you design yourself, and a Stop button, end to end."
+subtitle: "Replace the waiting state with words that appear as the model writes them. Server-Sent Events, a tiny wire format you design yourself, and a Stop button, end to end."
 image: "/images/series/langgraph/part-5/cover-light.svg"
 imageDark: "/images/series/langgraph/part-5/cover-dark.svg"
 createdAt: "2026-06-13T00:00:00.000Z"
@@ -10,17 +10,17 @@ series: "langgraph-fastapi-nextjs"
 seriesPart: 5
 ---
 
-In [Part 4](/blog/langgraph-4-nextjs-frontend#give-it-a-pulse-and-a-safety-net) your bot made you wait. You hit Send, the word "Thinking..." sat there doing nothing, and a few seconds later the whole reply dropped in at once, like a vending machine. Real chat apps don't do that. The words appear as the model writes them, and you start reading before it has finished its sentence.
+In [Part 4](/blog/langgraph-4-nextjs-frontend#give-it-a-pulse-and-a-safety-net) your bot made you wait. You hit Send, an animated waiting state held the assistant's place, and a few seconds later the whole reply dropped in at once, like a vending machine. Real chat apps don't do that. The words appear as the model writes them, and you start reading before it has finished its sentence.
 
 By the end of this page, yours does too. Same backend graph from [Part 3](/blog/langgraph-3-first-graph#hand-the-conversation-to-the-graph), same chat UI from [Part 4](/blog/langgraph-4-nextjs-frontend#wire-it-to-the-brain). The only thing that changes is when the words show up.
 
 <Figure
   src="/images/series/langgraph/part-5/browser-stream-filmstrip-light.svg"
   srcDark="/images/series/langgraph/part-5/browser-stream-filmstrip-dark.svg"
-  alt="Three frames of the same chat, left to right. In the first, at 0.3 seconds, the assistant bubble reads 'Recursion is' with a blinking cursor. In the second, at 0.7 seconds, it has grown to 'Recursion is when a function' with the cursor still going. In the third, at 1.2 seconds, it reads the full sentence 'Recursion is when a function calls itself.' with no cursor. The user's question 'Explain recursion.' sits above in each frame."
+  alt="Three panels of the same chat card, left to right, labeled FIRST TOKENS, MID-STREAM and COMPLETE. In the first the assistant bubble holds one word, 'Recursion', followed by a thin violet caret bar. In the second the bubble has grown to 'Recursion is when a function calls' with the caret still trailing the text. In the third it reads the finished sentence 'Recursion is when a function calls itself.' and the caret is gone. Each panel carries the Lattice header and a STREAMING pill."
   caption="Today's destination. One reply, landing a word at a time. The [Part 3 graph](/blog/langgraph-3-first-graph#hand-the-conversation-to-the-graph) is untouched; it just narrates itself now instead of making you wait for the end."
-  width={1180}
-  height={470}
+  width={1200}
+  height={700}
 />
 
 Nothing new to install today. [`StreamingResponse`](https://fastapi.tiangolo.com/advanced/custom-response/#streamingresponse) has shipped with FastAPI since your [Part 1 setup](/blog/langgraph-1-setup#your-backend-a-server-in-eight-lines), and [`astream_events`](https://docs.langchain.com/oss/python/langgraph/streaming) is already inside the LangGraph you installed. This part is all wiring, split evenly between the backend and the browser.
@@ -29,7 +29,7 @@ Nothing new to install today. [`StreamingResponse`](https://fastapi.tiangolo.com
 
 Here's the uncomfortable truth about the [Part 4 version](/blog/langgraph-4-nextjs-frontend#give-it-a-pulse-and-a-safety-net): the model was never the slow part. A small model writes that recursion answer in about three seconds whether you stream it or not. Streaming doesn't make the model faster. It makes the *wait* feel different.
 
-When the whole reply lands at once, you stare at a spinner for three seconds and read for one. When it streams, the first word shows up in a blink and you read along while the rest arrives. Same three seconds of work. Completely different experience.
+When the whole reply lands at once, you stare at three bouncing dots for three seconds and read for one. When it streams, the first word shows up in a blink and you read along while the rest arrives. Same three seconds of work. Completely different experience.
 
 <Figure
   src="/images/series/langgraph/part-5/fig-blocking-vs-streaming-light.svg"
@@ -99,7 +99,7 @@ async def token_stream(message: str):
 `graph.invoke` is a closed door: you knock, you wait, it opens with the finished answer. `graph.astream_events` is a glass door. It reports everything the graph does as it does it, as a stream of typed events, and `on_chat_model_stream` is the one that means "the model just produced another token." The same firehose carries tool events too, which is exactly why [Part 6 plugs into it](/blog/langgraph-6-tools#new-events-on-the-same-belt) without rebuilding anything. The `version="v2"` argument just pins the event format so a library update can't quietly change the shape on you.
 </Callout>
 
-Now the endpoint. It stops returning a single object and starts returning a stream, so the `-> ChatResponse` annotation comes off and `StreamingResponse` takes over. Replace your old `/chat`:
+Now the endpoint. It stops returning a single object and starts returning a stream, so the `-> ChatResponse` annotation comes off and `StreamingResponse` takes over. That leaves `class ChatResponse` with nothing to describe; it's harmless sitting there, so leave it where it is. Replace your old `/chat`:
 
 ```python filename="backend/app/main.py" repo="part-05-streaming/backend/app/main.py" lines="48-53"
 @app.post("/chat")
@@ -123,7 +123,7 @@ curl -N -X POST http://localhost:8000/chat \
 <Figure
   src="/images/series/langgraph/part-5/term-curl-stream.svg"
   alt="A dark terminal running curl with the -N flag against localhost:8000/chat. After a comment noting that -N turns off curl's buffering, the output is a run of lines: data: {'type': 'token', 'content': 'Recursion'}, then 'is', 'when', 'a', 'function', 'calls', 'itself.', each on its own data line, and finally data: {'type': 'done'}."
-  caption="The raw stream, before any browser touches it. The -N flag turns off curl's own buffering so each line prints the instant it lands. Each line is one envelope; the blank line between them is the part that matters next."
+  caption="The raw stream, before any browser touches it. The -N flag turns off curl's own buffering so each line prints the instant it lands. Each line is one envelope; the blank line the server sends between them is the part that matters next."
   width={1000}
   height={560}
 />
@@ -143,7 +143,7 @@ setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
 
 Start with a small helper that grows the last message. Add it inside the component, next to `sendMessage`:
 
-```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="27-34"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx"
 function appendToken(token: string) {
   setMessages((prev) => {
     const next = [...prev];
@@ -158,7 +158,7 @@ It's the same immutability rule from [Part 4](/blog/langgraph-4-nextjs-frontend#
 
 Next, when the user sends, add both the user's message and an empty assistant bubble in one shot. That empty bubble is the thing `appendToken` will fill:
 
-```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="45-49"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx"
 setMessages((prev) => [
   ...prev,
   { role: "user", content: text },
@@ -195,7 +195,7 @@ Save, send a message, and open your browser's dev tools console. Instead of a sm
 
 <Figure
   src="/images/series/langgraph/part-5/console-json-error.svg"
-  alt="A dark browser dev tools Console tab. A console.log shows a chunk reading 'data: {type: token, content:  fun' that ends mid-word with no closing brace. Below it, a red error: Uncaught (in promise) SyntaxError: Unexpected end of JSON input, with a stack trace pointing at sendMessage in page.tsx line 46. A comment notes that JSON.parse got half a parcel because the chunk ended mid-envelope."
+  alt="A dark browser dev tools Console tab. The first line is a console.log(chunk) call, and under it the chunk it printed: a data: line whose JSON breaks off at 'content:  fun' with no closing brace. Below that, a red error: Uncaught (in promise) SyntaxError: Unexpected end of JSON input, with a stack trace pointing at sendMessage in page.tsx line 46. A comment notes that JSON.parse got half a parcel because the chunk ended mid-envelope."
   caption="The error you will hit, met on purpose. A read handed you half a parcel, the JSON ended mid-object, and parse choked on the brace that never came."
   width={1000}
   height={430}
@@ -205,7 +205,7 @@ Read it like the errors from [Part 3](/blog/langgraph-3-first-graph#hand-the-con
 
 This is why you put a blank line after every envelope. The `\n\n` is a fence between messages, and the fix is to respect the fence: pile every chunk into a buffer, cut it on `\n\n`, handle the complete pieces, and keep the unfinished tail for next time.
 
-```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="66-74,76-81"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx"
 const reader = res.body.getReader();
 const decoder = new TextDecoder();
 let buffer = "";
@@ -231,7 +231,7 @@ Save and send. The reply crawls across the screen, word by word, exactly like th
 <Figure
   src="/images/series/langgraph/part-5/fig-stream-pipeline-light.svg"
   srcDark="/images/series/langgraph/part-5/fig-stream-pipeline-dark.svg"
-  alt="A pipeline diagram, left to right. On the left, a box labeled THE MODEL runs astream_events and emits an on_chat_model_stream event per word. In the middle, ONE BELT labeled text/event-stream carries four labeled envelopes reading 'Re', 'cursion', 'is', 'when', with a backslash-n-backslash-n marker between each. On the right, a box labeled THE BROWSER runs body.getReader, cuts on the blank line, and a chat bubble reads 'Recursion is when' with a cursor. A caption says the model plates each word, the belt carries it, the bubble grows a word at a time."
+  alt="A pipeline diagram, left to right. On the left, a box labeled THE MODEL runs astream_events and emits an on_chat_model_stream event per word. In the middle, ONE BELT labeled text/event-stream carries four labeled envelopes reading 'Re', 'cursion', 'is', 'when', with a backslash-n-backslash-n marker between each. On the right, a box labeled THE BROWSER runs body.getReader, cuts on the blank line, and a chat bubble reads 'Recursion is when' with a caret. A caption says the model plates each word, the belt carries it, the bubble grows a word at a time."
   caption="The whole pipeline. The model plates a word, the belt carries one labeled envelope, the reader cuts on the blank line and grows the bubble. Hold this picture; [Part 6](/blog/langgraph-6-tools#new-events-on-the-same-belt) reuses every piece of it."
   width={1240}
   height={600}
@@ -256,7 +256,7 @@ Streaming opens a new problem. A long answer might run for fifteen seconds, and 
 
 The browser's tool for canceling an in-flight `fetch` is an [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController). You make one per request, hand its `signal` to `fetch`, and calling `.abort()` tears the connection down. Add a piece of state to hold the current controller, and a `stop` function:
 
-```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="20,36-38"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx"
 const [controller, setController] = useState<AbortController | null>(null);
 
 function stop() {
@@ -266,7 +266,7 @@ function stop() {
 
 In `sendMessage`, create a controller before the fetch, pass its signal, and remember it so `stop` can reach it:
 
-```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="54-55,58-61,63"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx"
 const controller = new AbortController();
 setController(controller);
 
@@ -280,7 +280,7 @@ const res = await fetch(`${API_BASE}/chat`, {
 
 When you abort, `fetch` throws an `AbortError`. That's not a real failure, so your `catch` should ignore it instead of flashing the red "could not reach the backend" banner from [Part 4](/blog/langgraph-4-nextjs-frontend#give-it-a-pulse-and-a-safety-net). Adjust the `catch` and `finally`:
 
-```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="82-89"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx"
 } catch (err) {
   if ((err as Error).name !== "AbortError") {
     setError("Could not reach the backend. Is it running on :8000?");
@@ -293,15 +293,26 @@ When you abort, `fetch` throws an `AbortError`. That's not a real failure, so yo
 
 Last, swap the footer button while a reply is streaming. Send becomes Stop:
 
-```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="123-129"
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx"
 {loading ? (
-  <Button type="button" variant="outline" onClick={stop}>
-    Stop
+  <Button type="button" variant="outline" onClick={stop} aria-label="Stop response" className="h-11 rounded-xl px-4">
+    <Square className="size-3.5 fill-current" aria-hidden="true" />
+    <span className="hidden sm:inline">Stop</span>
   </Button>
 ) : (
-  <Button type="submit">Send</Button>
+  <Button
+    type="submit"
+    aria-label="Send message"
+    disabled={!input.trim()}
+    className="h-11 rounded-xl px-4 shadow-md shadow-primary/20"
+  >
+    <span className="hidden sm:inline">Send</span>
+    <Send className="size-4" aria-hidden="true" />
+  </Button>
 )}
 ```
+
+The Send branch is the button from Part 4 with one clause deleted: `disabled` used to read `loading || !input.trim()`, and now it's only `!input.trim()`. It doesn't need the `loading` half any more, because while a reply is in flight this branch isn't on screen at all; the Stop button is. Both buttons keep the same `h-11 rounded-xl` shape so the footer doesn't twitch when they swap, and both label themselves for screen readers while hiding the word on narrow screens, leaving the filled square and the paper plane to speak for themselves.
 
 <Callout type="info" title="Why bother with AbortController?">
 Think of it as a remote with one button. You hold the remote (`controller`), hand its `signal` to `fetch`, and pressing the button (`controller.abort()`) tells `fetch` to give up. Without it, hitting Stop would hide the activity in the UI, but the model would keep generating on the server and you'd keep paying for tokens nobody will ever read. The abort actually closes the connection, and the backend notices.
@@ -310,61 +321,107 @@ Think of it as a remote with one button. You hold the remote (`controller`), han
 <Figure
   src="/images/series/langgraph/part-5/browser-chat-stop-light.svg"
   srcDark="/images/series/langgraph/part-5/browser-chat-stop-dark.svg"
-  alt="The chat card at localhost:3000. The user asked 'Explain recursion in one sentence.' and the assistant bubble is mid-stream, reading 'Recursion is when a function solves a problem by calling itself on a smaller' with a blinking cursor at the end. The footer button now reads 'Stop' as an outline button instead of the filled 'Send'."
+  alt="The chat card at localhost:3000, its header pill now reading 'Streaming enabled'. The user asked 'Explain recursion in one sentence.' and the assistant bubble is mid-stream, reading 'Recursion is when a function solves a problem by calling itself on a smaller' with a thin violet caret bar after the last word. In the footer, the filled Send button has been replaced by an outline button showing a small square and the word 'Stop'."
   caption="Mid-stream, Send becomes Stop. One click aborts the fetch, the words stop, and you stop paying for an answer you don't want."
-  width={1120}
-  height={462}
+  width={1200}
+  height={720}
 />
 
 Watch the backend terminal while you do it. The instant you hit Stop, Uvicorn notices the client went away and the `async for` loop stops pulling tokens from the model. You didn't just hide the reply; you genuinely called it off.
 
-## Give it a cursor and a self-scroll
+## Give it a caret and a self-scroll
 
-Two small touches separate "it works" from "it feels alive." First, that blinking cursor you saw in every screenshot. It's the honest version of [Part 4's "Thinking..." line](/blog/langgraph-4-nextjs-frontend#give-it-a-pulse-and-a-safety-net): delete that line, because the answer writing itself is a better indicator than any spinner, and add a cursor to the streaming bubble instead. Inside your `messages.map`, render it on the last assistant bubble while `loading` is true:
+Two small touches separate "it works" from "it feels alive." First, that thin blinking bar trailing the text in every screenshot. It replaces [Part 4's three-dot waiting state](/blog/langgraph-4-nextjs-frontend#give-it-a-pulse-and-a-safety-net): once the answer is writing itself, the growing message is a better indicator than a separate loader.
 
-```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="102-106"
-<span className={/* the bubble classes from Part 4 */}>
-  {m.content}
-  {loading && m.role === "assistant" && i === messages.length - 1 && (
-    <span className="ml-0.5 animate-pulse">▍</span>
-  )}
-</span>
+Your `ChatBubble` from Part 4 learns one new prop, `streaming`, and draws the caret after the text when it's true:
+
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx"
+function ChatBubble({ message, streaming }: { message: Message; streaming: boolean }) {
+  // ...avatar and role label unchanged, down to the bubble itself...
+  <div
+    className={
+      isUser
+        ? "rounded-[1.35rem] rounded-br-md bg-primary px-4 py-3 text-sm leading-6 text-primary-foreground shadow-lg shadow-primary/15"
+        : "min-h-12 rounded-[1.35rem] rounded-bl-md border bg-card px-4 py-3 text-sm leading-6 shadow-sm"
+    }
+  >
+    {message.content}
+    {streaming ? (
+      <span className="ml-1 inline-block h-4 w-0.5 animate-pulse rounded-full bg-primary align-middle" aria-hidden="true" />
+    ) : null}
+  </div>
+  // ...rest of the component unchanged...
+}
 ```
 
-Second, auto-scroll. As the bubble grows past the bottom of the window, the newest words slide out of view and the reader has to chase them. Fix it by keeping an empty marker pinned to the bottom of the list and scrolling to it whenever the messages change. This needs a `useRef`:
+The caret is an empty `<span>`, not a character: `h-4 w-0.5` makes it a hairline bar, `bg-primary` paints it in the accent color, `animate-pulse` blinks it, and `aria-hidden` keeps a screen reader from announcing a decoration. The other new class is the `min-h-12` on the assistant branch. Without it, a bubble holding nothing but a caret collapses to a sliver for the split second before the first token lands, and you watch the layout jump.
 
-```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="21-25"
-const bottomRef = useRef<HTMLDivElement>(null);
+Now tell the bubble when to blink. Exactly one message in the list qualifies: the last one, when it's the assistant's, while `loading` is still true.
 
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx"
+{messages.map((message, index) => (
+  <ChatBubble
+    key={`${message.role}-${index}`}
+    message={message}
+    streaming={loading && message.role === "assistant" && index === messages.length - 1}
+  />
+))}
+```
+
+Which leaves the thinking bubble with nothing to do. A message that writes itself says everything three bouncing dots used to say, so take the dots out in three edits: delete the `ThinkingBubble` function, delete the `{loading ? <ThinkingBubble /> : null}` line from the message list, and loosen the empty-state guard from `{messages.length === 0 && !loading ? (` back to `{messages.length === 0 ? (`. That guard existed because `loading` used to go true while the message list was still empty; now `sendMessage` pushes the empty assistant bubble in the same `setMessages` call as your question, so the list is never empty while a reply is in flight. Leave the `.typing-dot` keyframes in `globals.css`. Nothing references them any more, and unused CSS isn't worth a trip to the stylesheet.
+
+Second, auto-scroll. Part 4 already built this: a `bottomRef`, an empty marker div sitting after the `.map(...)`, and a `useEffect` that calls `scrollIntoView` so new words don't slide past the bottom of the message list while you read. Streaming needs one thing changed, in the dependency array:
+
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx"
 useEffect(() => {
   bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-}, [messages]);
+}, [messages]);            // Part 4 had [messages, loading]
 ```
 
-Then drop the marker at the very end of the scrolling messages `<div>`, just after the `.map(...)`:
-
-```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="109"
-<div ref={bottomRef} />
-```
+`loading` was in that array because the thinking bubble appearing and vanishing changed the height of the list. There's no thinking bubble now, and every token rewrites `messages`, so the effect fires dozens of times per reply on its own. The list follows the text down without being asked.
 
 <Callout type="info" title="What's useRef?">
 `useState` is for values the screen should react to. `useRef` is for values it shouldn't. `useRef(null)` hands you a small box with a `.current` property that survives re-renders but never triggers one. Point it at a DOM node, like that empty marker div, and React fills `.current` with the real element, so you can call browser methods on it directly. Here that's `scrollIntoView`, which nudges the page down to keep the latest word in sight.
 </Callout>
 
-Remember to widen your React import for the two new hooks:
+Two import lines, and only one new name in either of them. The React hooks all arrived in Part 4; the single thing this part adds to the top of the file is the `Square` icon for the Stop button. Check yours match:
 
-```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx" lines="3"
-import { useState, useRef, useEffect, type FormEvent } from "react";
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx"
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Bot, CircleAlert, Send, Sparkles, Square, UserRound } from "lucide-react";
 ```
 
-Send one more message and watch it land: the cursor blinks at the empty bubble, words stream in to fill it, the window scrolls itself to follow, and the cursor vanishes when the `done` envelope arrives and `loading` flips off. That's a real chat app.
+Send one more message and watch it land: the caret blinks in the empty bubble, words stream in to fill it, the list scrolls itself to follow, and the caret disappears the moment the stream closes and `loading` flips off in the `finally`. Note what does *not* end it: your reader loop never looks at the `done` envelope at all. It filters for `type === "token"` and lets `done` sail past. The connection closing is the signal.
+
+## Make the chrome tell the truth
+
+One pass left, and it's all copy. The card still introduces itself the way it did back when it made you wait: the header pill claims a "Local workspace", the empty state offers to "figure out" something together, and the footer says answers "are generated by" your workflow. Six strings, and the app starts describing what it actually does:
+
+```tsx filename="frontend/app/page.tsx" repo="part-05-streaming/frontend/app/page.tsx"
+// EmptyState: the eyebrow, the headline, the line under it
+<p className="...">Streaming is on</p>
+<h1 className="...">Read the answer as it is written.</h1>
+<p className="...">
+  Lattice streams each token from your LangGraph workflow, so every response feels immediate.
+</p>
+
+// The header pill, wide screens then narrow
+<span className="hidden sm:inline">Streaming enabled</span>
+<span className="sm:hidden">Live</span>
+
+// The line under the composer
+<p className="...">Responses stream from your local LangGraph workflow.</p>
+```
+
+No logic, no risk, thirty seconds of typing. It's also the difference between an app and a demo of an app: every figure in this part shows the new strings, and yours should too.
 
 Right now you have: a backend that streams a model's reply token by token over SSE, a frontend that reads that stream through a buffer that never trips on a chunk boundary, a Stop button that genuinely cancels the work, and a UI that scrolls and blinks like the apps you use every day. Here's the full `page.tsx`, in case a piece drifted while you built it up:
 
 ```tsx filename="frontend/app/page.tsx" collapsed repo="part-05-streaming/frontend/app/page.tsx"
 "use client";
 
-import { useState, useRef, useEffect, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Bot, CircleAlert, Send, Sparkles, Square, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -375,6 +432,96 @@ interface Message {
 }
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+const STARTER_PROMPTS = [
+  "Explain recursion in one sentence",
+  "Give me a small Python project idea",
+  "What makes LangGraph useful?",
+];
+
+function Brand() {
+  return (
+    <div className="flex min-w-0 items-center gap-3">
+      <div className="grid size-10 shrink-0 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+        <Sparkles className="size-5" aria-hidden="true" />
+      </div>
+      <div className="min-w-0">
+        <p className="truncate text-base font-semibold tracking-tight">Lattice</p>
+        <p className="truncate text-xs text-muted-foreground">A LangGraph assistant</p>
+      </div>
+    </div>
+  );
+}
+
+function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
+  return (
+    <div className="mx-auto flex h-full w-full max-w-2xl flex-col items-center justify-center px-2 py-10 text-center">
+      <div className="relative mb-6">
+        <div className="absolute inset-0 scale-150 rounded-full bg-primary/15 blur-2xl" />
+        <div className="relative grid size-16 place-items-center rounded-3xl border border-primary/20 bg-card shadow-xl shadow-primary/10">
+          <Bot className="size-7 text-primary" aria-hidden="true" />
+        </div>
+      </div>
+      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-primary">
+        Streaming is on
+      </p>
+      <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+        Read the answer as it is written.
+      </h1>
+      <p className="mt-3 max-w-lg text-pretty text-sm leading-6 text-muted-foreground sm:text-base">
+        Lattice streams each token from your LangGraph workflow, so every response feels immediate.
+      </p>
+      <div className="mt-8 grid w-full gap-2 sm:grid-cols-3">
+        {STARTER_PROMPTS.map((prompt) => (
+          <button
+            key={prompt}
+            type="button"
+            onClick={() => onPick(prompt)}
+            className="rounded-2xl border bg-card/70 px-4 py-3 text-left text-sm leading-5 text-foreground shadow-sm transition hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {prompt}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ChatBubble({ message, streaming }: { message: Message; streaming: boolean }) {
+  const isUser = message.role === "user";
+
+  return (
+    <article className={`flex items-end gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
+      {!isUser ? (
+        <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+          <Bot className="size-4" aria-hidden="true" />
+        </div>
+      ) : null}
+      <div className={`flex max-w-[82%] flex-col sm:max-w-[72%] ${isUser ? "items-end" : "items-start"}`}>
+        <p className={`mb-1.5 px-1 text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground ${isUser ? "text-right" : "text-left"}`}>
+          {isUser ? "You" : "Lattice"}
+        </p>
+        <div
+          className={
+            isUser
+              ? "rounded-[1.35rem] rounded-br-md bg-primary px-4 py-3 text-sm leading-6 text-primary-foreground shadow-lg shadow-primary/15"
+              : "min-h-12 rounded-[1.35rem] rounded-bl-md border bg-card px-4 py-3 text-sm leading-6 shadow-sm"
+          }
+        >
+          {message.content}
+          {streaming ? (
+            <span className="ml-1 inline-block h-4 w-0.5 animate-pulse rounded-full bg-primary align-middle" aria-hidden="true" />
+          ) : null}
+        </div>
+      </div>
+      {isUser ? (
+        <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-secondary text-secondary-foreground">
+          <UserRound className="size-4" aria-hidden="true" />
+        </div>
+      ) : null}
+    </article>
+  );
+}
 
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -454,44 +601,86 @@ export default function Chat() {
   }
 
   return (
-    <main className="mx-auto flex h-dvh max-w-2xl flex-col p-4">
-      <Card className="flex flex-1 flex-col overflow-hidden">
-        <div className="border-b px-5 py-4 font-semibold">Chatbot</div>
-        <div className="flex-1 space-y-4 overflow-y-auto p-5">
-          {messages.map((m, i) => (
-            <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
-              <span className={`inline-block max-w-[75%] rounded-2xl px-4 py-2 ${
-                m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-              }`}>
-                {m.content}
-                {loading && m.role === "assistant" && i === messages.length - 1 && (
-                  <span className="ml-0.5 animate-pulse">▍</span>
-                )}
-              </span>
-            </div>
-          ))}
-          <div ref={bottomRef} />
-        </div>
-        {error && (
-          <p className="mx-5 mb-2 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">
-            {error}
-          </p>
-        )}
-        <form onSubmit={sendMessage} className="flex gap-2 border-t p-4">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask me anything..."
-            disabled={loading}
-          />
-          {loading ? (
-            <Button type="button" variant="outline" onClick={stop}>
-              Stop
-            </Button>
+    <main className="relative min-h-dvh overflow-hidden p-3 sm:p-5 lg:p-7">
+      <Card className="relative mx-auto flex h-[calc(100dvh-1.5rem)] min-h-[34rem] max-w-6xl flex-col gap-0 overflow-hidden rounded-[1.75rem] border-foreground/10 bg-card/95 py-0 shadow-2xl shadow-slate-950/10 ring-1 ring-foreground/10 backdrop-blur-xl sm:h-[calc(100dvh-2.5rem)] lg:h-[calc(100dvh-3.5rem)]">
+        <header className="flex h-20 shrink-0 items-center justify-between border-b px-4 sm:px-7">
+          <Brand />
+          <div className="flex items-center gap-2 rounded-full border bg-background/70 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm">
+            <span className="size-2 rounded-full bg-emerald-500 ring-4 ring-emerald-500/15" />
+            <span className="hidden sm:inline">Streaming enabled</span>
+            <span className="sm:hidden">Live</span>
+          </div>
+        </header>
+
+        <div
+          className="chat-scrollbar flex-1 overflow-y-auto px-4 py-5 sm:px-7 sm:py-7"
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions text"
+        >
+          {messages.length === 0 ? (
+            <EmptyState onPick={setInput} />
           ) : (
-            <Button type="submit">Send</Button>
+            <div className="mx-auto w-full max-w-3xl space-y-6">
+              {messages.map((message, index) => (
+                <ChatBubble
+                  key={`${message.role}-${index}`}
+                  message={message}
+                  streaming={loading && message.role === "assistant" && index === messages.length - 1}
+                />
+              ))}
+              <div ref={bottomRef} />
+            </div>
           )}
-        </form>
+        </div>
+
+        <div className="shrink-0 border-t bg-card/80 p-3 sm:p-5">
+          {error ? (
+            <div
+              role="alert"
+              className="mx-auto mb-3 flex max-w-3xl items-start gap-2 rounded-xl border border-destructive/25 bg-destructive/10 px-3 py-2.5 text-sm text-destructive"
+            >
+              <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              <span>{error}</span>
+            </div>
+          ) : null}
+          <form
+            onSubmit={sendMessage}
+            className="mx-auto flex max-w-3xl items-center gap-2 rounded-2xl border bg-background/85 p-2 shadow-lg shadow-slate-950/5 transition focus-within:border-primary/45 focus-within:ring-4 focus-within:ring-primary/10"
+          >
+            <label htmlFor="chat-message" className="sr-only">
+              Message Lattice
+            </label>
+            <Input
+              id="chat-message"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Message Lattice…"
+              autoComplete="off"
+              disabled={loading}
+              className="h-11 flex-1 border-0 bg-transparent px-3 text-sm shadow-none focus-visible:ring-0"
+            />
+            {loading ? (
+              <Button type="button" variant="outline" onClick={stop} aria-label="Stop response" className="h-11 rounded-xl px-4">
+                <Square className="size-3.5 fill-current" aria-hidden="true" />
+                <span className="hidden sm:inline">Stop</span>
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                aria-label="Send message"
+                disabled={!input.trim()}
+                className="h-11 rounded-xl px-4 shadow-md shadow-primary/20"
+              >
+                <span className="hidden sm:inline">Send</span>
+                <Send className="size-4" aria-hidden="true" />
+              </Button>
+            )}
+          </form>
+          <p className="mt-2 text-center text-[11px] text-muted-foreground">
+            Responses stream from your local LangGraph workflow.
+          </p>
+        </div>
       </Card>
     </main>
   );
@@ -501,7 +690,7 @@ export default function Chat() {
 <DemoVideo
   src="/videos/langgraph/part-5-demo.mp4"
   poster="/videos/langgraph/part-5-poster.jpg"
-  caption="Tokens streaming into the assistant bubble behind the `▍` caret, with Send swapping to Stop mid-stream."
+  caption="Tokens streaming into the assistant bubble behind a blinking caret, with Send swapping to Stop mid-stream."
   label="Screen recording of Part 5: a reply streaming into the chat token by token with a caret, then completing"
 />
 
@@ -512,7 +701,7 @@ export default function Chat() {
     "A wire format you designed on purpose: `data: {type, content}` envelopes framed by a blank line, built to carry [Part 6's tool events](/blog/langgraph-6-tools#new-events-on-the-same-belt) without a parser rewrite.",
     "A frontend that reads a stream: `getReader()` plus a buffer that splits on `\\n\\n` and keeps the unfinished tail, so a chunk boundary never breaks `JSON.parse` again.",
     "The buffering bug met head-on: you know why parsing a raw chunk fails, and you know the blank-line fence is the fix.",
-    "A Stop button that truly cancels the work with an `AbortController`, plus a blinking cursor and auto-scroll that make the whole thing feel alive.",
+    "A Stop button that truly cancels the work with an `AbortController`, plus a blinking caret and auto-scroll that make the whole thing feel alive.",
   ]}
 />
 

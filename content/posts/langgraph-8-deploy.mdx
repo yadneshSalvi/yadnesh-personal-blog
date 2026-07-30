@@ -17,10 +17,10 @@ By the end of this page that's over. The frontend lives on [Vercel](https://verc
 <Figure
   src="/images/series/langgraph/part-8/browser-live-phone-light.svg"
   srcDark="/images/series/langgraph/part-8/browser-live-phone-dark.svg"
-  alt="A phone with a mobile browser open to your-app.vercel.app showing the chat app. The conversation reads: user 'My name is Alex.', assistant 'Nice to meet you, Alex.', user 'What's my name?', assistant 'Your name is Alex.' The bot is running live on a public URL, on a phone."
+  alt="A promo-style frame with the eyebrow LIVE ON VERCEL and the headline 'Your LangGraph assistant, ready on every screen.' beside a phone running Lattice. On the phone, the compact header shows the Lattice brand and a green Memory pill, a thread selector reads 'My name is Alex' next to a new-conversation button, and the conversation shows the user asking 'What's my name?' with Lattice replying 'Your name is Alex. I remembered it in this thread.'"
   caption="Today's destination. The same chat you built on localhost, now at a public address, on a device that has never seen your laptop."
-  width={760}
-  height={636}
+  width={1200}
+  height={720}
 />
 
 Two deployments, one quiet catch you'll meet at the end. Let's ship it.
@@ -208,10 +208,10 @@ Now go to Vercel, click **Add New Project**, and import that repo. One screen do
   alt="The Vercel 'Configure Project' screen at vercel.com/new, importing your-name/langgraph-tutorial from GitHub. Fields: Project Name 'langgraph-chatbot'; Framework Preset 'Next.js' (detected); Root Directory set to 'frontend' and highlighted in accent with a note 'the Next.js app lives here'; an Environment Variables row highlighted in accent with key NEXT_PUBLIC_API_BASE_URL and value https://your-app.fly.dev. A black Deploy button sits at the bottom."
   caption="The two settings that matter, both in accent: Root Directory pointed at frontend, and the backend's URL handed to the frontend as NEXT_PUBLIC_API_BASE_URL."
   width={1120}
-  height={714}
+  height={730}
 />
 
-Click **Deploy**, watch the build run, and in a minute Vercel hands you a `your-app.vercel.app` URL. Open it. The page loads, the chat UI is right there, and it looks perfect. Now type a message.
+Click **Deploy**, watch the build run, and in a minute Vercel hands you a `your-app.vercel.app` URL. Open it. The page loads, the empty state greets you with "Memory is ready" over "Start a conversation worth remembering." and its three starter prompts, and it all looks perfect. Now type a message.
 
 <Callout type="info" title="Why that env var had to be set before the build">
 `NEXT_PUBLIC_API_BASE_URL` isn't read when a visitor loads your site; its value is baked into the JavaScript bundle when Vercel runs `next build`. That's what the `NEXT_PUBLIC_` prefix means: build-time, stamped into the files, shipped to the browser. The practical catch: if you ever change this value, you have to redeploy for it to take effect, because rebuilding is the only thing that re-stamps it. A runtime variable like the backend's `FRONTEND_ORIGIN` is read fresh every time the process starts; a build-time variable is frozen into the bundle. Knowing which is which saves an afternoon.
@@ -250,10 +250,10 @@ Pull out your phone, leave your home Wi-Fi if you want, and open the `vercel.app
 <Figure
   src="/images/series/langgraph/part-8/browser-live-phone-light.svg"
   srcDark="/images/series/langgraph/part-8/browser-live-phone-dark.svg"
-  alt="A phone with a mobile browser open to your-app.vercel.app showing the chat app working. The conversation reads: user 'My name is Alex.', assistant 'Nice to meet you, Alex.', user 'What's my name?', assistant 'Your name is Alex.' The bot remembers across turns, live, on a phone."
+  alt="A promo-style frame with the eyebrow LIVE ON VERCEL and the headline 'Your LangGraph assistant, ready on every screen.' beside a phone running Lattice. On the phone, the compact header shows the Lattice brand and a green Memory pill, a thread selector reads 'My name is Alex' next to a new-conversation button, and the conversation shows the user asking 'What's my name?' with Lattice replying 'Your name is Alex. I remembered it in this thread.'"
   caption="The payoff, and the same shot from the top of the page, now real. Streaming, tools, memory, all of it, served from two clouds to a phone on the couch."
-  width={760}
-  height={636}
+  width={1200}
+  height={720}
 />
 
 That's the build. Eight parts ago you had a laptop and a blank folder; now you have an AI chatbot, on the internet, that streams and remembers and reaches for tools, and a link you can hand to anyone. Take the win. There's one honest footnote left, and it's the best teacher in the whole series.
@@ -271,13 +271,13 @@ Now open your live site and ask the question you've asked all part: "What's my n
 <Figure
   src="/images/series/langgraph/part-8/browser-forgot-light.svg"
   srcDark="/images/series/langgraph/part-8/browser-forgot-dark.svg"
-  alt="The live chat at your-app.vercel.app after a redeploy. The conversation reads: user 'My name is Alex.', assistant 'Nice to meet you, Alex.', user 'What's my name?', assistant 'I have no idea, you never told me.' The bot has forgotten the name it knew a moment ago, because the redeploy started a fresh machine and wiped the in-memory state."
+  alt="The live Lattice assistant at your-app.vercel.app after a redeploy, and everything still looks healthy. The sidebar still lists the saved conversations with 'My name is Alex' selected, a card reads 'Thread memory, stored by LangGraph', and the header 'Active conversation' still carries the green 'Memory active' pill. But the user asks 'What's my name?' and Lattice replies 'I don't know your name yet. You haven't told me in this conversation.', because the fresh machine lost the in-memory thread state."
   caption="Gone. The redeploy started a brand-new machine with empty RAM, and every conversation went with the old one. This is [Part 7's caveat](/blog/langgraph-7-memory#the-catch-hiding-in-inmemorysaver), made visceral."
-  width={1120}
-  height={462}
+  width={1200}
+  height={720}
 />
 
-Blank. Not a bug; the whole truth of `InMemorySaver` in one moment. `fly deploy` doesn't restart your old machine, it builds and boots a *fresh* one, and a fresh machine has empty RAM. Every notebook in that dict went out with the old machine. The [goldfish bowl from Part 7](/blog/langgraph-7-memory#the-catch-hiding-in-inmemorysaver), the one labeled PROD, just tipped over in production exactly as promised.
+It doesn't know you. Not a bug; the whole truth of `InMemorySaver` in one moment. `fly deploy` doesn't restart your old machine, it builds and boots a *fresh* one, and a fresh machine has empty RAM. Every notebook in that dict went out with the old machine. The [goldfish bowl from Part 7](/blog/langgraph-7-memory#the-catch-hiding-in-inmemorysaver), the one labeled PROD, just tipped over in production exactly as promised.
 
 {/* comic prompt (gpt-image-2, --ref public/vibecoding.png, 1536x1024, quality high):
 Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 2-panel comic, panels side by side with a thin vertical black divider, about redeploying a chatbot to the cloud and it forgetting everyone because its memory lived only in RAM. The same small friendly white robot chatbot in both panels: rounded boxy body, simple smiling screen face, two little antennas. A small round glass goldfish bowl with one orange goldfish, with a small rectangular paper label reading "PROD" on its front, sits on top of a short stack of cloud servers in both panels. Panel 1: Yad sits at a laptop and presses a big round on-screen button labeled "DEPLOY"; a tiny rocket lifts off above the laptop; Yad looks hopeful and pleased. Panel 2: a moment later the small white robot turns to Yad with a bright, blank, polite stranger's smile and waves hello; the robot's speech bubble reads "NICE TO MEET YOU!" Yad slumps with a flat, exasperated expression, one palm raised; Yad's speech bubble reads "WE'VE MET 47 TIMES." The goldfish in the PROD bowl swims in an oblivious little circle. */}

@@ -8,7 +8,7 @@
   <text x="304" y="29" font-size="14" fill="#756d62">Sources</text>
   <line x1="0" y1="44" x2="1000" y2="44" stroke="#000000" stroke-opacity="0.25" stroke-width="1.5"/>
   <g font-size="15" xml:space="preserve">
-    <text x="28" y="96" fill="#756d62">&#8250; console.log(text)</text>
+    <text x="28" y="96" fill="#756d62">&#8250; console.log(chunk)</text>
     <text x="28" y="132" fill="#d8d2c6">  data: {"type": "token", "content": " fun</text>
     <text x="28" y="180" fill="#e5825a">&#9888;  Uncaught (in promise) SyntaxError:</text>
     <text x="56" y="210" fill="#e5825a">Unexpected end of JSON input</text>

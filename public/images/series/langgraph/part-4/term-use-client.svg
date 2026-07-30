@@ -10,12 +10,12 @@
     <text x="32" y="124"><tspan fill="#6fa8dc">&#9650; Next.js 16.2.9</tspan> (Turbopack)</text>
     <text x="32" y="152" fill="#756d62">- Local:   http://localhost:3000</text>
     <text x="32" y="188"><tspan fill="#8fb573">&#10003; Ready</tspan> in 1180ms</text>
-    <text x="32" y="220"><tspan fill="#e5825a">&#10799;</tspan> ./app/page.tsx:4:34</text>
+    <text x="32" y="220"><tspan fill="#e5825a">&#10799;</tspan> ./app/page.tsx:9:35</text>
     <text x="32" y="252">You're importing a component that needs <tspan fill="#e5825a">useState</tspan>. This</text>
     <text x="32" y="280">React hook only works in a Client Component. To fix,</text>
     <text x="32" y="308">mark the file (or its parent) with the <tspan fill="#8fb573">"use client"</tspan></text>
     <text x="32" y="336">directive.</text>
-    <text x="32" y="384" fill="#756d62">  3 | export default function Chat() {</text>
-    <text x="32" y="412" fill="#756d62">&gt; 4 |   const [messages, setMessages] = <tspan fill="#e5825a">useState</tspan>&lt;Message[]&gt;([]);</text>
+    <text x="32" y="384" fill="#756d62">  8 | export default function Chat() {</text>
+    <text x="32" y="412" fill="#756d62">&gt; 9 |   const [messages, setMessages] = <tspan fill="#e5825a">useState</tspan>&lt;Message[]&gt;([]);</text>
   </g>
 </svg>

@@ -6,7 +6,7 @@
 
 What changed since Part 3 (the backend didn't change by a single line):
 
-- `frontend/app/page.tsx` — the whole chat UI: message bubbles, a controlled input, one `fetch` to `POST /chat`, a "Thinking..." indicator, and an honest error banner
+- `frontend/app/page.tsx` — the whole chat UI: avatar message bubbles, starter prompts, a controlled input, one `fetch` to `POST /chat`, an animated typing indicator, and an honest error banner
 - shadcn/ui installed: `components/ui/button.tsx`, `input.tsx`, `card.tsx` (copied into the project, yours to edit)
 
 ## Run it

@@ -7,7 +7,7 @@
   <text x="520" y="30" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="15" fill="#756d62" text-anchor="middle" letter-spacing="1">terminal &#183; backend</text>
   <g font-size="14.5" fill="#d8d2c6" xml:space="preserve">
     <text x="32" y="92" fill="#756d62"># you added the checkpointer, then sent a message</text>
-    <text x="32" y="128" fill="#756d62">  File ".../app/main.py", line 28, in token_stream</text>
+    <text x="32" y="128" fill="#756d62">  File ".../app/main.py", line 40, in token_stream</text>
     <text x="56" y="156" fill="#d8d2c6">async for event in graph.astream_events(inputs, version="v2"):</text>
     <text x="32" y="184" fill="#756d62">  File ".../langgraph/pregel/__init__.py", in astream</text>
     <text x="32" y="212" fill="#756d62">  File ".../langgraph/pregel/_checkpoint.py", in _checkpoint</text>

@@ -1,35 +1,64 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="586" viewBox="0 0 1180 586" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
-  <rect width="1180" height="586" fill="#f5f5f4"/>
-  <rect x="0" y="0" width="1180" height="64" fill="#f3f1ec"/>
-  <line x1="0" y1="64" x2="1180" y2="64" stroke="#e2ded4" stroke-width="1.5"/>
-  <circle cx="32" cy="32" r="8" fill="#d6d1c5"/><circle cx="60" cy="32" r="8" fill="#d6d1c5"/><circle cx="88" cy="32" r="8" fill="#d6d1c5"/>
-  <rect x="330" y="14" width="520" height="36" rx="18" fill="#ffffff" stroke="#e2ded4"/>
-  <text x="590" y="38" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="17" fill="#5b554c" text-anchor="middle">localhost:3000</text>
-  <rect x="62" y="98" width="1056" height="454" rx="16" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
-  <rect x="62" y="98" width="256" height="454" rx="16" fill="#fbfaf8"/>
-  <rect x="317" y="98" width="1.5" height="454" fill="#eceae8"/>
-  <text x="86" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="1" fill="#78716c">CHATS</text>
-  <rect x="188" y="114" width="112" height="34" rx="9" fill="none" stroke="#e7e5e4" stroke-width="1.5"/>
-  <text x="244" y="136" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#78716c" text-anchor="middle">+ New chat</text>
-  <rect x="74" y="182" width="232" height="44" rx="9" fill="#f1ece9"/>
-  <rect x="74" y="190" width="3" height="28" rx="1.5" fill="#b3441a"/>
-  <text x="90" y="210" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#b3441a" font-weight="600">My name is Alex...</text>
-  <text x="90" y="262" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#78716c" font-weight="400">Explain recursion</text>
-  <text x="90" y="314" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#78716c" font-weight="400">23 × 17 and Tokyo</text>
-  <text x="346" y="139" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#1c1917">Chatbot</text>
-  <line x1="318" y1="164" x2="1118" y2="164" stroke="#eceae8" stroke-width="1.5"/>
-  
-  <rect x="918" y="190" width="172" height="47" rx="16" fill="#1c1917"/>
-  <text x="936" y="219" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#fafaf9">My name is Alex.</text>
-  <rect x="346" y="253" width="232" height="47" rx="16" fill="#f5f5f4"/>
-  <text x="364" y="282" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1c1917">Nice to meet you, Alex.</text>
-  <rect x="926" y="316" width="164" height="47" rx="16" fill="#1c1917"/>
-  <text x="944" y="345" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#fafaf9">What's my name?</text>
-  <rect x="346" y="379" width="189" height="47" rx="16" fill="#f5f5f4"/>
-  <text x="364" y="408" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#1c1917">Your name is Alex.</text>
-  <line x1="318" y1="464" x2="1118" y2="464" stroke="#eceae8" stroke-width="1.5"/>
-  <rect x="342" y="488" width="660" height="44" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
-  <text x="360" y="516" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#a8a29e">Ask me anything...</text>
-  <rect x="1018" y="488" width="76" height="44" rx="10" fill="#1c1917"/>
-  <text x="1056" y="516" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#fafaf9" text-anchor="middle">Send</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Lattice conversation history</title>
+  <desc id="desc">A polished sidebar lists saved LangGraph threads and highlights the active conversation.</desc>
+  <rect width="1200" height="720" fill="#eef2ff"/>
+  <circle cx="105" cy="95" r="210" fill="#6458dc" opacity=".08"/><circle cx="1110" cy="680" r="250" fill="#17a673" opacity=".06"/>
+
+    <rect x="36" y="28" width="1128" height="664" rx="26" fill="#ffffff" stroke="#d6dceb" stroke-width="2"/>
+    <path d="M36 54c0-14.4 11.6-26 26-26h1076c14.4 0 26 11.6 26 26v42H36V54Z" fill="#e7eaf2"/>
+    <circle cx="64" cy="62" r="6" fill="#ff635f"/><circle cx="84" cy="62" r="6" fill="#f5be3d"/><circle cx="104" cy="62" r="6" fill="#35c94a"/>
+    <rect x="142" y="45" width="500" height="34" rx="10" fill="#f8faff" stroke="#d6dceb"/>
+    <circle cx="162" cy="62" r="4" fill="#17a673"/>
+    <text x="176" y="67" fill="#68748b" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">localhost:3000</text>
+  <rect x="52" y="96" width="1096" height="580" fill="#ffffff"/>
+
+    <rect x="52" y="96" width="246" height="580" fill="#f1f4fb"/>
+
+    <rect x="74" y="118" width="32" height="32" rx="12" fill="#6458dc"/>
+    <path d="M 82.96000000000001 134h14.08M90 126.96000000000001v14.08M85.2 129.2l9.6 9.6M94.8 129.2l-9.6 9.6" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>
+    <text x="118" y="132" fill="#172036" font-family="Inter, -apple-system, sans-serif" font-size="14" font-weight="700">Lattice</text>
+    <text x="118" y="147" fill="#68748b" font-family="Inter, -apple-system, sans-serif" font-size="9">A LangGraph assistant</text>
+    <rect x="72" y="177" width="206" height="42" rx="13" fill="#6458dc"/>
+    <text x="92" y="203" fill="#ffffff" font-family="Inter, -apple-system, sans-serif" font-size="13" font-weight="650">＋  New conversation</text>
+    <text x="74" y="255" fill="#68748b" font-family="Inter, -apple-system, sans-serif" font-size="10" font-weight="700" letter-spacing="2">RECENT CONVERSATIONS</text>
+
+      <rect x="68" y="271" width="214" height="42" rx="12" fill="#eceaff"/>
+      <circle cx="87" cy="292" r="6" fill="none" stroke="#6458dc" stroke-width="1.5"/>
+      <text x="104" y="297" fill="#172036" font-family="Inter, -apple-system, sans-serif" font-size="12" font-weight="600">My name is Alex</text>
+      <text x="80" y="340" fill="#68748b" font-family="Inter, -apple-system, sans-serif" font-size="12">Explain recursion in one…</text>
+      <text x="80" y="371" fill="#68748b" font-family="Inter, -apple-system, sans-serif" font-size="12">What is 23 × 17?</text>
+    <rect x="72" y="610" width="206" height="46" rx="14" fill="#f8faff" stroke="#d6dceb"/>
+    <circle cx="94" cy="633" r="12" fill="#eceaff"/>
+    <path d="M90 633h8M94 629v8" stroke="#6458dc" stroke-width="1.8" stroke-linecap="round"/>
+    <text x="114" y="630" fill="#172036" font-family="Inter, -apple-system, sans-serif" font-size="10.5" font-weight="650">Thread memory</text>
+    <text x="114" y="644" fill="#68748b" font-family="Inter, -apple-system, sans-serif" font-size="9">Stored by LangGraph</text>
+
+    <line x1="298" y1="164" x2="1148" y2="164" stroke="#d6dceb"/>
+
+      <text x="324" y="126" fill="#172036" font-family="Inter, -apple-system, sans-serif" font-size="14" font-weight="700">Active conversation</text>
+      <text x="324" y="145" fill="#68748b" font-family="Inter, -apple-system, sans-serif" font-size="10.5">Messages stay isolated inside this thread</text>
+    <rect x="994" y="116" width="128" height="31" rx="16" fill="#f8faff" stroke="#d6dceb"/>
+    <circle cx="1013" cy="131.5" r="5" fill="#17a673"/>
+    <text x="1025" y="136" fill="#68748b" font-family="Inter, -apple-system, sans-serif" font-size="10.5">Memory active</text>
+
+    <text x="1106" y="196" fill="#68748b" font-family="Inter, -apple-system, sans-serif" font-size="9" font-weight="700" letter-spacing="1.7" text-anchor="end">YOU</text>
+    <rect x="776" y="209" width="330" height="49" rx="18" fill="#6458dc" stroke="#6458dc"/>
+    <text x="793" y="234" fill="#ffffff" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12.5" font-weight="400" text-anchor="start">What’s my name?</text>
+    <circle cx="1127" cy="229" r="14" fill="#eceaff"/>
+    <text x="1127" y="234" fill="#6458dc" font-family="Inter, sans-serif" font-size="12" font-weight="800" text-anchor="middle">Y</text>
+
+    <text x="362" y="279" fill="#68748b" font-family="Inter, -apple-system, sans-serif" font-size="9" font-weight="700" letter-spacing="1.7" text-anchor="start">LATTICE</text>
+    <rect x="362" y="292" width="470" height="49" rx="18" fill="#f8faff" stroke="#d6dceb"/>
+    <text x="379" y="317" fill="#172036" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12.5" font-weight="400" text-anchor="start">Your name is Alex. I remembered it in this thread.</text>
+    <circle cx="341" cy="312" r="14" fill="#eceaff"/>
+    <text x="341" y="317" fill="#6458dc" font-family="Inter, sans-serif" font-size="12" font-weight="800" text-anchor="middle">✦</text>
+
+
+    <line x1="298" y1="606" x2="1148" y2="606" stroke="#d6dceb"/>
+    <g>
+    <rect x="356" y="622" width="734" height="46" rx="18" fill="#f8faff" stroke="#d6dceb"/>
+    <text x="374" y="651" fill="#68748b" font-family="Inter, -apple-system, sans-serif" font-size="11.5">Message this conversation…</text>
+    <rect x="1014" y="628" width="76" height="34" rx="12" fill="#6458dc" stroke="#6458dc"/>
+    <text x="1052" y="650" fill="#ffffff" font-family="Inter, -apple-system, sans-serif" font-size="11.5" font-weight="650" text-anchor="middle">Send  ↗</text>
+    </g>
+  </svg>

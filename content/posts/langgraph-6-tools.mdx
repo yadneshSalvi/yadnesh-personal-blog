@@ -17,10 +17,10 @@ By the end of this page, your bot stops guessing. It gets a calculator that's al
 <Figure
   src="/images/series/langgraph/part-6/browser-tools-final-light.svg"
   srcDark="/images/series/langgraph/part-6/browser-tools-final-dark.svg"
-  alt="The chat UI at localhost:3000. The user asked 'What is 23 × 17, and the population of Tokyo?'. Below it are two tool-call bubbles with dashed borders, distinct from the chat bubbles: the first reads 'calculator(23 * 17)' then '→ 391', the second reads 'tavily_search(population of Tokyo)' then '→ Tokyo: ~14 million (city proper)'. Under those, the assistant's final bubble reads '23 × 17 is 391, and Tokyo has about 14 million people in the city proper.'"
-  caption="Today's destination. One question, two tools the bot chose to call, and a final answer built from their results. The dashed bubbles are the bot showing its work."
-  width={1120}
-  height={462}
+  alt="The polished Lattice interface after a question about multiplication and Tokyo. Two amber tool activity cards show completed calculator and web search calls, followed by the assistant's final answer."
+  caption="Today's destination. One question, two tools the assistant chose to call, and a final answer built from their results. The activity cards make its work visible without looking like chat messages."
+  width={1200}
+  height={720}
 />
 
 This part has more moving pieces than the last, so here's the map: one new Python file for the tools, a few lines that let the model reach for them, a graph that can now loop, and two new envelope types riding the [SSE belt from Part 5](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word). You'll install one new package along the way. Let's give the bot some hands.
@@ -285,13 +285,13 @@ curl -N -X POST http://localhost:8000/chat \
 
 <Figure
   src="/images/series/langgraph/part-6/term-tool-stream.svg"
-  alt="A dark backend terminal running curl -N against localhost:8000/chat with the message 'what is 23 * 17?'. The streamed output shows new envelope types: a tool_start line naming calculator with args expression 23 * 17, then a tool_end line giving calculator the result 391, then a tool_start and tool_end pair for tavily_search, then several token envelopes spelling out '23 × 17 is 391,', and finally a done envelope. A comment notes it's the same belt as Part 5 with two new labels riding it."
-  caption="The same wire from [Part 5](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word), carrying two new labels. tool_start and tool_end interleave with the token envelopes; the blank-line framing and the done envelope are exactly as you left them."
+  alt="A dark backend terminal running curl -N against localhost:8000/chat with the message 'what is 23 * 17?'. The streamed output shows new envelope types: a tool_start line naming calculator with args expression 23 * 17, then a tool_end line giving calculator the result 391, then four token envelopes carrying '23', ' × 17', ' is', and ' 391.', and finally a done envelope. A comment notes it's the same belt as Part 5 with two new labels riding it."
+  caption="The same wire from [Part 5](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word), carrying two new labels. tool_start and tool_end ride ahead of the token envelopes; the server still sends a blank line between envelopes, and the done envelope closes the stream exactly as you left it."
   width={1040}
-  height={620}
+  height={470}
 />
 
-There they are: `tool_start` and `tool_end` on the wire, in between the tokens, framed by the same blank line, closed by the same `done`. The backend is finished. The frontend just needs to learn what to do when those two new types arrive.
+There they are: `tool_start` and `tool_end` on the wire, ahead of the tokens, framed by the same blank line, closed by the same `done`. The backend is finished. The frontend just needs to learn what to do when those two new types arrive.
 
 {/* comic prompt (gpt-image-2, --ref public/vibecoding.png, 1536x1024, quality high):
 Flat cartoon comic, bold black outlines, flat colors, warm off-white paper background, same character and art style as the reference image (bearded man with headphones, dark t-shirt, "Yad"). 2-panel comic, panels side by side with a thin vertical black divider. Panel 1: Yad stands on the left, hand on chin, asking a friendly small white robot chatbot (rounded boxy body, simple smiling screen face, two little antennas). Yad's speech bubble: "WHAT'S 2 + 2?". The little robot looks blank with a single sweat drop. Panel 2: the same little robot now triumphantly holds up a big chunky pocket calculator showing "4" on its display, beaming, arms raised high; the robot's speech bubble: "I HAVE TOOLS NOW!". Yad on the right side gives a small amused thumbs up. Clean readable hand-lettered speech bubbles, large clear lettering, minimal text. No caption box, no watermark. */}
@@ -308,15 +308,23 @@ Flat cartoon comic, bold black outlines, flat colors, warm off-white paper backg
 
 Back in `frontend/app/page.tsx`. Your messages have been `{ role, content }` since [Part 4](/blog/langgraph-4-nextjs-frontend#teach-the-page-what-a-message-is). A tool call doesn't fit that shape; it has a name, arguments, and a result, not a body of text. So widen the `Message` type into a union:
 
-```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx" lines="8-10"
+```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx"
 type Message =
   | { role: "user" | "assistant"; content: string }
   | { role: "tool"; name: string; args: Record<string, unknown>; result: string | null };
+
+type ChatMessage = Extract<Message, { role: "user" | "assistant" }>;
+```
+
+That second type saves you from an error you'd hit within the minute. The moment `Message` can also be a tool message, `message.content` inside `ChatBubble` stops compiling, because a tool message has no `content` field and TypeScript won't guess: `Property 'content' does not exist on type 'Message'` (TS2339). `ChatBubble` only ever renders text, so narrow its prop to the two text roles and the error goes away:
+
+```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx"
+function ChatBubble({ message, streaming }: { message: ChatMessage; streaming: boolean }) {
 ```
 
 A tool message starts with `result: null`, the "running" state, and gets filled in when its `tool_end` arrives. Add two small helpers next to `appendToken`, one to start a tool and one to finish it:
 
-```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx" lines="56-72"
+```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx"
 function startTool(name: string, args: Record<string, unknown>) {
   setMessages((prev) => [...prev, { role: "tool", name, args, result: null }]);
 }
@@ -325,9 +333,9 @@ function endTool(result: string) {
   setMessages((prev) => {
     const next = [...prev];
     for (let i = next.length - 1; i >= 0; i--) {
-      const m = next[i];
-      if (m.role === "tool" && m.result === null) {
-        next[i] = { ...m, result };
+      const message = next[i];
+      if (message.role === "tool" && message.result === null) {
+        next[i] = { ...message, result };
         break;
       }
     }
@@ -340,13 +348,13 @@ function endTool(result: string) {
 
 There's one more change, and it's a consequence of the loop. In [Part 5](/blog/langgraph-5-streaming#teach-the-browser-to-read-a-firehose), when the user sent a message, you added an empty assistant bubble immediately, ready to fill with tokens. But now the bot might call a tool *before* it says anything, and you don't want an empty grey bubble sitting above the tool call. So stop pre-creating it. On send, add only the user's message:
 
-```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx" lines="83"
+```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx"
 setMessages((prev) => [...prev, { role: "user", content: text }]);
 ```
 
 And let `appendToken` create the assistant bubble on demand, the first time a token actually arrives:
 
-```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx" lines="44-54"
+```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx"
 function appendToken(token: string) {
   setMessages((prev) => {
     const last = prev[prev.length - 1];
@@ -364,7 +372,7 @@ If the last message is already an assistant bubble, grow it. If it isn't, becaus
 
 Now the moment [Part 5](/blog/langgraph-5-streaming#teach-the-browser-to-read-a-firehose) was built for. Find your reader loop, the one that splits on the blank line and parses each envelope. The parser doesn't change. You add two branches to the part that reacts to `type`, and nothing else moves:
 
-```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx" lines="110-116"
+```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx"
 for (const part of parts) {
   if (!part.startsWith("data: ")) continue;
   const envelope = JSON.parse(part.slice(6));
@@ -376,52 +384,427 @@ for (const part of parts) {
 
 That's it. That's the entire reward for [designing an envelope in Part 5](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word) instead of streaming bare tokens. Two new lines, no rewrite, no new parser. The buffer, the `\n\n` split, the kept tail: all of it works untouched, because you taught it to read a shape, not a token.
 
-Last, a component to render a tool bubble so it reads as the bot working, not as a chat message. Add a small `ToolCallBubble` above your `Chat` component:
+Last, a component to render tool activity so it reads as the assistant working, not as another chat message. Add a `ToolCallBubble` above your `Chat` component (and add `Wrench` to the Lucide import):
 
-```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx" lines="14-30"
+```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx"
 function ToolCallBubble({ name, args, result }: {
   name: string;
   args: Record<string, unknown>;
   result: string | null;
 }) {
   const argText = Object.values(args).join(", ");
+  const running = result === null;
+
   return (
-    <div className="text-left">
-      <span className="inline-flex max-w-[75%] flex-col gap-0.5 rounded-xl border border-dashed px-3 py-2 font-mono text-xs text-muted-foreground">
-        <span className="text-foreground">
-          <span className="font-semibold">{name}</span>({argText})
-        </span>
-        <span className="line-clamp-3 break-all">{result === null ? "running…" : `→ ${result}`}</span>
-      </span>
-    </div>
+    <article className="flex items-start gap-3">
+      <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-amber-500/[0.12] text-amber-600">
+        <Wrench className="size-4" aria-hidden="true" />
+      </div>
+      <div className="w-full max-w-[82%] rounded-2xl border border-amber-500/25 bg-amber-500/[0.06] px-4 py-3 shadow-sm sm:max-w-[72%]">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-600">
+            Tool activity
+          </p>
+          <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <span className={`size-1.5 rounded-full ${running ? "animate-pulse bg-amber-500" : "bg-emerald-500"}`} />
+            {running ? "Running" : "Complete"}
+          </span>
+        </div>
+        <code className="block break-all text-xs font-semibold text-foreground">
+          {name}({argText})
+        </code>
+        <p className="mt-2 line-clamp-3 break-all text-xs leading-5 text-muted-foreground" aria-live="polite">
+          {running ? "Waiting for the tool result…" : result}
+        </p>
+      </div>
+    </article>
   );
 }
 ```
 
-The dashed border and monospace font are deliberate: they make a tool call look like a machine doing work, clearly not the same thing as a person or the bot talking. Then, in your `messages.map`, send tool messages to it and everything else to the bubble you already have:
+The amber surface, tool icon, and compact status are deliberate: together they make a tool call look like work in progress, clearly distinct from a person or the assistant talking. Then, in your `messages.map`, send tool messages to it and everything else to the bubble you already have:
 
-```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx" lines="133-137,146-148"
-{messages.map((m, i) =>
-  m.role === "tool" ? (
-    <ToolCallBubble key={i} name={m.name} args={m.args} result={m.result} />
+```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx"
+{messages.map((message, index) =>
+  message.role === "tool" ? (
+    <ToolCallBubble
+      key={`tool-${index}`}
+      name={message.name}
+      args={message.args}
+      result={message.result}
+    />
   ) : (
-    <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
-      {/* the same <span> bubble (with the streaming caret) from Part 5, unchanged */}
-    </div>
+    <ChatBubble
+      key={`${message.role}-${index}`}
+      message={message}
+      streaming={loading && message.role === "assistant" && index === messages.length - 1}
+    />
   )
 )}
 ```
 
-Save and send "What is 23 times 17?". A dashed `calculator(23 * 17)` bubble pops in reading "running…", flips to "→ 391" a beat later, and then the answer streams in below it.
+One last pass, and none of it is logic. The page still advertises the last part: the starter prompts ask about recursion, the empty state's kicker says "Streaming is on", the header badge reads "Streaming enabled". Retune the copy so the first screen tells the truth about a bot with hands. Start with the prompts, which should now invite the tools:
+
+```tsx filename="frontend/app/page.tsx" repo="part-06-tools/frontend/app/page.tsx"
+const STARTER_PROMPTS = [
+  "What is 23 × 17?",
+  "Search for the latest LangGraph release",
+  "Find the population of Tokyo",
+];
+```
+
+Then four more swaps, all of them strings:
+
+- In `EmptyState`, trade the `Bot` icon for `Wrench` (already imported for `ToolCallBubble`), the kicker for "Tools connected", the headline for "Ask for facts, calculations, and more.", and the body for "Watch Lattice choose a tool, show its work, and fold the result into a clear response."
+- The header badge: "2 tools connected", with "Tools" for the narrow-screen version next to it.
+- The input placeholder: "Ask Lattice to calculate or search…".
+- The line under the composer: "Tool activity appears inline while your LangGraph workflow runs."
+
+Save and send "What is 23 times 17?". An amber `calculator(23 * 17)` activity card appears immediately with a pulsing Running status, flips to Complete when the result arrives, and then the answer streams in below it.
 
 <Figure
   src="/images/series/langgraph/part-6/browser-tool-running-light.svg"
   srcDark="/images/series/langgraph/part-6/browser-tool-running-dark.svg"
-  alt="The chat UI at localhost:3000. The user asked 'What is 23 × 17?'. Below it is a single dashed-border tool bubble reading 'calculator(23 * 17)' with a second line 'running...' in accent and a small pulsing dot, captured mid-execution before the result arrives."
-  caption="The tool mid-run. The bubble appears the instant tool_start lands and shows 'running…' until tool_end fills in the result. The bot is visibly thinking with its hands."
-  width={1120}
-  height={398}
+  alt="The Lattice interface after the user asks 'What is 23 × 17?'. An amber tool activity card shows calculator(23 * 17), a pulsing status dot, and the word Running while the result is pending."
+  caption="The tool mid-run. Its activity card appears the instant tool_start lands and stays in the Running state until tool_end fills in the result. The assistant is visibly working."
+  width={1200}
+  height={720}
 />
+
+Here's the whole `page.tsx` after this part, activity cards and retuned copy included, for comparing against yours:
+
+```tsx filename="frontend/app/page.tsx" collapsed repo="part-06-tools/frontend/app/page.tsx"
+"use client";
+
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Bot, CircleAlert, Send, Sparkles, Square, UserRound, Wrench } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+
+type Message =
+  | { role: "user" | "assistant"; content: string }
+  | { role: "tool"; name: string; args: Record<string, unknown>; result: string | null };
+
+type ChatMessage = Extract<Message, { role: "user" | "assistant" }>;
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+const STARTER_PROMPTS = [
+  "What is 23 × 17?",
+  "Search for the latest LangGraph release",
+  "Find the population of Tokyo",
+];
+
+function Brand() {
+  return (
+    <div className="flex min-w-0 items-center gap-3">
+      <div className="grid size-10 shrink-0 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+        <Sparkles className="size-5" aria-hidden="true" />
+      </div>
+      <div className="min-w-0">
+        <p className="truncate text-base font-semibold tracking-tight">Lattice</p>
+        <p className="truncate text-xs text-muted-foreground">A LangGraph assistant</p>
+      </div>
+    </div>
+  );
+}
+
+function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
+  return (
+    <div className="mx-auto flex h-full w-full max-w-2xl flex-col items-center justify-center px-2 py-10 text-center">
+      <div className="relative mb-6">
+        <div className="absolute inset-0 scale-150 rounded-full bg-primary/15 blur-2xl" />
+        <div className="relative grid size-16 place-items-center rounded-3xl border border-primary/20 bg-card shadow-xl shadow-primary/10">
+          <Wrench className="size-7 text-primary" aria-hidden="true" />
+        </div>
+      </div>
+      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-primary">
+        Tools connected
+      </p>
+      <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+        Ask for facts, calculations, and more.
+      </h1>
+      <p className="mt-3 max-w-lg text-pretty text-sm leading-6 text-muted-foreground sm:text-base">
+        Watch Lattice choose a tool, show its work, and fold the result into a clear response.
+      </p>
+      <div className="mt-8 grid w-full gap-2 sm:grid-cols-3">
+        {STARTER_PROMPTS.map((prompt) => (
+          <button
+            key={prompt}
+            type="button"
+            onClick={() => onPick(prompt)}
+            className="rounded-2xl border bg-card/70 px-4 py-3 text-left text-sm leading-5 text-foreground shadow-sm transition hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {prompt}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ChatBubble({ message, streaming }: { message: ChatMessage; streaming: boolean }) {
+  const isUser = message.role === "user";
+
+  return (
+    <article className={`flex items-end gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
+      {!isUser ? (
+        <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+          <Bot className="size-4" aria-hidden="true" />
+        </div>
+      ) : null}
+      <div className={`flex max-w-[82%] flex-col sm:max-w-[72%] ${isUser ? "items-end" : "items-start"}`}>
+        <p className={`mb-1.5 px-1 text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground ${isUser ? "text-right" : "text-left"}`}>
+          {isUser ? "You" : "Lattice"}
+        </p>
+        <div
+          className={
+            isUser
+              ? "rounded-[1.35rem] rounded-br-md bg-primary px-4 py-3 text-sm leading-6 text-primary-foreground shadow-lg shadow-primary/15"
+              : "min-h-12 rounded-[1.35rem] rounded-bl-md border bg-card px-4 py-3 text-sm leading-6 shadow-sm"
+          }
+        >
+          {message.content}
+          {streaming ? (
+            <span className="ml-1 inline-block h-4 w-0.5 animate-pulse rounded-full bg-primary align-middle" aria-hidden="true" />
+          ) : null}
+        </div>
+      </div>
+      {isUser ? (
+        <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-secondary text-secondary-foreground">
+          <UserRound className="size-4" aria-hidden="true" />
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+function ToolCallBubble({ name, args, result }: {
+  name: string;
+  args: Record<string, unknown>;
+  result: string | null;
+}) {
+  const argText = Object.values(args).join(", ");
+  const running = result === null;
+
+  return (
+    <article className="flex items-start gap-3">
+      <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-amber-500/[0.12] text-amber-600">
+        <Wrench className="size-4" aria-hidden="true" />
+      </div>
+      <div className="w-full max-w-[82%] rounded-2xl border border-amber-500/25 bg-amber-500/[0.06] px-4 py-3 shadow-sm sm:max-w-[72%]">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-600">
+            Tool activity
+          </p>
+          <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <span className={`size-1.5 rounded-full ${running ? "animate-pulse bg-amber-500" : "bg-emerald-500"}`} />
+            {running ? "Running" : "Complete"}
+          </span>
+        </div>
+        <code className="block break-all text-xs font-semibold text-foreground">
+          {name}({argText})
+        </code>
+        <p className="mt-2 line-clamp-3 break-all text-xs leading-5 text-muted-foreground" aria-live="polite">
+          {running ? "Waiting for the tool result…" : result}
+        </p>
+      </div>
+    </article>
+  );
+}
+
+export default function Chat() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [controller, setController] = useState<AbortController | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  function appendToken(token: string) {
+    setMessages((prev) => {
+      const last = prev[prev.length - 1];
+      if (last && last.role === "assistant") {
+        const next = [...prev];
+        next[next.length - 1] = { ...last, content: last.content + token };
+        return next;
+      }
+      return [...prev, { role: "assistant", content: token }];
+    });
+  }
+
+  function startTool(name: string, args: Record<string, unknown>) {
+    setMessages((prev) => [...prev, { role: "tool", name, args, result: null }]);
+  }
+
+  function endTool(result: string) {
+    setMessages((prev) => {
+      const next = [...prev];
+      for (let i = next.length - 1; i >= 0; i--) {
+        const message = next[i];
+        if (message.role === "tool" && message.result === null) {
+          next[i] = { ...message, result };
+          break;
+        }
+      }
+      return next;
+    });
+  }
+
+  function stop() {
+    controller?.abort();
+  }
+
+  async function sendMessage(e: FormEvent) {
+    e.preventDefault();
+    const text = input.trim();
+    if (!text || loading) return;
+
+    setMessages((prev) => [...prev, { role: "user", content: text }]);
+    setInput("");
+    setLoading(true);
+    setError(null);
+
+    const controller = new AbortController();
+    setController(controller);
+
+    try {
+      const res = await fetch(`${API_BASE}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }),
+        signal: controller.signal,
+      });
+      if (!res.ok || !res.body) throw new Error();
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split("\n\n");
+        buffer = parts.pop() ?? "";
+        for (const part of parts) {
+          if (!part.startsWith("data: ")) continue;
+          const envelope = JSON.parse(part.slice(6));
+          if (envelope.type === "token") appendToken(envelope.content);
+          else if (envelope.type === "tool_start") startTool(envelope.name, envelope.args);
+          else if (envelope.type === "tool_end") endTool(envelope.result);
+        }
+      }
+    } catch (err) {
+      if ((err as Error).name !== "AbortError") {
+        setError("Could not reach the backend. Is it running on :8000?");
+      }
+    } finally {
+      setLoading(false);
+      setController(null);
+    }
+  }
+
+  return (
+    <main className="relative min-h-dvh overflow-hidden p-3 sm:p-5 lg:p-7">
+      <Card className="relative mx-auto flex h-[calc(100dvh-1.5rem)] min-h-[34rem] max-w-6xl flex-col gap-0 overflow-hidden rounded-[1.75rem] border-foreground/10 bg-card/95 py-0 shadow-2xl shadow-slate-950/10 ring-1 ring-foreground/10 backdrop-blur-xl sm:h-[calc(100dvh-2.5rem)] lg:h-[calc(100dvh-3.5rem)]">
+        <header className="flex h-20 shrink-0 items-center justify-between border-b px-4 sm:px-7">
+          <Brand />
+          <div className="flex items-center gap-2 rounded-full border bg-background/70 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm">
+            <span className="size-2 rounded-full bg-emerald-500 ring-4 ring-emerald-500/15" />
+            <span className="hidden sm:inline">2 tools connected</span>
+            <span className="sm:hidden">Tools</span>
+          </div>
+        </header>
+
+        <div
+          className="chat-scrollbar flex-1 overflow-y-auto px-4 py-5 sm:px-7 sm:py-7"
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions text"
+        >
+          {messages.length === 0 ? (
+            <EmptyState onPick={setInput} />
+          ) : (
+            <div className="mx-auto w-full max-w-3xl space-y-6">
+              {messages.map((message, index) =>
+                message.role === "tool" ? (
+                  <ToolCallBubble
+                    key={`tool-${index}`}
+                    name={message.name}
+                    args={message.args}
+                    result={message.result}
+                  />
+                ) : (
+                  <ChatBubble
+                    key={`${message.role}-${index}`}
+                    message={message}
+                    streaming={loading && message.role === "assistant" && index === messages.length - 1}
+                  />
+                )
+              )}
+              <div ref={bottomRef} />
+            </div>
+          )}
+        </div>
+
+        <div className="shrink-0 border-t bg-card/80 p-3 sm:p-5">
+          {error ? (
+            <div
+              role="alert"
+              className="mx-auto mb-3 flex max-w-3xl items-start gap-2 rounded-xl border border-destructive/25 bg-destructive/10 px-3 py-2.5 text-sm text-destructive"
+            >
+              <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              <span>{error}</span>
+            </div>
+          ) : null}
+          <form
+            onSubmit={sendMessage}
+            className="mx-auto flex max-w-3xl items-center gap-2 rounded-2xl border bg-background/85 p-2 shadow-lg shadow-slate-950/5 transition focus-within:border-primary/45 focus-within:ring-4 focus-within:ring-primary/10"
+          >
+            <label htmlFor="chat-message" className="sr-only">
+              Message Lattice
+            </label>
+            <Input
+              id="chat-message"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask Lattice to calculate or search…"
+              autoComplete="off"
+              disabled={loading}
+              className="h-11 flex-1 border-0 bg-transparent px-3 text-sm shadow-none focus-visible:ring-0"
+            />
+            {loading ? (
+              <Button type="button" variant="outline" onClick={stop} aria-label="Stop response" className="h-11 rounded-xl px-4">
+                <Square className="size-3.5 fill-current" aria-hidden="true" />
+                <span className="hidden sm:inline">Stop</span>
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                aria-label="Send message"
+                disabled={!input.trim()}
+                className="h-11 rounded-xl px-4 shadow-md shadow-primary/20"
+              >
+                <span className="hidden sm:inline">Send</span>
+                <Send className="size-4" aria-hidden="true" />
+              </Button>
+            )}
+          </form>
+          <p className="mt-2 text-center text-[11px] text-muted-foreground">
+            Tool activity appears inline while your LangGraph workflow runs.
+          </p>
+        </div>
+      </Card>
+    </main>
+  );
+}
+```
 
 ## Watch it reach for both
 
@@ -429,7 +812,7 @@ Now the question this whole part was building toward. Ask it something that need
 
 > What is 23 times 17, and what's the population of Tokyo?
 
-Watch the loop run. The model reasons, decides it needs the calculator, and a `calculator(23 * 17)` bubble appears and resolves to 391. The result goes back to the model, which reasons again, decides it also needs the web, and a `tavily_search` bubble appears and resolves with Tokyo's population. That goes back too, and only now, with both facts in hand, does the model write its final answer, streaming in word by word under the two tool bubbles. You can see the dessert shot at the top of this page; that's your bot, running the loop twice and showing every step.
+Watch the loop run. The model reasons, decides it needs the calculator, and a `calculator(23 * 17)` activity card appears and resolves to 391. The result goes back to the model, which reasons again, decides it also needs the web, and a `tavily_search` activity card appears and resolves with Tokyo's population. That goes back too, and only now, with both facts in hand, does the model write its final answer, streaming in word by word under the two activity cards. You can see the dessert shot at the top of this page; that's your bot, running the loop twice and showing every step.
 
 <Callout type="info" title="Tools aren't free, and they can run in parallel">
 Each trip through the loop is another call to the model's API, so a two-tool answer costs roughly three model calls instead of one. Still pennies for this bot, but worth knowing before you give an agent twenty tools and a hard question. One nice freebie: when the model asks for several independent tools at once, LangGraph's `ToolNode` runs them in parallel for you, so two searches don't take twice as long. You didn't have to write a line of that.
@@ -441,7 +824,7 @@ Right now you have: a bot that holds two real tools, decides on its own when to 
   src="/videos/langgraph/part-6-demo.mp4"
   poster="/videos/langgraph/part-6-poster.jpg"
   caption="The bot deciding on its own to call `calculator(23 * 17 + 5)`, then reaching for web search on a question it can't know."
-  label="Screen recording of Part 6: the assistant calling the calculator tool, then the Tavily search tool, each shown as a dashed tool bubble"
+  label="Screen recording of Part 6: the assistant calling the calculator tool, then the Tavily search tool, each shown as a tool activity card"
 />
 
 <Recap
@@ -451,7 +834,7 @@ Right now you have: a bot that holds two real tools, decides on its own when to 
     "A real `web_search` tool from Tavily, wired in with one line and its own API key in `.env`.",
     "Tools bound to the model with `llm.bind_tools(...)`, so it can ask for them, and a graph that loops through a prebuilt `ToolNode` via `tools_condition`.",
     "The ReAct loop running end to end: the bot reasons, acts, observes the result, and reasons again until it can answer.",
-    "Two new envelope types, `tool_start` and `tool_end`, streamed over the [Part 5 belt](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word) and rendered as live tool bubbles, with the frontend parser unchanged.",
+    "Two new envelope types, `tool_start` and `tool_end`, streamed over the [Part 5 belt](/blog/langgraph-5-streaming#the-shape-of-one-streamed-word) and rendered as live tool activity cards, with the frontend parser unchanged.",
   ]}
 />
 

@@ -17,18 +17,18 @@ By the end of this page that changes completely. You'll have a real chat window 
 <Figure
   src="/images/series/langgraph/part-4/browser-chat-final-light.svg"
   srcDark="/images/series/langgraph/part-4/browser-chat-final-dark.svg"
-  alt="A browser at localhost:3000 showing a finished chat app titled Chatbot. An assistant bubble greets the user, the user asked to explain recursion in one sentence, and the assistant replied with a one-sentence definition. An input box at the bottom reads 'Ask me anything...' with a Send button."
+  alt="A polished browser app named Lattice, with a branded header and a Local workspace status pill. Four labeled bubbles run down the page: YOU asks 'Explain recursion in one sentence.', LATTICE answers 'Recursion is when a function solves a problem by calling itself on a smaller version of it.', YOU asks 'Does it ever stop?', and LATTICE answers 'Only when a base case says so. Otherwise it calls itself forever and overflows the stack.' A rounded composer at the bottom reads 'Message Lattice…' next to a Send button."
   caption="Today's destination. The same backend from [Part 3](/blog/langgraph-3-first-graph#hand-the-conversation-to-the-graph), now answering you in a real chat UI instead of a terminal. By the end of this page, you built this."
-  width={1120}
-  height={639}
+  width={1200}
+  height={720}
 />
 
-Everything new today lives mostly in one file, `frontend/app/page.tsx`, about seventy lines of TypeScript by the time you're done. Three tools do the heavy lifting, all of them already in your `frontend/` folder since [Part 1's `create-next-app`](/blog/langgraph-1-setup#your-frontend-scaffolded-in-one-command):
+Almost everything new today lives in one file, `frontend/app/page.tsx`, about two hundred and thirty lines of TypeScript by the time you're done, most of it presentation. Three tools do the heavy lifting, all of them already in your `frontend/` folder since [Part 1's `create-next-app`](/blog/langgraph-1-setup#your-frontend-scaffolded-in-one-command):
 
 | Tool | Version used here |
 |---|---|
 | Next.js | 16.2.9 |
-| React | 19.2.0 |
+| React | 19.2.4 |
 | Tailwind CSS | 4.1.13 |
 
 One more thing joins them today, [shadcn/ui](https://ui.shadcn.com), and it has no version number on purpose. More on that when we install it.
@@ -60,7 +60,7 @@ frontend/
     └── globals.css    global styles and the Tailwind import
 ```
 
-`layout.tsx` is the outer shell: it renders the `<html>` and `<body>` tags once and wraps every page inside them. You'll leave it alone. `globals.css` holds your global styles and the one line that pulls in Tailwind; shadcn will add a block of color variables here in a minute, and then you'll leave it alone too. `page.tsx` is the page served at `/`, the welcome screen you saw in [Part 1](/blog/langgraph-1-setup#your-frontend-scaffolded-in-one-command), and it's the one file you're about to gut.
+`layout.tsx` is the outer shell: it renders the `<html>` and `<body>` tags once and wraps every page inside them. You'll touch it exactly once today, in the `metadata` export near the top, so the browser tab says Lattice instead of "Create Next App". `globals.css` holds your global styles and the one line that pulls in Tailwind; shadcn is about to write a block of color variables in there, and you'll come back and give them the palette you actually want. `page.tsx` is the page served at `/`, the welcome screen you saw in [Part 1](/blog/langgraph-1-setup#your-frontend-scaffolded-in-one-command), and it's the one file you're about to gut.
 
 Open `app/page.tsx`, delete everything in it, and save. The browser tab goes blank. That's correct; an empty file is a clean canvas. Now let's fill it.
 
@@ -85,12 +85,72 @@ Three new files under `components/ui/`: `button.tsx`, `input.tsx`, and `card.tsx
 </Callout>
 
 <Callout type="warning" title="One quirk to fix before moving on: your fonts just went serif">
-`shadcn init` rewrites `globals.css` and expects your font variable to be called `--font-sans`, but `create-next-app` named it `--font-geist-sans`. The result is a self-referential `--font-sans: var(--font-sans)` that resolves to nothing, and the whole app quietly falls back to the browser's default serif font — everything suddenly looks like Times New Roman. Point the variable at the font you actually have, in the `@theme inline` block of `globals.css`:
+`shadcn init` rewrites `globals.css` and expects your font variable to be called `--font-sans`, but `create-next-app` named it `--font-geist-sans`. The result is a self-referential `--font-sans: var(--font-sans)` that resolves to nothing, and the whole app quietly falls back to the browser's default serif font, so everything suddenly looks like Times New Roman. Point the variable at the font you actually have, in the `@theme inline` block of `globals.css`:
 
 ```css filename="frontend/app/globals.css" repo="part-04-nextjs-frontend/frontend/app/globals.css" lines="10" nocollapse
   --font-sans: var(--font-geist-sans);
 ```
 </Callout>
+
+## Paint it Lattice
+
+The components shadcn just gave you don't hardcode a single color. They reference variables, `--primary`, `--card`, `--border`, and the `init` command filled those variables with a neutral gray scale, because it has no idea what your app is. You do. So open `globals.css` and overwrite the `:root` block with a palette:
+
+```css filename="frontend/app/globals.css" repo="part-04-nextjs-frontend/frontend/app/globals.css" lines="51-70"
+:root {
+  color-scheme: light;
+  --background: oklch(0.968 0.012 263);
+  --foreground: oklch(0.24 0.035 262);
+  --card: oklch(0.995 0.004 263);
+  --card-foreground: oklch(0.24 0.035 262);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.035 262);
+  --primary: oklch(0.55 0.22 278);
+  --primary-foreground: oklch(0.99 0.004 263);
+  --secondary: oklch(0.935 0.022 263);
+  --secondary-foreground: oklch(0.28 0.05 267);
+  --muted: oklch(0.945 0.014 263);
+  --muted-foreground: oklch(0.49 0.035 263);
+  --accent: oklch(0.91 0.045 196);
+  --accent-foreground: oklch(0.28 0.055 220);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.88 0.025 263);
+  --input: oklch(0.88 0.025 263);
+  --ring: oklch(0.61 0.18 278);
+```
+
+That's an excerpt; **View full file** on the block above shows the rest, including the matching `.dark` block and a `body` rule that lays two very soft radial gradients under the whole page, violet in one corner and teal in the other. `oklch()` is a color notation, lightness then chroma then hue, and `--primary: oklch(0.55 0.22 278)` is the indigo-violet you'll see on every button, avatar, and user bubble for the rest of this series. Change that one number, `278`, and the whole app changes clothes.
+
+The lines at the end of the file are less about taste and more about function, because the chat depends on them:
+
+```css filename="frontend/app/globals.css" repo="part-04-nextjs-frontend/frontend/app/globals.css" lines="174-197"
+.chat-scrollbar {
+  scrollbar-color: color-mix(in oklch, var(--muted-foreground) 32%, transparent) transparent;
+  scrollbar-width: thin;
+}
+
+@keyframes lattice-typing {
+  0%, 80%, 100% { opacity: 0.28; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-3px); }
+}
+
+.typing-dot {
+  animation: lattice-typing 1.2s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 120ms; }
+.typing-dot:nth-child(3) { animation-delay: 240ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+```
+
+`.chat-scrollbar` turns the message list's scrollbar into a thin gray hairline instead of the operating system's default slab. `lattice-typing` is the animation behind the three bouncing dots that appear while the model thinks; each dot gets the same 1.2-second loop, offset by 120 milliseconds, which is what makes them look like a wave instead of a strobe. And the last block respects `prefers-reduced-motion`: a reader who has asked their operating system for less movement gets the dots without the bouncing.
 
 Start the dev server again (`npm run dev`) and let's write some React.
 
@@ -98,7 +158,7 @@ Start the dev server again (`npm run dev`) and let's write some React.
 
 A chat is a list of messages, and each message has two facts: who said it, and what they said. Before you can store a conversation, you have to describe its shape, the same instinct as [Part 2's Pydantic models](/blog/langgraph-2-fastapi-basics#the-kitchen-gets-an-order-form), just in TypeScript this time. Type this into your empty `app/page.tsx`:
 
-```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="8-11,15-17"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx"
 import { useState } from "react";
 
 interface Message {
@@ -124,7 +184,7 @@ Save the file, and the dev server falls over instead of reloading clean:
 
 <Figure
   src="/images/series/langgraph/part-4/term-use-client.svg"
-  alt="A dark terminal running npm run dev. After the Next.js 16.2.9 ready banner, an error: './app/page.tsx:4:34. You're importing a component that needs useState. This React hook only works in a Client Component. To fix, mark the file (or its parent) with the use client directive.' A code frame points at line 4 where useState is called."
+  alt="A dark terminal running npm run dev. After the Next.js 16.2.9 ready banner, an error: './app/page.tsx:9:35. You're importing a component that needs useState. This React hook only works in a Client Component. To fix, mark the file (or its parent) with the use client directive.' A two-line code frame follows: line 8 is 'export default function Chat() {' and line 9, marked with an arrow, is the useState call for messages."
   caption="The error every App Router beginner meets. It's not a bug in your code; it's React asking you to declare which side of the fence this component lives on."
   width={980}
   height={440}
@@ -132,7 +192,7 @@ Save the file, and the dev server falls over instead of reloading clean:
 
 Read it like [Part 2 taught you](/blog/langgraph-2-fastapi-basics#now-break-it-on-purpose), except this one is friendly enough to read top-down: `useState` only works in a Client Component. Here's the idea behind that sentence. Next.js renders most components on the *server*, ahead of time, where there's no browser, no clicks, and no state that changes. A component that holds state and responds to typing has to run in the *browser* instead. Next.js won't guess which kind you meant; you have to say so, with one line at the very top of the file:
 
-```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="1"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx"
 "use client";
 
 import { useState } from "react";
@@ -146,55 +206,67 @@ The rule of thumb: add it the moment a component needs to *react* to something i
 
 ## Dress the window
 
-Right now the page renders the words "chat goes here". Time to render the actual conversation. First, bring in the shadcn pieces by adding to your imports:
+Right now the page renders the words "chat goes here". Time to render the actual conversation. First, bring in the shadcn pieces and a handful of icons by adding to your imports:
 
-```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="4-6"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="4-7"
+import { Bot, CircleAlert, Send, Sparkles, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 ```
 
-Now replace that placeholder `return` with a real layout: a card holding a header, a scrolling list of message bubbles, nothing else yet.
+You didn't install that first line's package: `shadcn init` did, because its own components draw their icons with [lucide-react](https://lucide.dev). It's already in your `node_modules`, so the whole icon set is sitting there waiting, and five of them do the visual work today.
 
-```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="47-60,62,79-81"
+Now replace that placeholder `return` with the product shell: a branded header, a generous scrolling canvas, and a message list with explicit accessibility labels. The small `Brand`, `EmptyState`, and `ChatBubble` helpers in the complete file keep this return block readable (a fourth one, `ThinkingBubble`, arrives later when the UI learns to wait); copy them from **View full file** on the snippet when you build along.
+
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx"
 return (
-  <main className="mx-auto flex h-dvh max-w-2xl flex-col p-4">
-    <Card className="flex flex-1 flex-col overflow-hidden">
-      <div className="border-b px-5 py-4 font-semibold">Chatbot</div>
-      <div className="flex-1 space-y-4 overflow-y-auto p-5">
-        {messages.map((m, i) => (
-          <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
-            <span className={`inline-block max-w-[75%] rounded-2xl px-4 py-2 ${
-              m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-            }`}>
-              {m.content}
-            </span>
+  <main className="relative min-h-dvh overflow-hidden p-3 sm:p-5 lg:p-7">
+    <Card className="mx-auto flex h-[calc(100dvh-1.5rem)] max-w-6xl flex-col gap-0 overflow-hidden rounded-[1.75rem] bg-card/95 py-0 shadow-2xl">
+      <header className="flex h-20 items-center justify-between border-b px-4 sm:px-7">
+        <Brand />
+        <div className="flex items-center gap-2 rounded-full border bg-background/70 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm">
+          <span className="size-2 rounded-full bg-emerald-500 ring-4 ring-emerald-500/15" />
+          <span className="hidden sm:inline">Local workspace</span>
+          <span className="sm:hidden">Local</span>
+        </div>
+      </header>
+      <div className="chat-scrollbar flex-1 overflow-y-auto px-4 py-5 sm:px-7" role="log" aria-live="polite">
+        {messages.length === 0 && !loading ? <EmptyState onPick={setInput} /> : (
+          <div className="mx-auto max-w-3xl space-y-6">
+            {messages.map((message, index) => (
+              <ChatBubble key={`${message.role}-${index}`} message={message} />
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </Card>
   </main>
 );
 ```
 
-The line that matters is `messages.map(...)`. It walks the `messages` array and turns each one into a bubble. User messages get pushed to the right with a dark fill; assistant messages stay left in a soft gray. The `key={i}` gives React a handle on each row so it can update the list efficiently. Everything else is Tailwind spacing.
+Two things in there run ahead of you on purpose. The status pill is a hairline-bordered capsule with an emerald dot, and it swaps its own label at the `sm` breakpoint: "Local workspace" on a laptop, "Local" on a phone. And the guard says `messages.length === 0 && !loading`, which mentions a flag you don't have yet. It's one line, `const [loading, setLoading] = useState(false);`, and the fetch section a bit further down is where it earns its keep; add it next to the other two now if a red underline in your editor would bother you.
+
+The line that matters is `messages.map(...)`. It walks the `messages` array and turns each one into a bubble. Your messages sit on the right in a filled violet bubble under a small `YOU` label; Lattice answers on the left in a bordered card under `LATTICE`, and each side gets its own little avatar chip. The composite `key`, the role plus the index, gives React a stable handle on each row so it can update the list instead of redrawing it. Everything else is Tailwind spacing.
+
+When `messages` is empty, none of that shows. `EmptyState` fills the canvas instead: a small eyebrow reading "Your first conversation", a headline asking "What can we figure out together?", and three starter prompts as clickable cards. Those cards are the reason `EmptyState` takes an `onPick` prop, and the reason you pass it `setInput` directly: clicking one drops the prompt straight into the composer, so a reader with no idea what to ask still has something to send.
 
 There's one problem: `messages` starts empty, so there's nothing to see. To check your styling before the backend is wired, hand `useState` two fake messages for a moment:
 
 ```tsx filename="frontend/app/page.tsx"
 const [messages, setMessages] = useState<Message[]>([
   { role: "user", content: "Is this thing on?" },
-  { role: "assistant", content: "Loud and clear. This bubble is just sample data for now." },
+  { role: "assistant", content: "Loud and clear. Your chat UI is ready." },
 ]);
 ```
 
 <Figure
   src="/images/series/langgraph/part-4/browser-chat-bubbles-light.svg"
   srcDark="/images/series/langgraph/part-4/browser-chat-bubbles-dark.svg"
-  alt="The chat card titled Chatbot showing two sample bubbles: a right-aligned dark user bubble reading 'Is this thing on?' and a left-aligned gray assistant bubble reading 'Loud and clear. This bubble is just sample data for now.' An input with a Send button sits at the bottom."
-  caption="Fake data, real layout. The map turned two objects into two bubbles. Now delete the sample messages and set the state back to an empty array."
-  width={1120}
-  height={483}
+  alt="The redesigned Lattice window showing two sample messages: a labeled right-aligned user bubble reading 'Is this thing on?' and a bordered left-aligned assistant bubble reading 'Loud and clear. Your chat UI is ready.' The branded header and rounded composer frame the conversation."
+  caption="Fake data, real layout. The map turned two objects into two bubbles. The composer along the bottom is drawn here for context; you build it in the next section. Now delete the sample messages and set the state back to an empty array."
+  width={1200}
+  height={720}
 />
 
 It works. Now put the state back to `useState<Message[]>([])`; real messages are about to arrive the honest way.
@@ -215,26 +287,56 @@ function sendMessage(e: FormEvent) {
 
 `e.preventDefault()` stops the browser's default form behavior (a full page reload, a relic from the 1990s). Then it trims the text, ignores empty submits, appends a new user message to the list, and clears the input. Note the `(prev) => [...prev, ...]` shape: it builds a *new* array from the old one plus the new message, because React only notices changes when you hand it a new array, never when you poke the old one.
 
-That handler uses a `FormEvent` type, so widen your React import to bring it in:
+That handler uses a `FormEvent` type, and two more hooks are coming before this part is over, so widen your React import once and be done with it:
 
 ```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="3"
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 ```
 
-Now the form itself. Add it inside the `Card`, right after the messages `<div>`:
+Now the form itself. Add it inside the `Card`, below the messages `<div>`:
 
-```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="68-72,74,76-78"
-<form onSubmit={sendMessage} className="flex gap-2 border-t p-4">
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx"
+<form
+  onSubmit={sendMessage}
+  className="mx-auto flex max-w-3xl items-center gap-2 rounded-2xl border bg-background/85 p-2 shadow-lg shadow-slate-950/5 transition focus-within:border-primary/45 focus-within:ring-4 focus-within:ring-primary/10"
+>
+  <label htmlFor="chat-message" className="sr-only">
+    Message Lattice
+  </label>
   <Input
+    id="chat-message"
     value={input}
     onChange={(e) => setInput(e.target.value)}
-    placeholder="Ask me anything..."
+    placeholder="Message Lattice…"
+    autoComplete="off"
+    disabled={loading}
+    className="h-11 flex-1 border-0 bg-transparent px-3 text-sm shadow-none focus-visible:ring-0"
   />
-  <Button type="submit">Send</Button>
-</form>
 ```
 
-The `Input` is *controlled*: its value is always `input` from state, and every keystroke fires `onChange`, which writes the new text back to state. The form's `onSubmit` runs your `sendMessage` whether the reader clicks Send or just presses Enter.
+The `Input` is *controlled*: its value is always `input` from state, and every keystroke fires `onChange`, which writes the new text back to state. It carries no border of its own, because the border belongs to the `<form>` around it, and `focus-within` on that form is what makes the whole capsule light up when the cursor lands inside. The `<label>` is `sr-only`, present for screen readers and invisible on screen, since the placeholder already tells sighted readers what the box is for.
+
+Then the button, and the closing tag:
+
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx"
+  <Button
+    type="submit"
+    aria-label="Send message"
+    disabled={loading || !input.trim()}
+    className="h-11 rounded-xl px-4 shadow-md shadow-primary/20"
+  >
+    <span className="hidden sm:inline">Send</span>
+    <Send className="size-4" aria-hidden="true" />
+  </Button>
+</form>
+<p className="mt-2 text-center text-[11px] text-muted-foreground">
+  Answers are generated by your local LangGraph workflow.
+</p>
+```
+
+The button holds three small decisions. `disabled={loading || !input.trim()}` means it refuses both empty messages and double-sends. The word "Send" hides below the `sm` breakpoint, leaving the paper-plane icon alone on narrow screens, which is why the `aria-label` is there: a screen reader announces "Send message" either way, and `aria-hidden` on the icon keeps it from being read as a second thing.
+
+Under the composer sits one line of fine print, "Answers are generated by your local LangGraph workflow", a quiet reminder that nothing typed here is going to somebody else's cloud. And the form's `onSubmit` runs your `sendMessage` whether the reader clicks the button or presses Enter.
 
 Save, type something, hit Send. Your message appears as a bubble, the box clears, and then... nothing. No reply. Of course not: you never told it to call the backend. The UI is gorgeous and completely deaf.
 
@@ -253,7 +355,7 @@ Flat cartoon comic, bold black outlines, flat colors, warm off-white paper backg
 
 Here's the cable. Your `sendMessage` currently adds the user's bubble and stops. It needs to take the next step: send that text to the backend, wait for the reply, and add the answer as a second bubble. Replace `sendMessage` with this:
 
-```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="21-45"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx"
 async function sendMessage(e: FormEvent) {
   e.preventDefault();
   const text = input.trim();
@@ -285,13 +387,13 @@ Look past the new `loading` and `error` lines for a second (they get their own s
 
 Two small things hold this together. First, `API_BASE`. Add it near the top of the file, just under the imports:
 
-```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="13"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx"
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 ```
 
-That reads the backend URL you saved in `frontend/.env.local` back in [Part 1](/blog/langgraph-1-setup#tell-your-code-about-the-key). You also need the two new state variables the handler uses; widen your state block:
+That reads the backend URL you saved in `frontend/.env.local` back in [Part 1](/blog/langgraph-1-setup#tell-your-code-about-the-key). The handler also leans on two new state variables, so widen your state block (if you already added `loading` back when you built the shell, this is only the second line):
 
-```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="18-19"
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx"
 const [loading, setLoading] = useState(false);
 const [error, setError] = useState<string | null>(null);
 ```
@@ -311,41 +413,82 @@ Now go back to the browser, type a real question, and hit Send. After a short pa
 <Figure
   src="/images/series/langgraph/part-4/fig-roundtrip-light.svg"
   srcDark="/images/series/langgraph/part-4/fig-roundtrip-dark.svg"
-  alt="A diagram of the request round trip. On the left, a browser box at localhost:3000 holds a chat input and the React state 'messages, input'. An accent arrow labeled 'fetch( /chat )' with '{ message }' points right to a server box at localhost:8000 running POST /chat and graph.invoke. A return arrow labeled '200 OK' and '{ reply }' points back left. A caption reads that your click sends the words out and the reply rides back to become a bubble."
+  alt="A diagram of the request round trip. On the left, a browser box at localhost:3000 holds a user bubble reading 'Explain recursion.', a composer whose placeholder reads 'Message Lattice…' next to a Send button, and a note that useState holds messages and input. An accent arrow labeled 'fetch( /chat )' with '{ message }' points right to a server box at localhost:8000 running POST /chat and graph.invoke. A return arrow labeled '200 OK' and '{ reply }' points back left. A line underneath reads that your click sends the words out and the reply rides back to become a bubble."
   caption="The whole trip. Same path as your [Part 2 curl](/blog/langgraph-2-fastapi-basics#teach-it-to-listen), except a browser makes it and React paints the answer. The backend is the [Part 3 one-node graph](/blog/langgraph-3-first-graph#hand-the-conversation-to-the-graph), untouched."
   width={1180}
   height={560}
 />
 
+## Ask it six questions and it walks off the screen
+
+Keep talking to it and a small irritation shows up: once the conversation is taller than the canvas, new bubbles land below the fold and you have to scroll down yourself to read the answer you just asked for. Chat apps pin themselves to the bottom instead. Add these two pieces at the top of the component, next to your state:
+
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx"
+const bottomRef = useRef<HTMLDivElement>(null);
+
+useEffect(() => {
+  bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+}, [messages, loading]);
+```
+
+[`useRef`](https://react.dev/reference/react/useRef) holds a handle to a real DOM node, and unlike state, changing it never re-renders anything; it's a pointer you keep, not a value React watches. [`useEffect`](https://react.dev/reference/react/useEffect) runs code *after* the browser has painted, and its second argument is the watch list: whenever `messages` or `loading` changes, scroll that node into view.
+
+Then give the ref something to point at. Drop `<div ref={bottomRef} />` in as the very last child inside the message list `<div>`, below the bubbles: an empty div with no styling and no content, whose entire job is to be the bottom of the conversation. React fills `bottomRef.current` with it on the first render, and from then on every new message quietly slides the list down to meet it.
+
 ## Give it a pulse and a safety net
 
-Two rough edges remain, and you already wrote half the fix. While the model thinks, the UI just sits there; and if the backend is down, the message vanishes into silence. The `loading` and `error` state you added handle both, but nothing *shows* them yet. Add two small pieces to your JSX.
+Two rough edges remain, and you already wrote half the fix. While the model thinks, the UI sits there looking asleep; and if the backend is down, the message vanishes into silence. The `loading` and `error` state you added handle both, but nothing *shows* them yet. One more helper and two small pieces of JSX close that gap.
 
-First, a thinking indicator. Inside the messages `<div>`, right after the `.map(...)`, add:
+First, the thinking indicator itself. It's the fourth helper, and it goes next to `ChatBubble`, above your `Chat` component:
 
-```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="61"
-{loading && <p className="text-muted-foreground">Thinking...</p>}
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="103-116"
+function ThinkingBubble() {
+  return (
+    <div className="flex items-end gap-3" aria-label="Lattice is thinking">
+      <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+        <Bot className="size-4" aria-hidden="true" />
+      </div>
+      <div className="flex items-center gap-1.5 rounded-[1.35rem] rounded-bl-md border bg-card px-4 py-4 shadow-sm">
+        <span className="typing-dot size-1.5 rounded-full bg-primary" />
+        <span className="typing-dot size-1.5 rounded-full bg-primary" />
+        <span className="typing-dot size-1.5 rounded-full bg-primary" />
+      </div>
+    </div>
+  );
+}
 ```
 
-Then an error banner and a disabled input while a request is in flight. Put the banner just above the `<form>`, and add `disabled={loading}` to both the `Input` and the `Button`:
+It's the same shape as an assistant bubble, avatar chip and all, with three dots where the words go. Those `typing-dot` spans are the payoff for the CSS you wrote at the start of this part: the class attaches the `lattice-typing` keyframes, and the `nth-child` delays stagger the second and third dot so the row ripples. The `aria-label` says out loud what the animation says visually, because a screen reader can't see dots bounce. Now render it inside the messages `<div>`, right after the `.map(...)`:
 
-```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx" lines="63-67"
-{error && (
-  <p className="mx-5 mb-2 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">
-    {error}
-  </p>
-)}
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx"
+{loading ? <ThinkingBubble /> : null}
 ```
 
-The `loading && ...` and `error && ...` are React's plain-JavaScript way of saying "render this only when that's true". When `loading` is `false`, `false` renders nothing; flip it `true` and the indicator appears. Send a message now and you get a "Thinking..." line and a frozen input until the reply lands:
+Then the safety net. The `Input` and the `Button` already carry `disabled={loading}`, so the composer freezes itself while a request is in flight; what's missing is the banner. Put it in the footer area, above the `<form>`:
+
+```tsx filename="frontend/app/page.tsx" repo="part-04-nextjs-frontend/frontend/app/page.tsx"
+{error ? (
+  <div
+    role="alert"
+    className="mx-auto mb-3 flex max-w-3xl items-start gap-2 rounded-xl border border-destructive/25 bg-destructive/10 px-3 py-2.5 text-sm text-destructive"
+  >
+    <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+    <span>{error}</span>
+  </div>
+) : null}
+```
+
+`role="alert"` is the important attribute: it tells assistive tech to announce this the moment it appears, rather than waiting for the reader to wander over to it. The `CircleAlert` icon and the `destructive` tokens do the visual half of the same job.
+
+The `loading ? ... : null` and `error ? ... : null` expressions are React's plain-JavaScript way of saying "render this only when that's true". When `loading` flips on, a compact three-dot assistant bubble appears and the composer freezes until the reply lands:
 
 <Figure
   src="/images/series/langgraph/part-4/browser-chat-loading-light.svg"
   srcDark="/images/series/langgraph/part-4/browser-chat-loading-dark.svg"
-  alt="The chat card with the user's message 'Explain recursion in one sentence.' showing, and below it a 'Thinking...' indicator with three dots while the assistant's reply is still being fetched. The input box is dimmed."
-  caption="The pulse. While fetch is in flight, loading is true, so the indicator shows and the input is disabled. It flips back the instant the reply arrives."
-  width={1120}
-  height={430}
+  alt="The Lattice window shows the user's bubble 'Explain recursion in one sentence.' on the right, and on the left a small assistant bubble with a sparkle avatar chip and three violet dots at different brightnesses, mid-animation. The composer along the bottom is greyed out because it is disabled."
+  caption="The pulse. While fetch is in flight, loading is true, so the three dots ripple and the composer greys out. Both flip back the instant the reply arrives."
+  width={1200}
+  height={720}
 />
 
 Now prove the safety net works by breaking it on purpose. Click into the backend's terminal and press `CTRL+C` to stop it, then send another message:
@@ -353,10 +496,10 @@ Now prove the safety net works by breaking it on purpose. Click into the backend
 <Figure
   src="/images/series/langgraph/part-4/browser-chat-error-light.svg"
   srcDark="/images/series/langgraph/part-4/browser-chat-error-dark.svg"
-  alt="The chat card with the user message 'Explain recursion in one sentence.' and a red error banner reading 'Could not reach the backend. Is it running on :8000?' above the input box."
+  alt="The Lattice chat card with a single user bubble reading 'Hello?' and, above the composer, a red-bordered banner with a warning icon reading 'Could not reach the backend. Is it running on :8000?'"
   caption="With the backend stopped, fetch throws, the catch block runs, and the reader gets an honest sentence instead of a spinner that never stops. Restart the backend and it works again."
-  width={1120}
-  height={430}
+  width={1200}
+  height={720}
 />
 
 With nothing listening on `:8000`, `fetch` throws, your `catch` block runs, and the reader sees a plain explanation instead of a dead screen. Start the backend again (`uvicorn app.main:app --reload`) and the chat works exactly as before. A real app spends a surprising amount of its code on these "what if it fails" paths; you just wrote your first one.
@@ -368,7 +511,8 @@ Here's the whole file, in case a piece drifted out of place while you built it u
 ```tsx filename="frontend/app/page.tsx" collapsed repo="part-04-nextjs-frontend/frontend/app/page.tsx"
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Bot, CircleAlert, Send, Sparkles, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -380,11 +524,118 @@ interface Message {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+const STARTER_PROMPTS = [
+  "Explain recursion in one sentence",
+  "Give me a small Python project idea",
+  "What makes LangGraph useful?",
+];
+
+function Brand() {
+  return (
+    <div className="flex min-w-0 items-center gap-3">
+      <div className="grid size-10 shrink-0 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+        <Sparkles className="size-5" aria-hidden="true" />
+      </div>
+      <div className="min-w-0">
+        <p className="truncate text-base font-semibold tracking-tight">Lattice</p>
+        <p className="truncate text-xs text-muted-foreground">A LangGraph assistant</p>
+      </div>
+    </div>
+  );
+}
+
+function EmptyState({ onPick }: { onPick: (prompt: string) => void }) {
+  return (
+    <div className="mx-auto flex h-full w-full max-w-2xl flex-col items-center justify-center px-2 py-10 text-center">
+      <div className="relative mb-6">
+        <div className="absolute inset-0 scale-150 rounded-full bg-primary/15 blur-2xl" />
+        <div className="relative grid size-16 place-items-center rounded-3xl border border-primary/20 bg-card shadow-xl shadow-primary/10">
+          <Bot className="size-7 text-primary" aria-hidden="true" />
+        </div>
+      </div>
+      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-primary">
+        Your first conversation
+      </p>
+      <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+        What can we figure out together?
+      </h1>
+      <p className="mt-3 max-w-lg text-pretty text-sm leading-6 text-muted-foreground sm:text-base">
+        Ask a question and your message will travel through FastAPI to the LangGraph workflow you built.
+      </p>
+      <div className="mt-8 grid w-full gap-2 sm:grid-cols-3">
+        {STARTER_PROMPTS.map((prompt) => (
+          <button
+            key={prompt}
+            type="button"
+            onClick={() => onPick(prompt)}
+            className="rounded-2xl border bg-card/70 px-4 py-3 text-left text-sm leading-5 text-foreground shadow-sm transition hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {prompt}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ChatBubble({ message }: { message: Message }) {
+  const isUser = message.role === "user";
+
+  return (
+    <article className={`flex items-end gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
+      {!isUser ? (
+        <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+          <Bot className="size-4" aria-hidden="true" />
+        </div>
+      ) : null}
+      <div className={`flex max-w-[82%] flex-col sm:max-w-[72%] ${isUser ? "items-end" : "items-start"}`}>
+        <p className={`mb-1.5 px-1 text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground ${isUser ? "text-right" : "text-left"}`}>
+          {isUser ? "You" : "Lattice"}
+        </p>
+        <div
+          className={
+            isUser
+              ? "rounded-[1.35rem] rounded-br-md bg-primary px-4 py-3 text-sm leading-6 text-primary-foreground shadow-lg shadow-primary/15"
+              : "rounded-[1.35rem] rounded-bl-md border bg-card px-4 py-3 text-sm leading-6 shadow-sm"
+          }
+        >
+          {message.content}
+        </div>
+      </div>
+      {isUser ? (
+        <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-secondary text-secondary-foreground">
+          <UserRound className="size-4" aria-hidden="true" />
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+function ThinkingBubble() {
+  return (
+    <div className="flex items-end gap-3" aria-label="Lattice is thinking">
+      <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+        <Bot className="size-4" aria-hidden="true" />
+      </div>
+      <div className="flex items-center gap-1.5 rounded-[1.35rem] rounded-bl-md border bg-card px-4 py-4 shadow-sm">
+        <span className="typing-dot size-1.5 rounded-full bg-primary" />
+        <span className="typing-dot size-1.5 rounded-full bg-primary" />
+        <span className="typing-dot size-1.5 rounded-full bg-primary" />
+      </div>
+    </div>
+  );
+}
+
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
 
   async function sendMessage(e: FormEvent) {
     e.preventDefault();
@@ -413,37 +664,76 @@ export default function Chat() {
   }
 
   return (
-    <main className="mx-auto flex h-dvh max-w-2xl flex-col p-4">
-      <Card className="flex flex-1 flex-col overflow-hidden">
-        <div className="border-b px-5 py-4 font-semibold">Chatbot</div>
-        <div className="flex-1 space-y-4 overflow-y-auto p-5">
-          {messages.map((m, i) => (
-            <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
-              <span className={`inline-block max-w-[75%] rounded-2xl px-4 py-2 ${
-                m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-              }`}>
-                {m.content}
-              </span>
+    <main className="relative min-h-dvh overflow-hidden p-3 sm:p-5 lg:p-7">
+      <Card className="relative mx-auto flex h-[calc(100dvh-1.5rem)] min-h-[34rem] max-w-6xl flex-col gap-0 overflow-hidden rounded-[1.75rem] border-foreground/10 bg-card/95 py-0 shadow-2xl shadow-slate-950/10 ring-1 ring-foreground/10 backdrop-blur-xl sm:h-[calc(100dvh-2.5rem)] lg:h-[calc(100dvh-3.5rem)]">
+        <header className="flex h-20 shrink-0 items-center justify-between border-b px-4 sm:px-7">
+          <Brand />
+          <div className="flex items-center gap-2 rounded-full border bg-background/70 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm">
+            <span className="size-2 rounded-full bg-emerald-500 ring-4 ring-emerald-500/15" />
+            <span className="hidden sm:inline">Local workspace</span>
+            <span className="sm:hidden">Local</span>
+          </div>
+        </header>
+
+        <div
+          className="chat-scrollbar flex-1 overflow-y-auto px-4 py-5 sm:px-7 sm:py-7"
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions text"
+        >
+          {messages.length === 0 && !loading ? (
+            <EmptyState onPick={setInput} />
+          ) : (
+            <div className="mx-auto w-full max-w-3xl space-y-6">
+              {messages.map((message, index) => (
+                <ChatBubble key={`${message.role}-${index}`} message={message} />
+              ))}
+              {loading ? <ThinkingBubble /> : null}
+              <div ref={bottomRef} />
             </div>
-          ))}
-          {loading && <p className="text-muted-foreground">Thinking...</p>}
+          )}
         </div>
-        {error && (
-          <p className="mx-5 mb-2 rounded-md bg-red-50 px-4 py-2 text-sm text-red-700">
-            {error}
+
+        <div className="shrink-0 border-t bg-card/80 p-3 sm:p-5">
+          {error ? (
+            <div
+              role="alert"
+              className="mx-auto mb-3 flex max-w-3xl items-start gap-2 rounded-xl border border-destructive/25 bg-destructive/10 px-3 py-2.5 text-sm text-destructive"
+            >
+              <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              <span>{error}</span>
+            </div>
+          ) : null}
+          <form
+            onSubmit={sendMessage}
+            className="mx-auto flex max-w-3xl items-center gap-2 rounded-2xl border bg-background/85 p-2 shadow-lg shadow-slate-950/5 transition focus-within:border-primary/45 focus-within:ring-4 focus-within:ring-primary/10"
+          >
+            <label htmlFor="chat-message" className="sr-only">
+              Message Lattice
+            </label>
+            <Input
+              id="chat-message"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Message Lattice…"
+              autoComplete="off"
+              disabled={loading}
+              className="h-11 flex-1 border-0 bg-transparent px-3 text-sm shadow-none focus-visible:ring-0"
+            />
+            <Button
+              type="submit"
+              aria-label="Send message"
+              disabled={loading || !input.trim()}
+              className="h-11 rounded-xl px-4 shadow-md shadow-primary/20"
+            >
+              <span className="hidden sm:inline">Send</span>
+              <Send className="size-4" aria-hidden="true" />
+            </Button>
+          </form>
+          <p className="mt-2 text-center text-[11px] text-muted-foreground">
+            Answers are generated by your local LangGraph workflow.
           </p>
-        )}
-        <form onSubmit={sendMessage} className="flex gap-2 border-t p-4">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask me anything..."
-            disabled={loading}
-          />
-          <Button type="submit" disabled={loading}>
-            Send
-          </Button>
-        </form>
+        </div>
       </Card>
     </main>
   );
@@ -523,7 +813,7 @@ export default function Chat() {
         "The `Input` component validated it",
       ],
       answer: 1,
-      explain: "With nothing listening on `:8000`, `fetch` rejects, control jumps to `catch`, and `setError(...)` updates state. The `error && ...` line in the JSX then renders the banner. No reply ever came from the backend; the message is yours.",
+      explain: "With nothing listening on `:8000`, `fetch` rejects, control jumps to `catch`, and `setError(...)` updates state. The `error ? … : null` line in the JSX then renders the banner. No reply ever came from the backend; the message is yours.",
     },
   ]}
 />
@@ -535,9 +825,9 @@ git add .
 git commit -m "part 4: a real chat UI wired to the backend over fetch"
 ```
 
-There's still a pause in the middle of every conversation, the few seconds where the UI just says "Thinking..." and waits for the whole reply to land at once. Real chat apps don't make you wait like that; the words appear as the model writes them. In [Part 5](/blog/langgraph-5-streaming#why-three-seconds-feels-like-forever) you'll replace that pause with text streaming in one token at a time.
+There's still a pause in the middle of every conversation: the animated dots wait for the whole reply to land at once. Real chat apps let the words appear as the model writes them. In [Part 5](/blog/langgraph-5-streaming#why-three-seconds-feels-like-forever) you'll replace that pause with text streaming in one token at a time.
 
-The complete, tested code for this part lives in [`part-04-nextjs-frontend`](https://github.com/yadneshSalvi/langgraph-from-scratch/tree/main/part-04-nextjs-frontend) in the [companion repo](https://github.com/yadneshSalvi/langgraph-from-scratch). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place with this section's changes highlighted.
+The complete, tested code for this part lives in [`part-04-nextjs-frontend`](https://github.com/yadneshSalvi/langgraph-from-scratch/tree/main/part-04-nextjs-frontend) in the [companion repo](https://github.com/yadneshSalvi/langgraph-from-scratch). Code blocks with a GitHub icon link straight to the exact file; "View full file" shows the whole file in place.
 
 {/* TODO once the Concepts page (langgraph-concepts.mdx) ships: link "use client", "fetch API", and "JSX" to /blog/langgraph-concepts#use-client, #fetch-api, and #jsx instead of defining only inline. */}
 

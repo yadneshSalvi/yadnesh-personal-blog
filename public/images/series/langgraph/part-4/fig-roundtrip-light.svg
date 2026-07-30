@@ -7,7 +7,7 @@
   <rect x="98" y="210" width="304" height="44" rx="10" fill="#f6e7df" stroke="#dcb09a" stroke-width="1.5"/>
   <text x="114" y="238" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#b3441a">"Explain recursion."</text>
   <rect x="98" y="268" width="240" height="36" rx="8" fill="#ffffff" stroke="#e7e3d9" stroke-width="1.5"/>
-  <text x="114" y="291" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#8f887a">type a message...</text>
+  <text x="114" y="291" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#8f887a">Message Lattice…</text>
   <rect x="346" y="268" width="56" height="36" rx="8" fill="#1f1c19"/>
   <text x="374" y="291" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#faf9f6" text-anchor="middle">Send</text>
   <text x="98" y="334" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12.5" fill="#5b554c">useState: messages, input</text>

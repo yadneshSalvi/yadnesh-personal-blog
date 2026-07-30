@@ -1,35 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="470" viewBox="0 0 1180 470" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
-  <rect width="1180" height="470" fill="#f5f5f4"/>
-  <text x="40" y="50" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" letter-spacing="2.5" fill="#8f887a">STREAMING &#183; localhost:3000 &#183; ONE ANSWER, ARRIVING</text>
-  
-  <rect x="40" y="86" width="336" height="300" rx="14" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
-  <text x="62" y="120" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Chatbot</text>
-  <line x1="40" y1="138" x2="376" y2="138" stroke="#eceae8" stroke-width="1.5"/>
-  <rect x="180" y="160" width="174" height="41" rx="13" fill="#1c1917"/>
-  <text x="195" y="185" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#fafaf9">Explain recursion.</text>
-  <rect x="62" y="217" width="126" height="41" rx="13" fill="#f5f5f4"/>
-  <text x="77" y="242" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">Recursion is</text>
-  <rect x="176" y="228" width="3" height="16" rx="1" fill="#b3441a"/>
-  <text x="208" y="420" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#78716c" text-anchor="middle">t = 0.3s</text>
-  <path d="M 391 227 l 11 9 l -11 9" fill="none" stroke="#b3441a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="422" y="86" width="336" height="300" rx="14" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
-  <text x="444" y="120" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Chatbot</text>
-  <line x1="422" y1="138" x2="758" y2="138" stroke="#eceae8" stroke-width="1.5"/>
-  <rect x="562" y="160" width="174" height="41" rx="13" fill="#1c1917"/>
-  <text x="577" y="185" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#fafaf9">Explain recursion.</text>
-  <rect x="444" y="217" width="182" height="62" rx="13" fill="#f5f5f4"/>
-  <text x="459" y="242" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">Recursion is when a</text>
-  <text x="459" y="263" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">function</text>
-  <rect x="526" y="249" width="3" height="16" rx="1" fill="#b3441a"/>
-  <text x="590" y="420" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#78716c" text-anchor="middle">t = 0.7s</text>
-  <path d="M 773 227 l 11 9 l -11 9" fill="none" stroke="#b3441a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="804" y="86" width="336" height="300" rx="14" fill="#ffffff" stroke="#e7e5e4" stroke-width="1.5"/>
-  <text x="826" y="120" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#1c1917">Chatbot</text>
-  <line x1="804" y1="138" x2="1140" y2="138" stroke="#eceae8" stroke-width="1.5"/>
-  <rect x="944" y="160" width="174" height="41" rx="13" fill="#1c1917"/>
-  <text x="959" y="185" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#fafaf9">Explain recursion.</text>
-  <rect x="826" y="217" width="206" height="62" rx="13" fill="#f5f5f4"/>
-  <text x="841" y="242" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">Recursion is when a</text>
-  <text x="841" y="263" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1c1917">function calls itself.</text>
-  <text x="972" y="420" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#78716c" text-anchor="middle">t = 1.2s</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+    <title id="title">A streamed response appearing token by token</title><desc id="desc">Three polished Lattice chat panels show the beginning, middle, and end of one streaming answer.</desc>
+    <rect width="1200" height="700" fill="#eef2ff"/>
+    <rect x="42" y="82" width="358" height="536" rx="24" fill="#ffffff" stroke="#d6dceb" stroke-width="2"/>
+
+    <rect x="64" y="106" width="32" height="32" rx="12" fill="#6458dc"/>
+    <path d="M 72.96000000000001 122h14.08M80 114.96000000000001v14.08M75.2 117.2l9.6 9.6M84.8 117.2l-9.6 9.6" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>
+    <text x="108" y="120" fill="#172036" font-family="Inter, -apple-system, sans-serif" font-size="14" font-weight="700">Lattice</text>
+    <text x="108" y="135" fill="#68748b" font-family="Inter, -apple-system, sans-serif" font-size="9">A LangGraph assistant</text>
+    <rect x="286" y="110" width="91" height="26" rx="13" fill="#f8faff" stroke="#d6dceb"/>
+    <text x="331.5" y="127" fill="#68748b" font-family="Inter, sans-serif" font-size="9" text-anchor="middle">STREAMING</text>
+    <text x="66" y="184" fill="#6458dc" font-family="Inter, sans-serif" font-size="9" font-weight="750" letter-spacing="1.7">FIRST TOKENS</text>
+    <rect x="66" y="205" width="310" height="90" rx="18" fill="#f8faff" stroke="#d6dceb"/>
+    <text x="85" y="239" fill="#172036" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="400" text-anchor="start">Recursion<tspan fill="#6458dc" font-weight="700"> |</tspan></text>
+    <rect x="66" y="536" width="310" height="52" rx="18" fill="#f8faff" stroke="#d6dceb"/>
+    <text x="84" y="568" fill="#68748b" font-family="Inter, sans-serif" font-size="11">Message Lattice…</text>
+    <circle cx="349" cy="562" r="17" fill="#6458dc"/>
+    <text x="349" y="566" fill="#ffffff" font-family="Inter, sans-serif" font-size="12" text-anchor="middle">↗</text>
+
+    <rect x="421" y="82" width="358" height="536" rx="24" fill="#ffffff" stroke="#d6dceb" stroke-width="2"/>
+
+    <rect x="443" y="106" width="32" height="32" rx="12" fill="#6458dc"/>
+    <path d="M 451.96 122h14.08M459 114.96000000000001v14.08M454.2 117.2l9.6 9.6M463.8 117.2l-9.6 9.6" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>
+    <text x="487" y="120" fill="#172036" font-family="Inter, -apple-system, sans-serif" font-size="14" font-weight="700">Lattice</text>
+    <text x="487" y="135" fill="#68748b" font-family="Inter, -apple-system, sans-serif" font-size="9">A LangGraph assistant</text>
+    <rect x="665" y="110" width="91" height="26" rx="13" fill="#f8faff" stroke="#d6dceb"/>
+    <text x="710.5" y="127" fill="#68748b" font-family="Inter, sans-serif" font-size="9" text-anchor="middle">STREAMING</text>
+    <text x="445" y="184" fill="#6458dc" font-family="Inter, sans-serif" font-size="9" font-weight="750" letter-spacing="1.7">MID-STREAM</text>
+    <rect x="445" y="205" width="310" height="90" rx="18" fill="#f8faff" stroke="#d6dceb"/>
+    <text x="464" y="239" fill="#172036" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="400" text-anchor="start">Recursion is when a</text>
+<text x="464" y="261" fill="#172036" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="400" text-anchor="start">function calls<tspan fill="#6458dc" font-weight="700"> |</tspan></text>
+    <rect x="445" y="536" width="310" height="52" rx="18" fill="#f8faff" stroke="#d6dceb"/>
+    <text x="463" y="568" fill="#68748b" font-family="Inter, sans-serif" font-size="11">Message Lattice…</text>
+    <circle cx="728" cy="562" r="17" fill="#6458dc"/>
+    <text x="728" y="566" fill="#ffffff" font-family="Inter, sans-serif" font-size="12" text-anchor="middle">↗</text>
+
+    <rect x="800" y="82" width="358" height="536" rx="24" fill="#ffffff" stroke="#d6dceb" stroke-width="2"/>
+
+    <rect x="822" y="106" width="32" height="32" rx="12" fill="#6458dc"/>
+    <path d="M 830.96 122h14.08M838 114.96000000000001v14.08M833.2 117.2l9.6 9.6M842.8 117.2l-9.6 9.6" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>
+    <text x="866" y="120" fill="#172036" font-family="Inter, -apple-system, sans-serif" font-size="14" font-weight="700">Lattice</text>
+    <text x="866" y="135" fill="#68748b" font-family="Inter, -apple-system, sans-serif" font-size="9">A LangGraph assistant</text>
+    <rect x="1044" y="110" width="91" height="26" rx="13" fill="#f8faff" stroke="#d6dceb"/>
+    <text x="1089.5" y="127" fill="#68748b" font-family="Inter, sans-serif" font-size="9" text-anchor="middle">STREAMING</text>
+    <text x="824" y="184" fill="#6458dc" font-family="Inter, sans-serif" font-size="9" font-weight="750" letter-spacing="1.7">COMPLETE</text>
+    <rect x="824" y="205" width="310" height="90" rx="18" fill="#f8faff" stroke="#d6dceb"/>
+    <text x="843" y="239" fill="#172036" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="400" text-anchor="start">Recursion is when a</text>
+<text x="843" y="261" fill="#172036" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="400" text-anchor="start">function calls itself.</text>
+    <rect x="824" y="536" width="310" height="52" rx="18" fill="#f8faff" stroke="#d6dceb"/>
+    <text x="842" y="568" fill="#68748b" font-family="Inter, sans-serif" font-size="11">Message Lattice…</text>
+    <circle cx="1107" cy="562" r="17" fill="#6458dc"/>
+    <text x="1107" y="566" fill="#ffffff" font-family="Inter, sans-serif" font-size="12" text-anchor="middle">↗</text>
+  </svg>

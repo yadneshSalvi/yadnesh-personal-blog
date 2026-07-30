@@ -9,7 +9,7 @@ What changed since Part 5:
 - `backend/app/tools.py` — a safe `calculator` (an `ast` walker with an operator whitelist; never `eval`) and Tavily `web_search`
 - `graph.py` — `llm.bind_tools(tools)`, a `ToolNode`, and `tools_condition` conditional edges: the ReAct loop (reason → act → observe → repeat)
 - `main.py` — two new envelope types on the same SSE belt: `tool_start` and `tool_end`
-- `page.tsx` — a `Message` union with a `tool` role and a dashed-border `ToolCallBubble` that shows `running…` → `→ result`
+- `page.tsx` — a `Message` union with a `tool` role and an amber `ToolCallBubble` activity card that moves from Running to Complete
 
 ## Run it
 
