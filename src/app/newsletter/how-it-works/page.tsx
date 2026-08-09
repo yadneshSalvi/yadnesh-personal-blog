@@ -14,13 +14,40 @@ export const metadata: Metadata = {
   alternates: { canonical: "/newsletter/how-it-works" },
 };
 
+// Server-known headings so the TOC rail is in the SSR HTML, exactly like the
+// blog passing initialHeadings from the MDX source. Ids live here once and are
+// shared by the h2s and the rail.
+const SECTIONS = {
+  sources: { id: "what-it-reads", title: "What it reads" },
+  models: { id: "which-model-does-which-job", title: "Which model does which job" },
+  selection: {
+    id: "what-gets-picked-and-what-gets-dropped",
+    title: "What gets picked, and what gets dropped",
+  },
+  review: {
+    id: "what-is-automated-and-what-i-sign-off-on",
+    title: "What is automated and what I sign off on",
+  },
+  corrections: {
+    id: "what-happens-when-it-is-wrong",
+    title: "What happens when it is wrong",
+  },
+  limits: { id: "what-this-does-not-do", title: "What this does not do" },
+} as const;
+
+const TOC_HEADINGS = Object.values(SECTIONS).map((s) => ({
+  id: s.id,
+  text: s.title,
+  level: 2,
+}));
+
 function Section({
   kicker,
-  title,
+  section,
   children,
 }: {
   kicker: string;
-  title: string;
+  section: { id: string; title: string };
   children: React.ReactNode;
 }) {
   return (
@@ -28,8 +55,11 @@ function Section({
       <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-faint">
         {kicker}
       </p>
-      <h2 className="mt-3 scroll-mt-24 font-serif text-3xl leading-tight tracking-tight text-ink">
-        {title}
+      <h2
+        id={section.id}
+        className="mt-3 scroll-mt-24 font-serif text-3xl leading-tight tracking-tight text-ink"
+      >
+        {section.title}
       </h2>
       <div className="mt-5 space-y-4 leading-relaxed text-muted">{children}</div>
     </section>
@@ -40,7 +70,12 @@ export default function HowItWorks() {
   return (
     <main className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
       <div className="grid grid-cols-1 lg:grid-cols-[auto_minmax(0,1fr)]">
-        <TOC contentSelector="#how-it-works-content" label="On this page" side="left" />
+        <TOC
+          contentSelector="#how-it-works-content"
+          initialHeadings={TOC_HEADINGS}
+          label="On this page"
+          side="left"
+        />
         {/* mx-auto, not lg:mx-auto, for the same reason as IssueArticle. */}
         <article id="how-it-works-content" className="mx-auto w-full max-w-3xl">
           <Breadcrumb
@@ -64,7 +99,7 @@ export default function HowItWorks() {
         </p>
       </header>
 
-      <Section kicker="Sources" title="What it reads">
+      <Section kicker="Sources" section={SECTIONS.sources}>
         <p>
           Twice a day, at 8am and 8pm IST, a scheduled job on a Mac in Mumbai
           collects candidates from four places:
@@ -105,7 +140,7 @@ export default function HowItWorks() {
         </p>
       </Section>
 
-      <Section kicker="Models" title="Which model does which job">
+      <Section kicker="Models" section={SECTIONS.models}>
         <p>
           The split is deliberate and it has not changed since the pipeline
           started. Judgment goes to one model, mechanical work goes to another,
@@ -143,7 +178,7 @@ export default function HowItWorks() {
         </p>
       </Section>
 
-      <Section kicker="Selection" title="What gets picked, and what gets dropped">
+      <Section kicker="Selection" section={SECTIONS.selection}>
         <p>
           Roughly 18 to 30 items survive a collection run. The rules the curation
           step works under:
@@ -173,7 +208,7 @@ export default function HowItWorks() {
         </ul>
       </Section>
 
-      <Section kicker="Review" title="What is automated and what I sign off on">
+      <Section kicker="Review" section={SECTIONS.review}>
         <p>
           The web edition publishes itself. The pipeline opens a pull request
           against this site, automated validation runs against it, and it merges
@@ -197,7 +232,7 @@ export default function HowItWorks() {
         </p>
       </Section>
 
-      <Section kicker="Corrections" title="What happens when it is wrong">
+      <Section kicker="Corrections" section={SECTIONS.corrections}>
         <p>
           Every issue carries a corrections section, in the same position,
           whether or not there is anything in it. Most days it reads
@@ -222,7 +257,7 @@ export default function HowItWorks() {
         </p>
       </Section>
 
-      <Section kicker="Limits" title="What this does not do">
+      <Section kicker="Limits" section={SECTIONS.limits}>
         <p>
           It does not read anything behind a paywall, so paywalled sources are
           marked and summarized from what is public. It does not rank by
