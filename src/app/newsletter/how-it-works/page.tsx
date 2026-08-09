@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import TOC from "@/components/TOC";
 import { Breadcrumb } from "@/components/brief/IssueNav";
 import BriefSubscribeCTA from "@/components/brief/BriefSubscribeCTA";
 import { BRIEF_NAME } from "@/lib/brief/seo";
@@ -27,7 +28,7 @@ function Section({
       <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-faint">
         {kicker}
       </p>
-      <h2 className="mt-3 font-serif text-3xl leading-tight tracking-tight text-ink">
+      <h2 className="mt-3 scroll-mt-24 font-serif text-3xl leading-tight tracking-tight text-ink">
         {title}
       </h2>
       <div className="mt-5 space-y-4 leading-relaxed text-muted">{children}</div>
@@ -37,14 +38,18 @@ function Section({
 
 export default function HowItWorks() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
-      <Breadcrumb
-        trail={[
-          { label: "Home", href: "/" },
-          { label: "Brief", href: "/newsletter" },
-          { label: "How it works" },
-        ]}
-      />
+    <main className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+      <div className="grid grid-cols-1 lg:grid-cols-[auto_minmax(0,1fr)]">
+        <TOC contentSelector="#how-it-works-content" label="On this page" side="left" />
+        {/* mx-auto, not lg:mx-auto, for the same reason as IssueArticle. */}
+        <article id="how-it-works-content" className="mx-auto w-full max-w-3xl">
+          <Breadcrumb
+            trail={[
+              { label: "Home", href: "/" },
+              { label: "Brief", href: "/newsletter" },
+              { label: "How it works" },
+            ]}
+          />
 
       <header className="mt-8">
         <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-faint">
@@ -234,8 +239,10 @@ export default function HowItWorks() {
         </p>
       </Section>
 
-      <div className="mt-16">
-        <BriefSubscribeCTA />
+          <div className="mt-16">
+            <BriefSubscribeCTA />
+          </div>
+        </article>
       </div>
     </main>
   );
