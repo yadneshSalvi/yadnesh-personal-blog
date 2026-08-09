@@ -16,7 +16,7 @@ export function IssueNav({
       className="grid gap-6 border-t border-line pt-8 sm:grid-cols-2"
     >
       {previous ? (
-        <Link href={`/brief/${previous.type}/${previous.id}`} className="group">
+        <Link href={`/newsletter/${previous.type}/${previous.id}`} className="group">
           <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
             ← Previous
           </span>
@@ -32,7 +32,7 @@ export function IssueNav({
       )}
       {next ? (
         <Link
-          href={`/brief/${next.type}/${next.id}`}
+          href={`/newsletter/${next.type}/${next.id}`}
           className="group sm:text-right"
         >
           <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">
@@ -61,7 +61,7 @@ export function RelatedIssues({ issues }: { issues: BriefIssue[] }) {
         {issues.map((issue) => (
           <li key={`${issue.type}-${issue.id}`}>
             <Link
-              href={`/brief/${issue.type}/${issue.id}`}
+              href={`/newsletter/${issue.type}/${issue.id}`}
               className="font-serif text-lg leading-snug text-ink transition-colors hover:text-accent"
             >
               {issue.title}

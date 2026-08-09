@@ -7,7 +7,7 @@ import SearchBar from "./SearchBar";
 
 const NAV = [
   { href: "/blog", label: "Writing" },
-  { href: "/brief", label: "Brief" },
+  { href: "/newsletter", label: "Newsletter" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];

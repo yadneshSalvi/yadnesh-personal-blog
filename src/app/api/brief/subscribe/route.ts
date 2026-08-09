@@ -29,7 +29,7 @@ export async function POST(request: Request) {
 
   // A tripped honeypot gets the success response a bot expects, and nothing else.
   if (honeypotTripped(body.website)) {
-    return NextResponse.json({ ok: true, next: "/brief/confirm-sent" });
+    return NextResponse.json({ ok: true, next: "/newsletter/confirm-sent" });
   }
 
   if (submittedTooFast(body.t)) {
@@ -115,7 +115,7 @@ export async function POST(request: Request) {
       kind: "transactional",
     });
 
-    return NextResponse.json({ ok: true, next: "/brief/confirm-sent" });
+    return NextResponse.json({ ok: true, next: "/newsletter/confirm-sent" });
   } catch (error) {
     console.error("[brief] subscribe failed", error);
     return NextResponse.json(

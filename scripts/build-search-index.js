@@ -270,7 +270,7 @@ function processBriefIssues() {
           updatedAt: createdAt,
           wordCount: words.length,
           readingTime: Number(issue.read_minutes) || 1,
-          url: `/brief/${type}/${issue.id}`,
+          url: `/newsletter/${type}/${issue.id}`,
           type: 'brief',
         });
       } catch (error) {

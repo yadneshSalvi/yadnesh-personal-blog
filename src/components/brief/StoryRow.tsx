@@ -45,7 +45,7 @@ export function StoryMeta({
       ))}
       {bits.length > 0 ? " · " : null}
       <Link
-        href={`/brief/story/${story.story_id}`}
+        href={`/newsletter/story/${story.story_id}`}
         className="transition-colors hover:text-accent"
       >
         Story page
@@ -54,7 +54,7 @@ export function StoryMeta({
         <>
           {" · "}
           <Link
-            href={`/brief/story/${story.story_id}#thread`}
+            href={`/newsletter/story/${story.story_id}#thread`}
             className="text-accent transition-colors hover:text-ink"
           >
             {threadLabel}

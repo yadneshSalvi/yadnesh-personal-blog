@@ -55,9 +55,9 @@ const {
 } = await import("../src/lib/brief/issueEmail.ts");
 
 const LINKS = {
-  webUrl: "https://yadneshsalvi.com/brief/daily/2026-08-06",
-  archiveUrl: "https://yadneshsalvi.com/brief/archive",
-  howItWorksUrl: "https://yadneshsalvi.com/brief/how-it-works",
+  webUrl: "https://yadneshsalvi.com/newsletter/daily/2026-08-06",
+  archiveUrl: "https://yadneshsalvi.com/newsletter/archive",
+  howItWorksUrl: "https://yadneshsalvi.com/newsletter/how-it-works",
 };
 
 let passed = 0;
@@ -388,7 +388,7 @@ test("personalizing leaves no placeholder behind", () => {
   const rendered = renderIssueEmail(fixtures[0].issue, LINKS);
   const urls = {
     unsubscribeUrl: "https://yadneshsalvi.com/api/brief/unsubscribe?token=abc.def",
-    preferencesUrl: "https://yadneshsalvi.com/brief/preferences?token=abc.def",
+    preferencesUrl: "https://yadneshsalvi.com/newsletter/preferences?token=abc.def",
     feedbackUpUrl: "https://yadneshsalvi.com/api/brief/feedback?type=daily&issue=2026-08-06&vote=up&token=abc.def",
     feedbackDownUrl: "https://yadneshsalvi.com/api/brief/feedback?type=daily&issue=2026-08-06&vote=down&token=abc.def",
   };

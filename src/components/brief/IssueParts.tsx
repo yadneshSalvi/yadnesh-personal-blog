@@ -77,7 +77,7 @@ export function IssueSection({
   notes?: Map<string, string[]>;
 }) {
   return (
-    <section>
+    <section id={`section-${section.key}`} className="scroll-mt-24">
       <Kicker>{sectionLabel(section.key)}</Kicker>
       <ul className="mt-2 divide-y divide-line border-b border-line">
         {section.items.map((story) => (
@@ -113,7 +113,7 @@ export function EditorNote({ text }: { text: string }) {
 export function QuickLinks({ stories }: { stories: BriefStory[] }) {
   if (stories.length === 0) return null;
   return (
-    <section>
+    <section id="quick-links" className="scroll-mt-24">
       <Kicker>Quick links</Kicker>
       <ul className="mt-4 space-y-3">
         {stories.map((story) => (
@@ -155,7 +155,7 @@ export function CorrectionsBlock({
               {correction.issue_id && correction.issue_type ? (
                 <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-faint">
                   <Link
-                    href={`/brief/${correction.issue_type}/${correction.issue_id}`}
+                    href={`/newsletter/${correction.issue_type}/${correction.issue_id}`}
                     className="transition-colors hover:text-accent"
                   >
                     The corrected issue
@@ -206,7 +206,7 @@ export function TopicChips({ topics }: { topics: string[] }) {
       {topics.map((topic) => (
         <li key={topic}>
           <Link
-            href={`/brief/topics/${topic}`}
+            href={`/newsletter/topics/${topic}`}
             className="inline-block rounded-sm border border-line px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted transition-colors hover:border-accent hover:text-accent"
           >
             {topicLabel(topic)}
@@ -224,7 +224,7 @@ export function DisclosureLine() {
       Curated and summarized by an agent pipeline built by Yadnesh; reviewed
       before send.{" "}
       <Link
-        href="/brief/how-it-works"
+        href="/newsletter/how-it-works"
         className="text-accent transition-colors hover:text-ink"
       >
         How this is made →

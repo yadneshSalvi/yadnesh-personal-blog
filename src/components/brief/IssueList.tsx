@@ -24,7 +24,7 @@ export default function IssueList({ issues }: { issues: BriefIssue[] }) {
       {issues.map((issue) => (
         <li key={`${issue.type}-${issue.id}`}>
           <Link
-            href={`/brief/${issue.type}/${issue.id}`}
+            href={`/newsletter/${issue.type}/${issue.id}`}
             className="group grid grid-cols-1 gap-x-6 py-7 sm:grid-cols-[7.5rem_1fr]"
           >
             <span className="pt-1 font-mono text-[11px] uppercase tracking-[0.14em] text-faint">

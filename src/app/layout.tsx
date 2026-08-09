@@ -47,9 +47,9 @@ export const metadata: Metadata = {
       "application/rss+xml": [
         { url: "/feed.xml", title: "Yadnesh Salvi — RSS" },
         { url: "/feed-all.xml", title: "Yadnesh Salvi, everything" },
-        { url: "/brief/feed.xml", title: "The Agentic Brief" },
-        { url: "/brief/daily/feed.xml", title: "The Agentic Brief, daily" },
-        { url: "/brief/weekly/feed.xml", title: "The Agentic Brief, weekly" },
+        { url: "/newsletter/feed.xml", title: "The Agentic Brief" },
+        { url: "/newsletter/daily/feed.xml", title: "The Agentic Brief, daily" },
+        { url: "/newsletter/weekly/feed.xml", title: "The Agentic Brief, weekly" },
       ],
     },
   },

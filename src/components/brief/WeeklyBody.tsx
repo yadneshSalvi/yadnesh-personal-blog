@@ -6,7 +6,7 @@ import { Kicker, WeeklyThroughLine } from "./IssueParts";
 
 export function WeekInFive({ lines }: { lines: string[] }) {
   return (
-    <section>
+    <section id="week-in-five" className="scroll-mt-24">
       <Kicker>The week in five lines</Kicker>
       <ol className="mt-4 space-y-3">
         {lines.map((line, i) => (
@@ -28,7 +28,7 @@ export function WhatMattered({
   picks: BriefWeekly["what_mattered"];
 }) {
   return (
-    <section>
+    <section id="what-mattered" className="scroll-mt-24">
       <Kicker>What mattered</Kicker>
       <ul className="mt-2 divide-y divide-line border-b border-line">
         {picks.map((pick) => {
@@ -70,7 +70,7 @@ export function QuietlyImportant({
 }) {
   if (picks.length === 0) return null;
   return (
-    <section>
+    <section id="quietly-important" className="scroll-mt-24">
       <Kicker>Quietly important</Kicker>
       <ul className="mt-2 divide-y divide-line border-b border-line">
         {picks.map((pick) => (
@@ -127,7 +127,7 @@ export function ThreadToWatch({
                   <>
                     {" "}
                     <Link
-                      href={`/brief/daily/${prior.issue_id}`}
+                      href={`/newsletter/daily/${prior.issue_id}`}
                       className="font-mono text-[11px] uppercase tracking-[0.14em] text-accent transition-colors hover:text-ink"
                     >
                       That issue →
@@ -146,7 +146,7 @@ export function ThreadToWatch({
 export function DeepCuts({ stories }: { stories: BriefWeekly["deep_cuts"] }) {
   if (stories.length === 0) return null;
   return (
-    <section>
+    <section id="deep-cuts" className="scroll-mt-24">
       <Kicker>Deep cuts</Kicker>
       <ul className="mt-4 space-y-3">
         {stories.map((story) => (

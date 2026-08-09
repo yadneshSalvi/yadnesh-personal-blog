@@ -30,7 +30,7 @@ export function confirmUrl(base: string, token: string): string {
 }
 
 export function preferencesUrl(base: string, token: string): string {
-  return `${base}/brief/preferences?token=${q(token)}`;
+  return `${base}/newsletter/preferences?token=${q(token)}`;
 }
 
 /** The one-click unsubscribe endpoint. GET shows a page, POST just does it. */
@@ -49,13 +49,13 @@ export function feedbackVoteUrl(
 }
 
 export function issueWebUrl(base: string, type: "daily" | "weekly", id: string): string {
-  return `${base}/brief/${type}/${id}`;
+  return `${base}/newsletter/${type}/${id}`;
 }
 
 export function archiveUrl(base: string): string {
-  return `${base}/brief/archive`;
+  return `${base}/newsletter/archive`;
 }
 
 export function howItWorksUrl(base: string): string {
-  return `${base}/brief/how-it-works`;
+  return `${base}/newsletter/how-it-works`;
 }

@@ -26,7 +26,7 @@ function ErrorNote({ message }: { message: string }) {
       <p>{message}</p>
       <p>
         <Link
-          href="/brief"
+          href="/newsletter"
           className="text-accent underline decoration-accent/40 underline-offset-[3px] transition-colors hover:decoration-accent"
         >
           Back to the brief
@@ -197,7 +197,7 @@ export default function PreferencesPanel() {
         {notice ? <p className="text-sm text-faint">{notice}</p> : null}
         <p>
           <Link
-            href="/brief/archive"
+            href="/newsletter/archive"
             className="text-accent underline decoration-accent/40 underline-offset-[3px] transition-colors hover:decoration-accent"
           >
             The archive stays open

@@ -110,7 +110,7 @@ function SubscribeForm({ compact = false }: { compact?: boolean }) {
         throw new Error(data.error || "That didn't go through. Try again in a minute.");
       }
       setState({ status: "done" });
-      window.location.assign(data.next || "/brief/confirm-sent");
+      window.location.assign(data.next || "/newsletter/confirm-sent");
     } catch (error) {
       setState({
         status: "error",
@@ -266,7 +266,7 @@ export default function BriefSubscribeCTA({
           </Link>
         ) : null}
         <a
-          href="/brief/feed.xml"
+          href="/newsletter/feed.xml"
           className="text-muted transition-colors hover:text-ink"
         >
           Subscribe by RSS →

@@ -14,7 +14,7 @@ export const BRIEF_TAGLINE =
   "A weekday brief on agentic AI, curated by an agent pipeline and reviewed before it ships.";
 
 export function issueHref(issue: Pick<BriefIssue, "type" | "id">): string {
-  return `/brief/${issue.type}/${issue.id}`;
+  return `/newsletter/${issue.type}/${issue.id}`;
 }
 
 /** The `<title>` pattern from plan 03 §3: topics first, cadence and date after. */
@@ -70,9 +70,9 @@ export function issueJsonLd(issue: BriefIssue) {
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     isPartOf: {
       "@type": "Periodical",
-      "@id": `${SITE_URL}/brief#periodical`,
+      "@id": `${SITE_URL}/newsletter#periodical`,
       name: BRIEF_NAME,
-      url: absoluteUrl("/brief"),
+      url: absoluteUrl("/newsletter"),
     },
     url,
     wordCount: plain.split(/\s+/).filter(Boolean).length,
@@ -99,7 +99,7 @@ export function itemListJsonLd(issues: BriefIssue[]) {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "@id": `${absoluteUrl("/brief/archive")}#itemlist`,
+    "@id": `${absoluteUrl("/newsletter/archive")}#itemlist`,
     name: `${BRIEF_NAME} archive`,
     itemListElement: issues.map((issue, i) => ({
       "@type": "ListItem",

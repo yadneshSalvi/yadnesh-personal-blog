@@ -27,10 +27,10 @@ export async function GET(request: Request) {
   const token = new URL(request.url).searchParams.get("token");
   const verified = verifyEither(token);
   if (!verified.ok) {
-    return NextResponse.redirect(`${base}/brief/preferences?error=token`, 302);
+    return NextResponse.redirect(`${base}/newsletter/preferences?error=token`, 302);
   }
   return NextResponse.redirect(
-    `${base}/brief/preferences?token=${encodeURIComponent(token as string)}&mode=unsub`,
+    `${base}/newsletter/preferences?token=${encodeURIComponent(token as string)}&mode=unsub`,
     302,
   );
 }

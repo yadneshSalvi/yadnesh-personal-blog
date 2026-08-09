@@ -29,7 +29,7 @@ export const BRIEF_SECTION_LABELS: Record<BriefSectionKey, string> = {
 };
 
 /**
- * Controlled topic vocabulary. Slugs are the URL segment at /brief/topics/<slug>;
+ * Controlled topic vocabulary. Slugs are the URL segment at /newsletter/topics/<slug>;
  * the pipeline maps the feed's `category` field onto these.
  */
 export const BRIEF_TOPICS = [
@@ -299,7 +299,7 @@ export function isWeeklyIssue(issue: BriefIssue): issue is BriefWeeklyIssue {
 
 /** The path an issue lives at, both on disk (relative to content/brief) and on the web. */
 export function issuePath(issue: Pick<BriefIssue, "type" | "id">): string {
-  return `/brief/${issue.type}/${issue.id}`;
+  return `/newsletter/${issue.type}/${issue.id}`;
 }
 
 export function topicLabel(topic: string): string {

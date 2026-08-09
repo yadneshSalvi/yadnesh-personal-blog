@@ -1,7 +1,7 @@
 // GET /api/brief/confirm?token=...
 //
 // Step two of double opt-in, and the only place a pending row becomes a real
-// subscriber. Every failure lands on /brief/confirm-sent?expired=1, which
+// subscriber. Every failure lands on /newsletter/confirm-sent?expired=1, which
 // explains what happened and offers a fresh signup.
 
 import { NextResponse } from "next/server";
@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const base = siteBaseUrl(request);
-  const expired = () => NextResponse.redirect(`${base}/brief/confirm-sent?expired=1`, 302);
+  const expired = () => NextResponse.redirect(`${base}/newsletter/confirm-sent?expired=1`, 302);
 
   const token = new URL(request.url).searchParams.get("token");
   const verified = verifyBriefToken(token, { purpose: "confirm" });
@@ -67,7 +67,7 @@ export async function GET(request: Request) {
       console.error("[brief] welcome email failed", error);
     }
 
-    return NextResponse.redirect(`${base}/brief/welcome?cadence=${cadence}`, 302);
+    return NextResponse.redirect(`${base}/newsletter/welcome?cadence=${cadence}`, 302);
   } catch (error) {
     console.error("[brief] confirm failed", error);
     return expired();

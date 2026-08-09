@@ -14,6 +14,6 @@ export default function robots(): MetadataRoute.Robots {
     // Two sitemaps, deliberately: Search Console then reports brief indexation
     // separately from the blog's, which is the early warning if generated pages
     // ever start dragging the hand-written posts.
-    sitemap: [absoluteUrl("/sitemap.xml"), absoluteUrl("/brief/sitemap.xml")],
+    sitemap: [absoluteUrl("/sitemap.xml"), absoluteUrl("/newsletter/sitemap.xml")],
   };
 }

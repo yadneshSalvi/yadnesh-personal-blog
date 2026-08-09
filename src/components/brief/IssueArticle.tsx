@@ -27,6 +27,8 @@ import {
   TopicChips,
 } from "./IssueParts";
 import { Breadcrumb, IssueNav, RelatedIssues } from "./IssueNav";
+import IssueTOC from "./IssueTOC";
+import { issueTocItems } from "./tocItems";
 import StoryRow from "./StoryRow";
 import {
   DeepCuts,
@@ -105,120 +107,127 @@ export default function IssueArticle({ issue }: { issue: BriefIssue }) {
       : -1;
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
+    <main className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
       <JsonLd data={issueJsonLd(issue)} />
       <JsonLd
         data={breadcrumbJsonLd([
           { name: "Home", url: SITE_URL },
-          { name: BRIEF_NAME, url: absoluteUrl("/brief") },
-          { name: "Archive", url: absoluteUrl("/brief/archive") },
+          { name: BRIEF_NAME, url: absoluteUrl("/newsletter") },
+          { name: "Archive", url: absoluteUrl("/newsletter/archive") },
           { name: issue.title, url },
         ])}
       />
 
-      <Breadcrumb
-        trail={[
-          { label: "Home", href: "/" },
-          { label: "Brief", href: "/brief" },
-          { label: "Archive", href: "/brief/archive" },
-          { label: dateLabel },
-        ]}
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-[auto_minmax(0,1fr)]">
+        <IssueTOC items={issueTocItems(issue)} />
+        {/* mx-auto, not the blog's lg:mx-auto: below lg there is no rail, and
+            the issue column stayed centered before the rail existed. */}
+        <article className="mx-auto w-full max-w-3xl">
+          <Breadcrumb
+            trail={[
+              { label: "Home", href: "/" },
+              { label: "Brief", href: "/newsletter" },
+              { label: "Archive", href: "/newsletter/archive" },
+              { label: dateLabel },
+            ]}
+          />
 
-      <header className="mt-8">
-        <Kicker>
-          {cadence} · {dateLabel} · {issue.read_minutes} min read
-          {issue.thin_day ? " · quiet day" : ""}
-          {issue.status === "draft" ? " · draft" : ""}
-        </Kicker>
-        <h1 className="mt-4 font-serif text-4xl leading-[1.12] tracking-tight text-ink sm:text-5xl">
-          {issue.title}
-        </h1>
-        <p className="mt-4 font-serif text-xl italic leading-relaxed text-muted">
-          {issue.preheader}
-        </p>
-        <DisclosureLine />
-        <div className="mt-6">
-          <TopicChips topics={issueTopics(issue)} />
-        </div>
-      </header>
+          <header className="mt-8">
+            <Kicker>
+              {cadence} · {dateLabel} · {issue.read_minutes} min read
+              {issue.thin_day ? " · quiet day" : ""}
+              {issue.status === "draft" ? " · draft" : ""}
+            </Kicker>
+            <h1 className="mt-4 font-serif text-4xl leading-[1.12] tracking-tight text-ink sm:text-5xl">
+              {issue.title}
+            </h1>
+            <p className="mt-4 font-serif text-xl italic leading-relaxed text-muted">
+              {issue.preheader}
+            </p>
+            <DisclosureLine />
+            <div className="mt-6">
+              <TopicChips topics={issueTopics(issue)} />
+            </div>
+          </header>
 
-      <div className="mt-14 space-y-14">
-        {issue.type === "daily" ? (
-          <>
-            {issue.lead ? (
-              <LeadStory
-                lead={issue.lead}
-                threadLabel={labels.get(issue.lead.story.story_id) ?? null}
-                notes={byStory.get(issue.lead.story.story_id) ?? []}
-              />
+          <div className="mt-14 space-y-14">
+            {issue.type === "daily" ? (
+              <>
+                {issue.lead ? (
+                  <LeadStory
+                    lead={issue.lead}
+                    threadLabel={labels.get(issue.lead.story.story_id) ?? null}
+                    notes={byStory.get(issue.lead.story.story_id) ?? []}
+                  />
+                ) : (
+                  <section id="quiet-day" className="scroll-mt-24">
+                    <Kicker>Quiet day</Kicker>
+                    <p className="mt-4 leading-relaxed text-muted">
+                      Not enough cleared the bar for a lead story today. Here is
+                      what did, and nothing more. Padding a thin day is how a daily
+                      loses you.
+                    </p>
+                  </section>
+                )}
+                {issue.sections.map((section, i) => (
+                  <div key={section.key} className="space-y-14">
+                    <IssueSection
+                      section={section}
+                      threadLabels={labels}
+                      notes={byStory}
+                    />
+                    {i === ctaAfterSectionIndex ? (
+                      <BriefSubscribeCTA variant="inline" />
+                    ) : null}
+                  </div>
+                ))}
+              </>
             ) : (
-              <section>
-                <Kicker>Quiet day</Kicker>
-                <p className="mt-4 leading-relaxed text-muted">
-                  Not enough cleared the bar for a lead story today. Here is
-                  what did, and nothing more. Padding a thin day is how a daily
-                  loses you.
-                </p>
-              </section>
+              <>
+                <WeekInFive lines={issue.weekly.week_in_five} />
+                <WeeklyThroughLine throughLine={issue.weekly.through_line} />
+                <BriefSubscribeCTA variant="inline" />
+                <WhatMattered picks={issue.weekly.what_mattered} />
+                <QuietlyImportant picks={issue.weekly.quietly_important} />
+                <ThreadToWatch thread={issue.weekly.thread_to_watch} />
+                <DeepCuts stories={issue.weekly.deep_cuts} />
+              </>
             )}
-            {issue.sections.map((section, i) => (
-              <div key={section.key} className="space-y-14">
-                <IssueSection
-                  section={section}
-                  threadLabels={labels}
-                  notes={byStory}
-                />
-                {i === ctaAfterSectionIndex ? (
-                  <BriefSubscribeCTA variant="inline" />
-                ) : null}
-              </div>
-            ))}
-          </>
-        ) : (
-          <>
-            <WeekInFive lines={issue.weekly.week_in_five} />
-            <WeeklyThroughLine throughLine={issue.weekly.through_line} />
-            <BriefSubscribeCTA variant="inline" />
-            <WhatMattered picks={issue.weekly.what_mattered} />
-            <QuietlyImportant picks={issue.weekly.quietly_important} />
-            <ThreadToWatch thread={issue.weekly.thread_to_watch} />
-            <DeepCuts stories={issue.weekly.deep_cuts} />
-          </>
-        )}
 
-        {issue.from_x.length > 0 ? (
-          <section>
-            <Kicker>From X</Kicker>
-            <ul className="mt-2 divide-y divide-line border-b border-line">
-              {issue.from_x.map((story) => (
-                <StoryRow
-                  key={story.story_id}
-                  story={story}
-                  threadLabel={labels.get(story.story_id) ?? null}
-                >
-                  {(byStory.get(story.story_id) ?? []).map((text, i) => (
-                    <EditorNote key={i} text={text} />
+            {issue.from_x.length > 0 ? (
+              <section id="from-x" className="scroll-mt-24">
+                <Kicker>From X</Kicker>
+                <ul className="mt-2 divide-y divide-line border-b border-line">
+                  {issue.from_x.map((story) => (
+                    <StoryRow
+                      key={story.story_id}
+                      story={story}
+                      threadLabel={labels.get(story.story_id) ?? null}
+                    >
+                      {(byStory.get(story.story_id) ?? []).map((text, i) => (
+                        <EditorNote key={i} text={text} />
+                      ))}
+                    </StoryRow>
                   ))}
-                </StoryRow>
-              ))}
-            </ul>
-          </section>
-        ) : null}
+                </ul>
+              </section>
+            ) : null}
 
-        <QuickLinks stories={issue.quick_links} />
+            <QuickLinks stories={issue.quick_links} />
 
-        {loose.map((text, i) => (
-          <EditorNote key={i} text={text} />
-        ))}
+            {loose.map((text, i) => (
+              <EditorNote key={i} text={text} />
+            ))}
 
-        <CorrectionsBlock corrections={issue.corrections} />
-      </div>
+            <CorrectionsBlock corrections={issue.corrections} />
+          </div>
 
-      <div className="mt-16 space-y-16">
-        <IssueNav previous={previous} next={next} />
-        <RelatedIssues issues={related} />
-        <BriefSubscribeCTA latestIssueHref={null} />
+          <div className="mt-16 space-y-16">
+            <IssueNav previous={previous} next={next} />
+            <RelatedIssues issues={related} />
+            <BriefSubscribeCTA latestIssueHref={null} />
+          </div>
+        </article>
       </div>
     </main>
   );
