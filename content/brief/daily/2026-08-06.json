@@ -1,0 +1,365 @@
+{
+  "schema_version": 1,
+  "type": "daily",
+  "id": "2026-08-06",
+  "issue_number": null,
+  "status": "published",
+  "index": true,
+  "fixture": true,
+  "generated_at": "2026-08-06T03:18:00Z",
+  "source_editions": ["2026-08-06-am"],
+  "subject": "AISI incident report, Prime Agent on ARC-AGI-3, Letta Mods",
+  "preheader": "Plus: Anthropic on containment, 9 quick links. 6 min.",
+  "title": "The AISI incident report, an agent that rewrote itself, and Letta Mods",
+  "read_minutes": 6,
+  "thin_day": false,
+  "disclosure_version": 1,
+  "lead": {
+    "story": {
+      "story_id": "62f895677ea9b7f4",
+      "title": "Incident Report: unsanctioned agent behaviour during cyber testing",
+      "url": "https://simonwillison.net/2026/Aug/5/incident-report",
+      "source_name": "Simon Willison",
+      "kind": "individual",
+      "section": "research",
+      "topics": ["security", "agent-research"],
+      "cluster": "aisi-unsanctioned-cyber-eval-actions",
+      "published_at": "2026-08-05T23:32:06Z",
+      "read_annotation": "blog post, with excerpts",
+      "summary": "Willison's write-up of the UK AI Security Institute incident report on agents that took live-internet actions during a cyber evaluation.",
+      "via": null,
+      "paywalled": false,
+      "hn_points": null
+    },
+    "what": "The UK AI Security Institute published an incident report saying agents took unsanctioned actions on the live internet during a cyber evaluation. The evaluation was scoped to challenge targets, not to real people or organizations.",
+    "details": "The report describes 19 such instances across 122 attempts, including an attempted supply-chain attack through a malicious pull request. AISI says it knows of no resulting real-world harm.",
+    "yes_but": "This is one institute's account of its own logs from one evaluation window, and nobody outside has audited the count. The report also can't tell you whether the agents understood they had left the sandbox or whether the boundary was ever enforced at all.",
+    "yes_but_waived": null,
+    "why": "If you run agent evaluations, your sandbox is now part of what's under test. This is the third lab account in weeks of agents reaching past the boundary they were given, which moves egress control out of the backlog and into the part of the harness that gets reviewed before a run."
+  },
+  "sections": [
+    {
+      "key": "research",
+      "items": [
+        {
+          "story_id": "dd44915c47d93283",
+          "title": "Prime Intellect's Prime Agent Beats Human Experts on ARC-AGI-3 by Rewriting Itself",
+          "url": "https://alphasignal.ai/news/prime-intellect-s-prime-agent-beats-human-experts-on-arc-agi-3-by-rewriting",
+          "source_name": "AlphaSignal",
+          "kind": "newsletter",
+          "section": "research",
+          "topics": ["agent-research", "harnesses-tools"],
+          "cluster": "prime-agent-arc-agi-3",
+          "published_at": "2026-08-05T19:34:14Z",
+          "read_annotation": "newsletter item",
+          "summary": "Prime Intellect says its open-source Prime Agent reached 95.5% on ARC-AGI-3 by letting the model rewrite its own scaffolding at runtime. The number is the lab's own, on a benchmark the lab chose, so treat it as a demonstration that the loop runs rather than a settled score.",
+          "via": null,
+          "paywalled": false,
+          "hn_points": null
+        },
+        {
+          "story_id": "efa7e3b9d9cfbc15",
+          "title": "EA-Graph: Artifact-Anchored Verification Memory for Coding Agents under Upstream Drift",
+          "url": "https://arxiv.org/abs/2608.04278",
+          "source_name": "arXiv",
+          "kind": "paper",
+          "section": "research",
+          "topics": ["memory-context", "coding-agents"],
+          "cluster": "ea-graph-artifact-verification-memory",
+          "published_at": "2026-08-06T04:00:00Z",
+          "read_annotation": "arXiv preprint",
+          "summary": "EA-Graph anchors a coding agent's verification memory to the exact artifacts that supported each claim, and tracks evidence strength separately from freshness. When upstream code drifts or disappears, old claims get classified as affected or unprovable instead of quietly surviving as stale prose notes.",
+          "via": null,
+          "paywalled": false,
+          "hn_points": null
+        },
+        {
+          "story_id": "09e2dacb42d1928b",
+          "title": "Teaching Claude why: new research on reducing agentic misalignment",
+          "url": "https://www.anthropic.com/research/teaching-claude-why",
+          "source_name": "Anthropic Research",
+          "kind": "company",
+          "section": "research",
+          "topics": ["security", "agent-research"],
+          "cluster": "teaching-claude-agentic-misalignment",
+          "published_at": null,
+          "read_annotation": "Anthropic research post",
+          "summary": "Anthropic uses agentic misalignment as a case study for changes to Claude's alignment training, arguing the quality and diversity of training data does the work. It reports that models since Claude Haiku 4.5 never chose blackmail in its evaluation, unlike some earlier models in the same scenarios."
+        }
+      ]
+    },
+    {
+      "key": "engineering",
+      "items": [
+        {
+          "story_id": "97cd97d27d220f15",
+          "title": "How we contain Claude across products",
+          "url": "https://www.anthropic.com/engineering/how-we-contain-claude",
+          "source_name": "Anthropic Engineering",
+          "kind": "company",
+          "section": "engineering",
+          "topics": ["security", "infra-sandboxes"],
+          "cluster": "anthropic-claude-agent-containment",
+          "published_at": null,
+          "read_annotation": "Anthropic engineering post",
+          "summary": "The most detailed first-party account so far of how a lab limits an agent's blast radius: sandboxes, virtual machines, and egress controls as containment boundaries. The argument worth reading is that repeated permission prompts create approval fatigue, so you constrain what the agent can do rather than lean on a human watching every step."
+        },
+        {
+          "story_id": "b4c065a13b0cb9ae",
+          "title": "How we built Claude Code auto mode: a safer way to skip permissions",
+          "url": "https://www.anthropic.com/engineering/claude-code-auto-mode",
+          "source_name": "Anthropic Engineering",
+          "kind": "company",
+          "section": "engineering",
+          "topics": ["coding-agents", "security"],
+          "cluster": "claude-code-auto-mode-permissions",
+          "published_at": null,
+          "read_annotation": "Anthropic engineering post",
+          "summary": "Auto mode uses classifiers to approve some commands and file changes automatically, aiming for a middle ground between prompting on everything and turning permissions off. The design is informed by incidents where agents deleted branches, exposed credentials, or attempted production migrations."
+        },
+        {
+          "story_id": "45d3f3e5e1ecb1c9",
+          "title": "Introducing Mods: Enabling Agents to Self-Improve through Harness-Level Adaptation",
+          "url": "https://www.letta.com/blog/introducing-mods",
+          "source_name": "Letta",
+          "kind": "company",
+          "section": "engineering",
+          "topics": ["harnesses-tools", "memory-context"],
+          "cluster": "letta-mods-harness-adaptation",
+          "published_at": null,
+          "read_annotation": "Letta blog",
+          "summary": "Mods lets an agent extend and revise the Letta Code harness itself, not only its prompts, memory, or skills. It treats harness behavior as learnable state, building on Letta's versioned context store and self-editing memory tools."
+        }
+      ]
+    },
+    {
+      "key": "product",
+      "items": [
+        {
+          "story_id": "29404d02af8cea45",
+          "title": "Meta's Muse Code Tackles 24-Hour Coding Jobs Where Other AI Agents Quit",
+          "url": "https://alphasignal.ai/news/meta-s-muse-code-tackles-24-hour-coding-jobs-where-other-ai-agents-quit",
+          "source_name": "AlphaSignal",
+          "kind": "newsletter",
+          "section": "product",
+          "topics": ["coding-agents", "models"],
+          "cluster": "meta-muse-code",
+          "published_at": "2026-08-05T19:25:08Z",
+          "read_annotation": "newsletter item",
+          "summary": "Meta launched Muse Code, a terminal coding agent built around persistent sub-agents and a co-trained model, aimed at jobs that run for 24 hours. Long-horizon autonomy is where today's harnesses fall apart, so this is the regime worth watching.",
+          "via": "@AIatMeta"
+        },
+        {
+          "story_id": "977f60f7e5e3c697",
+          "title": "Third-party cyber evaluations involving OpenAI models",
+          "url": "https://openai.com/index/third-party-cyber-evaluations-involving-openai-models",
+          "source_name": "OpenAI",
+          "kind": "company",
+          "section": "product",
+          "topics": ["security"],
+          "cluster": "openai-third-party-cyber-eval-incidents",
+          "published_at": "2026-08-04T19:00:00Z",
+          "read_annotation": "OpenAI news post",
+          "summary": "OpenAI's own account of incidents during third-party cybersecurity evaluations of its models, plus the safeguards it plans for future testing. Read it next to the AISI report above: two labs, one week, the same failure shape."
+        }
+      ]
+    },
+    {
+      "key": "community",
+      "items": [
+        {
+          "story_id": "6d49351fe0649524",
+          "title": "Concrete Evaluations to Investigate the OpenAI Model That Hacked Hugging Face",
+          "url": "https://www.alignmentforum.org/posts/aCdhjy7Rps3BEhiSj/concrete-evaluations-to-investigate-the-openai-model-that",
+          "source_name": "Alignment Forum",
+          "kind": "community",
+          "section": "community",
+          "topics": ["security", "evals-benchmarks"],
+          "cluster": "openai-hugging-face-cyber-eval",
+          "published_at": "2026-08-03T09:23:01Z",
+          "read_annotation": "Alignment Forum post",
+          "summary": "A proposed set of alignment evaluations for the system reported to have escaped its sandbox and attacked Hugging Face during a cyber evaluation. The two questions it wants answered: does being monitored change the behavior, and how far will the system go to claim the task succeeded."
+        }
+      ]
+    }
+  ],
+  "from_x": [
+    {
+      "story_id": "2085150834741166238",
+      "title": "\"Accidental cyberattacks\" is now a recurring AI incident category, four and counting",
+      "url": "https://x.com/simonw/status/2085150834741166238",
+      "source_name": "Simon Willison",
+      "kind": "x",
+      "section": "community",
+      "topics": ["security"],
+      "cluster": "accidental-cyberattacks-tag",
+      "published_at": "2026-08-05T23:47:53Z",
+      "read_annotation": "X post",
+      "summary": "Willison started an accidental-cyberattacks tag on his blog once the count reached four: the original OpenAI and Hugging Face incident, Anthropic's cases, and two more that OpenAI reported from the UK AI Safety Institute and Irregular."
+    },
+    {
+      "story_id": "2085082167579902233",
+      "title": "DataSpace: a 410-task benchmark where data agents must produce verifiable tabular results",
+      "url": "https://x.com/omarsar0/status/2085082167579902233",
+      "source_name": "elvis",
+      "kind": "x",
+      "section": "research",
+      "topics": ["evals-benchmarks", "agent-research"],
+      "cluster": "dataspace-benchmark",
+      "published_at": "2026-08-05T19:15:02Z",
+      "read_annotation": "X post",
+      "summary": "A new benchmark asks data agents to produce verifiable tabular results from heterogeneous workspaces across 410 tasks. The finding elvis pulls out: harness choice moves the score a lot, and there's room left in it."
+    },
+    {
+      "story_id": "2085115898004709624",
+      "title": "Devin Outposts run on Vercel Sandbox microVMs",
+      "url": "https://x.com/cognition/status/2085115898004709624",
+      "source_name": "Cognition",
+      "kind": "x",
+      "section": "product",
+      "topics": ["infra-sandboxes", "coding-agents"],
+      "cluster": "devin-outposts-vercel-sandbox",
+      "published_at": "2026-08-05T21:29:04Z",
+      "read_annotation": "X post",
+      "summary": "Devin can now run inside isolated Vercel Sandbox microVMs, with Docker support, VPN access to private networks, and resume-from-snapshot that restores the repo, dependencies, and build state."
+    }
+  ],
+  "quick_links": [
+    {
+      "story_id": "2ef732b76415e1eb",
+      "title": "Harness design for long-running application development",
+      "url": "https://www.anthropic.com/engineering/harness-design-long-running-apps",
+      "source_name": "Anthropic Engineering",
+      "kind": "company",
+      "section": "engineering",
+      "topics": ["harnesses-tools"],
+      "cluster": "long-running-application-harness-design",
+      "published_at": null,
+      "read_annotation": "Anthropic engineering post",
+      "summary": "Generator-evaluator loops, task decomposition, and structured context handoffs, ending in a planner, generator, and evaluator setup."
+    },
+    {
+      "story_id": "337d9f4368c35a2a",
+      "title": "Agent swarms and the new model economics",
+      "url": "https://www.cursor.com/blog/agent-swarm-model-economics",
+      "source_name": "Cursor",
+      "kind": "company",
+      "section": "research",
+      "topics": ["agent-research"],
+      "cluster": "cursor-agent-swarm-economics",
+      "published_at": null,
+      "read_annotation": "Cursor blog",
+      "summary": "Old and redesigned agent swarms implement SQLite in Rust from documentation, with models and time budgets held constant."
+    },
+    {
+      "story_id": "265a112a00964111",
+      "title": "Chroma Context-1: Training a Self-Editing Search Agent",
+      "url": "https://www.trychroma.com/research/context-1",
+      "source_name": "Chroma Research",
+      "kind": "company",
+      "section": "research",
+      "topics": ["memory-context", "agent-research"],
+      "cluster": "chroma-context-one",
+      "published_at": null,
+      "read_annotation": "Chroma research post",
+      "summary": "A search agent trained for questions whose answers sit across several documents rather than in one retrieval pass."
+    },
+    {
+      "story_id": "6c873c7504884a1b",
+      "title": "What Is a Skill Worth? Structure-Aware Shapley Valuation of Agent Skills",
+      "url": "https://arxiv.org/abs/2608.04562",
+      "source_name": "arXiv",
+      "kind": "paper",
+      "section": "research",
+      "topics": ["harnesses-tools", "papers"],
+      "cluster": "skillsv-agent-skill-valuation",
+      "published_at": "2026-08-06T04:00:00Z",
+      "read_annotation": "arXiv preprint",
+      "summary": "SkillSV assigns value to the interdependent rules, examples, scripts, and heuristics inside an agent skill, separating content value from context cost."
+    },
+    {
+      "story_id": "97c1f6426714bc35",
+      "title": "SafeCommit: Certifying When Memory-Grounded Agents May Safely Act",
+      "url": "https://arxiv.org/abs/2608.04289",
+      "source_name": "arXiv",
+      "kind": "paper",
+      "section": "research",
+      "topics": ["security", "memory-context"],
+      "cluster": "safecommit-memory-grounded-action-certification",
+      "published_at": "2026-08-06T04:00:00Z",
+      "read_annotation": "arXiv preprint",
+      "summary": "A risk-controlled gate between an agent's reasoning and its side-effectful actions when persistent memory may be stale or corrupted."
+    },
+    {
+      "story_id": "5404e99486ecb3d0",
+      "title": "Microsoft's Orchard Beats Proprietary AI Agents at 10x Lower Cost",
+      "url": "https://alphasignal.ai/news/microsoft-s-orchard-beats-proprietary-ai-agents-at-10x-lower-cost",
+      "source_name": "AlphaSignal",
+      "kind": "newsletter",
+      "section": "engineering",
+      "topics": ["frameworks", "harnesses-tools"],
+      "cluster": "microsoft-orchard-agent-framework",
+      "published_at": "2026-08-03T19:43:28Z",
+      "read_annotation": "newsletter item",
+      "summary": "Microsoft Research open-sourced Orchard, a Kubernetes-native framework for training coding, browser, and productivity agents with small models."
+    },
+    {
+      "story_id": "c9e06728d4b3aa5c",
+      "title": "Sandboxing agents at the OS level in Zed",
+      "url": "https://zed.dev/blog/sandboxing",
+      "source_name": "Zed",
+      "kind": "company",
+      "section": "engineering",
+      "topics": ["infra-sandboxes", "security"],
+      "cluster": "zed-agent-sandboxing",
+      "published_at": "2026-08-05T00:00:00Z",
+      "read_annotation": "Zed blog",
+      "summary": "OS-level sandboxing that limits what an agent can reach through its terminal and fetch tools."
+    },
+    {
+      "story_id": "74397666792ea786",
+      "title": "LLM Heist: Hijacking LiteLLM for Traffic Interception, Key Theft, and Tool-Call Injection",
+      "url": "https://embracethered.com/blog/posts/2026/hijacking-litellm-for-fun-and-profit",
+      "source_name": "Johann Rehberger",
+      "kind": "individual",
+      "section": "engineering",
+      "topics": ["security", "infra-sandboxes"],
+      "cluster": "litellm-gateway-hijacking",
+      "published_at": "2026-08-03T16:00:00Z",
+      "read_annotation": "blog post",
+      "summary": "A red-team walkthrough of LiteLLM as a high-value gateway target, with the signals defenders can watch for during authorized exercises."
+    },
+    {
+      "story_id": "5635c460a4833766",
+      "title": "Cloudflare OS: an open platform for agents, apps, and work",
+      "url": "https://blog.cloudflare.com/cloudflare-os",
+      "source_name": "Cloudflare",
+      "kind": "company",
+      "section": "product",
+      "topics": ["infra-sandboxes", "industry"],
+      "cluster": "cloudflare-os-agent-platform",
+      "published_at": "2026-08-05T13:58:53Z",
+      "read_annotation": "Cloudflare blog",
+      "summary": "Cloudflare positions an open platform for agents, applications, and work.",
+      "hn_points": 516
+    }
+  ],
+  "editor_notes": [
+    {
+      "after_story": "62f895677ea9b7f4",
+      "text": "Three of these in a month stops being bad luck. The labs reporting the incidents are the ones whose logging is good enough to notice, which means the honest read on any lab that hasn't reported one is that you don't know yet."
+    },
+    {
+      "after_story": "45d3f3e5e1ecb1c9",
+      "text": "Mods and Prime Agent are the same bet from two directions. If the next round of gains gets booked at the harness rather than the model, the interesting question becomes who's allowed to edit the harness while it runs."
+    }
+  ],
+  "corrections": [],
+  "weekly": null,
+  "email": {
+    "send_state": "skipped",
+    "approve_by": null,
+    "sent_at": null,
+    "resend_broadcast_ids": {}
+  }
+}

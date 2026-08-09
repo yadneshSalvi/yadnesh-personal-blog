@@ -1,0 +1,17 @@
+# Ownership split for The Agentic Brief.
+#
+# content/brief/** is written by the newsletter pipeline in the feed repo and
+# arrives as an automated pull request. It is listed here so those PRs still get
+# a named reviewer rather than merging with nobody accountable for them.
+#
+# TODO: once the pipeline gets its own machine identity (a fine-grained PAT or a
+# GitHub App named brief-bot), point these lines at that account's team so
+# generated commits are filterable and the human owner is the reviewer, not the
+# author.
+content/brief/**        @yadneshSalvi
+
+# Hand-written content and everything that renders it stays human-owned.
+content/posts/**        @yadneshSalvi
+content/series/**       @yadneshSalvi
+src/**                  @yadneshSalvi
+scripts/**              @yadneshSalvi

@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# Root-only negation: content/code/** vendors companion-repo .env.example files
+# that were ignored before and should stay that way.
+!/.env.example
 
 # vercel
 .vercel
@@ -69,3 +72,7 @@ next-env.d.ts
 /scripts/gen-agent-sdk-part12-svgs.mjs
 /scripts/gen-agent-sdk-part13-svgs.mjs
 /SERIES-PLAYBOOK.md
+plans/02_how_to_write_series
+
+# Local YouTube production workspace (strategy, research, media, renders)
+/content/youtube/

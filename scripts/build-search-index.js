@@ -14,6 +14,7 @@ const path = require('path');
 const matter = require('gray-matter');
 
 const POSTS_DIR = path.join(process.cwd(), 'content', 'posts');
+const BRIEF_DIR = path.join(process.cwd(), 'content', 'brief');
 const OUTPUT_PATH = path.join(process.cwd(), 'public', 'search-index.json');
 
 /**
@@ -165,11 +166,127 @@ function getAllPostSlugs() {
 }
 
 /**
+ * Collects the prose out of a brief issue: the labeled lead skeleton, every
+ * story headline and summary, the weekly's five lines and through-line, and the
+ * editor notes. Deliberately duplicated rather than imported from
+ * src/lib/brief/text.ts, which is ESM TypeScript; this script stays CommonJS
+ * and self-contained, the same tradeoff the post indexing above already makes.
+ */
+function briefIssueText(issue) {
+  const parts = [issue.title, issue.subject, issue.preheader];
+  const pushStories = (stories) => {
+    for (const story of stories || []) {
+      parts.push(story.title, story.summary, story.source_name);
+    }
+  };
+
+  if (issue.lead) {
+    parts.push(issue.lead.what, issue.lead.details, issue.lead.yes_but, issue.lead.why);
+    pushStories([issue.lead.story]);
+  }
+  for (const section of issue.sections || []) pushStories(section.items);
+
+  const weekly = issue.weekly;
+  if (weekly) {
+    parts.push(...(weekly.week_in_five || []));
+    parts.push(weekly.through_line?.title, weekly.through_line?.body_md);
+    for (const pick of weekly.what_mattered || []) {
+      parts.push(pick.what, pick.yes_but, pick.why);
+      pushStories([pick.story]);
+    }
+    for (const pick of weekly.quietly_important || []) {
+      parts.push(pick.note);
+      pushStories([pick.story]);
+    }
+    parts.push(weekly.thread_to_watch?.title, weekly.thread_to_watch?.body);
+    if (weekly.thread_to_watch?.story) pushStories([weekly.thread_to_watch.story]);
+    pushStories(weekly.deep_cuts);
+  }
+
+  pushStories(issue.from_x);
+  pushStories(issue.quick_links);
+  for (const note of issue.editor_notes || []) parts.push(note.text);
+  for (const correction of issue.corrections || []) {
+    parts.push(correction.we_said, correction.whats_true);
+  }
+
+  return parts.filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+}
+
+function collectTopics(issue) {
+  const topics = new Set();
+  const walk = (value) => {
+    if (!value || typeof value !== 'object') return;
+    if (Array.isArray(value)) {
+      for (const entry of value) walk(entry);
+      return;
+    }
+    if (Array.isArray(value.topics)) {
+      for (const topic of value.topics) topics.add(topic);
+    }
+    for (const entry of Object.values(value)) walk(entry);
+  };
+  walk(issue);
+  return [...topics];
+}
+
+/**
+ * Brief issues join the same `posts` array so the existing search UI needs no
+ * change: it keys on `slug` and links on `url`, both of which these carry. The
+ * extra `type: "brief"` field lets a future UI tell the two apart; post entries
+ * are left exactly as they were.
+ */
+function processBriefIssues() {
+  if (!fs.existsSync(BRIEF_DIR)) return [];
+
+  const entries = [];
+  for (const type of ['daily', 'weekly']) {
+    const dir = path.join(BRIEF_DIR, type);
+    if (!fs.existsSync(dir)) continue;
+
+    for (const file of fs.readdirSync(dir).sort()) {
+      if (!file.endsWith('.json')) continue;
+      const fullPath = path.join(dir, file);
+      try {
+        const issue = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+        if (issue.status !== 'published') continue;
+        if (!issue.id || !issue.title) {
+          console.warn(`Skipping brief issue without id/title: ${fullPath}`);
+          continue;
+        }
+
+        const content = briefIssueText(issue);
+        const words = content.split(/\s+/).filter(Boolean);
+        const createdAt = String(issue.generated_at || new Date().toISOString());
+
+        entries.push({
+          slug: `brief-${type}-${issue.id}`,
+          title: issue.title,
+          subtitle: issue.preheader,
+          excerpt: createExcerpt(content),
+          content,
+          tags: collectTopics(issue),
+          createdAt,
+          updatedAt: createdAt,
+          wordCount: words.length,
+          readingTime: Number(issue.read_minutes) || 1,
+          url: `/brief/${type}/${issue.id}`,
+          type: 'brief',
+        });
+      } catch (error) {
+        console.warn(`Skipping unreadable brief issue ${fullPath}: ${error.message}`);
+      }
+    }
+  }
+  return entries;
+}
+
+/**
  * Main function to build the search index
  */
 function buildSearchIndex() {
   console.log('🔍 Building search index...');
-  
+
   const slugs = getAllPostSlugs();
   const posts = [];
 
@@ -179,6 +296,9 @@ function buildSearchIndex() {
       posts.push(post);
     }
   }
+
+  const briefIssues = processBriefIssues();
+  posts.push(...briefIssues);
 
   // Sort by creation date (newest first)
   posts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -199,7 +319,8 @@ function buildSearchIndex() {
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(index, null, 2));
   
   console.log(`✅ Search index built successfully!`);
-  console.log(`   📄 ${posts.length} posts indexed`);
+  console.log(`   📄 ${posts.length - briefIssues.length} posts indexed`);
+  console.log(`   📰 ${briefIssues.length} brief issues indexed`);
   console.log(`   📁 Output: ${OUTPUT_PATH}`);
   console.log(`   📊 Total words: ${posts.reduce((sum, post) => sum + post.wordCount, 0)}`);
   console.log(`   🏷️  Unique tags: ${new Set(posts.flatMap(post => post.tags)).size}`);

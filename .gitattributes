@@ -1,0 +1,6 @@
+# Generated issue files. Collapsing them in review keeps a 600-line JSON diff
+# from burying the human-written changes in the same pull request.
+content/brief/** linguist-generated=true
+
+# Vendored copies of the companion repos' source, produced by npm run sync:code.
+content/code/** linguist-vendored=true

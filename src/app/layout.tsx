@@ -41,7 +41,17 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   alternates: {
     canonical: "/",
-    types: { "application/rss+xml": [{ url: "/feed.xml", title: "Yadnesh Salvi — RSS" }] },
+    // The first entry is the established feed and keeps meaning "blog posts".
+    // Everything after it is additive; never reorder or retitle what is here.
+    types: {
+      "application/rss+xml": [
+        { url: "/feed.xml", title: "Yadnesh Salvi — RSS" },
+        { url: "/feed-all.xml", title: "Yadnesh Salvi, everything" },
+        { url: "/brief/feed.xml", title: "The Agentic Brief" },
+        { url: "/brief/daily/feed.xml", title: "The Agentic Brief, daily" },
+        { url: "/brief/weekly/feed.xml", title: "The Agentic Brief, weekly" },
+      ],
+    },
   },
   applicationName: SITE_NAME,
   openGraph: {

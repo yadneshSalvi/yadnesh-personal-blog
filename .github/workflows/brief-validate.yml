@@ -1,0 +1,82 @@
+name: Validate brief issues
+
+# The repo's first workflow. It exists for one reason: issues arrive as
+# automated pull requests from the newsletter pipeline, and a bad generation has
+# to show up as a red PR rather than as a broken page. Production stays on
+# skip-and-warn (src/lib/brief/issues.ts); fail-hard belongs here.
+#
+# The job runs on every pull request so it can be made a required check, and
+# exits early when nothing under content/brief/ changed.
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: brief-validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Schema, house style, and read time
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The duplicate-story check reads the previous issues, so the merge
+          # base has to be present.
+          fetch-depth: 0
+
+      - name: Find changed brief files
+        id: changed
+        run: |
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          files="$(git diff --name-only --diff-filter=d "$base" "$head" -- 'content/brief/**' || true)"
+          if [ -z "$files" ]; then
+            echo "No brief files changed; skipping validation."
+            echo "any=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "any=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "files<<EOF"
+              echo "$files"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.changed.outputs.any == 'true'
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.changed.outputs.any == 'true'
+        run: npm ci
+
+      - name: Validate changed issues
+        if: steps.changed.outputs.any == 'true'
+        run: |
+          # The validator loads the zod schema straight out of src/ through
+          # node's type stripping, so there is one definition of an issue rather
+          # than a CI copy that can drift.
+          echo "${{ steps.changed.outputs.files }}" | xargs npm run validate:brief --
+
+      - name: Validate the whole archive
+        if: steps.changed.outputs.any == 'true'
+        run: npm run validate:brief
+
+      - name: Token primitive tests
+        if: steps.changed.outputs.any == 'true'
+        run: npm run test:brief-tokens
+
+      - name: Email renderer and byte budget
+        # Renders every issue in the PR's tree plus a synthetic worst case, and
+        # fails if anything would ship over 80KB, lose its footer, or leave a
+        # per-recipient placeholder unreplaced.
+        if: steps.changed.outputs.any == 'true'
+        run: npm run test:brief-email

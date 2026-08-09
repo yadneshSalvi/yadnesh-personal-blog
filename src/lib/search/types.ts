@@ -10,6 +10,8 @@ export interface SearchablePost {
   wordCount: number;
   readingTime: number;
   url: string;
+  /** Present only on brief issues; post entries keep their original shape. */
+  type?: "brief";
 }
 
 export interface SearchResult {
