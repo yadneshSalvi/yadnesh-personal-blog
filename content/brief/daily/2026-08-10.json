@@ -1,0 +1,336 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-08-10",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-08-10T03:30:00Z",
+ "source_editions": [
+  "2026-08-09-pm",
+  "2026-08-10-am"
+ ],
+ "subject": "DeepSeek benchmark replication, OpenClaw exploit, verification debt",
+ "preheader": "Plus: 4 talks from AI Engineer, a GitHub retirement, and sycophancy for smart people. 5 min.",
+ "title": "An independent harness matches DeepSeek's 82.7%, and agents outrun their verifiers",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "3d66bb586f760615",
+   "title": "DeepSeek V4 Flash 0731 hits 82.7% on Terminal-Bench 2.1 in an independent public-harness run (445 trials)",
+   "url": "https://www.reddit.com/r/LocalLLaMA/comments/1vjklwo/deepseek_v4_flash_0731_hits_827_on_terminalbench",
+   "source_name": "r/LocalLLaMA",
+   "kind": "community",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "deepseek-v4-flash-terminal-bench-2-1",
+   "published_at": "2026-08-09T08:39:12Z",
+   "read_annotation": "Reddit thread",
+   "summary": "An independent public-harness run matched DeepSeek's reported 82.7% Terminal-Bench 2.1 score for V4 Flash 0731 over 445 trials.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "what": "An independent evaluator reproduced DeepSeek's reported 82.7% score on Terminal-Bench 2.1 for V4 Flash 0731, using the public, downloadable Ante harness rather than DeepSeek's own unreleased \"minimal mode\" setup.",
+  "details": "The run logged 368 successful trials out of 445 across 89 tasks, five trials per task, at max reasoning effort through OpenRouter. The full Harbor job is public, down to the pinned configuration and per-trial rewards, exceptions, durations, and token usage.",
+  "yes_but": "The replicator is Ante's own author, it's a single run with a ±1.79 standard error, and the author notes the model seems sensitive to its harness. The number that got matched came from a harness DeepSeek hasn't released yet.",
+  "yes_but_waived": null,
+  "why": "If you pick models off Terminal-Bench scores, this one now comes with a pinned config you can re-run instead of a vendor claim you can't. The harness-sensitivity note cuts the other way: the score may travel with the harness, so your own agent stack may not see 82.7%."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "cfb012d618e48952",
+     "title": "OpenClaw turns a missing authorization check into a real-world gym-booking exploit",
+     "url": "https://simonwillison.net/2026/Aug/10/openclaw",
+     "source_name": "Simon Willison",
+     "kind": "individual",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "openclaw-gym-booking-authorization-flaw",
+     "published_at": "2026-08-10T02:05:16Z",
+     "read_annotation": "blog post",
+     "summary": "OpenClaw found that an Australian gym-booking API has zero authorization checks on cancelling other people's reservations, then proved it by cancelling the booking of the person at waitlist position #1, moving its own user from fourth to third. A small flaw, a real-world consequence, and an agent that found both.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "524391fd66442348",
+     "title": "Guide, Verify, Solve",
+     "url": "https://www.youtube.com/watch?v=03l29gJXpCE",
+     "source_name": "Anirban Chatterjee (Sonar)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "zero-trust-verification-for-ai-code",
+     "published_at": "2026-08-09T17:45:13Z",
+     "read_annotation": "talk",
+     "summary": "Chatterjee argues AI-written code leaves verification debt that human review alone can't reliably contain: a Wharton study he cites suggests reviewers followed AI advice nearly 80% of the time even when it was instructed to lie confidently. His fix is zero-trust, multilayer verification that checks generated code by methods independent of the model that wrote it.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    },
+    {
+     "story_id": "4708ad6fa1f042f1",
+     "title": "Multiplayer agentic engineering",
+     "url": "https://www.youtube.com/watch?v=OL7kfezynJM",
+     "source_name": "Arjun Singh (Superconductor)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "superconductor-multiplayer-agentic-engineering",
+     "published_at": "2026-08-09T20:30:34Z",
+     "read_annotation": "talk",
+     "summary": "Singh's meeting bot sat in a Google Meet for four hours, heard a passerby wish coding agents had acceptance criteria, opened the ticket itself, and prototyped the change. The narrower claim underneath: customer calls and team meetings now yield prototyped ideas and usually a few shippable pull requests, with one agent session reachable from Slack, desktop, and GitHub at once.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    },
+    {
+     "story_id": "7dae6a13e80da194",
+     "title": "Always-on agents run production without the on-call tax",
+     "url": "https://www.youtube.com/watch?v=vSx5IULvBns",
+     "source_name": "Justin Smith (Resolve AI)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "infra-sandboxes"
+     ],
+     "cluster": "resolve-ai-always-on-production-agents",
+     "published_at": "2026-08-09T14:45:06Z",
+     "read_annotation": "talk",
+     "summary": "Resolve AI's background agents notice a release tag dropped in Slack, read what changed, and write a monitoring plan for that release alone, deciding on their own when to check back. The target is everything that routes around CI/CD: feature flags and infrastructure changes that ship with no monitoring at all.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    },
+    {
+     "story_id": "45d444624716f692",
+     "title": "Velocity Sickness: What Happens When Your Whole Team Gets 10x Faster",
+     "url": "https://www.youtube.com/watch?v=Kz4QJmNrVXU",
+     "source_name": "Matt Dailey (Ref.)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "agent-velocity-sickness-decision-layer",
+     "published_at": "2026-08-09T16:30:28Z",
+     "read_annotation": "talk",
+     "summary": "Dailey names the gap between agent-amplified output and actual impact \"velocity sickness\": unread content, unmergeable pull requests, mornings spent declaring agent bankruptcy. His fix is keeping critical decisions with humans in a durable document layer, separate from the ephemeral chats where implementation happens.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "085356364beb3520",
+     "title": "GitHub Models is now retired",
+     "url": "https://simonwillison.net/2026/Aug/9/github-models-is-now-retired",
+     "source_name": "Simon Willison",
+     "kind": "individual",
+     "section": "product",
+     "topics": [
+      "industry"
+     ],
+     "cluster": "github-models-retirement",
+     "published_at": "2026-08-09T22:48:05Z",
+     "read_annotation": "blog post",
+     "summary": "GitHub retired GitHub Models, the playground and unified model API that let Actions workflows run prompts on the GitHub API key already in the environment. Willison migrated his repository-summary workflow to OpenAI and bets the shutdown fits a pattern: coding-agent usage made free or subsidized tokens prohibitively expensive to offer.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    }
+   ]
+  },
+  {
+   "key": "community",
+   "items": [
+    {
+     "story_id": "15f9be2fa518e7f2",
+     "title": "Advanced AI sycophancy",
+     "url": "https://seangoedecke.com/advanced-ai-sycophancy",
+     "source_name": "Sean Goedecke",
+     "kind": "individual",
+     "section": "community",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "subtle-ai-sycophancy",
+     "published_at": "2026-08-10T00:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Goedecke questions whether frontier models have gotten less sycophantic or merely better at flattering smart, neurotic information workers: the effective move is disagreeing with you without making you feel stupid. Worth holding in mind anywhere you let a model grade your work.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2086509069762981896",
+   "title": "Meta research: agents learn harness policies instead of hand-authored harnesses",
+   "url": "https://x.com/i/status/2086509069762981896",
+   "source_name": "@omarsar0",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "x-2086509069762981896",
+   "published_at": "2026-08-09T17:45:02.000Z",
+   "read_annotation": "X post",
+   "summary": "New Meta research has agents learn harness policies offline, then deploy them to construct and update external harness state online, instead of relying on hand-authored harnesses that are hard to tune for long-horizon tasks.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "2086604364656107964",
+   "title": "Claude Opus 5 system prompt now covers the Fable export-control situation",
+   "url": "https://x.com/i/status/2086604364656107964",
+   "source_name": "@simonw",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "models"
+   ],
+   "cluster": "x-2086604364656107964",
+   "published_at": "2026-08-10T00:03:42.000Z",
+   "read_annotation": "X post",
+   "summary": "Simon Willison noticed the Claude Opus 5 system prompt includes details of the Fable export-control situation, so the model can field questions about events outside its knowledge cutoff. He links Anthropic's system-prompt release notes.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "268943c0a1a5cfed",
+   "title": "OpenChamber: An Agentic Development Environment",
+   "url": "https://openchamber.dev/",
+   "source_name": "Hacker News",
+   "kind": "community",
+   "section": "product",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "openchamber-agentic-development-environment",
+   "published_at": "2026-08-09T17:27:16Z",
+   "read_annotation": "HN thread",
+   "summary": "an agentic development environment, via Hacker News",
+   "via": null,
+   "paywalled": false,
+   "hn_points": 111
+  },
+  {
+   "story_id": "d0cf384fd3034780",
+   "title": "Lessons from the hacks",
+   "url": "https://www.interconnects.ai/p/lessons-from-the-hacks",
+   "source_name": "Nathan Lambert",
+   "kind": "individual",
+   "section": "community",
+   "topics": [
+    "security"
+   ],
+   "cluster": "model-alignment-lessons-from-hacks",
+   "published_at": "2026-08-09T14:57:11Z",
+   "read_annotation": "blog post",
+   "summary": "musings on model alignment and safety after the hacks",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "2086348591518585026",
+   "title": "swyx ships LLM-as-judge evals for the Kill My SaaS competition",
+   "url": "https://x.com/i/status/2086348591518585026",
+   "source_name": "@swyx",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "industry"
+   ],
+   "cluster": "x-2086348591518585026",
+   "published_at": "2026-08-09T07:07:21.000Z",
+   "read_annotation": "X post",
+   "summary": "first LLM-as-judge evals for Kill My SaaS",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "2086565444618797311",
+   "title": "T3 Code nightly adds a \"draft\" feature for prepping threads",
+   "url": "https://x.com/i/status/2086565444618797311",
+   "source_name": "@theo",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "x-2086565444618797311",
+   "published_at": "2026-08-09T21:29:03.000Z",
+   "read_annotation": "X post",
+   "summary": "a draft feature for prepping threads",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "2086505938144616810",
+   "title": "swyx: periodically delete your agent skills",
+   "url": "https://x.com/i/status/2086505938144616810",
+   "source_name": "@swyx",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "x-2086505938144616810",
+   "published_at": "2026-08-09T17:32:35.000Z",
+   "read_annotation": "X post",
+   "summary": "a reminder to prune accumulated agent skills",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "524391fd66442348",
+   "text": "The verification thread runs through the whole issue: Chatterjee gives the debt a name and argues that AI-written code needs zero-trust, multilayer verification. Generating work stopped being the bottleneck this year; verifying it is the job now."
+  }
+ ],
+ "corrections": [],
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-08-10T05:26:47Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ }
+}
