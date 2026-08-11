@@ -26,6 +26,7 @@ import {
   QuickLinks,
   TopicChips,
 } from "./IssueParts";
+import { ComicFigure, HedgeBlock, MemeFigure } from "./IssueHumor";
 import { Breadcrumb, IssueNav, RelatedIssues } from "./IssueNav";
 import IssueTOC from "./IssueTOC";
 import { issueTocItems } from "./tocItems";
@@ -181,11 +182,15 @@ export default function IssueArticle({ issue }: { issue: BriefIssue }) {
                     ) : null}
                   </div>
                 ))}
+                {issue.hedge ? <HedgeBlock hedge={issue.hedge} /> : null}
               </>
             ) : (
               <>
                 <WeekInFive lines={issue.weekly.week_in_five} />
                 <WeeklyThroughLine throughLine={issue.weekly.through_line} />
+                {issue.weekly.comic ? (
+                  <ComicFigure comic={issue.weekly.comic} />
+                ) : null}
                 <BriefSubscribeCTA variant="inline" />
                 <WhatMattered picks={issue.weekly.what_mattered} />
                 <QuietlyImportant picks={issue.weekly.quietly_important} />
@@ -218,6 +223,8 @@ export default function IssueArticle({ issue }: { issue: BriefIssue }) {
             {loose.map((text, i) => (
               <EditorNote key={i} text={text} />
             ))}
+
+            {issue.meme ? <MemeFigure meme={issue.meme} type={issue.type} /> : null}
 
             <CorrectionsBlock corrections={issue.corrections} />
           </div>

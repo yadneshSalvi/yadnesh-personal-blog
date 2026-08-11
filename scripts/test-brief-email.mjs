@@ -9,6 +9,8 @@
  *   - a fat issue trims down under budget and still ends with a complete
  *     footer, an unsubscribe link, and the corrections block;
  *   - no em-dash reaches the reader (WRITING-STYLE.md §3);
+ *   - no issue email ever carries an <img>: the meme and the comic ship as a
+ *     line pointing at the web edition, by decision, not by accident;
  *   - each per-recipient placeholder appears exactly once in each part, so the
  *     send loop's string replace cannot leave a dead link in an inbox.
  *
@@ -37,6 +39,17 @@ module.registerHooks({
       const candidate = new URL(`${specifier}.ts`, pathToFileURL(parent));
       if (fs.existsSync(candidate)) return { url: candidate.href, shortCircuit: true };
     }
+    // The approval email reaches urls.ts, which uses the app's "@/" alias.
+    // issueEmail.ts avoids the alias on purpose so node can load it bare, but
+    // urls.ts is ordinary app code and should not be contorted for a test.
+    if (specifier.startsWith("@/")) {
+      const target = path.join(REPO_ROOT, "src", specifier.slice(2));
+      for (const candidate of [`${target}.ts`, `${target}.tsx`, path.join(target, "index.ts")]) {
+        if (fs.existsSync(candidate)) {
+          return { url: pathToFileURL(candidate).href, shortCircuit: true };
+        }
+      }
+    }
     return nextResolve(specifier, context);
   },
 });
@@ -53,6 +66,10 @@ const {
   personalizeIssueEmail,
   renderIssueEmail,
 } = await import("../src/lib/brief/issueEmail.ts");
+const { buildApprovalEmail } = await import("../src/lib/brief/approvalEmail.ts");
+// Content assertions against the HTML part have to escape the way the renderer
+// does, or an apostrophe in a fixture fails a test about something else.
+const { escapeHtml } = await import("../src/lib/brief/emailChrome.ts");
 
 const LINKS = {
   webUrl: "https://yadneshsalvi.com/newsletter/daily/2026-08-06",
@@ -76,6 +93,16 @@ function kb(bytes) {
 function assertNoEmDash(rendered, label) {
   assert.equal(rendered.html.includes("—"), false, `${label}: em-dash in the HTML part`);
   assert.equal(rendered.text.includes("—"), false, `${label}: em-dash in the text part`);
+}
+
+/**
+ * The humor features put drawn images on the web page only. An <img> in an
+ * issue email means somebody wired the meme into the wrong renderer, and the
+ * reader gets a blocked-image box where the joke was.
+ */
+function assertNoImages(rendered, label) {
+  assert.equal(/<img\b/i.test(rendered.html), false, `${label}: an <img> tag reached the HTML part`);
+  assert.equal(/<img\b/i.test(rendered.text), false, `${label}: an <img> tag reached the text part`);
 }
 
 function assertPlaceholdersOnce(rendered, label) {
@@ -138,6 +165,7 @@ test(`renders ${fixtures.length} real issues well under the byte budget`, () => 
     assert.equal(rendered.subject, issue.subject);
     assert.equal(rendered.preheader, issue.preheader);
     assertNoEmDash(rendered, label);
+    assertNoImages(rendered, label);
     assertPlaceholdersOnce(rendered, label);
     assertFooterIntact(rendered, label);
     console.log(`      ${label}: ${kb(rendered.size.bytes)}`);
@@ -170,8 +198,14 @@ test("a daily lead keeps its labeled skeleton", () => {
 });
 
 test("a weekly keeps its five lines, its through-line, and its thread", () => {
+  // The hand-built fixtures were deleted once real issues started publishing,
+  // and the first real weekly has not run yet. The fat synthetic weekly below
+  // still exercises the renderer; this checks a weekly on disk when there is one.
   const weekly = fixtures.find((entry) => entry.issue.type === "weekly");
-  assert.ok(weekly, "no weekly fixture");
+  if (!weekly) {
+    console.log("      no weekly issue on disk yet; the synthetic weekly covers the renderer");
+    return;
+  }
   const rendered = renderIssueEmail(weekly.issue, LINKS);
   assert.ok(rendered.html.includes("The week in five lines"));
   // Titles are compared against the text part: the HTML part has been through
@@ -257,6 +291,20 @@ function fatDaily() {
     from_x: fatList("fromx", 3, "community", { kind: "x" }),
     quick_links: fatList("quicklink", 60, "product"),
     editor_notes: [{ after_story: null, text: LONG }],
+    meme: {
+      image: "/images/brief/memes/2026-08-10/fat-meme.png",
+      alt: "A drawing described at length for a reader who cannot see it.",
+      alt_joke: "The bonus line nobody reads until they hover.",
+      caption: "The one that ran, and the reason the others did not.",
+      concept: "Take the day's claim literally until it falls over.",
+      story_id: "lead-0",
+    },
+    hedge: {
+      quote:
+        "Results may vary depending on the workload, the hardware, and a number of factors we did not measure.",
+      story: fatStory("hedge", 0, "research"),
+      note: "Every number in the post was measured; that sentence was not.",
+    },
     corrections: [
       {
         we_said: LONG,
@@ -290,6 +338,14 @@ function fatWeekly() {
     quick_links: fatList("wquicklink", 40, "product"),
     editor_notes: [],
     corrections: [],
+    meme: {
+      image: "/images/brief/memes/2026-W33/fat-meme.webp",
+      alt: "A drawing described at length for a reader who cannot see it.",
+      alt_joke: "The bonus line nobody reads until they hover.",
+      caption: "The week's meme, chosen over four that were funnier and less true.",
+      concept: "The week's pattern, drawn as one overloaded conveyor belt.",
+      story_id: null,
+    },
     email: { send_state: "pending_approval", approve_by: null, sent_at: null, resend_broadcast_ids: {} },
     weekly: {
       week_in_five: Array.from({ length: 5 }, () => LONG),
@@ -314,6 +370,12 @@ function fatWeekly() {
         prior_threads_paid_off: [{ title: "Paid off", body: LONG, issue_id: null }],
       },
       deep_cuts: fatList("deepcut", 60, "community"),
+      comic: {
+        image: "/images/brief/memes/2026-W33/comic.webp",
+        alt: "Three panels, described in full so the punchline survives a screen reader.",
+        alt_joke: "Panel four exists but it is still rendering.",
+        caption: "Drawn after the through line was written, which is why it agrees with it.",
+      },
     },
   });
 }
@@ -335,6 +397,7 @@ test("the fat daily trims under budget with the lead and footer intact", () => {
   assertFooterIntact(rendered, "fat daily");
   assertPlaceholdersOnce(rendered, "fat daily");
   assertNoEmDash(rendered, "fat daily");
+  assertNoImages(rendered, "fat daily");
 
   // The lead is never trimmed, and neither is its caveat.
   assert.ok(rendered.html.includes(issue.lead.story.url), "the lead story was dropped");
@@ -357,6 +420,7 @@ test("the fat weekly trims under budget and keeps its argument", () => {
   assertFooterIntact(rendered, "fat weekly");
   assertPlaceholdersOnce(rendered, "fat weekly");
   assertNoEmDash(rendered, "fat weekly");
+  assertNoImages(rendered, "fat weekly");
   assert.ok(rendered.html.includes("The week in five lines"), "the recap was dropped");
   assert.ok(rendered.html.includes(issue.weekly.through_line.title), "the through-line was dropped");
   assert.ok(rendered.html.includes("mattered-0"), "every what-mattered pick was dropped");
@@ -371,6 +435,7 @@ test("the bottom of the ladder keeps one pick, the corrections, and the footer",
   console.log(`      starved to ${kb(rendered.size.bytes)}; dropped ${rendered.dropped.join(", ")}`);
   assertFooterIntact(rendered, "starved weekly");
   assertPlaceholdersOnce(rendered, "starved weekly");
+  assertNoImages(rendered, "starved weekly");
   assert.ok(rendered.html.includes("mattered-0"), "the first what-mattered pick must survive");
   assert.equal(rendered.html.includes("mattered-23"), false, "the picks were not trimmed at all");
   assert.ok(
@@ -380,6 +445,146 @@ test("the bottom of the ladder keeps one pick, the corrections, and the footer",
   assert.equal(rendered.html.includes("quiet-0"), false, "quietly important should be gone");
   assert.equal(rendered.html.includes("deepcut-0"), false, "deep cuts should be gone");
   assert.ok(rendered.html.includes("Nothing to correct."), "the corrections block was dropped");
+});
+
+/* ── The humor blocks ───────────────────────────────────────────────────── */
+
+test("the daily's meme is one line and its hedge is the whole block", () => {
+  const issue = fatDaily();
+  const rendered = renderIssueEmail(issue, LINKS);
+
+  // The meme: a caption and a pointer at the web edition's anchor, no image.
+  assert.ok(
+    rendered.html.includes("<strong>Meme of the day:</strong>"),
+    "the meme line is missing from the HTML part",
+  );
+  assert.ok(rendered.html.includes(issue.meme.caption), "the meme caption is missing");
+  assert.ok(
+    rendered.html.includes(`${LINKS.webUrl}#meme`),
+    "the meme line does not point at the web edition's anchor",
+  );
+  assert.ok(rendered.text.includes(`Meme of the day: ${issue.meme.caption}`), "text part lost the meme line");
+  assert.ok(
+    rendered.text.includes(`See it on the web edition: ${LINKS.webUrl}#meme`),
+    "text part lost the meme's link",
+  );
+  assert.equal(
+    rendered.html.includes(issue.meme.image),
+    false,
+    "the meme's image path reached the email",
+  );
+  assert.equal(rendered.html.includes(issue.meme.alt), false, "the meme's alt text reached the email");
+
+  // The hedge is text, so all of it ships.
+  assert.ok(rendered.html.includes(">Hedge of the day</h2>"), "the hedge kicker is missing");
+  assert.ok(rendered.html.includes(issue.hedge.quote), "the hedge quote is missing from the HTML part");
+  assert.ok(rendered.html.includes(issue.hedge.note), "the hedge note is missing from the HTML part");
+  assert.ok(rendered.html.includes(issue.hedge.story.url), "the hedge's citation link is missing");
+  assert.ok(rendered.text.includes(`"${issue.hedge.quote}"`), "text part lost the hedge quote");
+  assert.ok(rendered.text.includes(issue.hedge.note), "text part lost the hedge note");
+  assertNoImages(rendered, "fat daily humor");
+  assertPlaceholdersOnce(rendered, "fat daily humor");
+});
+
+test("the weekly's comic points at the web edition too", () => {
+  const issue = fatWeekly();
+  const rendered = renderIssueEmail(issue, LINKS);
+
+  assert.ok(rendered.html.includes("<strong>The comic:</strong>"), "the comic line is missing");
+  assert.ok(rendered.html.includes(`${LINKS.webUrl}#comic`), "the comic line lost its anchor");
+  assert.ok(rendered.text.includes(`The comic: ${issue.weekly.comic.caption}`), "text part lost the comic line");
+  assert.ok(rendered.html.includes("<strong>Meme of the week:</strong>"), "a weekly meme is labeled for the week");
+  assert.equal(
+    rendered.html.includes(issue.weekly.comic.image),
+    false,
+    "the comic's image path reached the email",
+  );
+  assertNoImages(rendered, "fat weekly humor");
+});
+
+test("a fat issue with humor in it still fits the budget", () => {
+  for (const [label, issue] of [["fat daily", fatDaily()], ["fat weekly", fatWeekly()]]) {
+    const rendered = renderIssueEmail(issue, LINKS);
+    assert.equal(rendered.size.ok, true, `${label}: ${kb(rendered.size.bytes)} after trimming`);
+    // The humor blocks are never on the trim ladder, so they survive a starved
+    // render the way the lead and the corrections do.
+    const starved = renderIssueEmail(issue, LINKS, { limit: 14 * 1024 });
+    const memeLabel = issue.type === "weekly" ? "Meme of the week" : "Meme of the day";
+    assert.ok(
+      starved.html.includes(`<strong>${memeLabel}:</strong>`),
+      `${label}: the meme line was trimmed away`,
+    );
+    if (issue.type === "daily") {
+      assert.ok(starved.html.includes(issue.hedge.quote), `${label}: the hedge was trimmed away`);
+    } else {
+      assert.ok(starved.html.includes("<strong>The comic:</strong>"), `${label}: the comic line was trimmed away`);
+    }
+  }
+});
+
+/* ── The approval email ─────────────────────────────────────────────────── */
+
+/**
+ * The asymmetry these two tests lock down: the owner-only approval email SHOWS
+ * the drawings, because it is the one human review point before an issue sends
+ * itself and a meme cannot be reviewed as text. Reader-facing issue emails
+ * never do. Getting this backwards either ships an unreviewable joke or mails
+ * a blocked-image box to every subscriber.
+ */
+const APPROVAL_INPUT = {
+  base: "https://yadneshsalvi.com",
+  approveUrl: "https://yadneshsalvi.com/api/brief/send-action?do=approve&token=abc",
+  holdUrl: "https://yadneshsalvi.com/api/brief/send-action?do=hold&token=abc",
+  githubUrl: "https://github.com/yadneshSalvi/yadnesh-personal-blog",
+  webUrl: LINKS.webUrl,
+  approveBy: "2026-08-10T05:20:00Z",
+  recipients: 42,
+  sizeBytes: 12345,
+  dropped: [],
+};
+
+test("the approval email shows the meme, the hedge, and the comic", () => {
+  const daily = fatDaily();
+  const approval = buildApprovalEmail({ ...APPROVAL_INPUT, issue: daily });
+
+  assert.ok(
+    approval.html.includes(`src="https://yadneshsalvi.com${daily.meme.image}"`),
+    "the meme image is not in the approval email, or its URL is not absolute",
+  );
+  assert.ok(approval.html.includes(escapeHtml(daily.meme.caption)), "the meme caption is missing");
+  assert.ok(approval.html.includes(escapeHtml(daily.meme.alt)), "the meme alt text is missing");
+  assert.ok(approval.html.includes(escapeHtml(daily.meme.concept)), "the meme premise is missing");
+  assert.ok(approval.html.includes(escapeHtml(daily.hedge.quote)), "the hedge quote is missing");
+  assert.ok(approval.html.includes(escapeHtml(daily.hedge.note)), "the hedge note is missing");
+  assert.ok(
+    approval.text.includes(`Image: https://yadneshsalvi.com${daily.meme.image}`),
+    "the text part should carry the image as a link",
+  );
+  assert.ok(approval.text.includes(`"${daily.hedge.quote}"`), "text part lost the hedge quote");
+
+  const weekly = fatWeekly();
+  const weeklyApproval = buildApprovalEmail({ ...APPROVAL_INPUT, issue: weekly });
+  assert.ok(
+    weeklyApproval.html.includes(`src="https://yadneshsalvi.com${weekly.weekly.comic.image}"`),
+    "the comic image is missing from the weekly approval email",
+  );
+  assert.ok(
+    weeklyApproval.html.includes(escapeHtml(weekly.weekly.comic.caption)),
+    "the comic caption is missing",
+  );
+  assert.ok(weeklyApproval.html.includes(">Meme of the week</h2>"), "the weekly meme is mislabeled");
+});
+
+test("an issue with no humor produces an approval email with no images", () => {
+  const plain = fixtures[0].issue;
+  const approval = buildApprovalEmail({ ...APPROVAL_INPUT, issue: plain });
+  assert.equal(
+    /<img\b/i.test(approval.html),
+    false,
+    "an issue carrying no meme should produce no <img> at all",
+  );
+  // And the reader-facing render of the same issue never has one either.
+  assertNoImages(renderIssueEmail(plain, LINKS), "no-humor issue email");
 });
 
 /* ── Personalization ────────────────────────────────────────────────────── */

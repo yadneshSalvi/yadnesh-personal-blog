@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "build-index": "node scripts/build-search-index.js",
     "validate:brief": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/validate-brief.mjs",
+    "test:brief-text": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-brief-text.mjs",
     "test:brief-tokens": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-brief-tokens.mjs",
     "test:brief-email": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-brief-email.mjs",
     "sync:code": "node scripts/sync-tutorial-code.mjs",

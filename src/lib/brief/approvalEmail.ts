@@ -76,6 +76,108 @@ function contentsLines(issue: BriefIssue): string[] {
   return lines;
 }
 
+/**
+ * The jokes, shown rather than described.
+ *
+ * This is the only email that carries images, and deliberately so: it goes to
+ * one person, it is the single human review point before an issue sends itself,
+ * and a meme is the one part of an issue that cannot be reviewed as text. A
+ * caption reading "the benchmark number, drawn at the size of its error bars"
+ * tells you nothing about whether the drawing is funny, on-message, or has six
+ * fingers. Reader-facing issue emails stay image-free, and a test enforces it.
+ */
+function humorHtml(issue: BriefIssue, base: string): string {
+  const blocks: string[] = [];
+
+  const drawn = (label: string, image: string, alt: string, caption: string, altJoke: string | null) =>
+    [
+      `<h2>${escapeHtml(label)}</h2>`,
+      `<p><img src="${escapeHtml(`${base}${image}`)}" alt="${escapeHtml(alt)}" width="440" ` +
+        `style="max-width:100%;height:auto;border:1px solid #e7e3d9;border-radius:2px;"></p>`,
+      `<p><strong>Caption:</strong> ${escapeHtml(caption)}</p>`,
+      `<p class="lede" style="font-size:13px;"><strong>Alt:</strong> ${escapeHtml(alt)}</p>`,
+      altJoke
+        ? `<p class="lede" style="font-size:13px;"><strong>Bonus line:</strong> ${escapeHtml(altJoke)}</p>`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("");
+
+  if (issue.type === "weekly" && issue.weekly.comic) {
+    const comic = issue.weekly.comic;
+    blocks.push(drawn("The comic", comic.image, comic.alt, comic.caption, comic.alt_joke));
+  }
+
+  if (issue.meme) {
+    const meme = issue.meme;
+    blocks.push(
+      drawn(
+        issue.type === "weekly" ? "Meme of the week" : "Meme of the day",
+        meme.image,
+        meme.alt,
+        meme.caption,
+        meme.alt_joke,
+      ) + `<p class="lede" style="font-size:13px;"><strong>Premise:</strong> ${escapeHtml(meme.concept)}</p>`,
+    );
+  }
+
+  if (issue.type === "daily" && issue.hedge) {
+    const hedge = issue.hedge;
+    blocks.push(
+      [
+        `<h2>Hedge of the day</h2>`,
+        `<blockquote style="margin:0 0 12px;padding:2px 0 2px 14px;border-left:2px solid #e7e3d9;">` +
+          `<p style="margin:0;font-style:italic;">${escapeHtml(`"${hedge.quote}"`)}</p></blockquote>`,
+        `<p class="lede" style="font-size:13px;">${emailLink(hedge.story.url, `${hedge.story.title} (${hedge.story.source_name})`)}</p>`,
+        `<p>${escapeHtml(hedge.note)}</p>`,
+      ].join(""),
+    );
+  }
+
+  return blocks.join("\n");
+}
+
+/** The same content for the text part, where an image can only be a link. */
+function humorTextLines(issue: BriefIssue, base: string): string[] {
+  const lines: string[] = [];
+
+  const drawn = (label: string, image: string, alt: string, caption: string, altJoke: string | null) => {
+    lines.push(label.toUpperCase(), "", `Image: ${base}${image}`, `Caption: ${caption}`, `Alt: ${alt}`);
+    if (altJoke) lines.push(`Bonus line: ${altJoke}`);
+    lines.push("");
+  };
+
+  if (issue.type === "weekly" && issue.weekly.comic) {
+    const comic = issue.weekly.comic;
+    drawn("The comic", comic.image, comic.alt, comic.caption, comic.alt_joke);
+  }
+  if (issue.meme) {
+    const meme = issue.meme;
+    drawn(
+      issue.type === "weekly" ? "Meme of the week" : "Meme of the day",
+      meme.image,
+      meme.alt,
+      meme.caption,
+      meme.alt_joke,
+    );
+    lines.push(`Premise: ${meme.concept}`, "");
+  }
+  if (issue.type === "daily" && issue.hedge) {
+    const hedge = issue.hedge;
+    lines.push(
+      "HEDGE OF THE DAY",
+      "",
+      `"${hedge.quote}"`,
+      `${hedge.story.title} (${hedge.story.source_name})`,
+      `  ${hedge.story.url}`,
+      hedge.note,
+      "",
+    );
+  }
+
+  return lines;
+}
+
 export function buildApprovalEmail(input: {
   base: string;
   issue: BriefIssue;
@@ -122,6 +224,7 @@ export function buildApprovalEmail(input: {
           )
           .join("")}`
       : "",
+    humorHtml(issue, input.base),
     `<h2>Decide</h2>`,
     `<p>${emailLink(input.approveUrl, "Approve and send now")}<br>` +
       `${emailLink(input.holdUrl, "Hold it")} (web stays up, no email goes out)<br>` +
@@ -151,6 +254,7 @@ export function buildApprovalEmail(input: {
       ...(notes.length > 0
         ? ["THE NOTES THAT ONLY SURVIVE APPROVAL", ...notes.map((note) => `Y: ${note}`), ""]
         : []),
+      ...humorTextLines(issue, input.base),
       "DECIDE",
       `Approve and send now: ${input.approveUrl}`,
       `Hold it: ${input.holdUrl}`,

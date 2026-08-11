@@ -31,10 +31,12 @@ import {
   type BriefEmailFooter,
 } from "./emailChrome";
 import { issueDateLabel } from "./dates";
+import { COMIC_LABEL, HEDGE_LABEL, memeLabel } from "./humor";
 import {
   BRIEF_SECTION_KEYS,
   sectionLabel,
   type BriefEditorNote,
+  type BriefHedge,
   type BriefIssue,
   type BriefStory,
 } from "./schema";
@@ -263,6 +265,54 @@ function editorNoteHtml(text: string): string {
   );
 }
 
+/* ── The humor blocks ───────────────────────────────────────────────────── */
+
+/**
+ * A drawn thing gets a line, not a picture. Images in email are a fight with
+ * every client's blocking rules, they cost the byte budget the trim ladder
+ * exists to protect, and a meme that renders as a grey box with a red cross is
+ * worse than a sentence saying where the joke is. So the email points at the
+ * web edition's anchor and stays text, which is also what the plain-text part
+ * has always been able to promise.
+ */
+function drawnPointerHtml(label: string, caption: string, href: string): string {
+  return (
+    `<p><strong>${escapeHtml(label)}:</strong> ${escapeHtml(caption)} ` +
+    `${emailLink(href, "see it on the web edition")}</p>`
+  );
+}
+
+function drawnPointerTextLines(label: string, caption: string, href: string): string[] {
+  return [`${label}: ${caption}`, `See it on the web edition: ${href}`, ""];
+}
+
+/**
+ * The hedge is text, so unlike the meme it ships whole: the quote as somebody
+ * else said it, the citation, and the one dry line that is the actual joke.
+ */
+function hedgeParts(hedge: BriefHedge, parts: Parts): void {
+  parts.html.push(`<h2>${escapeHtml(HEDGE_LABEL)}</h2>`);
+  parts.html.push(
+    `<blockquote style="margin:0 0 12px;padding:2px 0 2px 14px;border-left:2px solid #e7e3d9;">` +
+      `<p style="margin:0;font-style:italic;">${escapeHtml(`"${hedge.quote}"`)}</p>` +
+      `</blockquote>`,
+  );
+  parts.html.push(`<p class="lede" style="font-size:14px;">${headlineLink(hedge.story)}</p>`);
+  parts.html.push(`<p>${escapeHtml(hedge.note)}</p>`);
+
+  parts.text.push(
+    HEDGE_LABEL.toUpperCase(),
+    "",
+    `"${hedge.quote}"`,
+    "",
+    `${headlineText(hedge.story)}`,
+    `  ${hedge.story.url}`,
+    "",
+    hedge.note,
+    "",
+  );
+}
+
 function splitEditorNotes(notes: BriefEditorNote[]): {
   byStory: Map<string, string[]>;
   loose: string[];
@@ -362,10 +412,14 @@ function dailyBody(
       for (const note of notesFor(story.story_id)) parts.text.push(`  Y: ${note}`, "");
     }
   }
+
+  // Same seat as the web edition: after the last section, before the quick links.
+  if (issue.hedge) hedgeParts(issue.hedge, parts);
 }
 
 function weeklyBody(
   issue: Extract<BriefIssue, { type: "weekly" }>,
+  links: IssueEmailLinks,
   plan: TrimPlan,
   parts: Parts,
 ): void {
@@ -392,6 +446,12 @@ function weeklyBody(
   for (const paragraph of paragraphs) parts.html.push(`<p>${escapeHtml(paragraph)}</p>`);
   parts.text.push(weekly.through_line.title.toUpperCase(), "");
   for (const paragraph of paragraphs) parts.text.push(paragraph, "");
+
+  if (weekly.comic) {
+    const href = `${links.webUrl}#comic`;
+    parts.html.push(drawnPointerHtml(COMIC_LABEL, weekly.comic.caption, href));
+    parts.text.push(...drawnPointerTextLines(COMIC_LABEL, weekly.comic.caption, href));
+  }
 
   const picks = cap(weekly.what_mattered, plan.whatMattered);
   if (picks.length > 0) {
@@ -463,7 +523,12 @@ function weeklyBody(
   }
 }
 
-function tail(issue: BriefIssue, plan: TrimPlan, parts: Parts): void {
+function tail(
+  issue: BriefIssue,
+  links: IssueEmailLinks,
+  plan: TrimPlan,
+  parts: Parts,
+): void {
   const { loose } = splitEditorNotes(issue.editor_notes);
 
   if (plan.fromX && issue.from_x.length > 0) {
@@ -486,6 +551,13 @@ function tail(issue: BriefIssue, plan: TrimPlan, parts: Parts): void {
   for (const note of loose) {
     parts.html.push(editorNoteHtml(note));
     parts.text.push(`Y: ${note}`, "");
+  }
+
+  if (issue.meme) {
+    const label = memeLabel(issue.type);
+    const href = `${links.webUrl}#meme`;
+    parts.html.push(drawnPointerHtml(label, issue.meme.caption, href));
+    parts.text.push(...drawnPointerTextLines(label, issue.meme.caption, href));
   }
 
   // Standing section, fixed position. The usual single line is the point: it
@@ -555,9 +627,9 @@ function renderWithPlan(
   if (issue.type === "daily") {
     dailyBody(issue, plan, parts);
   } else {
-    weeklyBody(issue, plan, parts);
+    weeklyBody(issue, links, plan, parts);
   }
-  tail(issue, plan, parts);
+  tail(issue, links, plan, parts);
 
   return {
     html: renderBriefEmailHtml({

@@ -5,6 +5,7 @@
 // blog's heading-collecting TOC has nothing to collect here.
 import type { BriefIssue } from "@/lib/brief/schema";
 import { sectionLabel } from "@/lib/brief/schema";
+import { COMIC_LABEL, HEDGE_LABEL, memeLabel } from "@/lib/brief/humor";
 import { storyAnchor } from "./StoryRow";
 
 /** Level 2 is a block of the issue; level 3 is a story inside one. */
@@ -19,6 +20,9 @@ export function issueTocItems(issue: BriefIssue): IssueTocItem[] {
   }
   if (issue.quick_links.length > 0) {
     items.push({ id: "quick-links", text: "Quick links", level: 2 });
+  }
+  if (issue.meme) {
+    items.push({ id: "meme", text: memeLabel(issue.type), level: 2 });
   }
   items.push({ id: "corrections", text: "Corrections", level: 2 });
 
@@ -50,6 +54,10 @@ function dailyItems(issue: BriefIssue): IssueTocItem[] {
     }
   }
 
+  if (issue.hedge) {
+    items.push({ id: "hedge", text: HEDGE_LABEL, level: 2 });
+  }
+
   return items;
 }
 
@@ -60,8 +68,12 @@ function weeklyItems(issue: BriefIssue): IssueTocItem[] {
   const items: IssueTocItem[] = [
     { id: "week-in-five", text: "The week in five", level: 2 },
     { id: "through-line", text: weekly.through_line.title, level: 2 },
-    { id: "what-mattered", text: "What mattered", level: 2 },
   ];
+
+  if (weekly.comic) {
+    items.push({ id: "comic", text: COMIC_LABEL, level: 2 });
+  }
+  items.push({ id: "what-mattered", text: "What mattered", level: 2 });
 
   for (const pick of weekly.what_mattered) {
     items.push({

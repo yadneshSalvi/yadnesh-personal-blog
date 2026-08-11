@@ -15,6 +15,8 @@ type ZoomableImageProps = {
   imageClassName?: string;
   sizes?: string;
   zoomLabel?: string;
+  /** Skip the image optimizer. For sources that are already small and modern. */
+  unoptimized?: boolean;
 };
 
 type ImagePairProps = {
@@ -26,6 +28,7 @@ type ImagePairProps = {
   priority?: boolean;
   className?: string;
   sizes?: string;
+  unoptimized?: boolean;
 };
 
 type DialogSize = {
@@ -45,6 +48,7 @@ function ImageVariant({
   priority,
   className,
   sizes,
+  unoptimized,
 }: Omit<ImagePairProps, "srcDark">) {
   return (
     <Image
@@ -54,7 +58,7 @@ function ImageVariant({
       height={height}
       priority={priority}
       sizes={sizes}
-      unoptimized={isSvg(src)}
+      unoptimized={unoptimized || isSvg(src)}
       className={className}
     />
   );
@@ -69,6 +73,7 @@ function ThemedImage({
   priority,
   className,
   sizes,
+  unoptimized,
 }: ImagePairProps) {
   if (!srcDark) {
     return (
@@ -80,6 +85,7 @@ function ThemedImage({
         priority={priority}
         className={className}
         sizes={sizes}
+        unoptimized={unoptimized}
       />
     );
   }
@@ -94,6 +100,7 @@ function ThemedImage({
         priority={priority}
         className={clsx(className, "dark:hidden")}
         sizes={sizes}
+        unoptimized={unoptimized}
       />
       <ImageVariant
         src={srcDark}
@@ -103,6 +110,7 @@ function ThemedImage({
         priority={priority}
         className={clsx(className, "hidden dark:block")}
         sizes={sizes}
+        unoptimized={unoptimized}
       />
     </>
   );
@@ -119,6 +127,7 @@ export default function ZoomableImage({
   imageClassName = "h-auto w-full",
   sizes = "(max-width: 1024px) calc(100vw - 3rem), 768px",
   zoomLabel,
+  unoptimized,
 }: ZoomableImageProps) {
   const [open, setOpen] = useState(false);
   const [dialogSize, setDialogSize] = useState<DialogSize | null>(null);
@@ -206,6 +215,7 @@ export default function ZoomableImage({
           priority={priority}
           className={imageClassName}
           sizes={sizes}
+          unoptimized={unoptimized}
         />
       </button>
 
@@ -240,6 +250,7 @@ export default function ZoomableImage({
                 priority={priority}
                 className="h-full w-full object-contain"
                 sizes="(max-width: 768px) 92vw, 88vw"
+                unoptimized={unoptimized}
               />
             </div>
           </div>

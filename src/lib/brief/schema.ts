@@ -158,6 +158,115 @@ export const BriefCorrectionSchema = z.object({
 });
 export type BriefCorrection = z.infer<typeof BriefCorrectionSchema>;
 
+/**
+ * Where meme and comic images live, both on disk (under public/) and on the
+ * web. The pipeline commits the image in the same PR as the issue, so a path
+ * that points nowhere is a CI failure rather than a broken image in an inbox.
+ */
+export const MEME_IMAGE_ROOT = "/images/brief/memes";
+
+/**
+ * `/images/brief/memes/<issue-id>/<file>.png|.webp`. The issue-id folder is
+ * checked in CI, and the filename is free-form because a daily's candidates are
+ * named after the edition they came from, not the issue they ran in.
+ *
+ * Both formats are allowed because the pipeline is moving from png to webp: a
+ * real render is around 1.6MB as png, which is over 2GB of binary a year in a
+ * blog repo. Nothing about delivery depends on this choice, since next/image
+ * already serves resized webp whatever the source is.
+ */
+export const MEME_IMAGE_PATTERN =
+  /^\/images\/brief\/memes\/[A-Za-z0-9][A-Za-z0-9._-]*\/[A-Za-z0-9][A-Za-z0-9._-]*\.(png|webp)$/;
+
+/** A quote runs verbatim, so it is capped rather than rewritten. */
+export const HEDGE_QUOTE_MAX_LENGTH = 300;
+
+const memeImagePath = z
+  .string()
+  .regex(
+    MEME_IMAGE_PATTERN,
+    `must be a site-relative image under ${MEME_IMAGE_ROOT}/<issue-id>/`,
+  );
+
+/**
+ * The weekly comic: one drawn panel set with an xkcd-style bonus line. `alt`
+ * describes the image for a screen reader and retells the joke; `alt_joke` is
+ * the extra gag, shown as the title attribute the way xkcd does it.
+ */
+export const BriefComicSchema = z.object({
+  image: memeImagePath,
+  alt: z.string().min(1),
+  alt_joke: z.string().min(1).nullable().default(null),
+  caption: z.string().min(1),
+});
+export type BriefComic = z.infer<typeof BriefComicSchema>;
+
+/**
+ * The meme. Same shape as the comic plus the two fields that keep it honest:
+ * `concept` names the premise in one line (if you can't, the joke isn't about
+ * anything), and `story_id` grounds it in a story the issue actually carried.
+ */
+export const BriefMemeSchema = BriefComicSchema.extend({
+  concept: z.string().min(1),
+  story_id: z.string().min(1).nullable().default(null),
+});
+export type BriefMeme = z.infer<typeof BriefMemeSchema>;
+
+/**
+ * Hedge of the day: a verbatim line of hedging from a source, the story it came
+ * from, and one dry sentence about it. `quote` is source text, so the house
+ * style scan skips it the way it skips story titles; `note` is ours and is
+ * scanned.
+ */
+export const BriefHedgeSchema = z.object({
+  quote: z.string().min(1).max(HEDGE_QUOTE_MAX_LENGTH),
+  story: BriefStorySchema,
+  note: z.string().min(1),
+});
+export type BriefHedge = z.infer<typeof BriefHedgeSchema>;
+
+/* ── The meme hall of fame ──────────────────────────────────────────────── */
+
+/**
+ * One candidate from a day's batch. The winner ran in the issue; the rest are
+ * kept because the runner-ups are half the fun of a hall of fame.
+ */
+export const BriefMemeCandidateSchema = z.object({
+  id: z.string().min(1),
+  image: memeImagePath,
+  alt: z.string().min(1),
+  alt_joke: z.string().min(1).nullable().default(null),
+  caption: z.string().min(1),
+  /** Required on a daily's memes, absent on a weekly's comics. See the set refine. */
+  concept: z.string().min(1).nullable().default(null),
+  winner: z.boolean(),
+});
+export type BriefMemeCandidate = z.infer<typeof BriefMemeCandidateSchema>;
+
+/**
+ * One file per issue day at content/brief/memes/<issue-id>.json.
+ *
+ * A daily's candidates are memes and must name their premise; a weekly's are
+ * comics, which carry no `concept` field in the issue either, so the set's type
+ * decides whether the field is required rather than the field itself.
+ */
+export const BriefMemeSetSchema = z
+  .object({
+    issue_id: z.string().min(1),
+    type: z.enum(["daily", "weekly"]),
+    candidates: z.array(BriefMemeCandidateSchema).min(1),
+  })
+  .refine(
+    (set) =>
+      set.type !== "daily" ||
+      set.candidates.every((candidate) => (candidate.concept ?? "").trim().length > 0),
+    {
+      message: "every candidate in a daily's set needs a concept",
+      path: ["candidates"],
+    },
+  );
+export type BriefMemeSet = z.infer<typeof BriefMemeSetSchema>;
+
 export const BRIEF_SEND_STATES = [
   "pending_approval",
   "approved",
@@ -213,6 +322,8 @@ export const BriefWeeklySchema = z.object({
       .default([]),
   }),
   deep_cuts: z.array(BriefStorySchema).default([]),
+  /** Drawn, not memed. Sits right under the through line. */
+  comic: BriefComicSchema.nullable().default(null),
 });
 export type BriefWeekly = z.infer<typeof BriefWeeklySchema>;
 
@@ -234,6 +345,8 @@ const commonIssueShape = {
   quick_links: z.array(BriefStorySchema).default([]),
   editor_notes: z.array(BriefEditorNoteSchema).default([]),
   corrections: z.array(BriefCorrectionSchema).default([]),
+  /** Optional on every cadence. An issue with nothing funny in it runs without one. */
+  meme: BriefMemeSchema.nullable().default(null),
   email: BriefEmailSchema,
   /** Set on the hand-built sample issues; real generated issues omit it. */
   fixture: z.boolean().optional(),
@@ -248,6 +361,8 @@ export const BriefDailyIssueSchema = z
     thin_day: z.boolean(),
     lead: BriefLeadSchema.nullable().default(null),
     sections: z.array(BriefSectionSchema).default([]),
+    /** Daily only: the weekly gets a comic instead. */
+    hedge: BriefHedgeSchema.nullable().default(null),
     weekly: z.null().default(null),
   })
   .refine((issue) => issue.thin_day || issue.lead !== null, {
@@ -271,6 +386,7 @@ export const BriefWeeklyIssueSchema = z.object({
   thin_day: z.literal(false).default(false),
   lead: z.null().default(null),
   sections: z.array(BriefSectionSchema).max(0).default([]),
+  hedge: z.null().default(null),
   weekly: BriefWeeklySchema,
 });
 

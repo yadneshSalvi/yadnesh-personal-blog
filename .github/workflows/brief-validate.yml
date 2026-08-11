@@ -70,6 +70,14 @@ jobs:
         if: steps.changed.outputs.any == 'true'
         run: npm run validate:brief
 
+      - name: Prose walk and read time
+        # Guards the split between what a reader reads (counted) and what CI
+        # scans (counted plus the humor blocks). If the humor fields ever leak
+        # into the word count, this repo and the pipeline start disagreeing
+        # about read_minutes and every issue with a meme fails the step above.
+        if: steps.changed.outputs.any == 'true'
+        run: npm run test:brief-text
+
       - name: Token primitive tests
         if: steps.changed.outputs.any == 'true'
         run: npm run test:brief-tokens

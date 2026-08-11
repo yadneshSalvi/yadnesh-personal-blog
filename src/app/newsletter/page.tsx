@@ -4,6 +4,7 @@ import JsonLd from "@/components/JsonLd";
 import BriefSubscribeCTA from "@/components/brief/BriefSubscribeCTA";
 import IssueList from "@/components/brief/IssueList";
 import { getAllIssues, getLatestIssue } from "@/lib/brief/issues";
+import { hasMemeGallery } from "@/lib/brief/memes";
 import type { BriefIssue } from "@/lib/brief/schema";
 import { issueDateLabel } from "@/lib/brief/dates";
 import { BRIEF_NAME, BRIEF_TAGLINE, issueHref } from "@/lib/brief/seo";
@@ -21,6 +22,7 @@ export default function BriefLanding() {
   const latestDaily = getLatestIssue("daily");
   const latestWeekly = getLatestIssue("weekly");
   const recent = getAllIssues().slice(0, 6);
+  const memesExist = hasMemeGallery();
 
   const periodicalSchema = {
     "@context": "https://schema.org",
@@ -117,6 +119,19 @@ export default function BriefLanding() {
         <div className="mt-6">
           <IssueList issues={recent} />
         </div>
+        {memesExist ? (
+          <p className="mt-6 text-sm leading-relaxed text-muted">
+            Every meme the pipeline has drawn, winners and runner-ups, lives in
+            the{" "}
+            <Link
+              href="/newsletter/memes"
+              className="text-accent underline decoration-accent/40 underline-offset-[3px] transition-colors hover:decoration-accent"
+            >
+              hall of fame
+            </Link>
+            .
+          </p>
+        ) : null}
       </section>
 
       <section className="mt-16">

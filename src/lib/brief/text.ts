@@ -146,6 +146,54 @@ export function authoredProse(issue: BriefIssue): ProseField[] {
   return fields;
 }
 
+/**
+ * Every field the house-style scan checks: the authored prose above plus the
+ * humor blocks.
+ *
+ * The humor fields are scanned but deliberately NOT counted, which is why they
+ * live here rather than in authoredProse(). A caption, an alt text and a
+ * premise are not reading time: alt text is not read by sighted readers, the
+ * premise never renders at all, and the feed repo's validator counts none of
+ * them either. Counting them here would put roughly a hundred words into
+ * read_minutes that the pipeline does not know about, and the two repos would
+ * disagree about the same issue's read time on better than half of all issues.
+ *
+ * hedge.quote is absent from both walks: it is verbatim source text, and a
+ * house-style scan has no business policing what somebody else wrote. The
+ * validator scans it for leftover placeholders separately.
+ */
+export function houseStyleProse(issue: BriefIssue): ProseField[] {
+  const fields = authoredProse(issue);
+
+  if (issue.type === "daily") {
+    if (issue.hedge) {
+      fields.push({ path: "hedge.note", text: issue.hedge.note });
+      fields.push({
+        path: "hedge.story.summary",
+        text: issue.hedge.story.summary,
+      });
+    }
+  } else if (issue.weekly.comic) {
+    const comic = issue.weekly.comic;
+    fields.push({ path: "weekly.comic.alt", text: comic.alt });
+    fields.push({ path: "weekly.comic.caption", text: comic.caption });
+    if (comic.alt_joke) {
+      fields.push({ path: "weekly.comic.alt_joke", text: comic.alt_joke });
+    }
+  }
+
+  if (issue.meme) {
+    fields.push({ path: "meme.alt", text: issue.meme.alt });
+    fields.push({ path: "meme.caption", text: issue.meme.caption });
+    fields.push({ path: "meme.concept", text: issue.meme.concept });
+    if (issue.meme.alt_joke) {
+      fields.push({ path: "meme.alt_joke", text: issue.meme.alt_joke });
+    }
+  }
+
+  return fields;
+}
+
 function countWords(text: string): number {
   return text.split(/\s+/).filter((word) => word.length > 0).length;
 }
