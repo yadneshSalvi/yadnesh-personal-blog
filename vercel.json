@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/brief/send",
-      "schedule": "*/15 3-5 * * *"
+      "schedule": "*/15 0-2 * * *"
     },
     {
       "path": "/api/brief/send?sweep=1",
