@@ -1,0 +1,131 @@
+{
+ "issue_id": "2026-08-12",
+ "type": "daily",
+ "renders": 12,
+ "cost_usd": 3.0,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A rail switchyard: tracks meet at a single switch, a broad fan of tracks carries a crowded line of small freight cars one way while a narrow siding sends a single car toward a large locomotive waiting alone.",
+   "bytes": [
+    99578,
+    96716
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 3,
+   "cost_usd": 0.75,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A railway switchyard seen from a gentle elevated angle, everything kept in the middle band of the frame. Tracks arrive from the left and meet a single switch point at the centre. From the switch, a broad fan of tracks curves off to the right carrying a long, crowded line of small, plain freight cars. One narrow siding peels off toward the upper middle, carrying a single freight car toward a much larger, heavier locomotive that waits alone at the end of that siding. The switch itself is drawn clearly, with its lever set toward the broad fan, making it obvious that almost everything is being sent the ordinary way and only the one car goes to the big engine. No signage, no lettering anywhere. Keep the locomotive and the crowded fan of cars well inside the frame, clear of the top and bottom edges, since the image will be cropped to a wide banner.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T10:48:03Z"
+  },
+  {
+   "key": "7d7ad1bd4f7bba53",
+   "story_id": "7d7ad1bd4f7bba53",
+   "light_name": "7d7ad1bd4f7bba53-light.webp",
+   "dark_name": "7d7ad1bd4f7bba53-dark.webp",
+   "alt": "Left: a three-level org chart of robots where a bold key held at the top becomes fainter and more broken at each level down, and a bottom robot reaches through a door. Right: a flat circle of robots, each holding an identical intact key, their door shut.",
+   "bytes": [
+    53812,
+    51104
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A side-by-side comparison diagram, both halves kept well inside the frame. On the left, a three-level hierarchy of small robot figures drawn as an org chart: the single robot at the top holds a large, bold, fully drawn key; the two robots on the middle level hold visibly fainter, partially eroded copies of the same key; the four robots on the bottom level hold keys so faded and broken they are barely outlines, and one bottom robot is reaching through a doorway it clearly should not open. On the right, a flat ring of four robot figures arranged in a circle, each holding an identical, fully drawn bold key, the doorway beside them firmly shut. The contrast is the whole picture: the key degrades as it passes down levels of the hierarchy, and stays intact around the flat ring.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T10:50:00Z"
+  },
+  {
+   "key": "a0987c924477664d",
+   "story_id": "a0987c924477664d",
+   "light_name": "a0987c924477664d-light.webp",
+   "dark_name": "a0987c924477664d-dark.webp",
+   "alt": "A wall of experiment cards each sealed under glass; one crossed-out card sits behind its pane while a small robot arm with an eraser is stopped flat against the glass. A separate figure with a magnifying glass points at an empty frame at the row's end.",
+   "bytes": [
+    46036,
+    45408
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 3,
+   "cost_usd": 0.75,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A laboratory wall of experiment record cards, drawn from straight on and kept comfortably inside the frame. Each card is sealed under its own pane of glass in a sturdy frame, like specimens in a museum case. One card in the middle bears a large cross-out mark over its central diagram, marking a falsified result, and it is sealed under glass exactly like the others. In front of that card, a small robot arm holding an eraser is stopped flat against the glass, unable to reach the card to change it. To one side, slightly apart from the wall, a single distinct figure with a magnifying glass examines the cards and points toward an empty frame at the end of the row, choosing where the next card will go. No lettering on the cards, just small abstract diagram marks.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T10:55:35Z"
+  },
+  {
+   "key": "659ff3b6b4be9c21",
+   "story_id": "659ff3b6b4be9c21",
+   "light_name": "659ff3b6b4be9c21-light.webp",
+   "dark_name": "659ff3b6b4be9c21-dark.webp",
+   "alt": "A corkboard where an old note card at the centre is held in place by taut threads to five surrounding cards, while a hand pressing a fresh card into that spot is bounced off, the new card hovering at an angle.",
+   "bytes": [
+    78758,
+    76286
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A corkboard scene, centred with wide margins. An old, slightly yellowed note card is pinned at the centre of the board, and thick threads run from it to five surrounding related cards, forming a taut web. A hand enters from the lower right holding a fresh, clean card, trying to press it into the old card's spot, but the web of threads holds the old card firmly in place and the new card is visibly bounced off, hovering at an angle, unable to seat. The threads are the point: the old card is not stronger on its own, it is held there by its connections. Keep the hand and new card well clear of the frame edge.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T10:57:24Z"
+  },
+  {
+   "key": "28e7c110597f5035",
+   "story_id": "28e7c110597f5035",
+   "light_name": "28e7c110597f5035-light.webp",
+   "dark_name": "28e7c110597f5035-dark.webp",
+   "alt": "Two stacked assembly-line diagrams labeled BEFORE and AFTER. In the top one a mouth icon is chained in series with tool stations and its clock shows a long wait; in the bottom the mouth sits on its own track with tools on a parallel rail, its clock nearly empty.",
+   "bytes": [
+    33194,
+    31930
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 2,
+   "prompt": "A diagram of two horizontal assembly lines stacked one above the other, centred in the frame with generous margin on all sides. On the top line, a single chain: a speaking mouth icon at the left is shackled directly to a row of wrench-and-gear tool stations, and a small clock at the right end shows a long elapsed arc, nearly a full circle. On the bottom line, the same speaking mouth sits alone on its own short track and has already produced a speech bubble, while the row of wrench-and-gear tool stations runs on a separate parallel rail just below it, connected only by thin dashed vertical links; the clock at this line's right end shows a tiny elapsed arc. The two clocks make the comparison: chained together is slow, decoupled is fast. Labels BEFORE and AFTER sit at the left end of the top and bottom lines respectively.",
+   "labels": [
+    "BEFORE",
+    "AFTER"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T11:05:26Z"
+  }
+ ]
+}

@@ -1,0 +1,158 @@
+{
+ "issue_id": "2026-08-11",
+ "type": "daily",
+ "renders": 7,
+ "cost_usd": 1.75,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A conveyor of identical sealed crates rolls through a checkpoint whose barrier arm is latched upright; the inspection booth beside it is empty, with a rubber stamp left unused on the ledge.",
+   "bytes": [
+    82780,
+    79350
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A checkpoint gate on a conveyor line, seen side-on and centred in the frame with generous margin above and below. The barrier arm is raised and latched fully upright, and the small inspection booth beside it stands empty, a rubber stamp resting unused on its ledge. A steady procession of identical sealed crates rolls through the open gate without pausing, spaced evenly along the middle of the frame. Everything important sits in the central horizontal band, well clear of the top and bottom edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T10:40:51Z"
+  },
+  {
+   "key": "bf96c9bf1932cd75",
+   "story_id": "bf96c9bf1932cd75",
+   "light_name": "bf96c9bf1932cd75-light.webp",
+   "dark_name": "bf96c9bf1932cd75-dark.webp",
+   "alt": "Identical instruction cards being slotted into an open toolbox; one card is cut away to reveal a fish-hook and coiled wire concealed inside its body.",
+   "bytes": [
+    40580,
+    36980
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A row of neat, identical instruction cards standing upright like files in a tray, being slotted one by one into an open toolbox at centre. One card in the middle of the row is shown in cross-section: beneath its clean printed face, a concealed layer holds a fish-hook and a coiled wire hidden inside the card's body. The other cards are plain and innocent. The whole tray and toolbox sit centred with clear margin on all sides.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T10:42:02Z"
+  },
+  {
+   "key": "2d64df6192b00274",
+   "story_id": "2d64df6192b00274",
+   "light_name": "2d64df6192b00274-light.webp",
+   "dark_name": "2d64df6192b00274-dark.webp",
+   "alt": "A guard studies a board of sketches showing round spotted creatures while a tall, angular striped creature, unlike any sketch, walks past behind the watch post unnoticed.",
+   "bytes": [
+    52078,
+    51752
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A guard in a small watch post, centred left, studying a pinned board of practice sketches: simple drawings of round, spotted creatures. Behind the post, passing unnoticed on the right, walks a real creature that is tall, angular and striped, resembling none of the sketches. The guard's gaze is fixed on the board, angled away from the passerby. The mismatch between the sketches studied and the thing actually passing is the idea. Keep both the post and the passing figure well inside the frame.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T10:43:47Z"
+  },
+  {
+   "key": "0b2744e224d2a974",
+   "story_id": "0b2744e224d2a974",
+   "light_name": "0b2744e224d2a974-light.webp",
+   "dark_name": "0b2744e224d2a974-dark.webp",
+   "alt": "A tall column of tiny beads with a shaded level risen from its base; a faint dashed line marks an old lower level and a bold line marks the new higher one.",
+   "bytes": [
+    14544,
+    13624
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A tall vertical column densely dotted from bottom to top with tiny identical beads, standing centred in the frame like a measuring column. A shaded fill rises from its base, like a water level. A thin horizontal marker line partway up shows an old, lower level, drawn faint and dashed; a bold solid marker line sits noticeably higher, where the shaded fill now reaches. The rise between the two lines is the idea. Keep the full column inside the frame with margin above and below.",
+   "labels": [
+    "42%",
+    "67%"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T10:46:30Z"
+  },
+  {
+   "key": "e41ad55864be90a7",
+   "story_id": "e41ad55864be90a7",
+   "light_name": "e41ad55864be90a7-light.webp",
+   "dark_name": "e41ad55864be90a7-dark.webp",
+   "alt": "Cutaway of a thick-walled box holding a single gear; a hose escapes through one small gap in the wall, carrying a line of envelopes and a key out of the box.",
+   "bytes": [
+    38516,
+    36558
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A heavy-walled box shown in cutaway, centred in the frame, containing a single running gear to stand for a contained process. The walls are thick and unbroken except for one small gap low on the right side, where a hose snakes out of the box and away toward the frame's edge, carrying a line of small envelopes and a key outward through it. The contrast is the point: the walls hold the process in, the hose carries its consequences out. Keep the box and the visible run of hose well inside the frame.",
+   "labels": [
+    "SANDBOX",
+    "EGRESS"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T10:48:09Z"
+  },
+  {
+   "key": "4a201751682460f1",
+   "story_id": "4a201751682460f1",
+   "light_name": "4a201751682460f1-light.webp",
+   "dark_name": "4a201751682460f1-dark.webp",
+   "alt": "A tiny index card with three short lines feeds into a small machine, which unrolls a much longer scroll of connected step boxes ending in a small flag.",
+   "bytes": [
+    24720,
+    23646
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "On the left, a small index card bearing three short handwritten-length lines, rendered as plain rules rather than legible text. The card feeds into a compact machine at centre, and out of the machine's right side unrolls a long scroll many times the card's size, its surface organised into a ladder of ordered step boxes connected top to bottom, ending in a small flag at the scroll's foot. The size difference between the tiny card and the long scroll is the idea. Keep both card and scroll comfortably inside the frame.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T10:50:01Z"
+  }
+ ]
+}

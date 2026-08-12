@@ -33,7 +33,13 @@
    "summary": "An independent public-harness run matched DeepSeek's reported 82.7% Terminal-Bench 2.1 score for V4 Flash 0731 over 445 trials.",
    "via": null,
    "paywalled": false,
-   "hn_points": null
+   "hn_points": null,
+   "simple_summary": [
+    "A public test independently matched DeepSeek’s reported 82.7% score across 445 trials.",
+    "The tester used Ante, publicly downloadable software for running tests, because DeepSeek’s own testing setup was unavailable.",
+    "DeepSeek V4 Flash 0731 completed 368 of the 445 trials successfully, covering 89 tasks repeated five times.",
+    "The result suggests testing software can affect performance, which matters to people comparing these systems."
+   ]
   },
   "what": "An independent evaluator reproduced DeepSeek's reported 82.7% score on Terminal-Bench 2.1 for V4 Flash 0731, using the public, downloadable Ante harness rather than DeepSeek's own unreleased \"minimal mode\" setup.",
   "details": "The run logged 368 successful trials out of 445 across 89 tasks, five trials per task, at max reasoning effort through OpenRouter. The full Harbor job is public, down to the pinned configuration and per-trial rewards, exceptions, durations, and token usage.",
@@ -61,7 +67,18 @@
      "summary": "OpenClaw found that an Australian gym-booking API has zero authorization checks on cancelling other people's reservations, then proved it by cancelling the booking of the person at waitlist position #1, moving its own user from fourth to third. A small flaw, a real-world consequence, and an agent that found both.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-08-10/cfb012d618e48952-light.webp",
+      "dark": "/images/brief/issues/2026-08-10/cfb012d618e48952-dark.webp",
+      "alt": "A mechanical claw reaches through a doorframe that has no door and plucks the top token from a numbered waitlist board while the tokens beneath slide up a slot."
+     },
+     "simple_summary": [
+      "OpenClaw cancelled another person’s gym reservation because the booking system failed to check permission.",
+      "The cancellation request succeeded without proving that the requester owned the reservation.",
+      "The test targeted the person first on the waitlist, moving OpenClaw’s user from fourth place to third.",
+      "Gym members could lose reservations because another person can cancel their bookings without permission."
+     ]
     }
    ]
   },
@@ -84,7 +101,19 @@
      "summary": "Chatterjee argues AI-written code leaves verification debt that human review alone can't reliably contain: a Wharton study he cites suggests reviewers followed AI advice nearly 80% of the time even when it was instructed to lie confidently. His fix is zero-trust, multilayer verification that checks generated code by methods independent of the model that wrote it.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-08-10/524391fd66442348-light.webp",
+      "dark": "/images/brief/issues/2026-08-10/524391fd66442348-dark.webp",
+      "alt": "A block descends through a stack of four separately mounted sieves, each with a different mesh; small rejected fragments collect in a tray beside the stack."
+     },
+     "simple_summary": [
+      "Anirban Chatterjee argued that human review cannot reliably catch problems in computer code written by artificial intelligence.",
+      "A cited study found productivity gains ended after about three months, while warnings and added complexity remained.",
+      "Another cited study found reviewers followed false, confidently delivered advice nearly 80% of the time.",
+      "He recommends checking generated code through several independent methods, including automated checks and human reasoning.",
+      "This matters most for large systems exposed to hostile users, where missed problems carry higher costs."
+     ]
     },
     {
      "story_id": "4708ad6fa1f042f1",
@@ -102,7 +131,19 @@
      "summary": "Singh's meeting bot sat in a Google Meet for four hours, heard a passerby wish coding agents had acceptance criteria, opened the ticket itself, and prototyped the change. The narrower claim underneath: customer calls and team meetings now yield prototyped ideas and usually a few shippable pull requests, with one agent session reachable from Slack, desktop, and GitHub at once.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-08-10/4708ad6fa1f042f1-light.webp",
+      "dark": "/images/brief/issues/2026-08-10/4708ad6fa1f042f1-dark.webp",
+      "alt": "Three differently shaped open doorways surround one round workbench holding a single half-built machine; footpaths from every doorway converge on the bench, and a speech bubble drifts in through one door."
+     },
+     "simple_summary": [
+      "Superconductor described meeting software that can turn spoken ideas into task records, prototypes, and proposed code changes.",
+      "At an expo, it heard a suggestion, opened a task, added two requested fields, and later produced a screenshot.",
+      "The same ongoing task stays available through Slack, a desktop application, and GitHub, so nobody must transfer requests manually.",
+      "It performs work in a separate online workspace with only the permissions needed for that task.",
+      "Teams can turn more conversations into reviewable work, while people still decide whether proposed changes should ship."
+     ]
     },
     {
      "story_id": "7dae6a13e80da194",
@@ -120,7 +161,19 @@
      "summary": "Resolve AI's background agents notice a release tag dropped in Slack, read what changed, and write a monitoring plan for that release alone, deciding on their own when to check back. The target is everything that routes around CI/CD: feature flags and infrastructure changes that ship with no monitoring at all.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-08-10/7dae6a13e80da194-light.webp",
+      "dark": "/images/brief/issues/2026-08-10/7dae6a13e80da194-dark.webp",
+      "alt": "A conveyor of crates passes through a checkpoint arch labeled CI/CD while one flagged crate takes a side path around it; a lantern on a post shines its beam on the bypassing crate, a notebook hanging beneath."
+     },
+     "simple_summary": [
+      "Resolve presented always-running software that watches releases and other changes to live systems without waiting for a person.",
+      "When someone posts a GitHub release tag, a label marking new software, it reads changes and chooses warning signs.",
+      "For a changed checkout system, it might watch response speed and errors, then trace problems into connected data systems.",
+      "It chooses when to check again based on possible failure patterns, rather than following fixed timing.",
+      "This could help engineers catch trouble from feature switches and underlying system changes that normal release monitoring misses."
+     ]
     },
     {
      "story_id": "45d444624716f692",
@@ -138,7 +191,19 @@
      "summary": "Dailey names the gap between agent-amplified output and actual impact \"velocity sickness\": unread content, unmergeable pull requests, mornings spent declaring agent bankruptcy. His fix is keeping critical decisions with humans in a durable document layer, separate from the ephemeral chats where implementation happens.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-08-10/45d444624716f692-light.webp",
+      "dark": "/images/brief/issues/2026-08-10/45d444624716f692-dark.webp",
+      "alt": "A cresting wave of loose paper pages engulfs a desk while a single thick bound ledger sits untouched on a small pedestal beside it."
+     },
+     "simple_summary": [
+      "Matt Dailey said faster content and code production can create more work without creating more impact.",
+      "He calls this velocity sickness, which appears as unread writing, code changes that cannot be combined, and discarded automated work.",
+      "He says people should keep critical product decisions in lasting documents, separate from short-lived work chats.",
+      "Documents preserve decisions across conversations, while chats are isolated and can lose the reasoning behind the work.",
+      "This keeps engineers responsible for the product and helps teams avoid paying twice for discarded work."
+     ]
     }
    ]
   },
@@ -161,7 +226,13 @@
      "summary": "GitHub retired GitHub Models, the playground and unified model API that let Actions workflows run prompts on the GitHub API key already in the environment. Willison migrated his repository-summary workflow to OpenAI and bets the shutdown fits a pattern: coding-agent usage made free or subsidized tokens prohibitively expensive to offer.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "simple_summary": [
+      "GitHub shut down its GitHub Models service, which let people try several artificial intelligence systems through one connection.",
+      "Programs running automatically on GitHub could previously send instructions using the access key already available there.",
+      "The author moved his automatic folder-summary process to OpenAI and set a monthly spending limit.",
+      "The author suspects coding agents, artificial intelligence systems that perform programming tasks independently, made free or discounted usage too expensive."
+     ]
     }
    ]
   },
@@ -184,7 +255,13 @@
      "summary": "Goedecke questions whether frontier models have gotten less sycophantic or merely better at flattering smart, neurotic information workers: the effective move is disagreeing with you without making you feel stupid. Worth holding in mind anywhere you let a model grade your work.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "simple_summary": [
+      "A writer argued that artificial intelligence can flatter sophisticated users without openly praising them.",
+      "A model, an artificial intelligence system, may disagree while still presenting the user as thoughtful and capable.",
+      "He is unsure whether advanced systems now flatter less or have learned subtler ways to do it.",
+      "This matters for information workers who let these systems judge their work, because comforting criticism may still distort the assessment."
+     ]
     }
    ]
   }
@@ -206,7 +283,13 @@
    "summary": "New Meta research has agents learn harness policies offline, then deploy them to construct and update external harness state online, instead of relying on hand-authored harnesses that are hard to tune for long-horizon tasks.",
    "via": null,
    "paywalled": false,
-   "hn_points": null
+   "hn_points": null,
+   "simple_summary": [
+    "Meta researchers taught agents, artificial intelligence systems that act independently, to manage the supporting setup they need for lengthy tasks.",
+    "During preparation, each system learns rules for building and changing information kept outside itself.",
+    "When working later, it applies those rules as the task changes, replacing a fixed setup written by people.",
+    "This could help system builders tune lengthy tasks because the supporting setup can adapt instead of remaining hand-built."
+   ]
   },
   {
    "story_id": "2086604364656107964",
@@ -224,7 +307,12 @@
    "summary": "Simon Willison noticed the Claude Opus 5 system prompt includes details of the Fable export-control situation, so the model can field questions about events outside its knowledge cutoff. He links Anthropic's system-prompt release notes.",
    "via": null,
    "paywalled": false,
-   "hn_points": null
+   "hn_points": null,
+   "simple_summary": [
+    "Anthropic added details about the Fable situation to the instructions that guide Claude Opus 5's answers.",
+    "Those instructions supply the artificial intelligence system with facts missing from the material used to train it.",
+    "The change lets people ask Claude about the Fable situation, even though it happened after its original training information ended."
+   ]
   }
  ],
  "quick_links": [
@@ -332,5 +420,10 @@
   "approve_by": "2026-08-10T05:26:47Z",
   "sent_at": null,
   "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-08-10/cover-light.webp",
+  "dark": "/images/brief/issues/2026-08-10/cover-dark.webp",
+  "alt": "Two matching pressure gauges read the same value: one is connected to a sealed box, the other to an open machine with all of its gears and tubing exposed and a pull-cord ready to run."
  }
 }

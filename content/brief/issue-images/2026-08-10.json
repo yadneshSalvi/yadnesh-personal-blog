@@ -1,0 +1,156 @@
+{
+ "issue_id": "2026-08-10",
+ "type": "daily",
+ "renders": 1,
+ "cost_usd": 0.25,
+ "images": [
+  {
+   "key": "cfb012d618e48952",
+   "story_id": "cfb012d618e48952",
+   "light_name": "cfb012d618e48952-light.webp",
+   "dark_name": "cfb012d618e48952-dark.webp",
+   "alt": "A mechanical claw reaches through a doorframe that has no door and plucks the top token from a numbered waitlist board while the tokens beneath slide up a slot.",
+   "bytes": [
+    30852,
+    28676
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A vertical waitlist board holding a column of numbered booking tokens, seen straight on in the centre of the frame. A slender mechanical claw arm reaches in through a doorframe on the left that has hinges but no door at all, and is lifting the topmost token clean off the board. The tokens below have visibly slid up one slot, shown with short motion marks. The doorframe's emptiness — no lock, no latch, no door — is the point; keep the claw, board, and frame away from the edges.",
+   "labels": [
+    "#1"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T08:54:38Z"
+  },
+  {
+   "key": "524391fd66442348",
+   "story_id": "524391fd66442348",
+   "light_name": "524391fd66442348-light.webp",
+   "dark_name": "524391fd66442348-dark.webp",
+   "alt": "A block descends through a stack of four separately mounted sieves, each with a different mesh; small rejected fragments collect in a tray beside the stack.",
+   "bytes": [
+    32724,
+    31674
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 2,
+   "prompt": "A single block of material descending through a stack of four horizontal sieves, each with a visibly different mesh pattern — coarse grid, fine grid, slots, holes — mounted on separate stands so it is clear no sieve touches another. The block has passed the top two and rests on the third. Off to one side, small rejected fragments have collected in a tray under the stack. One object, one path downward, four independent checks. Centre the stack and keep the tray tucked well inside the frame.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T09:01:47Z"
+  },
+  {
+   "key": "4708ad6fa1f042f1",
+   "story_id": "4708ad6fa1f042f1",
+   "light_name": "4708ad6fa1f042f1-light.webp",
+   "dark_name": "4708ad6fa1f042f1-dark.webp",
+   "alt": "Three differently shaped open doorways surround one round workbench holding a single half-built machine; footpaths from every doorway converge on the bench, and a speech bubble drifts in through one door.",
+   "bytes": [
+    75316,
+    71340
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "One round workbench in the centre of the frame with a single half-assembled machine on it. Three open doorways stand around the bench at even spacing, each doorway a different shape — one arched, one square, one wide and low — with a worn footpath leading from each doorway to the same bench. Through one doorway, a small speech bubble floats in as if a remark drifted in from a meeting and landed on the bench as a tagged part. Keep the bench and all three doorways comfortably inside the frame.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T09:06:01Z"
+  },
+  {
+   "key": "7dae6a13e80da194",
+   "story_id": "7dae6a13e80da194",
+   "light_name": "7dae6a13e80da194-light.webp",
+   "dark_name": "7dae6a13e80da194-dark.webp",
+   "alt": "A conveyor of crates passes through a checkpoint arch labeled CI/CD while one flagged crate takes a side path around it; a lantern on a post shines its beam on the bypassing crate, a notebook hanging beneath.",
+   "bytes": [
+    52928,
+    50932
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A main conveyor line running through a tall checkpoint archway in the middle of the frame, with crates queued on it. A narrow side path branches off before the arch and loops around it entirely, carrying one crate marked with a small flag tag. A lantern on a tall post stands over the side path, its beam cone fixed on that one bypassing crate, with a small notebook and pen hanging from the post. The idea: the watched thing is the one that skipped the gate. Keep the arch, path, and lantern clear of the edges.",
+   "labels": [
+    "CI/CD"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T09:08:07Z"
+  },
+  {
+   "key": "45d444624716f692",
+   "story_id": "45d444624716f692",
+   "light_name": "45d444624716f692-light.webp",
+   "dark_name": "45d444624716f692-dark.webp",
+   "alt": "A cresting wave of loose paper pages engulfs a desk while a single thick bound ledger sits untouched on a small pedestal beside it.",
+   "bytes": [
+    65058,
+    62884
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A desk in the centre of the frame nearly buried under a cresting wave of loose paper sheets that pours in from one side, pages tumbling and overlapping, a few sliding off the desk's edge. Beside the desk, on a small plain pedestal untouched by the flood, sits one thick bound ledger, closed, squared, and solid. The contrast is the whole picture: a torrent of ephemeral pages against one durable book. Keep both the wave's crest and the pedestal well inside the frame.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T09:09:35Z"
+  },
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "Two matching pressure gauges read the same value: one is connected to a sealed box, the other to an open machine with all of its gears and tubing exposed and a pull-cord ready to run.",
+   "bytes": [
+    80980,
+    74702
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two pressure gauges side by side in the centre of the frame, their needles pointing to exactly the same mark. The left gauge is plumbed into a sealed, featureless box. The right gauge is plumbed into an open machine of the same size whose inner workings — gears, tubes, a small crank — are fully visible, with a thin pull-cord hanging from it as if anyone could run it again. Everything is kept well inside the middle band of the frame, since the top and bottom will be cropped away.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-12T10:43:30Z"
+  }
+ ]
+}

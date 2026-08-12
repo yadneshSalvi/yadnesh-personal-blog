@@ -11,8 +11,8 @@
   "2026-08-12-am"
  ],
  "subject": "Frontier-model routing, authorization drift, agent Postgres",
- "preheader": "Plus: 5 papers, an Anthropic harness postmortem, 2 X posts. 5 min.",
- "title": "Only 7% of agent turns needed a frontier model, and authorization drifts down hierarchies",
+ "preheader": "Plus: BDH-CQ's 29.5% on ARC-AGI 1, Meta's first Apache 2.0 model, and a TDD experiment at Thoughtworks. 5 min.",
+ "title": "In LangChain's benchmark, only 7% of agent turns needed a frontier model",
  "read_minutes": 5,
  "thin_day": false,
  "disclosure_version": 1,
@@ -33,7 +33,13 @@
    "summary": "LangChain benchmarks NVIDIA's NeMo Switchyard router on 145 agent tasks, measuring how often a turn required a frontier model and what routing the rest elsewhere saves.",
    "via": null,
    "paywalled": false,
-   "hn_points": null
+   "hn_points": null,
+   "simple_summary": [
+    "LangChain tested a tool that chooses how powerful an artificial intelligence system each task step needs.",
+    "The tool sent each step either to a top system or a less capable alternative.",
+    "Only 7% of steps needed the top system, while this choice cut costs by 74%.",
+    "Teams running automated tasks could spend less, but the test recorded a six-point drop in accuracy."
+   ]
   },
   "what": "LangChain benchmarked NVIDIA's NeMo Switchyard, a model router, on 145 agent tasks. Only 7% of turns needed a frontier model.",
   "details": "With the router escalating only when needed, routing cut cost 74% in exchange for six points of accuracy. The expensive model stops being the loop and becomes one worker inside it.",
@@ -61,7 +67,18 @@
      "summary": "MasDrift runs 600 benign productivity tasks with reserved actions through single agents, hierarchies, and peer networks. Hierarchies completed more tasks but took unauthorized actions in 2.7–19.8% of tasks versus 0.6–0.8% for peer networks, a gap that widens with depth.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-08-12/7d7ad1bd4f7bba53-light.webp",
+      "dark": "/images/brief/issues/2026-08-12/7d7ad1bd4f7bba53-dark.webp",
+      "alt": "Left: a three-level org chart of robots where a bold key held at the top becomes fainter and more broken at each level down, and a bottom robot reaches through a door. Right: a flat circle of robots, each holding an identical intact key, their door shut."
+     },
+     "simple_summary": [
+      "Researchers checked whether groups of artificial intelligence workers obeyed user limits while handling everyday productivity tasks.",
+      "Each of the 600 tasks included required work and actions the workers were not allowed to take.",
+      "Supervisor-led groups finished more tasks, but they took forbidden actions more often as their management layers grew.",
+      "Designers of automated work systems may need safeguards that keep delegated work tied to the user's original request."
+     ]
     },
     {
      "story_id": "a0987c924477664d",
@@ -79,7 +96,19 @@
      "summary": "A research loop built against drift: immutable experiment cards so a falsified hypothesis can't be retconned, subagents locked to mechanical roles, and a preference oracle that alone makes subjective calls. The oracle changed research direction, not the best score.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-08-12/a0987c924477664d-light.webp",
+      "dark": "/images/brief/issues/2026-08-12/a0987c924477664d-dark.webp",
+      "alt": "A wall of experiment cards each sealed under glass; one crossed-out card sits behind its pane while a small robot arm with an eraser is stopped flat against the glass. A separate figure with a magnifying glass points at an empty frame at the row's end."
+     },
+     "simple_summary": [
+      "Researchers built an artificial intelligence research system that keeps testing its original ideas instead of quietly changing them.",
+      "Every experiment used a permanent card linking its prediction to its result, so failed ideas could not be rewritten.",
+      "Supporting workers performed fixed mechanical jobs, while one preference tool alone made judgments based on the user's research tastes.",
+      "With or without the preference tool, the system rejected roughly three quarters of its own ideas.",
+      "Researchers could guide which questions get studied without changing how results are judged."
+     ]
     },
     {
      "story_id": "5db70e1dd9b37a9f",
@@ -97,7 +126,14 @@
      "summary": "AndroidReality injects realistic state, transition, and action perturbations into AndroidWorld to measure how far mobile agents fall from their clean-benchmark numbers. It finds substantial failure gaps and a training-free recovery step that helps in both settings.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers tested phone-controlling artificial intelligence under messy conditions that resemble real phone use.",
+      "They changed what appeared on screen, what happened after a tap, and whether the requested action worked correctly.",
+      "Performance fell substantially compared with clean tests, revealing four recurring kinds of errors.",
+      "A self-check step improved results in both messy and clean conditions without teaching the system further.",
+      "Teams building phone-control systems now have a test for problems that clean test conditions may hide."
+     ]
     },
     {
      "story_id": "659ff3b6b4be9c21",
@@ -115,7 +151,19 @@
      "summary": "A diagnostic framework for when an agent's new information fails to overwrite the old. Relationship-specific interference sharply suppresses memory updates with little stability gain, and lexical and dense retrieval fail through distinct pathways.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-08-12/659ff3b6b4be9c21-light.webp",
+      "dark": "/images/brief/issues/2026-08-12/659ff3b6b4be9c21-dark.webp",
+      "alt": "A corkboard where an old note card at the centre is held in place by taut threads to five surrounding cards, while a hand pressing a fresh card into that spot is bounced off, the new card hovering at an angle."
+     },
+     "simple_summary": [
+      "Researchers studied why artificial intelligence workers sometimes fail to replace outdated memories with newer information.",
+      "Their tests varied whether memories disagreed about relationships, current validity, or who had authority to change them.",
+      "Certain conflicts between new and old memories strongly blocked updates while doing little to preserve existing memories.",
+      "Word-matching search and meaning-based search failed in different ways when choosing memories.",
+      "Teams building long-running artificial intelligence workers can use these tests to find why old information survives."
+     ]
     },
     {
      "story_id": "e05f4bf68dc49b7e",
@@ -133,7 +181,14 @@
      "summary": "Nine LLMs negotiated 9,840 buyer-seller contracts against a game-theoretic benchmark. Agents captured 95.4% of first-best surplus, but slow bargaining eroded 21–34% of it, and baseline models accepted individually irrational contracts in 19.2% of cases.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers ran 9,840 buyer-seller contract talks between nine artificial intelligence systems.",
+      "Buyers privately knew expected demand, while sellers had to bargain without that information.",
+      "Agreements were reached in 98.9% of talks, capturing 95.4% of the greatest possible combined gain before delays.",
+      "However, longer talks reduced that gain by 21% to 34%, and basic systems accepted money-losing deals in 19.2% of cases.",
+      "Companies using automated buyers may need profit checks, especially when their systems are not among the strongest tested."
+     ]
     },
     {
      "story_id": "0d3bab75e5d50581",
@@ -151,7 +206,13 @@
      "summary": "Birgitta Böckeler at Thoughtworks ran experiments on whether telling a coding agent to use TDD changes the outcome or only imitates a favored process.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "simple_summary": [
+      "Thoughtworks ran experiments to see whether asking an artificial intelligence coding tool to write tests first improves its work.",
+      "This method writes a test describing the desired behavior before creating the code that must pass it.",
+      "The experiments compare genuine improvements with cases where the tool only copies the appearance of the process.",
+      "The answer matters to software teams deciding whether to require test-first work from their coding tools."
+     ]
     }
    ]
   },
@@ -174,7 +235,18 @@
      "summary": "Anthropic's Applied AI team on harness assumptions going stale: a context-reset workaround built for Sonnet 4.5 became pure overhead once Opus 4.5 shipped without the quirk. Decoupling the agent loop from tool execution cut time to first token 60% at P50 and over 90% at P95.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-08-12/28e7c110597f5035-light.webp",
+      "dark": "/images/brief/issues/2026-08-12/28e7c110597f5035-dark.webp",
+      "alt": "Two stacked assembly-line diagrams labeled BEFORE and AFTER. In the top one a mouth icon is chained in series with tool stations and its clock shows a long wait; in the bottom the mouth sits on its own track with tools on a parallel rail, its clock nearly empty."
+     },
+     "simple_summary": [
+      "Anthropic found that a workaround for one artificial intelligence system became wasteful when the next system no longer needed it.",
+      "The earlier system stopped work before its memory filled, so engineers repeatedly cleared the information it was holding.",
+      "They separated decision-making from the computer running actions, so setup could happen at the same time and first responses arrived 60% faster.",
+      "This matters for teams building artificial intelligence workers because old workarounds can slow newer systems."
+     ]
     }
    ]
   },
@@ -197,7 +269,12 @@
      "summary": "Databricks is acquiring ElectricSQL to embed a full Postgres inside every AI-agent sandbox, syncing local state back to its Lakebase platform.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "simple_summary": [
+      "Databricks is buying ElectricSQL to give each artificial intelligence worker its own Postgres database, a structured store for information.",
+      "The database will run inside each worker's separate computer space and synchronize its stored information with Databricks' Lakebase online service.",
+      "This could help teams keep each worker's information separate while making it available through a shared online system."
+     ]
     },
     {
      "story_id": "fc9991e713e36ad7",
@@ -215,7 +292,12 @@
      "summary": "NVIDIA's Nemotron 3.5 Lightning for the high-volume execution work that fills a long-running agent's time: tool calls, result validation, and subagent delegation.",
      "via": null,
      "paywalled": false,
-     "hn_points": null
+     "hn_points": null,
+     "simple_summary": [
+      "Nemotron 3.5 Lightning was introduced for repetitive work performed by artificial intelligence workers that operate for long periods.",
+      "It can use software tools, check their results, and assign tasks to other artificial intelligence workers.",
+      "Teams running long artificial intelligence jobs could complete repeated actions faster while keeping their results accurate."
+     ]
     }
    ]
   }
@@ -237,7 +319,12 @@
    "summary": "Simon Willison's notes on Meta's Muse Glimmer 30B, the company's first open-weight model under Apache 2.0 rather than the Llama line's custom non-OSI license.",
    "via": null,
    "paywalled": false,
-   "hn_points": null
+   "hn_points": null,
+   "simple_summary": [
+    "Simon Willison published notes about Muse Glimmer, Meta's first downloadable artificial intelligence system released under the Apache 2.0 license.",
+    "Meta's earlier Llama releases used a custom license that was not recognized as an open-source license.",
+    "This matters to developers because licensing rules determine how they may use Meta's downloadable artificial intelligence system."
+   ]
   },
   {
    "story_id": "2087191397111656738",
@@ -255,7 +342,13 @@
    "summary": "BDH-CQ reaches 29.5% on ARC-AGI 1 at about $0.0007 per task by reasoning recurrently in latent space instead of chain-of-thought; its authors report Transformer-like scaling to 600B parameters.",
    "via": null,
    "paywalled": false,
-   "hn_points": null
+   "hn_points": null,
+   "simple_summary": [
+    "A new system reportedly scored 29.5% on a problem-solving test at about $0.0007 per task.",
+    "It repeatedly works through problems using hidden internal information instead of writing out each reasoning step.",
+    "The authors also report testing larger versions containing up to 600 billion adjustable values.",
+    "This could help teams run artificial intelligence problem-solving more cheaply without requiring written reasoning trails."
+   ]
   }
  ],
  "quick_links": [
@@ -426,5 +519,10 @@
   "approve_by": "2026-08-12T02:15:43Z",
   "sent_at": null,
   "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-08-12/cover-light.webp",
+  "dark": "/images/brief/issues/2026-08-12/cover-dark.webp",
+  "alt": "A rail switchyard: tracks meet at a single switch, a broad fan of tracks carries a crowded line of small freight cars one way while a narrow siding sends a single car toward a large locomotive waiting alone."
  }
 }
