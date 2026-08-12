@@ -68,17 +68,44 @@ export function StoryMeta({
 }
 
 /**
+ * The title band: headline, copy button and meta line. It is the left half of
+ * a two-column band when the story has a picture, and the full width when it
+ * does not.
+ */
+export function StoryHead({
+  story,
+  threadLabel,
+  anchor,
+}: {
+  story: BriefStory;
+  threadLabel?: string | null;
+  anchor: string;
+}) {
+  return (
+    <div className="min-w-0">
+      <div className="flex items-baseline justify-between gap-4">
+        <h4 className="font-serif text-xl leading-snug tracking-tight">
+          <StoryLink story={story} />
+        </h4>
+        <CopyLinkButton anchor={anchor} label={story.title} />
+      </div>
+      <StoryMeta story={story} threadLabel={threadLabel} />
+    </div>
+  );
+}
+
+/**
  * A story in a section list.
  *
- * Everything runs at the full measure in one column, and the picture is a plate
- * under the summary rather than a thumbnail beside the headline. The side
- * gutter this replaced cost every row about 200px of measure so that half of
- * them could show art too small to read, and it put the headline, the copy
- * button and the picture in the same narrow band, where they collided.
+ * A story with a picture opens on a two-column band: the headline, its copy
+ * button and the meta line on the left, the diagram on the right. Everything
+ * that follows, the summary, the plain-words disclosure and any editor note,
+ * runs the full measure underneath. A story without a picture is that same
+ * stack with no band, so the left text edge never moves between rows.
  *
- * The left edge is invariant because there is only one column now, so a section
- * that mixes stories with art and stories without needs no reserved space and
- * no placeholder mark. A row without a picture is simply a row of text.
+ * The band splits at md rather than sm. Half of a phone's measure is under
+ * 200px, and these diagrams carry labels that stop being readable well before
+ * that, so below md the picture takes the full width under the title instead.
  */
 export default function StoryRow({
   story,
@@ -91,23 +118,24 @@ export default function StoryRow({
   children?: React.ReactNode;
 }) {
   const anchor = storyAnchor(story);
+  const head = (
+    <StoryHead story={story} threadLabel={threadLabel} anchor={anchor} />
+  );
+
   return (
     <li id={anchor} className="scroll-mt-24 py-6">
-      <div className="flex items-baseline justify-between gap-4">
-        <h4 className="font-serif text-xl leading-snug tracking-tight">
-          <StoryLink story={story} />
-        </h4>
-        <CopyLinkButton anchor={anchor} label={story.title} />
-      </div>
-      <StoryMeta story={story} threadLabel={threadLabel} />
-      <p className="mt-3 leading-relaxed text-muted">{story.summary}</p>
-      {/* The disclosure stays next to the prose it discloses, and the plate
-          closes the row. With the picture between them, a control sat 288
-          pixels of drawing away from its own subject. */}
+      {story.image ? (
+        <div className="grid gap-x-6 md:grid-cols-2">
+          {head}
+          <StoryImage image={story.image} />
+        </div>
+      ) : (
+        head
+      )}
+      <p className="mt-4 leading-relaxed text-muted">{story.summary}</p>
       {story.simple_summary ? (
         <PlainWordsToggle bullets={story.simple_summary} />
       ) : null}
-      {story.image ? <StoryImage image={story.image} /> : null}
       {children}
     </li>
   );

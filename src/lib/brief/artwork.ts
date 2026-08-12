@@ -20,9 +20,14 @@
 /** The cover runs at the article's full measure, which tops out at 768px. */
 export const COVER_SIZES = "(max-width: 1024px) calc(100vw - 3rem), 768px";
 
-/** The story plate: the full measure on a phone, 24rem from sm up. */
+/**
+ * The story diagram: the full measure below md, half the row in the title band
+ * from md up. The article tops out at 48rem, so a half column with the 1.5rem
+ * gutter between them is 372px; 384 is the next size up and covers the widest
+ * case without ever asking for a candidate that is too small.
+ */
 export const STORY_IMAGE_SIZES =
-  "(max-width: 640px) calc(100vw - 3rem), 320px";
+  "(max-width: 767px) calc(100vw - 3rem), 384px";
 
 /** The landing hero, which is the widest an image gets on this site. */
 export const HERO_SIZES = "(max-width: 640px) calc(100vw - 3rem), 768px";

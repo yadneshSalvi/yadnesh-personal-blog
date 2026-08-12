@@ -3,24 +3,22 @@ import { STORY_IMAGE_BOX, STORY_IMAGE_SIZES } from "@/lib/brief/artwork";
 import ThemedArt from "./ThemedArt";
 
 /**
- * The diagram that belongs to a story, set as a plate under its summary.
+ * The diagram that belongs to a story. It fills whatever column it is given:
+ * half the row in the title band from md up, the full measure below that.
  *
- * It is not a thumbnail and it is deliberately not in a side gutter. What the
- * pipeline draws are captioned diagrams: a sandbox with the word SANDBOX on it,
- * a BEFORE and AFTER pair, a memory grid with labelled cells. Their words are
- * load-bearing, and at the 168px a gutter can spare, a cap height of 80 source
- * pixels lands at seven on screen. A picture whose labels cannot be read is
- * worse than no picture, because it advertises information it withholds.
- *
- * Half the measure on a wide screen, the full measure on a phone. That is the
- * inversion of a thumbnail's usual behaviour and it is the right one here:
- * small screens have the least room to spare and the most need for the art to
- * be legible when it does appear.
+ * Its size is the caller's decision because legibility is the constraint that
+ * matters. What the pipeline draws are captioned diagrams, a cube labelled
+ * SANDBOX, a BEFORE and AFTER pair, a memory grid with labelled cells, and
+ * their words are load-bearing. A cap height of 80 source pixels needs roughly
+ * a 300px frame to stay readable; at thumbnail size it is mush, and a picture
+ * whose labels cannot be read is worse than no picture because it advertises
+ * information it withholds. Small screens therefore get the full measure
+ * rather than a half-width miniature.
  */
 export default function StoryImage({ image }: { image: BriefArtwork }) {
   return (
     <figure
-      className={`${STORY_IMAGE_BOX} mt-4 w-full overflow-hidden rounded-sm border border-line sm:w-80`}
+      className={`${STORY_IMAGE_BOX} mt-4 w-full overflow-hidden rounded-sm border border-line md:mt-0`}
     >
       <ThemedArt
         art={image}

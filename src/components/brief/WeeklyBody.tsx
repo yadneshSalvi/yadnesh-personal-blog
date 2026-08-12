@@ -38,15 +38,32 @@ export function WhatMattered({
           const anchor = storyAnchor(pick.story);
           return (
             <li key={pick.story.story_id} id={anchor} className="scroll-mt-24 py-7">
-              <div className="flex items-baseline justify-between gap-4">
-                <h3 className="font-serif text-2xl leading-snug tracking-tight">
-                  <StoryLink story={pick.story} />
-                </h3>
-                <CopyLinkButton anchor={anchor} label={pick.story.title} />
-              </div>
-              <StoryMeta story={pick.story} />
+              {/* Same band as a section row, at the weekly's larger headline. */}
+              {pick.story.image ? (
+                <div className="grid gap-x-6 md:grid-cols-2">
+                  <div className="min-w-0">
+                    <div className="flex items-baseline justify-between gap-4">
+                      <h3 className="font-serif text-2xl leading-snug tracking-tight">
+                        <StoryLink story={pick.story} />
+                      </h3>
+                      <CopyLinkButton anchor={anchor} label={pick.story.title} />
+                    </div>
+                    <StoryMeta story={pick.story} />
+                  </div>
+                  <StoryImage image={pick.story.image} />
+                </div>
+              ) : (
+                <div className="min-w-0">
+                  <div className="flex items-baseline justify-between gap-4">
+                    <h3 className="font-serif text-2xl leading-snug tracking-tight">
+                      <StoryLink story={pick.story} />
+                    </h3>
+                    <CopyLinkButton anchor={anchor} label={pick.story.title} />
+                  </div>
+                  <StoryMeta story={pick.story} />
+                </div>
+              )}
               <p className="mt-4 leading-relaxed text-muted">{pick.what}</p>
-              {pick.story.image ? <StoryImage image={pick.story.image} /> : null}
               <p className="mt-3 leading-relaxed text-muted">
                 <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink">
                   Yes, but:{" "}
@@ -87,12 +104,25 @@ export function QuietlyImportant({
             id={storyAnchor(pick.story)}
             className="scroll-mt-24 py-6"
           >
-            <h4 className="font-serif text-xl leading-snug tracking-tight">
-              <StoryLink story={pick.story} />
-            </h4>
-            <StoryMeta story={pick.story} />
-            <p className="mt-3 leading-relaxed text-muted">{pick.note}</p>
-            {pick.story.image ? <StoryImage image={pick.story.image} /> : null}
+            {pick.story.image ? (
+              <div className="grid gap-x-6 md:grid-cols-2">
+                <div className="min-w-0">
+                  <h4 className="font-serif text-xl leading-snug tracking-tight">
+                    <StoryLink story={pick.story} />
+                  </h4>
+                  <StoryMeta story={pick.story} />
+                </div>
+                <StoryImage image={pick.story.image} />
+              </div>
+            ) : (
+              <div className="min-w-0">
+                <h4 className="font-serif text-xl leading-snug tracking-tight">
+                  <StoryLink story={pick.story} />
+                </h4>
+                <StoryMeta story={pick.story} />
+              </div>
+            )}
+            <p className="mt-4 leading-relaxed text-muted">{pick.note}</p>
             {pick.story.simple_summary ? (
               <PlainWordsToggle bullets={pick.story.simple_summary} />
             ) : null}
