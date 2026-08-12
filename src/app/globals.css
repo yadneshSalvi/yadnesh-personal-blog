@@ -117,6 +117,137 @@ html {
   color: var(--faint);
 }
 
+/* ———————————————————————————————————————————————
+   Motion
+   The whole vocabulary is four effects, and every one
+   of them is opt-in per element. Nothing animates on
+   its own, and prefers-reduced-motion turns all of it
+   off at the bottom of this file.
+   ——————————————————————————————————————————————— */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Entrance for figures. Scroll-driven, so nothing fires for art the reader
+   never reaches. Every declaration lives inside the @supports block on
+   purpose: a browser without view() timelines, or a reader who asked for less
+   motion, gets the element in its final state rather than an opacity:0 it can
+   never animate out of. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .rise-in {
+      animation: rise 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 26%;
+    }
+  }
+}
+
+/* The reading hairline under the sticky header.
+
+   The empty state lives here rather than on the element as Tailwind's
+   scale-x-0, and that is not a style preference. Tailwind v4 compiles scale-*
+   to the independent `scale` property, which the browser multiplies with
+   `transform`, so a `scale: 0 1` on the element would cancel every frame this
+   keyframe produces and the bar would stay invisible at every scroll position.
+   One property, one mechanism, no composition to reason about.
+
+   Keeping the empty state outside the guard is deliberate: a browser without
+   scroll timelines shows no bar rather than a permanently full one. */
+.read-progress {
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .read-progress {
+      animation: progress linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+/* Hover on cards that are entirely clickable, which story rows deliberately
+   are not. Declared here rather than as utilities so the reduced-motion rule
+   has one thing to switch off: zeroing transition-duration alone would keep
+   the 3% jump and merely make it instant. */
+.hover-zoom {
+  transition: scale 500ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.group:hover .hover-zoom {
+  scale: 1.03;
+}
+@media (prefers-reduced-motion: reduce) {
+  .group:hover .hover-zoom {
+    scale: none;
+  }
+}
+
+/* Auto height without measuring anything: the row collapses from 1fr to 0fr
+   and the child clips. The child must keep its own overflow rule, which is
+   why it is a selector here and not a utility on the panel. */
+.disclosure-grid {
+  display: grid;
+  grid-template-rows: 0fr;
+}
+.disclosure-grid[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+.disclosure-grid > * {
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .disclosure-grid {
+    transition: grid-template-rows 260ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+}
+
+/* One drop cap per issue: the lead's opening paragraph, or the weekly's
+   through line. The accent is the only place the rust gets to be large. */
+.dropcap::first-letter {
+  float: left;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 3.4em;
+  line-height: 0.82;
+  padding-right: 0.08em;
+  color: var(--accent);
+}
+
+/* The safety net, and a fix: scroll-behavior: smooth was unconditional above,
+   which is a real problem for readers with vestibular sensitivity. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Search-specific utilities */
 .line-clamp-1 {
   overflow: hidden;

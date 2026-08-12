@@ -352,6 +352,23 @@ export function getRelatedIssues(issue: BriefIssue, limit = 3): BriefIssue[] {
   return scored.slice(0, limit).map((entry) => entry.candidate);
 }
 
+/**
+ * The issue's number within its own cadence, counting from the oldest.
+ *
+ * Printed as the folio's "No. 037". Derived from the archive rather than stored
+ * on the issue, the same way thread appearance counts are: the pipeline has no
+ * business knowing how many times it has run, and a stored counter is a thing
+ * that can disagree with the files on disk.
+ *
+ * A draft is not in the published list, so it reports the number it would take.
+ */
+export function issueOrdinal(issue: BriefIssue): number {
+  const siblings = getIssuesOfType(issue.type);
+  const index = siblings.findIndex((candidate) => candidate.id === issue.id);
+  // siblings is newest-first, so the oldest is number one.
+  return index === -1 ? siblings.length + 1 : siblings.length - index;
+}
+
 /** Issues that carry a `noindex` robots directive. Weeklies are always indexed. */
 export function isIndexed(issue: BriefIssue): boolean {
   return issue.type === "weekly" ? true : issue.index;

@@ -27,6 +27,16 @@ export function issueMetadata(issue: BriefIssue): Metadata {
   const href = issueHref(issue);
   const description = issue.preheader;
   const indexed = isIndexed(issue) && issue.status === "published";
+  // The cover is 16:9 for exactly this reason: one render is both the picture
+  // that leads the page and the card that ships to social. Issues without one
+  // fall through to the site-wide default, as they always have.
+  //
+  // Setting images here is safe where it would not be on a blog post: issue
+  // routes have no file-based opengraph-image, so there is no generated card
+  // for a config value to suppress.
+  const card = issue.cover
+    ? [{ url: absoluteUrl(issue.cover.light), alt: issue.cover.alt }]
+    : undefined;
 
   return {
     title: issuePageTitle(issue),
@@ -42,11 +52,13 @@ export function issueMetadata(issue: BriefIssue): Metadata {
       url: href,
       publishedTime: issue.generated_at,
       authors: [`${SITE_URL}/about`],
+      ...(card ? { images: card } : {}),
     },
     twitter: {
       card: "summary_large_image",
       title: issue.title,
       description,
+      ...(card ? { images: card } : {}),
     },
   };
 }
@@ -62,7 +74,7 @@ export function issueJsonLd(issue: BriefIssue) {
     "@id": `${url}#article`,
     headline: issue.title,
     description: issue.preheader,
-    image: absoluteUrl(ogImageFor(undefined)),
+    image: absoluteUrl(ogImageFor(issue.cover?.light)),
     datePublished: published,
     dateModified: issue.generated_at,
     author: { "@id": `${SITE_URL}/#person` },

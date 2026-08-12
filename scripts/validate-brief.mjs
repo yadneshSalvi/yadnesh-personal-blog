@@ -27,9 +27,12 @@ import { fileURLToPath } from "node:url";
 import {
   BriefIssueSchema,
   BriefMemeSetSchema,
+  COVER_RATIO,
   DAILY_ID_PATTERN,
   HEDGE_QUOTE_MAX_LENGTH,
+  ISSUE_IMAGE_ROOT,
   MEME_IMAGE_ROOT,
+  STORY_IMAGE_RATIO,
   SUBJECT_MAX_LENGTH,
   WEEKLY_ID_PATTERN,
 } from "../src/lib/brief/schema.ts";
@@ -113,6 +116,22 @@ function isMemeFile(file) {
   return path.dirname(file) === MEMES_DIR;
 }
 
+/** Where the pipeline records what it drew for an issue and why. */
+const IMAGE_AUDIT_DIR = path.join(BRIEF_DIR, "issue-images");
+
+/**
+ * The image audit sidecar, `content/brief/issue-images/<issue-id>.json`.
+ *
+ * Archive material. Nothing renders it, nothing here has a schema for it, and
+ * it is none of this script's business. It needs naming anyway, because CI
+ * hands this script every changed file under `content/brief/**`, and a sidecar
+ * riding in the same pull request as its issue would otherwise be parsed as an
+ * issue and fail the build on a file that is doing nothing wrong.
+ */
+function isImageAuditFile(file) {
+  return path.dirname(file) === IMAGE_AUDIT_DIR;
+}
+
 /** The hall-of-fame file for an issue, or null when there is none or it is unreadable. */
 function memeSetFor(issueId) {
   const file = path.join(MEMES_DIR, `${issueId}.json`);
@@ -151,6 +170,76 @@ function checkDrawnImage(label, issueId, imagePath, errors) {
     errors.push(
       `${label}: image "${imagePath}" could not be measured; it is not a readable png or webp`,
     );
+  }
+}
+
+/**
+ * How far a committed image may drift from the ratio the layout box crops to
+ * before it is a bug rather than a rounding difference.
+ */
+const ASPECT_TOLERANCE = 0.02;
+
+/**
+ * Cover and story artwork: both variants live in the issue's own folder, are
+ * actually in the tree, are the shape the page reserves for them, and are the
+ * same format as each other.
+ *
+ * The ratio check is the one that earns its keep. A cover fills a 16:9 box and
+ * a story picture a 4:3 one, both with `object-cover`, so a file delivered at
+ * the wrong shape does not fail, it silently crops the subject out of frame.
+ * That is precisely the kind of defect that survives review and ships.
+ *
+ * It is a ratio rather than a size because there is no canonical size: the
+ * generator has no native 16:9, so covers arrive as a 3:2 render center-cropped
+ * to 1536x864. Anything that divides to 16:9 is correct.
+ *
+ * The extension check exists because the dark file is computed locally from the
+ * light one. Two different formats in a pair means they did not come from the
+ * same run, and the pair is the whole mechanism behind the theme swap.
+ */
+function checkArtwork(label, issueId, art, targetRatio, errors) {
+  const expected = `${ISSUE_IMAGE_ROOT}/${issueId}/`;
+
+  if (art.dark) {
+    const ext = (file) => path.extname(file).toLowerCase();
+    if (ext(art.light) !== ext(art.dark)) {
+      errors.push(
+        `${label}: the light and dark variants are ${ext(art.light)} and ${ext(art.dark)}; ` +
+          `a pair is one render and its remap, so both carry the same format`,
+      );
+    }
+  }
+
+  for (const [variant, imagePath] of [
+    ["light", art.light],
+    ["dark", art.dark],
+  ]) {
+    if (!imagePath) continue;
+    const where = `${label}.${variant}`;
+
+    if (!imagePath.startsWith(expected)) {
+      errors.push(`${where}: image "${imagePath}" must live under ${expected}`);
+      continue;
+    }
+    const onDisk = path.join(REPO_ROOT, "public", imagePath.replace(/^\/+/, ""));
+    if (!fs.existsSync(onDisk)) {
+      errors.push(`${where}: image "${imagePath}" is not in public/`);
+      continue;
+    }
+    const size = measurePublicImage(imagePath, REPO_ROOT);
+    if (!size) {
+      errors.push(
+        `${where}: image "${imagePath}" could not be measured; it is not a readable png or webp`,
+      );
+      continue;
+    }
+    const ratio = size.width / size.height;
+    if (Math.abs(ratio - targetRatio) / targetRatio > ASPECT_TOLERANCE) {
+      errors.push(
+        `${where}: image "${imagePath}" is ${size.width}x${size.height}, a ratio of ` +
+          `${ratio.toFixed(3)} where the page crops it to ${targetRatio.toFixed(3)}`,
+      );
+    }
   }
 }
 
@@ -224,12 +313,25 @@ function checkIssue(file, issue, previousIssues) {
     errors.push(`read_minutes says ${issue.read_minutes}, recomputed ${computed}`);
   }
 
+  if (issue.cover) {
+    checkArtwork("cover", issue.id, issue.cover, COVER_RATIO, errors);
+  }
+
   const seen = new Map();
   for (const story of storiesOf(issue)) {
     if (seen.has(story.story_id)) {
       errors.push(`story ${story.story_id} appears twice in this issue`);
     }
     seen.set(story.story_id, story);
+    if (story.image) {
+      checkArtwork(
+        `story ${story.story_id}.image`,
+        issue.id,
+        story.image,
+        STORY_IMAGE_RATIO,
+        errors,
+      );
+    }
     let url;
     try {
       url = new URL(story.url);
@@ -418,9 +520,15 @@ function main() {
 
   let failed = 0;
   let warned = 0;
+  let skipped = 0;
 
   for (const file of targets) {
     const relative = path.relative(REPO_ROOT, file);
+    if (isImageAuditFile(file)) {
+      console.log(`skip ${relative} (image audit sidecar, nothing renders it)`);
+      skipped += 1;
+      continue;
+    }
     if (!fs.existsSync(file)) {
       console.error(`FAIL ${relative}\n  - file does not exist`);
       failed += 1;
@@ -465,7 +573,9 @@ function main() {
     }
   }
 
-  const summary = `${targets.length} file(s) checked, ${failed} failed, ${warned} warning(s)`;
+  const summary =
+    `${targets.length - skipped} file(s) checked, ${failed} failed, ${warned} warning(s)` +
+    (skipped > 0 ? `, ${skipped} skipped` : "");
   if (failed > 0) {
     console.error(`\n${summary}`);
     return 1;

@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/brief/IssueNav";
-import { EditorNote, TopicChips } from "@/components/brief/IssueParts";
+import { EditorNote, Kicker, TopicChips } from "@/components/brief/IssueParts";
 import BriefSubscribeCTA from "@/components/brief/BriefSubscribeCTA";
+import PlainWordsList from "@/components/brief/PlainWords";
 import { StoryLink, StoryMeta, storyAnchor } from "@/components/brief/StoryRow";
+import ThemedArt from "@/components/brief/ThemedArt";
+import { STORY_IMAGE_BOX, STORY_PAGE_IMAGE_SIZES } from "@/lib/brief/artwork";
 import {
   getClusterThread,
   getEditorNotesForStory,
@@ -88,7 +91,35 @@ export default async function StoryPage({
         <StoryMeta story={story} />
       </header>
 
+      {/* Capped rather than run to the full measure. The source is 1200x900, so
+          a 768px box would be asking a 2x display for more pixels than exist,
+          and a 4:3 picture at full width is a slab rather than a feature. */}
+      {story.image ? (
+        <div
+          className={`${STORY_IMAGE_BOX} mt-10 max-w-lg overflow-hidden rounded-sm border border-line`}
+        >
+          <ThemedArt
+            art={story.image}
+            sizes={STORY_PAGE_IMAGE_SIZES}
+            priority
+            className="object-cover"
+          />
+        </div>
+      ) : null}
+
       <p className="mt-8 text-lg leading-relaxed text-muted">{story.summary}</p>
+
+      {/* Expanded, and with no toggle. This page is one story with room to
+          spare, so the disclosure an issue page needs would only be a control
+          asking the reader to press it. */}
+      {story.simple_summary ? (
+        <section className="mt-8">
+          <Kicker>In plain words</Kicker>
+          <div className="mt-3">
+            <PlainWordsList bullets={story.simple_summary} />
+          </div>
+        </section>
+      ) : null}
 
       {notes.length > 0 ? (
         <div className="mt-8">

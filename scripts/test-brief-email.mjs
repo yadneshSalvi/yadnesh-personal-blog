@@ -105,6 +105,26 @@ function assertNoImages(rendered, label) {
   assert.equal(/<img\b/i.test(rendered.text), false, `${label}: an <img> tag reached the text part`);
 }
 
+/**
+ * Nothing web-only reached either part.
+ *
+ * Checked as raw substrings against both parts rather than by looking for an
+ * <img>, because these fields could leak as a bare URL in the text part, as an
+ * alt attribute, or as bullets of prose, and only one of those three would look
+ * like an image to a tag-based check.
+ */
+function assertNoWebOnly(rendered, label) {
+  for (const part of ["text", "html"]) {
+    for (const needle of [...WEB_ONLY_NEEDLES, "In plain words"]) {
+      assert.equal(
+        rendered[part].includes(needle),
+        false,
+        `${label}: web-only content reached the ${part} part: ${needle}`,
+      );
+    }
+  }
+}
+
 function assertPlaceholdersOnce(rendered, label) {
   for (const placeholder of Object.values(ISSUE_EMAIL_PLACEHOLDERS)) {
     const inHtml = rendered.html.split(placeholder).length - 1;
@@ -229,6 +249,46 @@ const LONG = [
 ].join(" ");
 
 /**
+ * The fields that exist for the web page and must never reach an inbox: cover
+ * art, story pictures, and the plain-words bullets.
+ *
+ * The first two are a delivery decision (plan 07 keeps the email text-only, and
+ * a blocked or broken image is worse than no image). The third is an editorial
+ * one: a disclosure a page can collapse, an email cannot, so shipping it would
+ * add several hundred words to a four-minute read whose whole promise is that
+ * it stops.
+ *
+ * Every string here is distinctive enough that finding it in a rendered email
+ * means exactly one thing. The folder name is a fixture rather than a real
+ * issue id because the renderer never reads the path; the validator is what
+ * ties artwork to its issue.
+ */
+const WEB_ONLY_ART = (name) => ({
+  light: `/images/brief/issues/fat-fixture/${name}-light.webp`,
+  dark: `/images/brief/issues/fat-fixture/${name}-dark.webp`,
+  alt: `Web only artwork described for ${name}, which no inbox should ever be told about.`,
+});
+
+const WEB_ONLY_BULLETS = [
+  "Web only plain words, the first bullet, which belongs to a page that can collapse it.",
+  "Web only plain words, the second bullet, restating the summary for somebody newer.",
+  "Web only plain words, the third bullet, which would cost the email its promise.",
+];
+
+/**
+ * What a rendered email is searched for. Every one of these must be present in
+ * the fixture and absent from the render, and the test asserts both halves: an
+ * absence check whose fixture quietly stopped carrying the thing is a test that
+ * passes forever while checking nothing.
+ */
+const WEB_ONLY_NEEDLES = [
+  "/images/brief/issues/",
+  WEB_ONLY_ART("lead-0").light,
+  WEB_ONLY_ART("lead-0").alt,
+  ...WEB_ONLY_BULLETS,
+];
+
+/**
  * Every fat story's id shows up inside its own URL, so an assertion about what
  * survived a trim can look for the id in the rendered HTML.
  */
@@ -249,6 +309,8 @@ function fatStory(prefix, index, section) {
     via: null,
     paywalled: false,
     hn_points: 128,
+    image: WEB_ONLY_ART(id),
+    simple_summary: WEB_ONLY_BULLETS,
   };
 }
 
@@ -276,6 +338,7 @@ function fatDaily() {
     subject: "A fat synthetic issue for the byte budget test",
     preheader: "Every list at its maximum, every summary at its longest.",
     title: "A fat synthetic issue",
+    cover: WEB_ONLY_ART("cover"),
     read_minutes: 40,
     thin_day: false,
     disclosure_version: 1,
@@ -331,6 +394,7 @@ function fatWeekly() {
     subject: "Weekly #2: a fat synthetic issue for the byte budget test",
     preheader: "Every list at its maximum, every summary at its longest.",
     title: "A fat synthetic weekly",
+    cover: WEB_ONLY_ART("cover"),
     read_minutes: 60,
     thin_day: false,
     disclosure_version: 1,
@@ -379,6 +443,37 @@ function fatWeekly() {
     },
   });
 }
+
+test("cover art, story pictures, and plain words never reach an inbox", () => {
+  // Half one: the fixture really does carry all of it. Without this the
+  // absence checks below would pass by default the moment somebody refactored
+  // fatStory, and nobody would notice for a year.
+  const carried = JSON.stringify(fatDaily());
+  for (const needle of WEB_ONLY_NEEDLES) {
+    assert.ok(
+      carried.includes(needle),
+      `the fat daily no longer carries "${needle}", so this test proves nothing`,
+    );
+  }
+
+  // Half two: none of it survives into an email.
+  for (const [label, issue] of [
+    ["fat daily", fatDaily()],
+    ["fat weekly", fatWeekly()],
+  ]) {
+    assertNoWebOnly(renderIssueEmail(issue, LINKS), label);
+  }
+
+  // Untrimmed as well, and that is the assertion that carries the weight. A
+  // trimmed fat daily has dropped most of its stories, so absence there could
+  // just as easily mean the trim ladder threw the evidence away. With no limit
+  // every story is still in the render, and the fields are absent because the
+  // renderer never reads them.
+  assertNoWebOnly(
+    renderIssueEmail(fatDaily(), LINKS, { limit: Number.MAX_SAFE_INTEGER }),
+    "fat daily untrimmed",
+  );
+});
 
 test("the fat daily overflows before trimming", () => {
   const untrimmed = renderIssueEmail(fatDaily(), LINKS, { limit: Number.MAX_SAFE_INTEGER });

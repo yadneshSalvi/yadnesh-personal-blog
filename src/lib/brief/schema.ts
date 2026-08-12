@@ -95,6 +95,58 @@ const httpsUrl = z.string().refine(
 );
 
 /**
+ * Where issue artwork lives: the cover every issue ships with, and the images
+ * that hang in the picture gutter next to a story. Separate from the meme root
+ * because the two have different lifecycles: memes are one drawing per day kept
+ * forever in a gallery, artwork is per issue and per story.
+ */
+export const ISSUE_IMAGE_ROOT = "/images/brief/issues";
+
+/**
+ * `/images/brief/issues/<issue-id>/<name>-light|dark.webp|png`.
+ *
+ * The theme suffix is part of the contract rather than a convention: the
+ * pipeline computes the dark variant locally as a duotone remap of the light
+ * one, so the two always arrive as a pair and always share an extension. The
+ * stem before the suffix is free-form, because a story id belongs to the feed
+ * and nothing here should depend on parsing one back out of a path.
+ */
+export const ISSUE_IMAGE_PATTERN =
+  /^\/images\/brief\/issues\/[A-Za-z0-9][A-Za-z0-9._-]*\/[A-Za-z0-9][A-Za-z0-9._-]*-(light|dark)\.(png|webp)$/;
+
+const issueImagePath = z
+  .string()
+  .regex(
+    ISSUE_IMAGE_PATTERN,
+    `must be a site-relative -light/-dark image under ${ISSUE_IMAGE_ROOT}/<issue-id>/`,
+  );
+
+/**
+ * The shape artwork is cropped into, as a ratio rather than a pixel size.
+ *
+ * Deliberately not a width and a height. The generator has no native 16:9, so a
+ * cover is rendered at 3:2 and center-cropped to 1536x864; writing 1600x900
+ * anywhere in this repo would encode one render's arithmetic as if it were the
+ * contract. What the layout actually depends on is the ratio, the validator
+ * checks the ratio, and the CSS boxes are declared in the same two ratios.
+ */
+export const COVER_RATIO = 16 / 9;
+export const STORY_IMAGE_RATIO = 4 / 3;
+
+/**
+ * One piece of art in both papers. The pipeline renders a dark variant for
+ * everything it draws, so `dark` is normally set; it stays nullable because a
+ * single warm-paper render with a brightness knockback is a working page, and a
+ * missing dark file should degrade rather than fail the issue.
+ */
+export const BriefArtworkSchema = z.object({
+  light: issueImagePath,
+  dark: issueImagePath.nullable().default(null),
+  alt: z.string().min(1),
+});
+export type BriefArtwork = z.infer<typeof BriefArtworkSchema>;
+
+/**
  * A story as it appears inside an issue: fully denormalized, so the site builds
  * with zero access to the feed repo. `story_id` is the feed's item id (already
  * stable and deduped) and `cluster` is what powers threading across issues.
@@ -117,6 +169,22 @@ export const BriefStorySchema = z.object({
   via: z.string().nullable().default(null),
   paywalled: z.boolean().default(false),
   hn_points: z.number().int().nonnegative().nullable().default(null),
+  /**
+   * The picture that hangs in the gutter next to this story. Every engineering
+   * item carries one; research items carry one when there is something worth
+   * drawing. Product, community, from-X and quick-link entries never do.
+   */
+  image: BriefArtworkSchema.nullable().default(null),
+  /**
+   * Three to five plain-language bullets behind the "In plain words" toggle.
+   *
+   * Deliberately NOT counted by authoredProse: the panel is collapsed by
+   * default, and counting text the reader has not opened would make this repo
+   * recompute read_minutes higher than the pipeline wrote it. That disagreement
+   * fails CI on a number nobody can see, which is the same trap the humor
+   * fields set (see text.ts).
+   */
+  simple_summary: z.array(z.string().min(1)).min(3).max(5).nullable().default(null),
 });
 export type BriefStory = z.infer<typeof BriefStorySchema>;
 
@@ -345,6 +413,13 @@ const commonIssueShape = {
   quick_links: z.array(BriefStorySchema).default([]),
   editor_notes: z.array(BriefEditorNoteSchema).default([]),
   corrections: z.array(BriefCorrectionSchema).default([]),
+  /**
+   * The issue's cover art, 16:9. It leads the page, and it is also the issue's
+   * OG card, which is why the ratio is fixed rather than whatever the render
+   * came out as. Nullable so every issue published before covers existed still
+   * parses and renders.
+   */
+  cover: BriefArtworkSchema.nullable().default(null),
   /** Optional on every cadence. An issue with nothing funny in it runs without one. */
   meme: BriefMemeSchema.nullable().default(null),
   email: BriefEmailSchema,

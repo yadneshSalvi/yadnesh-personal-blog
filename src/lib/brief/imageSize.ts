@@ -7,6 +7,17 @@
 // moment it loads and hands the zoom dialog the wrong shape, so the file header
 // is read straight off disk instead.
 //
+// Two roots feed this now. `/images/brief/memes/` is the original case, where
+// the shape is genuinely unknown until the file exists. `/images/brief/issues/`
+// holds covers and story pictures, whose shape is fixed by contract and checked
+// in CI; those render into CSS boxes and do not measure at all, with one
+// exception. An issue cover measures here so its lightbox knows what size to
+// open at, and it still pins its own box in CSS, so the square fallback below
+// can never reshape a page.
+//
+// Nothing on the client may import this. It reads the filesystem, and the
+// archive's issue list is rendered inside a client component.
+//
 // Both formats the pipeline can emit are parsed here (png, and all three webp
 // variants) so that switching format is a content decision with no code
 // coupling. Anything unrecognised falls back to a 4:3 box rather than throwing;
@@ -87,8 +98,10 @@ function webpSize(header: Buffer): ImageSize | null {
 }
 
 /**
- * The real intrinsic size of `/images/brief/memes/2026-08-12/one.webp`, or null
- * when the file is missing, truncated, or in a format this cannot read.
+ * The real intrinsic size of `/images/brief/memes/2026-08-12/one.webp` or of
+ * `/images/brief/issues/2026-08-12/cover-light.webp`, or null when the file is
+ * missing, truncated, or in a format this cannot read. Any path under public/
+ * works; the two brief roots are simply the ones that use it.
  *
  * CI calls this one and treats null as a validation error, because a wrong
  * aspect ratio that ships silently is exactly the bug that survives to

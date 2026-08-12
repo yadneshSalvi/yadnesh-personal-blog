@@ -31,7 +31,10 @@ function DrawnFigure({
 }) {
   const { width, height } = publicImageSize(image);
   return (
-    <figure id={anchor} className="scroll-mt-24">
+    // rise-in is a scroll-driven entrance and does nothing until the drawing is
+    // actually on its way into view. It is safe here and wrong on the cover:
+    // this one is always below the fold.
+    <figure id={anchor} className="rise-in scroll-mt-24">
       <Kicker>{kicker}</Kicker>
       <div className="mt-4 overflow-hidden rounded-sm border border-line">
         {/* The art is drawn on warm paper, which glares against a dark page.
@@ -106,7 +109,7 @@ export function ComicFigure({ comic }: { comic: BriefComic }) {
 export function HedgeBlock({ hedge }: { hedge: BriefHedge }) {
   return (
     <section id="hedge" className="scroll-mt-24">
-      <div className="rounded-sm border border-line bg-surface px-6 py-6 sm:px-8 sm:py-7">
+      <div className="rise-in rounded-sm border border-line bg-surface px-6 py-6 sm:px-8 sm:py-7">
         <Kicker>{HEDGE_LABEL}</Kicker>
         <blockquote className="mt-4 font-serif text-xl italic leading-relaxed text-ink sm:text-2xl">
           &ldquo;{hedge.quote}&rdquo;

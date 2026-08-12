@@ -102,9 +102,54 @@ function withHumor(raw) {
   });
 }
 
+/**
+ * Artwork alt text and plain-words bullets are the second wave of fields with
+ * the same trap in them: reader-facing prose that must be scanned and must not
+ * be counted. Alt text is not read by sighted readers, and a collapsed
+ * disclosure panel is not read by anybody until they open it, so counting
+ * either would push read_minutes past what the pipeline computed.
+ */
+const LONG_IMAGE_ALT =
+  "A wide drawing of a small robot holding a clipboard beside a stack of paper " +
+  "taller than it is, with a laptop character peering over the top of the pile " +
+  "and a single sheet drifting to the floor between them, unread by either one.";
+
+const SIMPLE_SUMMARY = [
+  "A benchmark is a fixed set of tasks used to compare one system against another.",
+  "Somebody outside the company ran the same tasks and got a number close to the published one.",
+  "That is unusual, because most published numbers come from the company that made the thing.",
+  "It still says nothing about whether the system is useful on work that is not on the list.",
+];
+
+function withArtwork(raw) {
+  const dir = `/images/brief/issues/${raw.id}`;
+  return BriefIssueSchema.parse({
+    ...raw,
+    cover: {
+      light: `${dir}/cover-light.webp`,
+      dark: `${dir}/cover-dark.webp`,
+      alt: LONG_IMAGE_ALT,
+    },
+    lead: {
+      ...raw.lead,
+      story: {
+        ...raw.lead.story,
+        image: {
+          light: `${dir}/lead-light.webp`,
+          dark: `${dir}/lead-dark.webp`,
+          alt: LONG_IMAGE_ALT,
+        },
+        simple_summary: SIMPLE_SUMMARY,
+      },
+    },
+  });
+}
+
 const rawDaily = realDaily();
 const plain = BriefIssueSchema.parse(rawDaily);
 const funny = withHumor(rawDaily);
+const illustrated = withArtwork(rawDaily);
+const leadStoryId = plain.lead.story.story_id;
 
 console.log("brief prose walk");
 
@@ -221,6 +266,56 @@ test("the search index and feeds stay free of alt text", () => {
   assert.equal(text.includes(HUMOR.meme.alt), false, "alt text reached the search index");
   assert.equal(text.includes(HUMOR.meme.concept), false, "the premise reached the search index");
   assert.equal(text, issuePlainText(plain), "plain text changed when a meme was added");
+});
+
+/* ── Artwork and plain words ────────────────────────────────────────────── */
+
+test("read time is artwork-invariant", () => {
+  assert.equal(
+    issueWordCount(illustrated),
+    issueWordCount(plain),
+    "cover alt, image alt, or the plain-words bullets are being counted as reading time",
+  );
+  assert.equal(computeReadMinutes(illustrated), computeReadMinutes(plain));
+  assert.equal(computeReadMinutes(illustrated), plain.read_minutes);
+});
+
+test("authoredProse carries no artwork or plain-words field", () => {
+  const paths = authoredProse(illustrated).map((field) => field.path);
+  for (const leaked of paths.filter((p) => /(^cover\.|image\.alt|simple_summary)/.test(p))) {
+    assert.fail(`${leaked} reached the counted walk`);
+  }
+  assert.deepEqual(paths, authoredProse(plain).map((field) => field.path));
+});
+
+test("houseStyleProse scans the cover, the pictures, and every bullet", () => {
+  const walked = new Map(
+    houseStyleProse(illustrated).map((field) => [field.path, field.text]),
+  );
+  const expected = [
+    "cover.alt",
+    `story[${leadStoryId}].image.alt`,
+    ...SIMPLE_SUMMARY.map((_, i) => `story[${leadStoryId}].simple_summary[${i}]`),
+  ];
+  for (const path of expected) {
+    assert.ok(walked.has(path), `${path} is not being scanned`);
+  }
+  assert.equal(
+    walked.get(`story[${leadStoryId}].simple_summary[0]`),
+    SIMPLE_SUMMARY[0],
+    "a bullet is being scanned under the wrong text",
+  );
+});
+
+test("plain words and alt text stay out of the search index", () => {
+  const text = issuePlainText(illustrated);
+  assert.equal(text.includes(LONG_IMAGE_ALT), false, "alt text reached the search index");
+  assert.equal(
+    text.includes(SIMPLE_SUMMARY[0]),
+    false,
+    "a plain-words bullet reached the search index",
+  );
+  assert.equal(text, issuePlainText(plain), "plain text changed when artwork was added");
 });
 
 console.log(`\n${passed} passed`);

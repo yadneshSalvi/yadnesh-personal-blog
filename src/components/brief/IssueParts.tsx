@@ -1,4 +1,5 @@
 import Link from "next/link";
+import clsx from "clsx";
 import type {
   BriefCorrection,
   BriefLead,
@@ -9,8 +10,10 @@ import type {
 import { sectionLabel, topicLabel } from "@/lib/brief/schema";
 import StoryRow, { StoryLink, StoryMeta, storyAnchor } from "./StoryRow";
 import CopyLinkButton from "./CopyLinkButton";
+import PlainWordsToggle from "./PlainWordsToggle";
+import SectionHead from "./SectionHead";
 
-/** The mono kicker used above every block in the issue. */
+/** The mono kicker used above the issue's smaller blocks. */
 export function Kicker({ children }: { children: React.ReactNode }) {
   return (
     <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-faint">
@@ -19,7 +22,32 @@ export function Kicker({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** The labeled skeleton. `Yes, but:` is structural, so it always renders. */
+/**
+ * A drop cap needs a capital letter. On a digit it reads as a rendering fault,
+ * on an opening quote as a stray mark, and on a lowercase initial it reads as a
+ * typo three lines tall, which is what a paragraph opening with "xAI shipped"
+ * or "vLLM now" would get. Any of those runs without one.
+ *
+ * Matching the Unicode uppercase category rather than A-Z also lets "Élan" and
+ * "Über" keep theirs.
+ */
+export function dropCapEligible(text: string): boolean {
+  return /^\p{Lu}/u.test(text.trim());
+}
+
+/**
+ * The labeled skeleton. `Yes, but:` is structural, so it always renders.
+ *
+ * `What happened` is the exception: it leaves the list and becomes the opening
+ * paragraph, larger and with the issue's one drop cap. The label was redundant
+ * with its position (it is the first thing under the headline), and the first
+ * paragraph of a five-minute read has to look different from the eight that
+ * follow or the page reads as one flat column.
+ *
+ * The lead's own story picture is deliberately not rendered. The cover already
+ * leads the page, and two large pictures in the first screen means neither one
+ * is the dominant element.
+ */
 export function LeadStory({
   lead,
   threadLabel,
@@ -32,16 +60,23 @@ export function LeadStory({
   const anchor = storyAnchor(lead.story);
   return (
     <section id={anchor} className="scroll-mt-24">
-      <Kicker>The lead</Kicker>
-      <div className="mt-4 flex items-baseline justify-between gap-4">
-        <h2 className="font-serif text-3xl leading-tight tracking-tight">
+      <SectionHead label="The lead" />
+      <div className="mt-5 flex items-baseline justify-between gap-4">
+        <h2 className="font-serif text-[2.125rem] leading-[1.15] tracking-tight sm:text-[2.5rem]">
           <StoryLink story={lead.story} />
         </h2>
         <CopyLinkButton anchor={anchor} label={lead.story.title} />
       </div>
       <StoryMeta story={lead.story} threadLabel={threadLabel} />
-      <dl className="mt-6 space-y-4 leading-relaxed text-muted">
-        <LabeledLine label="What happened" text={lead.what} />
+      <p
+        className={clsx(
+          "mt-6 font-serif text-[1.375rem] leading-[1.55] text-ink",
+          dropCapEligible(lead.what) && "dropcap",
+        )}
+      >
+        {lead.what}
+      </p>
+      <dl className="mt-5 space-y-4 leading-relaxed text-muted">
         <LabeledLine label="The details" text={lead.details} />
         <LabeledLine
           label="Yes, but"
@@ -49,6 +84,9 @@ export function LeadStory({
         />
         <LabeledLine label="Why it matters" text={lead.why} />
       </dl>
+      {lead.story.simple_summary ? (
+        <PlainWordsToggle bullets={lead.story.simple_summary} />
+      ) : null}
       {notes.map((text, i) => (
         <EditorNote key={i} text={text} />
       ))}
@@ -76,14 +114,20 @@ export function IssueSection({
   threadLabels?: Map<string, string>;
   notes?: Map<string, string[]>;
 }) {
+  // All of a section's rows reserve the picture column or none of them do.
+  // Per-row would move the headlines' left edge from one story to the next,
+  // which is exactly what turns a scannable list into a jumble.
+  const reserveGutter = section.items.some((story) => story.image !== null);
+
   return (
     <section id={`section-${section.key}`} className="scroll-mt-24">
-      <Kicker>{sectionLabel(section.key)}</Kicker>
+      <SectionHead label={sectionLabel(section.key)} count={section.items.length} />
       <ul className="mt-2 divide-y divide-line border-b border-line">
         {section.items.map((story) => (
           <StoryRow
             key={story.story_id}
             story={story}
+            reserveGutter={reserveGutter}
             threadLabel={threadLabels?.get(story.story_id) ?? null}
           >
             {(notes?.get(story.story_id) ?? []).map((text, i) => (
@@ -186,14 +230,27 @@ export function WeeklyThroughLine({
 
   return (
     <section id="through-line" className="scroll-mt-24">
-      <Kicker>The through line</Kicker>
-      <h2 className="mt-4 font-serif text-3xl leading-tight tracking-tight text-ink">
+      <SectionHead label="The through line" />
+      <h2 className="mt-5 font-serif text-[2.125rem] leading-[1.15] tracking-tight text-ink sm:text-[2.5rem]">
         {throughLine.title}
       </h2>
       <div className="mt-6 space-y-5 leading-relaxed text-muted">
-        {paragraphs.map((paragraph, i) => (
-          <p key={i}>{paragraph}</p>
-        ))}
+        {paragraphs.map((paragraph, i) =>
+          // The weekly's one drop cap, the counterpart of the daily's lead.
+          i === 0 ? (
+            <p
+              key={i}
+              className={clsx(
+                "font-serif text-[1.375rem] leading-[1.55] text-ink",
+                dropCapEligible(paragraph) && "dropcap",
+              )}
+            >
+              {paragraph}
+            </p>
+          ) : (
+            <p key={i}>{paragraph}</p>
+          ),
+        )}
       </div>
     </section>
   );

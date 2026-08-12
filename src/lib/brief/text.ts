@@ -161,9 +161,36 @@ export function authoredProse(issue: BriefIssue): ProseField[] {
  * hedge.quote is absent from both walks: it is verbatim source text, and a
  * house-style scan has no business policing what somebody else wrote. The
  * validator scans it for leftover placeholders separately.
+ *
+ * Artwork alt text and the plain-words bullets land here for the same reason
+ * the humor fields do. Both are prose the pipeline wrote and a reader can meet,
+ * so an em-dash in either is a house-style failure; neither is reading time,
+ * because alt text is not read by sighted readers and a collapsed panel is not
+ * read by anyone until they ask for it.
  */
 export function houseStyleProse(issue: BriefIssue): ProseField[] {
   const fields = authoredProse(issue);
+
+  if (issue.cover) {
+    fields.push({ path: "cover.alt", text: issue.cover.alt });
+  }
+
+  // Keyed by story id rather than position: whoever reads this error message is
+  // about to search the JSON for the string it names.
+  for (const story of allStories(issue)) {
+    if (story.image) {
+      fields.push({
+        path: `story[${story.story_id}].image.alt`,
+        text: story.image.alt,
+      });
+    }
+    (story.simple_summary ?? []).forEach((line, i) => {
+      fields.push({
+        path: `story[${story.story_id}].simple_summary[${i}]`,
+        text: line,
+      });
+    });
+  }
 
   if (issue.type === "daily") {
     if (issue.hedge) {

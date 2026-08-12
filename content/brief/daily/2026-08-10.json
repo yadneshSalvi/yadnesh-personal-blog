@@ -12,7 +12,7 @@
  ],
  "subject": "DeepSeek benchmark replication, OpenClaw exploit, verification debt",
  "preheader": "Plus: 4 talks from AI Engineer, a GitHub retirement, and sycophancy for smart people. 5 min.",
- "title": "An independent harness matches DeepSeek's 82.7%, and agents outrun their verifiers",
+ "title": "A public harness reproduces DeepSeek's 82.7% on Terminal-Bench, 445 trials deep",
  "read_minutes": 5,
  "thin_day": false,
  "disclosure_version": 1,

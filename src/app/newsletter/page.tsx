@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
 import BriefSubscribeCTA from "@/components/brief/BriefSubscribeCTA";
+import IssueCard from "@/components/brief/IssueCard";
 import IssueList from "@/components/brief/IssueList";
 import { getAllIssues, getLatestIssue } from "@/lib/brief/issues";
 import { hasMemeGallery } from "@/lib/brief/memes";
-import type { BriefIssue } from "@/lib/brief/schema";
-import { issueDateLabel } from "@/lib/brief/dates";
 import { BRIEF_NAME, BRIEF_TAGLINE, issueHref } from "@/lib/brief/seo";
 import { SITE_URL, absoluteUrl } from "@/lib/seo";
 
@@ -53,7 +52,22 @@ export default function BriefLanding() {
         </p>
       </header>
 
-      <section className="mt-12 space-y-5 leading-relaxed text-muted">
+      {/* The latest issue leads, before the pitch and before the form. The
+          archive is the sample, so showing one is a stronger argument than
+          three paragraphs about how it is made. */}
+      {latestDaily ? (
+        <section className="mt-12">
+          <IssueCard issue={latestDaily} label="Today's daily" variant="hero" priority />
+        </section>
+      ) : null}
+
+      <div className="mt-14">
+        <BriefSubscribeCTA
+          latestIssueHref={latestDaily ? issueHref(latestDaily) : null}
+        />
+      </div>
+
+      <section className="mt-16 space-y-5 leading-relaxed text-muted">
         <p>
           Every weekday a pipeline reads 82 feeds, the Hacker News stories that
           clear 80 points, 15 company engineering blogs, and 12 accounts on X.
@@ -65,10 +79,7 @@ export default function BriefLanding() {
           On Sunday it does the thing a daily structurally can&apos;t. One
           argued observation connecting the week&apos;s stories, the items whose
           significance only showed up in hindsight, and the two or three good
-          things that nobody clicked.
-        </p>
-        <p>
-          The pipeline is the pitch. It ships at the same time every weekday
+          things that nobody clicked. It ships at the same time every weekday
           because software doesn&apos;t oversleep, it says so out loud when the
           day was quiet instead of padding, and every issue carries a
           corrections section whether or not there is anything in it. What it
@@ -84,23 +95,9 @@ export default function BriefLanding() {
         </p>
       </section>
 
-      <div className="mt-14">
-        <BriefSubscribeCTA
-          latestIssueHref={latestDaily ? issueHref(latestDaily) : null}
-        />
-      </div>
-
-      {latestDaily || latestWeekly ? (
+      {latestWeekly ? (
         <section className="mt-16">
-          <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-faint">
-            Latest
-          </p>
-          <div className="mt-6 grid gap-8 sm:grid-cols-2">
-            {latestDaily ? <LatestCard issue={latestDaily} label="Today's daily" /> : null}
-            {latestWeekly ? (
-              <LatestCard issue={latestWeekly} label="This week's weekly" />
-            ) : null}
-          </div>
+          <IssueCard issue={latestWeekly} label="This week's weekly" />
         </section>
       ) : null}
 
@@ -172,28 +169,5 @@ export default function BriefLanding() {
         </ul>
       </section>
     </main>
-  );
-}
-
-function LatestCard({
-  issue,
-  label,
-}: {
-  issue: BriefIssue;
-  label: string;
-}) {
-  return (
-    <Link href={issueHref(issue)} className="group block border-t border-line pt-5">
-      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-faint">
-        {label}
-      </p>
-      <h2 className="mt-3 font-serif text-2xl leading-snug tracking-tight text-ink transition-colors group-hover:text-accent">
-        {issue.title}
-      </h2>
-      <p className="mt-2 text-sm leading-relaxed text-muted">{issue.preheader}</p>
-      <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-faint">
-        {issueDateLabel(issue.type, issue.id)} · {issue.read_minutes} min
-      </p>
-    </Link>
   );
 }

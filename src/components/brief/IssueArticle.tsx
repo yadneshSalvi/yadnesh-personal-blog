@@ -5,6 +5,7 @@ import {
   getAdjacentIssues,
   getClusterThread,
   getRelatedIssues,
+  issueOrdinal,
   issueTopics,
 } from "@/lib/brief/issues";
 import { allStories } from "@/lib/brief/text";
@@ -28,7 +29,10 @@ import {
 } from "./IssueParts";
 import { ComicFigure, HedgeBlock, MemeFigure } from "./IssueHumor";
 import { Breadcrumb, IssueNav, RelatedIssues } from "./IssueNav";
+import IssueCover from "./IssueCover";
 import IssueTOC from "./IssueTOC";
+import ReadingProgress from "./ReadingProgress";
+import SectionHead from "./SectionHead";
 import { issueTocItems } from "./tocItems";
 import StoryRow from "./StoryRow";
 import {
@@ -107,8 +111,16 @@ export default function IssueArticle({ issue }: { issue: BriefIssue }) {
         })
       : -1;
 
+  // The folio's edition number. Weeklies already carry one for display; a daily
+  // gets its position in the archive.
+  const folioNumber =
+    issue.type === "weekly" && issue.issue_number
+      ? issue.issue_number
+      : issueOrdinal(issue);
+
   return (
     <main className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+      <ReadingProgress />
       <JsonLd data={issueJsonLd(issue)} />
       <JsonLd
         data={breadcrumbJsonLd([
@@ -134,17 +146,35 @@ export default function IssueArticle({ issue }: { issue: BriefIssue }) {
           />
 
           <header className="mt-8">
-            <Kicker>
-              {cadence} · {dateLabel} · {issue.read_minutes} min read
-              {issue.thin_day ? " · quiet day" : ""}
-              {issue.status === "draft" ? " · draft" : ""}
-            </Kicker>
+            {/* The folio. An issue is an edition of something, and saying so
+                above the title is what a printed masthead does. */}
+            <div className="flex items-baseline justify-between gap-4 border-b border-line pb-3">
+              <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-ink">
+                {BRIEF_NAME}
+              </span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.18em] tabular-nums text-faint">
+                No. {String(folioNumber).padStart(3, "0")}
+              </span>
+            </div>
+            <div className="mt-5">
+              <Kicker>
+                {cadence} · {dateLabel} · {issue.read_minutes} min read
+                {issue.thin_day ? " · quiet day" : ""}
+                {issue.status === "draft" ? " · draft" : ""}
+              </Kicker>
+            </div>
             <h1 className="mt-4 font-serif text-4xl leading-[1.12] tracking-tight text-ink sm:text-5xl">
               {issue.title}
             </h1>
             <p className="mt-4 font-serif text-xl italic leading-relaxed text-muted">
               {issue.preheader}
             </p>
+            {issue.cover ? (
+              <IssueCover cover={issue.cover} title={issue.title} />
+            ) : null}
+            {/* Both of these sit under the picture rather than above it: they
+                are the header's footnotes, and between the deck and the cover
+                they were what made the first screen trail off. */}
             <DisclosureLine />
             <div className="mt-6">
               <TopicChips topics={issueTopics(issue)} />
@@ -201,7 +231,7 @@ export default function IssueArticle({ issue }: { issue: BriefIssue }) {
 
             {issue.from_x.length > 0 ? (
               <section id="from-x" className="scroll-mt-24">
-                <Kicker>From X</Kicker>
+                <SectionHead label="From X" count={issue.from_x.length} />
                 <ul className="mt-2 divide-y divide-line border-b border-line">
                   {issue.from_x.map((story) => (
                     <StoryRow
@@ -224,7 +254,14 @@ export default function IssueArticle({ issue }: { issue: BriefIssue }) {
               <EditorNote key={i} text={text} />
             ))}
 
-            {issue.meme ? <MemeFigure meme={issue.meme} type={issue.type} /> : null}
+            {issue.meme ? (
+              <>
+                {/* The one ornament on the page: a short centered rule that
+                    says the reporting is finished and a joke is next. */}
+                <hr className="mx-auto h-px w-16 border-0 bg-line" />
+                <MemeFigure meme={issue.meme} type={issue.type} />
+              </>
+            ) : null}
 
             <CorrectionsBlock corrections={issue.corrections} />
           </div>
