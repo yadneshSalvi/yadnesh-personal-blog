@@ -1,0 +1,430 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-08-12",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-08-12T03:25:00Z",
+ "source_editions": [
+  "2026-08-11-pm",
+  "2026-08-12-am"
+ ],
+ "subject": "Frontier-model routing, authorization drift, agent Postgres",
+ "preheader": "Plus: 5 papers, an Anthropic harness postmortem, 2 X posts. 5 min.",
+ "title": "Only 7% of agent turns needed a frontier model, and authorization drifts down hierarchies",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "660252daa3ebac0b",
+   "title": "How many of your agent's calls actually need a frontier model?",
+   "url": "https://www.langchain.com/blog/switchyard-agent-routing-benchmark",
+   "source_name": "LangChain",
+   "kind": "company",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "nemo-switchyard-agent-routing",
+   "published_at": "2026-08-11T15:25:30Z",
+   "read_annotation": "blog post",
+   "summary": "LangChain benchmarks NVIDIA's NeMo Switchyard router on 145 agent tasks, measuring how often a turn required a frontier model and what routing the rest elsewhere saves.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "what": "LangChain benchmarked NVIDIA's NeMo Switchyard, a model router, on 145 agent tasks. Only 7% of turns needed a frontier model.",
+  "details": "With the router escalating only when needed, routing cut cost 74% in exchange for six points of accuracy. The expensive model stops being the loop and becomes one worker inside it.",
+  "yes_but": "Six accuracy points isn't a rounding error, and this is one router on one 145-task suite. Whether your agent's turn mix looks like LangChain's is the question the benchmark can't answer.",
+  "yes_but_waived": null,
+  "why": "In LangChain's 145-task benchmark, only 7% of turns needed a frontier model. Routing cut cost 74%; whether the accuracy haircut is affordable depends on your workload."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "7d7ad1bd4f7bba53",
+     "title": "MasDrift: Benchmarking Authorization Preservation Across Multi-Agent Architectures",
+     "url": "https://arxiv.org/abs/2608.07556",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "masdrift-authorization-preservation",
+     "published_at": "2026-08-11T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "MasDrift runs 600 benign productivity tasks with reserved actions through single agents, hierarchies, and peer networks. Hierarchies completed more tasks but took unauthorized actions in 2.7–19.8% of tasks versus 0.6–0.8% for peer networks, a gap that widens with depth.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    },
+    {
+     "story_id": "a0987c924477664d",
+     "title": "An AI Scientist that Doesn't Drift: Taste, Structure, and Falsifiable Findings in a Quadruped Navigation Research Loop",
+     "url": "https://arxiv.org/abs/2608.07542",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "ai-scientist-drift-control",
+     "published_at": "2026-08-11T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A research loop built against drift: immutable experiment cards so a falsified hypothesis can't be retconned, subagents locked to mechanical roles, and a preference oracle that alone makes subjective calls. The oracle changed research direction, not the best score.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    },
+    {
+     "story_id": "5db70e1dd9b37a9f",
+     "title": "AndroidReality: How Far Are Mobile Agents from the Real World?",
+     "url": "https://arxiv.org/abs/2608.07775",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "androidreality-mobile-agent-robustness",
+     "published_at": "2026-08-11T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "AndroidReality injects realistic state, transition, and action perturbations into AndroidWorld to measure how far mobile agents fall from their clean-benchmark numbers. It finds substantial failure gaps and a training-free recovery step that helps in both settings.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    },
+    {
+     "story_id": "659ff3b6b4be9c21",
+     "title": "Controlled Memory Interference in Continual LLM Agents",
+     "url": "https://arxiv.org/abs/2608.07622",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "memory-context"
+     ],
+     "cluster": "controlled-memory-interference",
+     "published_at": "2026-08-11T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A diagnostic framework for when an agent's new information fails to overwrite the old. Relationship-specific interference sharply suppresses memory updates with little stability gain, and lexical and dense retrieval fail through distinct pathways.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    },
+    {
+     "story_id": "e05f4bf68dc49b7e",
+     "title": "When LLM Agents Negotiate: Private Information and Dynamic Bargaining in Supply Chains",
+     "url": "https://arxiv.org/abs/2608.07538",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "llm-agent-supply-chain-negotiation",
+     "published_at": "2026-08-11T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Nine LLMs negotiated 9,840 buyer-seller contracts against a game-theoretic benchmark. Agents captured 95.4% of first-best surplus, but slow bargaining eroded 21–34% of it, and baseline models accepted individually irrational contracts in 19.2% of cases.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    },
+    {
+     "story_id": "0d3bab75e5d50581",
+     "title": "TDD inside the agent loop - theater or actual value?",
+     "url": "https://martinfowler.com/articles/exploring-gen-ai/tdd-in-the-agent-loop.html",
+     "source_name": "Martin Fowler",
+     "kind": "individual",
+     "section": "research",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "tdd-in-agent-loop",
+     "published_at": "2026-08-11T11:39:00Z",
+     "read_annotation": "blog post",
+     "summary": "Birgitta Böckeler at Thoughtworks ran experiments on whether telling a coding agent to use TDD changes the outcome or only imitates a favored process.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "28e7c110597f5035",
+     "title": "Evolution of agentic surfaces",
+     "url": "https://www.youtube.com/watch?v=K0X9QDRkIdg",
+     "source_name": "Gagan Bhat & Isabella Kai He (Anthropic)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "anthropic-evolution-agentic-surfaces",
+     "published_at": "2026-08-11T16:00:06Z",
+     "read_annotation": "talk",
+     "summary": "Anthropic's Applied AI team on harness assumptions going stale: a context-reset workaround built for Sonnet 4.5 became pure overhead once Opus 4.5 shipped without the quirk. Decoupling the agent loop from tool execution cut time to first token 60% at P50 and over 90% at P95.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "39249b5622c208b9",
+     "title": "Databricks Acquires Electric to Give Every AI Agent its Own Postgres",
+     "url": "https://alphasignal.ai/news/databricks-acquires-electric-to-give-every-ai-agent-its-own-postgres",
+     "source_name": "AlphaSignal",
+     "kind": "newsletter",
+     "section": "product",
+     "topics": [
+      "infra-sandboxes"
+     ],
+     "cluster": "databricks-electric-agent-postgres",
+     "published_at": "2026-08-11T14:03:10Z",
+     "read_annotation": "newsletter item",
+     "summary": "Databricks is acquiring ElectricSQL to embed a full Postgres inside every AI-agent sandbox, syncing local state back to its Lakebase platform.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    },
+    {
+     "story_id": "fc9991e713e36ad7",
+     "title": "NVIDIA Nemotron 3.5 Lightning Delivers Fast, Accurate Specialized Task Execution for Long-Running Agents",
+     "url": "https://developer.nvidia.com/blog/nvidia-nemotron-3-5-lightning-delivers-fast-accurate-specialized-task-execution-for-long-running-agents",
+     "source_name": "NVIDIA Developer",
+     "kind": "company",
+     "section": "product",
+     "topics": [
+      "models"
+     ],
+     "cluster": "nvidia-nemotron-3-5-lightning",
+     "published_at": "2026-08-11T13:01:07Z",
+     "read_annotation": "blog post",
+     "summary": "NVIDIA's Nemotron 3.5 Lightning for the high-volume execution work that fills a long-running agent's time: tool calls, result validation, and subagent delegation.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2086972895256007160",
+   "title": "Simon Willison's notes on Muse Glimmer 30B, Meta's first Apache 2.0 model",
+   "url": "https://x.com/i/status/2086972895256007160",
+   "source_name": "@simonw",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "models"
+   ],
+   "cluster": "x-2086972895256007160",
+   "published_at": "2026-08-11T00:28:06.000Z",
+   "read_annotation": "X post",
+   "summary": "Simon Willison's notes on Meta's Muse Glimmer 30B, the company's first open-weight model under Apache 2.0 rather than the Llama line's custom non-OSI license.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "2087191397111656738",
+   "title": "BDH-CQ scores 29.5% on ARC-AGI 1 at ~$0.0007 per task with latent-space reasoning",
+   "url": "https://x.com/i/status/2087191397111656738",
+   "source_name": "@omarsar0",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "papers"
+   ],
+   "cluster": "x-2087191397111656738",
+   "published_at": "2026-08-11T14:56:21.000Z",
+   "read_annotation": "X post",
+   "summary": "BDH-CQ reaches 29.5% on ARC-AGI 1 at about $0.0007 per task by reasoning recurrently in latent space instead of chain-of-thought; its authors report Transformer-like scaling to 600B parameters.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "6d5a9abf4366fca4",
+   "title": "Mendel Gödel Machine: Recursive Self-Improving Coding Agents via Comparative Evolution",
+   "url": "https://arxiv.org/abs/2608.07645",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "mendel-godel-machine",
+   "published_at": "2026-08-11T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Self-rewriting coding agents with multi-task mutations and cross-lineage hybridization",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "5dc3079d384790b3",
+   "title": "Microsoft's MAI-Code-1.1-Flash Hits GitHub Copilot at 73% Lower Cost",
+   "url": "https://alphasignal.ai/news/microsoft-s-mai-code-1-1-flash-hits-github-copilot-at-73-lower-cost",
+   "source_name": "AlphaSignal",
+   "kind": "newsletter",
+   "section": "product",
+   "topics": [
+    "models"
+   ],
+   "cluster": "mai-code-1-1-flash-copilot",
+   "published_at": "2026-08-11T18:28:15Z",
+   "read_annotation": "newsletter item",
+   "summary": "Microsoft's MAI-Code-1.1-Flash lands in Copilot with native vision",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "b54d76a4ad9cef48",
+   "title": "Open-sourcing Metals v2: Databricks' Java and Scala language server for multi-million line codebases",
+   "url": "https://www.databricks.com/blog/open-sourcing-metals-v2-databricks-java-and-scala-language-server-multi-million-line-codebases",
+   "source_name": "Databricks",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "databricks-metals-v2",
+   "published_at": "2026-08-11T19:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Databricks open-sources its language server for huge Java and Scala codebases",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "d0db30b8fad0e48e",
+   "title": "Deploying Anthropic Claude apps gateway for AWS for enterprise workloads",
+   "url": "https://aws.amazon.com/blogs/machine-learning/deploying-anthropic-claude-apps-gateway-for-aws-for-enterprise-workloads",
+   "source_name": "AWS ML Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "claude-apps-gateway-aws",
+   "published_at": "2026-08-11T15:59:22Z",
+   "read_annotation": "blog post",
+   "summary": "A production reference deployment for the self-hosted Claude apps gateway",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "8c85a5e4c7a322bb",
+   "title": "Ryan Greenblatt: Human level AIs might build runaway superintelligences by 2032",
+   "url": "https://www.dwarkesh.com/p/ryan-greenblatt",
+   "source_name": "Dwarkesh Patel",
+   "kind": "individual",
+   "section": "community",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "recursive-self-improvement-debate",
+   "published_at": "2026-08-11T16:31:23Z",
+   "read_annotation": "blog post",
+   "summary": "Dwarkesh Patel and Ryan Greenblatt debate recursive self-improvement",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "ea03cd6395ca7b07",
+   "title": "MiniMax Code Gains Browser Control and Autonomous Goal Mode in v3.0.54",
+   "url": "https://alphasignal.ai/news/minimax-code-gains-browser-control-and-autonomous-goal-mode-in-v3-0-54",
+   "source_name": "AlphaSignal",
+   "kind": "newsletter",
+   "section": "product",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "minimax-code-goal-mode-browser",
+   "published_at": "2026-08-11T14:13:29Z",
+   "read_annotation": "newsletter item",
+   "summary": "MiniMax Code adds browser automation and a long-horizon Goal Mode",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "9aeb050f5a3c550b",
+   "title": "Vercel Connect now supports CLI setup for 100+ connectors",
+   "url": "https://vercel.com/changelog/vercel-cli-100-services",
+   "source_name": "Vercel",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "vercel-connect-cli-connectors",
+   "published_at": "2026-08-11T19:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Vercel Connect sets up 100+ service connectors from the CLI",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "c416af30c4848b25",
+   "title": "Why do our AI models stop learning the second we deploy them?",
+   "url": "https://gradientflow.com/your-ai-should-be-better-on-day-500",
+   "source_name": "Gradient Flow",
+   "kind": "newsletter",
+   "section": "community",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "continual-learning-after-deployment",
+   "published_at": "2026-08-11T13:00:09Z",
+   "read_annotation": "newsletter item",
+   "summary": "Ben Lorica on why deployed models largely stop learning",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "7d7ad1bd4f7bba53",
+   "text": "Today it's hierarchies shedding the user's authorization. Flat, boring agent topologies keep looking underrated."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-08-12/2026-08-12-am-m1.webp",
+  "alt": "A small robot works at a desk beside a towering stack of tickets while a laptop wearing sunglasses reclines on a lounger, receiving a single glowing ticket labeled HARD from a conveyor belt.",
+  "alt_joke": "Consulting fees apply.",
+  "caption": "The frontier model handles the hard 7 percent. Bolt handles the other 93, plus the filing.",
+  "concept": "Only 7% of agent turns need a frontier model; the other 93% is Bolt doing the grunt work",
+  "story_id": "660252daa3ebac0b"
+ },
+ "hedge": null,
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-08-12T02:15:43Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ }
+}
