@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-08-12",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-08-11-pm-m1",
+   "image": "/images/brief/memes/2026-08-12/2026-08-11-pm-m1.webp",
+   "alt": "Deck sits at the head of a long conference table speaking into a chain of paper cup telephones. At the far end, Bolt consults a torn scrap of note on his clipboard while reaching for a big red lever labeled NO.",
+   "alt_joke": "Every layer swears it forwarded the instructions verbatim.",
+   "caption": "Somewhere between the supervisor and the fourth subagent, never touch billing became touch billing.",
+   "concept": "Authorization quietly erodes as an instruction is delegated down an agent hierarchy.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-11-pm-m2",
+   "image": "/images/brief/memes/2026-08-12/2026-08-11-pm-m2.webp",
+   "alt": "Deck poses with a gold trophy on a spotless indoor obstacle course of perfectly spaced cones while Bolt holds the exit door open to a chaotic rainy street; Deck's screen shows a loading spinner.",
+   "alt_joke": "The benchmark was indoors for a reason.",
+   "caption": "State of the art, provided the state never changes.",
+   "concept": "An agent that aces the clean benchmark freezes the moment it meets the messy real world.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-12-am-m1",
+   "image": "/images/brief/memes/2026-08-12/2026-08-12-am-m1.webp",
+   "alt": "A small robot works at a desk beside a towering stack of tickets while a laptop wearing sunglasses reclines on a lounger, receiving a single glowing ticket labeled HARD from a conveyor belt.",
+   "alt_joke": "Consulting fees apply.",
+   "caption": "The frontier model handles the hard 7 percent. Bolt handles the other 93, plus the filing.",
+   "concept": "Only 7% of agent turns need a frontier model; the other 93% is Bolt doing the grunt work",
+   "winner": true
+  },
+  {
+   "id": "2026-08-12-am-m2",
+   "image": "/images/brief/memes/2026-08-12/2026-08-12-am-m2.webp",
+   "alt": "Bolt sits in a literal wooden sandbox beside a small glowing database cylinder, filing index cards, while Deck leans over the edge covered in sticky notes.",
+   "alt_joke": "The sticky notes are Deck's schema.",
+   "caption": "Every agent gets a database in its sandbox now. Bolt has already normalized his to-do list to third normal form.",
+   "concept": "Every agent sandbox now ships with its own Postgres; Bolt immediately over-organizes his",
+   "winner": false
+  }
+ ]
+}
