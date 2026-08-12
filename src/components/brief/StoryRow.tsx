@@ -125,7 +125,7 @@ export default function StoryRow({
   return (
     <li id={anchor} className="scroll-mt-24 py-6">
       {story.image ? (
-        <div className="grid gap-x-6 md:grid-cols-2">
+        <div className="grid gap-x-6 md:grid-cols-2 md:items-center">
           {head}
           <StoryImage image={story.image} />
         </div>

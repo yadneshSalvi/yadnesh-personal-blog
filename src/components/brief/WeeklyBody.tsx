@@ -40,7 +40,7 @@ export function WhatMattered({
             <li key={pick.story.story_id} id={anchor} className="scroll-mt-24 py-7">
               {/* Same band as a section row, at the weekly's larger headline. */}
               {pick.story.image ? (
-                <div className="grid gap-x-6 md:grid-cols-2">
+                <div className="grid gap-x-6 md:grid-cols-2 md:items-center">
                   <div className="min-w-0">
                     <div className="flex items-baseline justify-between gap-4">
                       <h3 className="font-serif text-2xl leading-snug tracking-tight">
@@ -105,7 +105,7 @@ export function QuietlyImportant({
             className="scroll-mt-24 py-6"
           >
             {pick.story.image ? (
-              <div className="grid gap-x-6 md:grid-cols-2">
+              <div className="grid gap-x-6 md:grid-cols-2 md:items-center">
                 <div className="min-w-0">
                   <h4 className="font-serif text-xl leading-snug tracking-tight">
                     <StoryLink story={pick.story} />
