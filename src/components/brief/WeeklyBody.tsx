@@ -1,11 +1,10 @@
 import Link from "next/link";
-import clsx from "clsx";
 import type { BriefWeekly } from "@/lib/brief/schema";
-import { GUTTER_GRID, StoryLink, StoryMeta, storyAnchor } from "./StoryRow";
+import { StoryLink, StoryMeta, storyAnchor } from "./StoryRow";
 import CopyLinkButton from "./CopyLinkButton";
 import PlainWordsToggle from "./PlainWordsToggle";
 import SectionHead from "./SectionHead";
-import StoryImage, { GutterTick } from "./StoryImage";
+import StoryImage from "./StoryImage";
 import { Kicker, WeeklyThroughLine } from "./IssueParts";
 
 export function WeekInFive({ lines }: { lines: string[] }) {
@@ -31,8 +30,6 @@ export function WhatMattered({
 }: {
   picks: BriefWeekly["what_mattered"];
 }) {
-  const reserveGutter = picks.some((pick) => pick.story.image !== null);
-
   return (
     <section id="what-mattered" className="scroll-mt-24">
       <SectionHead label="What mattered" count={picks.length} />
@@ -40,44 +37,30 @@ export function WhatMattered({
         {picks.map((pick) => {
           const anchor = storyAnchor(pick.story);
           return (
-            <li
-              key={pick.story.story_id}
-              id={anchor}
-              className={clsx("scroll-mt-24 py-7", reserveGutter && GUTTER_GRID)}
-            >
-              <div className="min-w-0">
-                <div className="flex items-baseline justify-between gap-4">
-                  <h3 className="font-serif text-2xl leading-snug tracking-tight">
-                    <StoryLink story={pick.story} />
-                  </h3>
-                  <CopyLinkButton anchor={anchor} label={pick.story.title} />
-                </div>
-                <StoryMeta story={pick.story} />
-                <p className="mt-4 leading-relaxed text-muted">{pick.what}</p>
-                <p className="mt-3 leading-relaxed text-muted">
-                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink">
-                    Yes, but:{" "}
-                  </span>
-                  {pick.yes_but}
-                </p>
-                <p className="mt-3 leading-relaxed text-muted">
-                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink">
-                    Why it matters:{" "}
-                  </span>
-                  {pick.why}
-                </p>
-                {pick.story.simple_summary ? (
-                  <PlainWordsToggle bullets={pick.story.simple_summary} />
-                ) : null}
+            <li key={pick.story.story_id} id={anchor} className="scroll-mt-24 py-7">
+              <div className="flex items-baseline justify-between gap-4">
+                <h3 className="font-serif text-2xl leading-snug tracking-tight">
+                  <StoryLink story={pick.story} />
+                </h3>
+                <CopyLinkButton anchor={anchor} label={pick.story.title} />
               </div>
-              {reserveGutter ? (
-                <div>
-                  {pick.story.image ? (
-                    <StoryImage image={pick.story.image} />
-                  ) : (
-                    <GutterTick />
-                  )}
-                </div>
+              <StoryMeta story={pick.story} />
+              <p className="mt-4 leading-relaxed text-muted">{pick.what}</p>
+              {pick.story.image ? <StoryImage image={pick.story.image} /> : null}
+              <p className="mt-3 leading-relaxed text-muted">
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink">
+                  Yes, but:{" "}
+                </span>
+                {pick.yes_but}
+              </p>
+              <p className="mt-3 leading-relaxed text-muted">
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink">
+                  Why it matters:{" "}
+                </span>
+                {pick.why}
+              </p>
+              {pick.story.simple_summary ? (
+                <PlainWordsToggle bullets={pick.story.simple_summary} />
               ) : null}
             </li>
           );
@@ -93,7 +76,6 @@ export function QuietlyImportant({
   picks: BriefWeekly["quietly_important"];
 }) {
   if (picks.length === 0) return null;
-  const reserveGutter = picks.some((pick) => pick.story.image !== null);
 
   return (
     <section id="quietly-important" className="scroll-mt-24">
@@ -103,26 +85,16 @@ export function QuietlyImportant({
           <li
             key={pick.story.story_id}
             id={storyAnchor(pick.story)}
-            className={clsx("scroll-mt-24 py-6", reserveGutter && GUTTER_GRID)}
+            className="scroll-mt-24 py-6"
           >
-            <div className="min-w-0">
-              <h4 className="font-serif text-xl leading-snug tracking-tight">
-                <StoryLink story={pick.story} />
-              </h4>
-              <StoryMeta story={pick.story} />
-              <p className="mt-3 leading-relaxed text-muted">{pick.note}</p>
-              {pick.story.simple_summary ? (
-                <PlainWordsToggle bullets={pick.story.simple_summary} />
-              ) : null}
-            </div>
-            {reserveGutter ? (
-              <div>
-                {pick.story.image ? (
-                  <StoryImage image={pick.story.image} />
-                ) : (
-                  <GutterTick />
-                )}
-              </div>
+            <h4 className="font-serif text-xl leading-snug tracking-tight">
+              <StoryLink story={pick.story} />
+            </h4>
+            <StoryMeta story={pick.story} />
+            <p className="mt-3 leading-relaxed text-muted">{pick.note}</p>
+            {pick.story.image ? <StoryImage image={pick.story.image} /> : null}
+            {pick.story.simple_summary ? (
+              <PlainWordsToggle bullets={pick.story.simple_summary} />
             ) : null}
           </li>
         ))}

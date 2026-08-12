@@ -114,11 +114,6 @@ export function IssueSection({
   threadLabels?: Map<string, string>;
   notes?: Map<string, string[]>;
 }) {
-  // All of a section's rows reserve the picture column or none of them do.
-  // Per-row would move the headlines' left edge from one story to the next,
-  // which is exactly what turns a scannable list into a jumble.
-  const reserveGutter = section.items.some((story) => story.image !== null);
-
   return (
     <section id={`section-${section.key}`} className="scroll-mt-24">
       <SectionHead label={sectionLabel(section.key)} count={section.items.length} />
@@ -127,7 +122,6 @@ export function IssueSection({
           <StoryRow
             key={story.story_id}
             story={story}
-            reserveGutter={reserveGutter}
             threadLabel={threadLabels?.get(story.story_id) ?? null}
           >
             {(notes?.get(story.story_id) ?? []).map((text, i) => (

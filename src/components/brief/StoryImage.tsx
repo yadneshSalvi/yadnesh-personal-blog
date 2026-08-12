@@ -3,35 +3,30 @@ import { STORY_IMAGE_BOX, STORY_IMAGE_SIZES } from "@/lib/brief/artwork";
 import ThemedArt from "./ThemedArt";
 
 /**
- * The picture that hangs in a story row's right-hand gutter.
+ * The diagram that belongs to a story, set as a plate under its summary.
  *
- * Deliberately not interactive. Only the headline is a link, so a hover
- * response here would promise a click target that isn't there. The cards that
- * ARE entirely clickable (the landing hero, archive rows) do get one.
+ * It is not a thumbnail and it is deliberately not in a side gutter. What the
+ * pipeline draws are captioned diagrams: a sandbox with the word SANDBOX on it,
+ * a BEFORE and AFTER pair, a memory grid with labelled cells. Their words are
+ * load-bearing, and at the 168px a gutter can spare, a cap height of 80 source
+ * pixels lands at seven on screen. A picture whose labels cannot be read is
+ * worse than no picture, because it advertises information it withholds.
+ *
+ * Half the measure on a wide screen, the full measure on a phone. That is the
+ * inversion of a thumbnail's usual behaviour and it is the right one here:
+ * small screens have the least room to spare and the most need for the art to
+ * be legible when it does appear.
  */
 export default function StoryImage({ image }: { image: BriefArtwork }) {
   return (
-    <div
-      className={`${STORY_IMAGE_BOX} overflow-hidden rounded-sm border border-line`}
+    <figure
+      className={`${STORY_IMAGE_BOX} mt-4 w-full overflow-hidden rounded-sm border border-line sm:w-80`}
     >
       <ThemedArt
         art={image}
         sizes={STORY_IMAGE_SIZES}
         className="object-cover"
       />
-    </div>
+    </figure>
   );
-}
-
-/**
- * What sits in the gutter of a story that has no picture, inside a section
- * where other stories do.
- *
- * A section reserves the gutter for all of its rows or none of them, which is
- * what keeps the headlines' left edge from moving. That leaves a hole on the
- * rows without art, and a hole reads as a missing image. A short rule at the
- * headline's cap height reads as a mark somebody made on purpose.
- */
-export function GutterTick() {
-  return <span aria-hidden className="mt-[0.6rem] block h-px w-6 bg-line" />;
 }

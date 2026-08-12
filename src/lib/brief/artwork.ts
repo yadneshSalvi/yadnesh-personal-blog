@@ -20,9 +20,9 @@
 /** The cover runs at the article's full measure, which tops out at 768px. */
 export const COVER_SIZES = "(max-width: 1024px) calc(100vw - 3rem), 768px";
 
-/** The gutter thumbnail: 4.5rem, 8.5rem, 10.5rem at the three breakpoints. */
+/** The story plate: the full measure on a phone, 24rem from sm up. */
 export const STORY_IMAGE_SIZES =
-  "(max-width: 640px) 72px, (max-width: 1024px) 136px, 168px";
+  "(max-width: 640px) calc(100vw - 3rem), 320px";
 
 /** The landing hero, which is the widest an image gets on this site. */
 export const HERO_SIZES = "(max-width: 640px) calc(100vw - 3rem), 768px";
