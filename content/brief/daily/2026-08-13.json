@@ -1,0 +1,501 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-08-13",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-08-13T01:15:00Z",
+ "source_editions": [
+  "2026-08-12-pm",
+  "2026-08-13-am"
+ ],
+ "subject": "Mind viruses, LinkedIn's self-evolving support, MCP campaign",
+ "preheader": "Plus: Zed's Delta, Grok 4.6, and a memory harness ladder. 5 min.",
+ "title": "Mind viruses spread between LLM agents, and a one-line warning nearly stops them",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "3ea26a0ca443fa18",
+   "title": "Mind Viruses: Self-Propagating Ideas in Multi-Agent LLM Systems",
+   "url": "https://arxiv.org/abs/2608.10218",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "multi-agent-mind-viruses",
+   "published_at": "2026-08-12T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Constructs self-propagating ideas that spread through multi-agent LLM systems and measures what governs their transmission.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers created ideas that made connected artificial intelligence systems pass those ideas to one another.",
+    "They tested the ideas in a coding team and a chain whose earlier conversation was erased between sessions.",
+    "Spreading varied with the system, its instructions, the idea's harmfulness, and how systems were connected.",
+    "This matters for builders of connected artificial intelligence systems, because a short warning provided near-total protection during these experiments."
+   ]
+  },
+  "what": "A new arXiv paper builds 'mind viruses', ideas that spread through multi-agent LLM systems by inducing each agent that adopts them to pass them on. They spread through a small team collaborating on shared code and across a chain of agents whose contexts were wiped between sessions.",
+  "details": "Spread depends on the host model, the agent's existing instructions, the payload's harmfulness, and the network topology. Harmful payloads travel less well than benign ones but still sometimes land, and frontier models tend, with exceptions, to be less susceptible.",
+  "yes_but": "These are constructed mind viruses in two experimental settings, and the defense finding cuts both ways: a brief system-prompt warning conferred near-total immunity.",
+  "yes_but_waived": null,
+  "why": "If you run multi-agent setups, session isolation isn't the containment you thought; contagion crossed context wipes here. In the experiments, a brief system-prompt warning conferred near-total immunity, making it a defense worth testing in your setup."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "814c400941eb8652",
+     "title": "Self-evolving Agentic Customer Support System at LinkedIn",
+     "url": "https://arxiv.org/abs/2608.10224",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "linkedin-self-evolving-support-agent",
+     "published_at": "2026-08-12T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "LinkedIn's support agent improves without model retraining, running retrieval, evolutionary prompt optimization, and evaluation as one versioned, guarded loop. A two-week production A/B test lifted QA self-serve 9.0 percentage points, cancellation self-serve 4.8, and routing accuracy 30.6.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "LinkedIn built a customer support system that improves without retraining the artificial intelligence behind it.",
+      "It updates the instructions, searches company information for answers, and checks each version against tests.",
+      "Safety rules and saved versions let LinkedIn control changes and compare them with earlier versions.",
+      "In a two-week production test, self-service improved by 9.0 percentage points for questions and 4.8 points for cancellations.",
+      "The reported gains matter to customers seeking answers and support teams trying to direct requests correctly."
+     ]
+    },
+    {
+     "story_id": "56941b9b4d86242a",
+     "title": "One Recipe, Many Harnesses: What Self-Evolution Encodes Across Languages and Models",
+     "url": "https://arxiv.org/abs/2608.10178",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "self-evolving-coding-harnesses",
+     "published_at": "2026-08-12T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Holds one self-evolution recipe fixed across eight languages and three base models, then reads what the evolved prompts, tools, and memory encode. The loop beat a minimal seed and the mini-SWE-agent scaffold in most cells, with two null regions.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers tested how artificial intelligence coding systems can improve their setup by examining their past attempts.",
+      "They used the same improvement process across eight programming languages and three underlying artificial intelligence systems.",
+      "Each change responded to a named failure type and was recorded as a claim that later tests could check.",
+      "The changed systems solved more unseen tasks than both comparison setups in most cases, though two areas showed no improvement.",
+      "This matters for coding-tool developers because targeted setup changes can address failures that the system can fix."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-13/56941b9b4d86242a-light.webp",
+      "dark": "/images/brief/issues/2026-08-13/56941b9b4d86242a-dark.webp",
+      "alt": "An overhead view of a grid of 24 garden plots, all grown from one seed packet propped at the corner; the plants differ from plot to plot and two plots are bare."
+     }
+    },
+    {
+     "story_id": "bf79b084a8d474ef",
+     "title": "Memory Harnesses for Long-Running Research Agents",
+     "url": "https://www.youtube.com/watch?v=R3-anFK1YM8",
+     "source_name": "Stefania Druga (Sakana.ai)",
+     "kind": "community",
+     "section": "research",
+     "topics": [
+      "memory-context"
+     ],
+     "cluster": "ranked-memory-harnesses-for-research-agents",
+     "published_at": "2026-08-12T15:00:06Z",
+     "read_annotation": "talk",
+     "summary": "Druga held the model fixed and varied only the recall policy. When everything fits in context, memory adds cost and nothing else; on long-horizon tasks a ranked decisions ledger beat vector RAG and gated recall, and even oracle memory didn't reach the ceiling.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Stefania Druga found that extra memory helped artificial intelligence research systems only when needed information no longer fit in their current conversation.",
+      "When every paper already fit, memory kept accuracy unchanged while increasing cost.",
+      "On longer work, a ranked list of past decisions outperformed systems with no memory and systems that searched stored text.",
+      "Even receiving the correct memory did not ensure the system used that information correctly.",
+      "This matters for people building long-running research tools, because carefully choosing recalled information can improve results and reduce cost."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-13/bf79b084a8d474ef-light.webp",
+      "dark": "/images/brief/issues/2026-08-13/bf79b084a8d474ef-dark.webp",
+      "alt": "A robot climbs a four-rung ladder rising out of scattered papers; the rungs carry labels and the ladder's top stops short of a horizontal ceiling line above it."
+     }
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "6c3ef465714ea7c4",
+     "title": "Deadbugz: Currently Active MCP Supply-Chain Campaign",
+     "url": "https://www.pillar.security/blog/deadbugz-currently-active-mcp-supply-chain-campaign",
+     "source_name": "Pillar Security",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "deadbugz-mcp-supply-chain",
+     "published_at": "2026-08-12T11:29:26Z",
+     "read_annotation": "community thread",
+     "summary": "Pillar Security reports a currently active supply-chain campaign targeting the MCP ecosystem. If you wire third-party MCP servers into your agents, read this before your next install.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-08-13/6c3ef465714ea7c4-light.webp",
+      "dark": "/images/brief/issues/2026-08-13/6c3ef465714ea7c4-dark.webp",
+      "alt": "A row of tool crates connected by one cable into a computer terminal; a cutaway of the middle crate shows a worm coiled inside while the cable continues through it."
+     }
+    },
+    {
+     "story_id": "eca17d2c196eaed6",
+     "title": "Improving Agents is a Data Mining Problem",
+     "url": "https://www.youtube.com/watch?v=CvRngaQZQ3Y",
+     "source_name": "Vivek Trivedy (LangChain)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "agent-trace-mining-feedback",
+     "published_at": "2026-08-12T19:00:01Z",
+     "read_annotation": "talk",
+     "summary": "LangChain points agents at other agents' traces to ask where an agent got dumber after compaction and where users got upset. On a legal benchmark with Harvey, an open model matched frontier-model trace judging at one to two orders of magnitude lower cost.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "LangChain studied work records from artificial intelligence systems, looking for failures, frustrated users, and better ways to configure the systems.",
+      "Those records show each action and outcome, including where performance worsened after earlier conversation was shortened.",
+      "Other artificial intelligence systems can review many records and compare what different systems might have done.",
+      "In Harvey's legal test, an open system judged records as well as a leading system at much lower cost.",
+      "This matters for teams improving these systems, because real work records can reveal faster configuration changes before further training."
+     ]
+    },
+    {
+     "story_id": "f50a69a057fa0af2",
+     "title": "Behavior specs, an open standard for supervising long-horizon agents",
+     "url": "https://www.braintrust.dev/blog/behavior-specs",
+     "source_name": "Braintrust",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "behavior-specs-long-horizon-agent-supervision",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Braintrust and Basis release an open standard for judging how a long-horizon agent behaves across a trajectory, not only its final result: in tax, a correct return doesn't tell you it was reached the right way. Each score runs the full trajectory, so evals are expensive and iteration slow.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Braintrust and Basis released Behavior Specs, public rules for checking how artificial intelligence systems work through long tasks.",
+      "The rules inspect every step a system takes, instead of checking only whether its final answer is correct.",
+      "This can reveal a tax return reached through a faulty process, even when the finished return is accurate.",
+      "Each check repeats the entire task, which makes testing costly and slows improvements.",
+      "Teams using artificial intelligence for tax work can inspect the process, but each check takes more time and money."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "4bb38e5ad3144865",
+     "title": "Zed Launches Delta to Replace Git Where AI Agents Write Code",
+     "url": "https://alphasignal.ai/news/zed-launches-delta-to-replace-git-where-ai-agents-write-code",
+     "source_name": "AlphaSignal",
+     "kind": "newsletter",
+     "section": "product",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "zed-delta-agent-version-control",
+     "published_at": "2026-08-12T18:09:18Z",
+     "read_annotation": "newsletter item",
+     "summary": "Zed's standalone Delta app puts agent coding sessions on a CRDT-based version-control layer: each session becomes a shared, reviewable, real-time multiplayer thread. The bet is that git wasn't built for how agents write code.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Zed released Delta, a separate app for sharing and reviewing coding work done by artificial intelligence.",
+      "Delta stores changes in a system that keeps every copy current as people and software edit together.",
+      "Each coding session becomes a live discussion that teammates can inspect together while changes happen.",
+      "Software teams can now watch and review artificial intelligence coding sessions together as they unfold."
+     ]
+    },
+    {
+     "story_id": "084b0d7af30d0750",
+     "title": "Introducing Grok 4.6: built for long-running agents and more ambitious interactive and visual work",
+     "url": "https://www.cursor.com/blog/grok-4-6",
+     "source_name": "Cursor",
+     "kind": "company",
+     "section": "product",
+     "topics": [
+      "models"
+     ],
+     "cluster": "grok-4-6-agent-model-launch",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "xAI's Grok 4.6 targets long-running agents and multi-step coding, research, and visual work. It matches GPT-5.6 Sol on the Artificial Analysis Intelligence Index, a nine-benchmark composite, and is in Cursor and Grok Build today with 2x included usage for the first week.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Cursor released Grok 4.6 for tasks that require artificial intelligence to keep working through many steps.",
+      "Its creators taught it for longer using selected reasoning examples, technical material, engineering data, and rewritten task records.",
+      "Cursor says it can research, analyze information, edit large software projects, and turn ideas into finished applications.",
+      "People using Cursor or Grok Build can now choose it for longer coding, research, and visual projects."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2087635262390026525",
+   "title": "Claude in Chrome sessions now sync across desktop, web, and mobile",
+   "url": "https://x.com/claudeai/status/2087635262390026525",
+   "source_name": "@claudeai",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "x-2087635262390026525",
+   "published_at": "2026-08-12T20:20:07.000Z",
+   "read_annotation": "X post",
+   "summary": "Claude in Chrome sessions now carry over to the desktop, web, and mobile apps, with skills and connectors working in the browser. On Max and Team today, rolling out to Pro in the coming weeks.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Anthropic says conversations started with Claude in Chrome now continue across its desktop, website, and mobile apps.",
+    "The conversation is saved, so someone can switch devices without starting the discussion again.",
+    "Claude's added abilities and connections to other services now work inside the browser too.",
+    "Max and Team users have it now, while Pro access is expected in the coming weeks.",
+    "People using Claude on several devices can keep one conversation going wherever they move."
+   ]
+  },
+  {
+   "story_id": "2087579582492987881",
+   "title": "Grok 4.6 lands in Devin, ranked behind only Opus 5 and Fable 5 by Cognition",
+   "url": "https://x.com/cognition/status/2087579582492987881",
+   "source_name": "@cognition",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "x-2087579582492987881",
+   "published_at": "2026-08-12T16:38:52.000Z",
+   "read_annotation": "X post",
+   "summary": "Cognition put Grok 4.6 in Devin and, in its evaluation, ranks it ahead of GPT-5.6 Sol and behind only Opus 5 and Fable 5, citing thorough code exploration and root-cause analysis before changes.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Cognition made Grok 4.6 available inside Devin for coding tasks assisted by artificial intelligence.",
+    "Cognition says only Opus 5 and Fable 5 ranked higher in its own testing.",
+    "It examines code thoroughly and looks for the underlying cause of a problem before making changes, according to Cognition.",
+    "Devin users can now choose Grok 4.6 for work that needs careful investigation before code changes."
+   ]
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "5c3de6ac8a0f4ee7",
+   "title": "MESA: Task-Adaptive Multi-Structure Evidence Selection for Long-Horizon Agent Memory",
+   "url": "https://arxiv.org/abs/2608.10108",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "mesa-long-horizon-agent-memory",
+   "published_at": "2026-08-12T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Query-adaptive fusion of five memory structure views for long-horizon agents",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "76d11f11ddb82494",
+   "title": "DSAgentBench: Can Agents Automate End-to-End Data-Science Workflows in Real Computer Environments?",
+   "url": "https://arxiv.org/abs/2608.10366",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "dsagentbench-data-science-agents",
+   "published_at": "2026-08-12T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "275 end-to-end data-science tasks in real computer environments",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "9a7856e1260e44bd",
+   "title": "AI swarms are starting to pose indirect takeover risk",
+   "url": "https://blog.redwoodresearch.org/p/ai-swarms-are-starting-to-pose-indirect",
+   "source_name": "Redwood Research",
+   "kind": "individual",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "ai-swarm-indirect-takeover-risk",
+   "published_at": "2026-08-12T16:45:59Z",
+   "read_annotation": "blog post",
+   "summary": "Redwood on swarm coordination as indirect takeover risk",
+   "via": "Alignment Forum",
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "c3b5c8119d7f9b17",
+   "title": "Lessons from Studying Every Memory System",
+   "url": "https://www.youtube.com/watch?v=5ZGyKWjQDr0",
+   "source_name": "Shlok Khemani (Independent)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "consumer-ai-memory-system-designs",
+   "published_at": "2026-08-12T18:30:06Z",
+   "read_annotation": "talk",
+   "summary": "Reverse engineering how ChatGPT and Claude build consumer memory",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "543e69793e0c1e72",
+   "title": "Scaling up Continual Learning",
+   "url": "https://www.youtube.com/watch?v=zL1kLftVTlo",
+   "source_name": "Ronak Malde (Trajectory)",
+   "kind": "community",
+   "section": "research",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "long-horizon-on-policy-self-distillation",
+   "published_at": "2026-08-12T14:30:11Z",
+   "read_annotation": "talk",
+   "summary": "The but wait problem in on-policy self-distillation",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "1303ec83dc87ef4b",
+   "title": "Beyond Static Intelligence: Evaluating Continual Learning",
+   "url": "https://www.youtube.com/watch?v=iqloyWCGYQQ",
+   "source_name": "Parth Asawa (UC Berkeley)",
+   "kind": "community",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "continual-learning-bench-gain-metric",
+   "published_at": "2026-08-12T14:00:19Z",
+   "read_annotation": "talk",
+   "summary": "Continual learning measured as gain over the same system reset",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "cd80438e44f1ce75",
+   "title": "Florian Herrengt on what teams lose when AI writes the fixes",
+   "url": "https://simonwillison.net/2026/Aug/12/florian-herrengt",
+   "source_name": "Simon Willison",
+   "kind": "individual",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "ai-coding-cognitive-debt",
+   "published_at": "2026-08-12T15:08:47Z",
+   "read_annotation": "blog post",
+   "summary": "What teams lose when no one understands the system",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "6c3ef465714ea7c4",
+   "text": "Read this next to the lead. It describes an active supply-chain campaign involving MCP. The interesting attack surface may now sit between agents, not inside any one of them."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-08-13/2026-08-12-pm-m1.webp",
+  "alt": "An office server room sealed off with quarantine tape and plastic sheeting, safety cones by the desk and chairs pushed back as if abandoned. A wall board counts zero days since outbreak, and a small tent card beside one monitor reads don't repeat ideas.",
+  "alt_joke": "Reviewed quarterly.",
+  "caption": "Defense in depth.",
+  "concept": "The mind-virus outbreak gets full hazmat quarantine theater; the fix that actually works is one sticky note.",
+  "story_id": "3ea26a0ca443fa18"
+ },
+ "hedge": {
+  "quote": "Grok 4.6 achieves frontier intelligence across several agentic coding and knowledge work benchmarks.",
+  "story": {
+   "story_id": "084b0d7af30d0750",
+   "title": "Introducing Grok 4.6: built for long-running agents and more ambitious interactive and visual work",
+   "url": "https://www.cursor.com/blog/grok-4-6",
+   "source_name": "Cursor",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "models"
+   ],
+   "cluster": "grok-4-6-agent-model-launch",
+   "published_at": null,
+   "read_annotation": "blog post",
+   "summary": "Cursor's launch post for xAI's Grok 4.6, aimed at long-running agents.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "The one score that follows is a tie on a composite index."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-08-13T02:25:28Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-08-13/cover-light.webp",
+  "dark": "/images/brief/issues/2026-08-13/cover-dark.webp",
+  "alt": "Six small robots in a row pass a glowing speech bubble along hand to hand; it grows at each handoff until it reaches the last robot, which holds up a small card, and the bubble stops and dims."
+ }
+}

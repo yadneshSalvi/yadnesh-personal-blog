@@ -1,0 +1,109 @@
+{
+ "issue_id": "2026-08-13",
+ "type": "daily",
+ "renders": 7,
+ "cost_usd": 1.75,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "Six small robots in a row pass a glowing speech bubble along hand to hand; it grows at each handoff until it reaches the last robot, which holds up a small card, and the bubble stops and dims.",
+   "bytes": [
+    91306,
+    85760
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A bucket brigade of six identical small robots standing in a row, passing a single glowing speech bubble down the line hand to hand; the bubble grows slightly at each handoff. The last robot in the row holds up a small card, and the bubble stops in midair in front of it, dimmed. Figures arranged horizontally across the centre of a plain ground, everything kept well clear of the edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-13T00:17:48Z"
+  },
+  {
+   "key": "56941b9b4d86242a",
+   "story_id": "56941b9b4d86242a",
+   "light_name": "56941b9b4d86242a-light.webp",
+   "dark_name": "56941b9b4d86242a-dark.webp",
+   "alt": "An overhead view of a grid of 24 garden plots, all grown from one seed packet propped at the corner; the plants differ from plot to plot and two plots are bare.",
+   "bytes": [
+    109654,
+    103566
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A grid of garden plots seen from above, eight columns by three rows, every plot sown from the same single seed packet propped at the grid's corner; the grown plants differ in shape and size from plot to plot, and two plots are bare earth. Grid centred with wide margins on all sides.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-13T00:19:25Z"
+  },
+  {
+   "key": "bf79b084a8d474ef",
+   "story_id": "bf79b084a8d474ef",
+   "light_name": "bf79b084a8d474ef-light.webp",
+   "dark_name": "bf79b084a8d474ef-dark.webp",
+   "alt": "A robot climbs a four-rung ladder rising out of scattered papers; the rungs carry labels and the ladder's top stops short of a horizontal ceiling line above it.",
+   "bytes": [
+    55082,
+    51674
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 3,
+   "cost_usd": 0.75,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A small robot climbing a ladder that stands in a sea of loose scattered papers; the ladder has four rungs labeled from bottom to top NONE, RAG, LEDGER, ORACLE, and the ladder's top ends a short distance below a horizontal ceiling line drawn above it. Ladder centred, ceiling line and papers kept well inside the frame.",
+   "labels": [
+    "NONE",
+    "RAG",
+    "LEDGER",
+    "ORACLE"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-13T00:23:46Z"
+  },
+  {
+   "key": "6c3ef465714ea7c4",
+   "story_id": "6c3ef465714ea7c4",
+   "light_name": "6c3ef465714ea7c4-light.webp",
+   "dark_name": "6c3ef465714ea7c4-dark.webp",
+   "alt": "A row of tool crates connected by one cable into a computer terminal; a cutaway of the middle crate shows a worm coiled inside while the cable continues through it.",
+   "bytes": [
+    32872,
+    32086
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A daisy chain of cables and plugs running from a row of closed tool crates into the back of a single computer terminal; one crate at mid-chain is drawn in cutaway, revealing a worm coiled inside it while the cable passes through unbroken. The chain runs horizontally through the centre with wide margins above and below.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-13T00:25:06Z"
+  }
+ ]
+}

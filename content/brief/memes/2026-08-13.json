@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-08-13",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-08-12-pm-m1",
+   "image": "/images/brief/memes/2026-08-13/2026-08-12-pm-m1.webp",
+   "alt": "An office server room sealed off with quarantine tape and plastic sheeting, safety cones by the desk and chairs pushed back as if abandoned. A wall board counts zero days since outbreak, and a small tent card beside one monitor reads don't repeat ideas.",
+   "alt_joke": "Reviewed quarterly.",
+   "caption": "Defense in depth.",
+   "concept": "The mind-virus outbreak gets full hazmat quarantine theater; the fix that actually works is one sticky note.",
+   "winner": true
+  },
+  {
+   "id": "2026-08-12-pm-m2",
+   "image": "/images/brief/memes/2026-08-13/2026-08-12-pm-m2.webp",
+   "alt": "A three panel comic. First panel: a small plain robot at a help desk tells a customer robot with a locked account to try the help center. Second panel: the desk robot hangs mid transformation in a glowing cocoon of cables marked evolving while the customer waits. Third panel: the desk robot is now huge and gleaming with trophies behind it, and gives the same customer the same answer.",
+   "alt_joke": "Version 48 ships Thursday.",
+   "caption": "Routing accuracy is up again.",
+   "concept": "A support agent self-evolves between panels; everything about it upgrades except the answer.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-13-am-m1",
+   "image": "/images/brief/memes/2026-08-13/2026-08-13-am-m1.webp",
+   "alt": "A server room in flames, smoke rising from the racks. A small robot stands at a large red emergency alarm lever, one finger raised but not pulling it. Its speech balloon reads 'Possibly, though it depends'. A wall monitor shows STATUS: ON FIRE.",
+   "alt_joke": "Top marks all semester.",
+   "caption": "One hundred corrections later, the student has learned the only answer nobody marks wrong.",
+   "concept": "An agent trained by a hundred teacher corrections hedges the question of whether the server room is currently on fire.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-13-am-m2",
+   "image": "/images/brief/memes/2026-08-13/2026-08-13-am-m2.webp",
+   "alt": "A robot holds one coin at a vending machine whose display reads $1.50. Behind it, a formal queue: a notary stamping a document marked ATTESTED, an official holding a slip reading RISK: LOW, an open bank vault door, and a stonemason chiseling numbers into a granite monument. Inside the machine, the candy bar hangs mid-drop behind a small velvet rope.",
+   "alt_joke": "Auditable down to the nougat.",
+   "caption": "The candy bar clears in three business days.",
+   "concept": "A robot buys a $1.50 candy bar through the full governed-payment ceremony: notarized attestation, risk pricing, a vault, and a stone settlement record.",
+   "winner": false
+  }
+ ]
+}
