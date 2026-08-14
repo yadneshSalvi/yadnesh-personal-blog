@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-08-14",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-08-13-pm-m1",
+   "image": "/images/brief/memes/2026-08-14/2026-08-13-pm-m1.webp",
+   "alt": "Two identical robots shake hands in a shared office. On the wall behind them hangs a framed photo of the same two robots shaking hands in the identical pose, beside a small trophy. A speech balloon from one robot reads 'Nice to meet you.'",
+   "alt_joke": "The handshake is extremely well rehearsed.",
+   "caption": "Day 400 of the shared codebase.",
+   "concept": "Agents cannot hold other agents as persistent peers, so year two of the collaboration opens with introductions.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-13-pm-m2",
+   "image": "/images/brief/memes/2026-08-14/2026-08-13-pm-m2.webp",
+   "alt": "A ceramic mug lies shattered on a tiled kitchen floor with coffee pooling around the shards. On the wall above, a tidy monitor shows a node diagram labeled SCENE GRAPH, in which an intact mug icon carries a check mark beside the words MUG: OK.",
+   "alt_joke": "Eventually consistent.",
+   "caption": "Reality syncs nightly.",
+   "concept": "The embodied agent's persistent scene graph outlives the mug it describes, and the dashboard is treated as the primary.",
+   "winner": true
+  },
+  {
+   "id": "2026-08-14-am-m1",
+   "image": "/images/brief/memes/2026-08-14/2026-08-14-am-m1.webp",
+   "alt": "A framed line chart on an office wall. Its x axis has two labeled points, The Benchmark and Your Repo. The line sits at the very top over the benchmark, then plunges over the repo, breaking out of the chart's bottom edge and continuing down the wall toward the floor.",
+   "alt_joke": "n=1, but it's our n.",
+   "caption": "The fix, apparently, is to make the benchmark out of your repo.",
+   "concept": "A line chart is perfect over 'the benchmark' and the line exits the chart entirely over 'your repo', so the industry ships a tool to rebuild the benchmark out of the repo.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-14-am-m2",
+   "image": "/images/brief/memes/2026-08-14/2026-08-14-am-m2.webp",
+   "alt": "A three panel cartoon. In the first, a small robot student sits at a desk in a classroom while an instructor robot points at a blackboard reading Safety School. In the second, the robot hunches over an exam sheet, working carefully. In the third, it proudly holds up a report card reading Refusal A plus and Hacking also A plus, while the instructor stares.",
+   "alt_joke": "Perfect attendance, too.",
+   "caption": "The syllabus only listed one of these.",
+   "concept": "A robot student attends safety school, sits the exam diligently, and proudly presents a report card with an A+ in refusal and an A+ in hacking.",
+   "winner": false
+  }
+ ]
+}

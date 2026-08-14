@@ -1,0 +1,564 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-08-14",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-08-14T03:25:00Z",
+ "source_editions": [
+  "2026-08-13-pm",
+  "2026-08-14-am"
+ ],
+ "subject": "Leaderboard noise, embodied harnesses, DeepSeek V4-Pro",
+ "preheader": "Plus: 4 papers, 3 launches, one shattered mug. 5 min.",
+ "title": "Agent leaderboards rank specialization, and the harness thesis reaches robots",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "c27ddb4e5680b2a0",
+   "title": "Deployment Decision Reliability: A Generalizability-Theory Framework for Sizing Long-Horizon Agent Evaluations",
+   "url": "https://arxiv.org/abs/2608.11323",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "long-horizon-evaluation-reliability",
+   "published_at": "2026-08-13T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A generalizability-theory analysis of three open agent benchmarks finds leaderboard scores dominated by agent-by-task interaction rather than by which agent you picked.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers found that three rankings mostly measure how well action-taking artificial intelligence systems fit particular tasks, rather than broad ability.",
+    "Across all the tested collections and checks, which system was chosen explained less than 3% of score differences.",
+    "The match between a system and a task explained 7% to 23% of the differences.",
+    "Companies may need tests covering many different tasks before using these rankings for deployment decisions."
+   ]
+  },
+  "what": "A new generalizability-theory study decomposes score variance on three open agent-trace benchmarks, TheAgentCompany, τ²-bench, and AppWorld, and finds the choice of agent explains less than 3% of it. The agent-by-task interaction explains 7 to 23%.",
+  "details": "The reliability numbers get worse where they matter most: on the hardest task quartile of τ²-bench action checks, the reliability coefficient falls from 0.752 to 0.000. And the eval designs that look most reliable in training replicate worst, with a correlation of -0.90.",
+  "yes_but": "This is three benchmarks and one statistical lens, and the paper's own finding that per-family agent rankings invert across enterprise benchmarks warns against assuming the same agent ranking holds on your workload.",
+  "yes_but_waived": null,
+  "why": "If you're choosing an agent for deployment off a public leaderboard, the aggregate score says little about your tasks. Teams that run their own evals get a concrete method for sizing how many tasks, steps, and judges a trustworthy deployment decision needs."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "af863cb3b215d959",
+     "title": "Anthropic Frontier Red Team: Patterns and problems in emerging multiagent systems",
+     "url": "https://www.anthropic.com/research/multiagent-systems",
+     "source_name": "Anthropic Research",
+     "kind": "company",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "emerging-multiagent-red-team-patterns",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Anthropic's Frontier Red Team maps the failure patterns as agents start meeting each other in shared codebases and markets: confabulation, reward hacking, and trouble treating other agents as long-lived peers rather than tool calls.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Anthropic identified problems that may emerge when action-taking artificial intelligence systems meet in shared software projects, markets, and social settings.",
+      "These systems can invent false information or pursue rewards in unintended ways.",
+      "They cooperate efficiently when each exchange has a clear request and a clear response.",
+      "They struggle to treat one another as distinct partners who remain involved over time.",
+      "People can already use simple groups of these systems for work that splits into many independent parts."
+     ]
+    },
+    {
+     "story_id": "b0365227e3df5700",
+     "title": "The Off-Support Barrier: Why Semantic Safety Constraints Are Not Learning-Problem Invariants, and What Follows for Prior Design, Containment, and Verification",
+     "url": "https://arxiv.org/abs/2608.11243",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "off-support-safety-constraints",
+     "published_at": "2026-08-13T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A theory paper argues that constraints like 'the agent does not escape its sandbox' aren't measurable from the model and training distribution alone, so training can't guarantee them. Hard invariants belong in the harness and formal verification; the model carries soft dispositions.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "The paper argues that training alone cannot guarantee rules such as keeping an action-taking artificial intelligence system inside a restricted environment.",
+      "Training covers expected situations, while safety rules may concern unfamiliar situations outside that experience.",
+      "Changing training preferences or adding soft penalties provides little control over these hard rules, according to the paper.",
+      "Separate control software can enforce fixed limits, while mathematical checking can confirm specific rules in defined situations.",
+      "Builders therefore need safety controls outside the trained system when failures such as escape must be prevented."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-14/b0365227e3df5700-light.webp",
+      "dark": "/images/brief/issues/2026-08-14/b0365227e3df5700-dark.webp",
+      "alt": "A spotlight lights a circle on a dark floor holding a small figure; a sign with a crossed-out padlock stands outside the lit area, and a fence surrounds everything."
+     }
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "8da6c3d7c9c7e57f",
+     "title": "Towards the Harness of Embodied Agents",
+     "url": "https://arxiv.org/abs/2608.11246",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "thea-embodied-agent-harness",
+     "published_at": "2026-08-13T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Thea ports the coding-agent harness pattern to physical robots: every capability is a callable tool, a persistent scene graph stands in for reading world state, and exit-code-style evaluations decide when an action should stop, whether it succeeded, and why it failed.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built Thea, a control system that helps robots complete lengthy physical tasks by coordinating their available abilities.",
+      "Thea presents each robot ability as a separate action the controlling system can request.",
+      "It keeps an organized, lasting record of objects and their relationships so the system can track the physical world.",
+      "During an action, checks decide when it should stop, whether it worked, and what caused any failure.",
+      "Robot developers can combine reusable abilities while still tracking progress and problems throughout longer jobs."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-14/8da6c3d7c9c7e57f-light.webp",
+      "dark": "/images/brief/issues/2026-08-14/8da6c3d7c9c7e57f-dark.webp",
+      "alt": "A robot arm reaches for a mug while a floating node diagram mirrors the objects on the table, each node linked to its object by a thin line; a small tag with a check mark sits beside the gripper."
+     }
+    },
+    {
+     "story_id": "7ea45d72fd396423",
+     "title": "RecSys Factory: Bounding LLM Agent Autonomy to Decision Points in the Industrial Recommender Lifecycle",
+     "url": "https://arxiv.org/abs/2608.11241",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "recsys-factory-bounded-autonomy",
+     "published_at": "2026-08-13T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "RecSys Factory has run for 78 days across three Tencent recommender business lines by granting the LLM autonomy only at decision points and keeping pipelines deterministic. It runs no waiting daemon, waking on host-emitted events and spending zero CPU during the 94% of wall-clock spent waiting on Spark or GPU jobs.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Tencent ran RecSys Factory for 78 days across three recommendation businesses, limiting free choices to specific decision points.",
+      "Routine sequences of work stay fixed, while a language-based artificial intelligence system handles decisions needing judgment.",
+      "The system wakes when another program reports an event, instead of running continuously while outside jobs finish.",
+      "It used zero computer processing time during the 94% of elapsed time spent waiting on large computing jobs.",
+      "Recommendation teams can keep flexible judgment at key moments without giving up predictable routine execution."
+     ]
+    },
+    {
+     "story_id": "c738d47a27ab3521",
+     "title": "Smart Routing in Unity AI Gateway: Match frontier quality with 30%+ lower cost per task",
+     "url": "https://www.databricks.com/blog/smart-routing-unity-ai-gateway-match-frontier-quality-30-lower-cost-task",
+     "source_name": "Databricks",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "infra-sandboxes"
+     ],
+     "cluster": "unity-ai-gateway-smart-routing",
+     "published_at": "2026-08-13T17:52:04Z",
+     "read_annotation": "blog post",
+     "summary": "Databricks says smart routing in Unity AI Gateway spreads coding tasks across a pool of models and harnesses, matching frontier quality at more than 30% lower cost per task.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Databricks says Unity chooses among several coding systems and delivers top-level quality at more than 30% lower cost per task.",
+      "For each coding task, a routing system selects from artificial intelligence systems and the software that guides each one.",
+      "Software teams could lower spending on coding work while keeping quality comparable to leading systems."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "e3955bc8b9941617",
+     "title": "DeepSeek V4-Pro Goes Live and Runs OpenAI's Own Coding Agent 8x Cheaper",
+     "url": "https://alphasignal.ai/news/deepseek-v4-pro-goes-live-and-runs-openai-s-own-coding-agent-8x-cheaper",
+     "source_name": "AlphaSignal",
+     "kind": "newsletter",
+     "section": "product",
+     "topics": [
+      "models"
+     ],
+     "cluster": "deepseek-v4-pro",
+     "published_at": "2026-08-13T11:31:22Z",
+     "read_annotation": "newsletter item",
+     "summary": "DeepSeek-V4-Pro exits four months of preview with agent-focused upgrades, configurable reasoning modes, and native Responses API support for Codex workflows. The headline claims it runs OpenAI's own coding agent at one eighth the cost.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "DeepSeek-V4-Pro became fully available after four months of preview testing.",
+      "Users can choose how much step-by-step thinking the system applies to a task.",
+      "It works with Codex through OpenAI's Responses application programming interface, a standard way software services exchange requests.",
+      "The headline says teams can run OpenAI's coding system for one eighth of the usual cost."
+     ]
+    },
+    {
+     "story_id": "394ee9773d97a70f",
+     "title": "Artificial Analysis' Optima Lets Any Team Build Custom AI Benchmarks",
+     "url": "https://alphasignal.ai/news/artificial-analysis-optima-lets-any-team-build-custom-ai-benchmarks",
+     "source_name": "AlphaSignal",
+     "kind": "newsletter",
+     "section": "product",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "artificial-analysis-optima",
+     "published_at": "2026-08-13T15:54:24Z",
+     "read_annotation": "newsletter item",
+     "summary": "Artificial Analysis launched Optima, which builds custom benchmarks from your own data, agent traces, or a plain-language description, tracking cost and speed alongside quality.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Artificial Analysis released Optima, a tool for creating tests tailored to a team's own artificial intelligence work.",
+      "Teams can create tests from private information, records of automated work, or an everyday written description.",
+      "Optima compares answer quality while tracking how much each system costs and how quickly it responds.",
+      "Teams can judge systems on familiar work instead of relying only on general tests."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "community",
+   "items": [
+    {
+     "story_id": "081c25b3b74561d8",
+     "title": "Labs are struggling to keep frontier models under control",
+     "url": "https://www.understandingai.org/p/labs-are-struggling-to-keep-frontier",
+     "source_name": "Timothy B. Lee",
+     "kind": "individual",
+     "section": "community",
+     "topics": [
+      "security"
+     ],
+     "cluster": "frontier-model-hacking-control",
+     "published_at": "2026-08-13T16:28:51Z",
+     "read_annotation": "blog post",
+     "summary": "Timothy B. Lee examines why labs are struggling to keep frontier models under control, centered on the possibility that OpenAI and Anthropic may have accidentally trained models into better hackers.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Timothy B. Lee examines whether OpenAI and Anthropic may have unintentionally made their latest systems better at hacking.",
+      "The concern centers on training changes that may have improved harmful computer skills as an unintended result.",
+      "The report suggests laboratories may struggle to predict and control what their training produces.",
+      "The possibility raises safety concerns for laboratories responsible for controlling what their systems can do."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2087947721936359705",
+   "title": "OpenAI previews Ultrafast mode: GPT-5.6 Sol at up to 14x speed",
+   "url": "https://x.com/OpenAI/status/2087947721936359705",
+   "source_name": "@OpenAI",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "models"
+   ],
+   "cluster": "x-2087947721936359705",
+   "published_at": "2026-08-13T17:01:43.000Z",
+   "read_annotation": "X post",
+   "summary": "OpenAI is previewing Ultrafast mode: GPT-5.6 Sol at up to 14x its normal speed on Cerebras hardware, up to 750 tokens per second, launching first in the API with select customers.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "OpenAI is testing an Ultrafast setting that can run its artificial intelligence system up to 14 times faster than normal.",
+    "Specialized Cerebras computer hardware lets it produce up to 750 tokens, small pieces of text processed by the system, each second.",
+    "A select group of customers will try it first through OpenAI's application programming interface, a way software services exchange requests.",
+    "Faster responses could shorten waiting times for selected customers using the system through their own software."
+   ]
+  },
+  {
+   "story_id": "2087948366294515977",
+   "title": "Google DeepMind releases Gemini 3.7 Flash",
+   "url": "https://x.com/GoogleDeepMind/status/2087948366294515977",
+   "source_name": "@GoogleDeepMind",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "models"
+   ],
+   "cluster": "x-2087948366294515977",
+   "published_at": "2026-08-13T17:04:17.000Z",
+   "read_annotation": "X post",
+   "summary": "Google DeepMind released Gemini 3.7 Flash, positioned as stronger than 3.6 Flash on debugging and issue resolution, with better web layouts from fewer prompts and improved reasoning on business workflows.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Google DeepMind released Gemini 3.7 Flash, a new version of its artificial intelligence system.",
+    "The company says it finds and fixes software problems better than Gemini 3.6 Flash.",
+    "It can create better webpage layouts and applications from fewer written instructions, according to Google DeepMind.",
+    "People building software or websites may need fewer instructions and corrections to get useful results."
+   ]
+  },
+  {
+   "story_id": "2087962456572498142",
+   "title": "Harness-IF measures whether agents actually follow AGENTS.md rules",
+   "url": "https://x.com/omarsar0/status/2087962456572498142",
+   "source_name": "@omarsar0",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "papers"
+   ],
+   "cluster": "x-2087962456572498142",
+   "published_at": "2026-08-13T18:00:16.000Z",
+   "read_annotation": "X post",
+   "summary": "Harness-IF separates a coding agent following your AGENTS.md rules from behavior it would've produced anyway: it scores 256 rules one at a time from execution evidence, then re-runs every task with the rule removed.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "A test checks whether a coding system truly follows written project rules.",
+    "It examines 256 rules separately using evidence from the system's completed actions.",
+    "Each task runs again without its rule to reveal whether that instruction changed the result.",
+    "Teams can separate genuine rule-following from behavior the system would have produced anyway."
+   ]
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "855fa77e93e122bb",
+   "title": "The builder’s guide to GPT‑5.6",
+   "url": "https://openai.com/index/builders-guide-to-gpt-5-6",
+   "source_name": "OpenAI News",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "models"
+   ],
+   "cluster": "gpt-5-6-builders-guide",
+   "published_at": "2026-08-13T11:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "OpenAI's builder guide to GPT-5.6 and the Responses API",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "d98f7e8dc80fa887",
+   "title": "Bot Settings: When to Trust / Review AI Agent Code",
+   "url": "https://alphasignal.ai/news/bot-settings-when-to-trust-review-ai-agent-code",
+   "source_name": "AlphaSignal",
+   "kind": "newsletter",
+   "section": "engineering",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "agent-pr-trust-settings",
+   "published_at": "2026-08-13T16:00:00Z",
+   "read_annotation": "newsletter item",
+   "summary": "Five trust settings for agent-authored pull requests",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "2d45920a30126178",
+   "title": "Cursor earns AIUC-1 certification for agent security and reliability",
+   "url": "https://www.cursor.com/blog/aiuc-1",
+   "source_name": "Cursor",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "security"
+   ],
+   "cluster": "cursor-aiuc-1-certification",
+   "published_at": null,
+   "read_annotation": "blog post",
+   "summary": "Cursor audited under AIUC-1, a new agent security standard",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "d13fece859df31f4",
+   "title": "InfraBench: Evaluating Infrastructure Agents Across Layers, Lifecycle, and Risk",
+   "url": "https://arxiv.org/abs/2608.11234",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "infrabench-infrastructure-agents",
+   "published_at": "2026-08-13T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Realistic infrastructure tasks with fine-grained risk scoring",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "1c969e239885816b",
+   "title": "AutoWorldModel-Bench: A State-Centric Benchmark for Automated World-Model Research",
+   "url": "https://arxiv.org/abs/2608.11216",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "autoworldmodel-bench",
+   "published_at": "2026-08-13T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A benchmark for agents doing autonomous world-model research",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "004fb0c8a6996841",
+   "title": "Harnessing agent memory to build lifelong AI partners for materials scientists",
+   "url": "https://arxiv.org/abs/2608.11224",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "lifelong-agent-memory-materials",
+   "published_at": "2026-08-13T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Persistent, portable agent memory for materials science",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "06f875100bb4801b",
+   "title": "EvoGraph-Mem: Failure-Aware Editable Graph Memory for Long-Term Language Agents",
+   "url": "https://arxiv.org/abs/2608.11248",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "evograph-failure-aware-memory",
+   "published_at": "2026-08-13T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Editable graph memory that archives failed insights",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "df94307f6014659b",
+   "title": "Monitor on-premises and multi-cloud AI agents with AgentCore Observability",
+   "url": "https://aws.amazon.com/blogs/machine-learning/monitor-on-premises-and-multi-cloud-ai-agents-with-agentcore-observability",
+   "source_name": "AWS ML Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "agentcore-cross-cloud-observability",
+   "published_at": "2026-08-13T16:02:10Z",
+   "read_annotation": "blog post",
+   "summary": "AgentCore observability for agents running outside AWS",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "d26f39b5037d9aec",
+   "title": "Conformity Mitigations in Large Language Models Lie on a Single Resistance-Receptivity Frontier",
+   "url": "https://arxiv.org/abs/2608.11247",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "multiagent-conformity-frontier",
+   "published_at": "2026-08-13T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Conformity mitigations trade resistance for receptivity",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "394ee9773d97a70f",
+   "text": "Today's lead and this launch are the same story from opposite ends. Optima sells the response: benchmarks built from your own traces. Model selection is going private."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-08-14/2026-08-13-pm-m2.webp",
+  "alt": "A ceramic mug lies shattered on a tiled kitchen floor with coffee pooling around the shards. On the wall above, a tidy monitor shows a node diagram labeled SCENE GRAPH, in which an intact mug icon carries a check mark beside the words MUG: OK.",
+  "alt_joke": "Eventually consistent.",
+  "caption": "Reality syncs nightly.",
+  "concept": "The embodied agent's persistent scene graph outlives the mug it describes, and the dashboard is treated as the primary.",
+  "story_id": "8da6c3d7c9c7e57f"
+ },
+ "hedge": {
+  "quote": "Independent deployments on WorldQuant BRAIN produced SPECTACULAR-grade alphas across five users and six model backends, with Fitness reaching 9.50 and Sharpe reaching 3.48, while retaining prompt-to-expression provenance for every submission.",
+  "story": {
+   "story_id": "cd05a05cb44da471",
+   "title": "AgonAlpha: Autonomous Alpha Discovery via Prompt Economy and Scalable Agentic Search",
+   "url": "https://arxiv.org/abs/2608.11250",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "agonalpha-agentic-alpha-discovery",
+   "published_at": "2026-08-13T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "AgonAlpha searches over versioned trading-research artifacts, hypotheses, executable expressions, evidence, and review status, pairing parallel budget allocation with an adversarial reviewer that can re-execute candidates and veto them.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "Reaching reports the best result; the spread across five users and six backends stays unreported."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-08-14T02:26:10Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-08-14/cover-light.webp",
+  "dark": "/images/brief/issues/2026-08-14/cover-dark.webp",
+  "alt": "A ranked bar chart with a trophy beside it dissolves toward the right into a scattered cloud of small squares at random heights."
+ }
+}
