@@ -1,0 +1,89 @@
+{
+ "issue_id": "2026-08-14",
+ "type": "daily",
+ "renders": 6,
+ "cost_usd": 1.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A ranked bar chart with a trophy beside it dissolves toward the right into a scattered cloud of small squares at random heights.",
+   "bytes": [
+    54596,
+    52304
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A tall leaderboard stands on the left: a ranked column of five solid horizontal bars, longest at the top, with a small trophy silhouette beside it. Moving rightward, the bars break apart into a loose cloud of small square tiles scattered at every height with no order left in them. The board is intact at the left of the subject and fully dissolved into scatter by the right, the whole arrangement centered and well clear of the frame edges.",
+   "labels": [
+    "LEADERBOARD",
+    "YOUR TASKS"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-14T00:17:58Z"
+  },
+  {
+   "key": "b0365227e3df5700",
+   "story_id": "b0365227e3df5700",
+   "light_name": "b0365227e3df5700-light.webp",
+   "dark_name": "b0365227e3df5700-dark.webp",
+   "alt": "A spotlight lights a circle on a dark floor holding a small figure; a sign with a crossed-out padlock stands outside the lit area, and a fence surrounds everything.",
+   "bytes": [
+    28922,
+    27288
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A single spotlight cone lights a bright circle on a dark floor, and a small simple model figure sits fully inside the lit circle. A rule sign showing a crossed-out open padlock stands in the darkness outside the circle, beyond the light's reach. A sturdy fence encloses the entire floor, both the lit and dark regions. The spotlight circle sits at the center of the frame, and the fence keeps a generous margin from every edge.",
+   "labels": [
+    "TRAINING DATA",
+    "HARNESS"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-14T00:24:05Z"
+  },
+  {
+   "key": "8da6c3d7c9c7e57f",
+   "story_id": "8da6c3d7c9c7e57f",
+   "light_name": "8da6c3d7c9c7e57f-light.webp",
+   "dark_name": "8da6c3d7c9c7e57f-dark.webp",
+   "alt": "A robot arm reaches for a mug while a floating node diagram mirrors the objects on the table, each node linked to its object by a thin line; a small tag with a check mark sits beside the gripper.",
+   "bytes": [
+    33480,
+    30986
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A robot arm reaches for a mug on a table holding a few plain objects: the mug, a plate, a bottle. Above the table floats a small connected node diagram with one node per object, each node echoing its object's silhouette, and a thin line running from each node down to its object. A small tag with a check mark hangs beside the arm's gripper. Everything sits centered and well clear of the frame edges.",
+   "labels": [
+    "SCENE GRAPH",
+    "EXIT 0"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-14T00:25:41Z"
+  }
+ ]
+}
