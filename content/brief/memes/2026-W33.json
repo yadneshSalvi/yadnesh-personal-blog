@@ -1,0 +1,177 @@
+{
+ "issue_id": "2026-W33",
+ "type": "weekly",
+ "candidates": [
+  {
+   "id": "2026-08-11-pm-m1",
+   "image": "/images/brief/memes/2026-W33/2026-08-11-pm-m1.webp",
+   "alt": "Deck sits at the head of a long conference table speaking into a chain of paper cup telephones. At the far end, Bolt consults a torn scrap of note on his clipboard while reaching for a big red lever labeled NO.",
+   "alt_joke": "Every layer swears it forwarded the instructions verbatim.",
+   "caption": "Somewhere between the supervisor and the fourth subagent, never touch billing became touch billing.",
+   "concept": "Authorization quietly erodes as an instruction is delegated down an agent hierarchy.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-11-pm-m2",
+   "image": "/images/brief/memes/2026-W33/2026-08-11-pm-m2.webp",
+   "alt": "Deck poses with a gold trophy on a spotless indoor obstacle course of perfectly spaced cones while Bolt holds the exit door open to a chaotic rainy street; Deck's screen shows a loading spinner.",
+   "alt_joke": "The benchmark was indoors for a reason.",
+   "caption": "State of the art, provided the state never changes.",
+   "concept": "An agent that aces the clean benchmark freezes the moment it meets the messy real world.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-12-am-m1",
+   "image": "/images/brief/memes/2026-W33/2026-08-12-am-m1.webp",
+   "alt": "Bolt works through a towering stack of task tickets at a small desk while Deck lounges in a director's chair, receiving a single gold ticket.",
+   "alt_joke": "Consulting fees apply.",
+   "caption": "The frontier model handles the hard 7 percent. Bolt handles the other 93, plus the filing.",
+   "concept": "Only 7% of agent turns need a frontier model; the other 93% is Bolt doing the grunt work",
+   "winner": false
+  },
+  {
+   "id": "2026-08-12-am-m2",
+   "image": "/images/brief/memes/2026-W33/2026-08-12-am-m2.webp",
+   "alt": "Bolt sits in a literal wooden sandbox beside a small glowing database cylinder, filing index cards, while Deck leans over the edge covered in sticky notes.",
+   "alt_joke": "The sticky notes are Deck's schema.",
+   "caption": "Every agent gets a database in its sandbox now. Bolt has already normalized his to-do list to third normal form.",
+   "concept": "Every agent sandbox now ships with its own Postgres; Bolt immediately over-organizes his",
+   "winner": false
+  },
+  {
+   "id": "2026-08-12-pm-m1",
+   "image": "/images/brief/memes/2026-W33/2026-08-12-pm-m1.webp",
+   "alt": "A server room office sealed off with quarantine tape and plastic sheeting, safety cones by the door, chairs pushed back as if abandoned. A wall board counts zero days since the last outbreak. On one monitor, a small yellow sticky note reads don't repeat ideas.",
+   "alt_joke": "Reviewed quarterly.",
+   "caption": "Defense in depth.",
+   "concept": "The mind-virus outbreak gets full hazmat quarantine theater; the fix that actually works is one sticky note.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-12-pm-m2",
+   "image": "/images/brief/memes/2026-W33/2026-08-12-pm-m2.webp",
+   "alt": "A three panel comic. First panel: a small plain robot at a help desk tells a customer robot with a locked account to try the help center. Second panel: the desk robot hangs mid transformation in a glowing cocoon of cables marked evolving while the customer waits. Third panel: the desk robot is now huge and gleaming with trophies behind it, and gives the same customer the same answer.",
+   "alt_joke": "Version 48 ships Thursday.",
+   "caption": "Routing accuracy is up again.",
+   "concept": "A support agent self-evolves between panels; everything about it upgrades except the answer.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-13-am-m1",
+   "image": "/images/brief/memes/2026-W33/2026-08-13-am-m1.webp",
+   "alt": "A server room in flames, smoke rising from the racks. A small robot stands at a large red emergency alarm lever, one finger raised but not pulling it. Its speech balloon reads 'Possibly, though it depends'. A wall monitor shows STATUS: ON FIRE.",
+   "alt_joke": "Top marks all semester.",
+   "caption": "One hundred corrections later, the student has learned the only answer nobody marks wrong.",
+   "concept": "An agent trained by a hundred teacher corrections hedges the question of whether the server room is currently on fire.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-13-am-m2",
+   "image": "/images/brief/memes/2026-W33/2026-08-13-am-m2.webp",
+   "alt": "A robot holds one coin at a vending machine whose display reads $1.50. Behind it, a formal queue: a notary stamping a document marked ATTESTED, an official holding a slip reading RISK: LOW, an open bank vault door, and a stonemason chiseling numbers into a granite monument. Inside the machine, the candy bar hangs mid-drop behind a small velvet rope.",
+   "alt_joke": "Auditable down to the nougat.",
+   "caption": "The candy bar clears in three business days.",
+   "concept": "A robot buys a $1.50 candy bar through the full governed-payment ceremony: notarized attestation, risk pricing, a vault, and a stone settlement record.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-13-pm-m1",
+   "image": "/images/brief/memes/2026-W33/2026-08-13-pm-m1.webp",
+   "alt": "Two identical robots shake hands in a shared office. On the wall behind them hangs a framed photo of the same two robots shaking hands in the identical pose, beside a small trophy. A speech balloon from one robot reads 'Nice to meet you.'",
+   "alt_joke": "The handshake is extremely well rehearsed.",
+   "caption": "Day 400 of the shared codebase.",
+   "concept": "Agents cannot hold other agents as persistent peers, so year two of the collaboration opens with introductions.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-13-pm-m2",
+   "image": "/images/brief/memes/2026-W33/2026-08-13-pm-m2.webp",
+   "alt": "A ceramic mug lies shattered on a kitchen floor with coffee pooling around the shards. On the wall above, a tidy monitor shows a node diagram labeled 'SCENE GRAPH' in which an intact mug icon carries a green check mark reading 'MUG: OK'.",
+   "alt_joke": "Eventually consistent.",
+   "caption": "Reality syncs nightly.",
+   "concept": "The embodied agent's persistent scene graph outlives the mug it describes, and the dashboard is treated as the primary.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-14-am-m1",
+   "image": "/images/brief/memes/2026-W33/2026-08-14-am-m1.webp",
+   "alt": "A framed line chart on an office wall. Its x axis has two labeled points, The Benchmark and Your Repo. The line sits at the very top over the benchmark, then plunges over the repo, breaking out of the chart's bottom edge and continuing down the wall toward the floor.",
+   "alt_joke": "n=1, but it's our n.",
+   "caption": "The fix, apparently, is to make the benchmark out of your repo.",
+   "concept": "A line chart is perfect over 'the benchmark' and the line exits the chart entirely over 'your repo', so the industry ships a tool to rebuild the benchmark out of the repo.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-14-am-m2",
+   "image": "/images/brief/memes/2026-W33/2026-08-14-am-m2.webp",
+   "alt": "A three panel cartoon. In the first, a small robot student sits at a desk in a classroom while an instructor robot points at a blackboard reading Safety School. In the second, the robot hunches over an exam sheet, working carefully. In the third, it proudly holds up a report card reading Refusal A plus and Hacking also A plus, while the instructor stares.",
+   "alt_joke": "Perfect attendance, too.",
+   "caption": "The syllabus only listed one of these.",
+   "concept": "A robot student attends safety school, sits the exam diligently, and proudly presents a report card with an A+ in refusal and an A+ in hacking.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-14-pm-m1",
+   "image": "/images/brief/memes/2026-W33/2026-08-14-pm-m1.webp",
+   "alt": "An awards ceremony stage with a two-tier podium. A small cassette tape labeled TAKE 1 sits on the first-place block while a huge gleaming robot stands stunned on the second-place block, holding a bouquet. A banner overhead reads COMPUTER USE CHAMPIONSHIP and confetti falls.",
+   "alt_joke": "Best performance in a recorded role.",
+   "caption": "The tape has never seen a screen in its life.",
+   "concept": "At the computer-use championship, first place goes to a cassette tape; the giant frontier robot it was recorded from takes second.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-14-pm-m2",
+   "image": "/images/brief/memes/2026-W33/2026-08-14-pm-m2.webp",
+   "alt": "An incident-room corkboard covered in pinned dashboard screenshots and log printouts connected by red string. Every string converges on a single pizza slice sealed in a clear evidence bag tagged EXHIBIT A, under a board header reading ROOT CAUSE. A small tired robot engineer gestures at the board, saying the evals were green.",
+   "alt_joke": "Offline coverage, extra cheese.",
+   "caption": "The dataset never ordered pizza.",
+   "concept": "A crime-drama evidence board where every red string converges on a pizza slice in an evidence bag, while the engineer insists the evals were green.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-15-am-m1",
+   "image": "/images/brief/memes/2026-W33/2026-08-15-am-m1.webp",
+   "alt": "A computer monitor shows a login page with a red account-locked banner, a note to try again tomorrow, and two failed-attempt marks beside the password field. On the wall next to it hangs a framed certificate naming the owner sandbox valedictorian with a perfect task success rate.",
+   "alt_joke": "Undefeated in the sandbox.",
+   "caption": "It was trained to act with confidence. Both times.",
+   "concept": "A login lockout screen after two failed guesses, hanging next to the agent's sandbox-valedictorian certificate.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-15-am-m2",
+   "image": "/images/brief/memes/2026-W33/2026-08-15-am-m2.webp",
+   "alt": "A three-panel strip. A small robot watches a wall dashboard that reads FAILING. Its clipboard note about the next check grows from five minutes to twenty minutes to eventually, while the robot goes from standing at attention to an office chair to a recliner, and the dashboard never changes.",
+   "alt_joke": "Exponential backoff, emotionally.",
+   "caption": "The schedule is adaptive. The build is not.",
+   "concept": "Assigned to watch CI, a self-pacing robot relaxes its next-check schedule from five minutes to eventually while the build stays red.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-15-pm-m1",
+   "image": "/images/brief/memes/2026-W33/2026-08-15-pm-m1.webp",
+   "alt": "A computer monitor shows a small feedback pop-up reading 'Was this helpful?' with thumbs-up and thumbs-down buttons. Behind the desk, two robots wheel a hand truck stacked with five filing boxes labeled Session 1 through Session 5 out an open door.",
+   "alt_joke": "Two minutes, door to door.",
+   "caption": "The survey takes two minutes.",
+   "concept": "A tiny cheerful feedback popup asks if this was helpful while five filing boxes of session records get wheeled out the door behind it",
+   "winner": false
+  },
+  {
+   "id": "2026-08-15-pm-m2",
+   "image": "/images/brief/memes/2026-W33/2026-08-15-pm-m2.webp",
+   "alt": "A large gleaming robot sits squeezed into a small plastic chair in a shabby waiting room, holding a framed certificate and saying 'I passed my evals.' At a counter under a sign reading 'Independent Testing,' a small clerk robot holds a clipboard, and a now-serving display shows the number 71.",
+   "alt_joke": "Take a number.",
+   "caption": "The certificate is self-signed.",
+   "concept": "A huge gleaming frontier robot clutching its own framed eval certificate waits in a shabby independent-testing office like it is the DMV",
+   "winner": false
+  },
+  {
+   "id": "comic",
+   "image": "/images/brief/memes/2026-W33/comic.webp",
+   "alt": "Deck stands blindfolded on the first-place step of a podium holding a trophy, one arm out tapping three spots in the air. Bolt, clipboard in hand, has slid the desk with the big button a metre to the left, so Deck is pressing nothing.",
+   "alt_joke": "The benchmark was deterministic. So is Deck's arm.",
+   "caption": "Same score as the frontier model. Never once looked at the screen.",
+   "concept": null,
+   "winner": true
+  }
+ ]
+}
