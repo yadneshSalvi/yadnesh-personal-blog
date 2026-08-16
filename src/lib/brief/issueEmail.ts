@@ -32,6 +32,7 @@ import {
 } from "./emailChrome";
 import { issueDateLabel } from "./dates";
 import { COMIC_LABEL, HEDGE_LABEL, memeLabel } from "./humor";
+import { parseMdLinks } from "./mdLinks";
 import {
   BRIEF_SECTION_KEYS,
   sectionLabel,
@@ -443,9 +444,29 @@ function weeklyBody(
     .split(/\n{2,}/)
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);
-  for (const paragraph of paragraphs) parts.html.push(`<p>${escapeHtml(paragraph)}</p>`);
+  // The through line carries markdown links; a mail client gets real anchors
+  // with absolute hrefs, and the text part gets "label (url)".
+  const origin = new URL(links.webUrl).origin;
+  const absolute = (href: string) => (href.startsWith("/") ? origin + href : href);
+  for (const paragraph of paragraphs) {
+    const html = parseMdLinks(paragraph)
+      .map((segment) =>
+        segment.href
+          ? `<a href="${escapeHtml(absolute(segment.href))}">${escapeHtml(segment.text)}</a>`
+          : escapeHtml(segment.text),
+      )
+      .join("");
+    parts.html.push(`<p>${html}</p>`);
+  }
   parts.text.push(weekly.through_line.title.toUpperCase(), "");
-  for (const paragraph of paragraphs) parts.text.push(paragraph, "");
+  for (const paragraph of paragraphs) {
+    const text = parseMdLinks(paragraph)
+      .map((segment) =>
+        segment.href ? `${segment.text} (${absolute(segment.href)})` : segment.text,
+      )
+      .join("");
+    parts.text.push(text, "");
+  }
 
   if (weekly.comic) {
     const href = `${links.webUrl}#comic`;

@@ -12,6 +12,7 @@ import StoryRow, { StoryLink, StoryMeta, storyAnchor } from "./StoryRow";
 import CopyLinkButton from "./CopyLinkButton";
 import PlainWordsToggle from "./PlainWordsToggle";
 import SectionHead from "./SectionHead";
+import { parseMdLinks, stripMdLinks } from "@/lib/brief/mdLinks";
 
 /** The mono kicker used above the issue's smaller blocks. */
 export function Kicker({ children }: { children: React.ReactNode }) {
@@ -212,6 +213,33 @@ export function CorrectionsBlock({
  * The weekly's argued observation. `body_md` carries paragraph breaks only; the
  * generator writes plain paragraphs, so there is no markdown parser here.
  */
+/**
+ * The through line carries the issue's only markdown links. Internal hrefs
+ * stay in-tab; external ones open a new tab like every StoryLink does.
+ */
+function ThroughLineProse({ text }: { text: string }) {
+  return (
+    <>
+      {parseMdLinks(text).map((segment, i) =>
+        segment.href ? (
+          <a
+            key={i}
+            href={segment.href}
+            {...(segment.href.startsWith("/")
+              ? {}
+              : { target: "_blank", rel: "noreferrer" })}
+            className="text-accent underline decoration-accent/40 underline-offset-[3px] transition-colors hover:decoration-accent"
+          >
+            {segment.text}
+          </a>
+        ) : (
+          <span key={i}>{segment.text}</span>
+        ),
+      )}
+    </>
+  );
+}
+
 export function WeeklyThroughLine({
   throughLine,
 }: {
@@ -236,13 +264,15 @@ export function WeeklyThroughLine({
               key={i}
               className={clsx(
                 "font-serif text-[1.375rem] leading-[1.55] text-ink",
-                dropCapEligible(paragraph) && "dropcap",
+                dropCapEligible(stripMdLinks(paragraph)) && "dropcap",
               )}
             >
-              {paragraph}
+              <ThroughLineProse text={paragraph} />
             </p>
           ) : (
-            <p key={i}>{paragraph}</p>
+            <p key={i}>
+              <ThroughLineProse text={paragraph} />
+            </p>
           ),
         )}
       </div>

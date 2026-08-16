@@ -6,6 +6,7 @@
 import type { BriefIssue, BriefStory } from "./schema";
 import { sectionLabel } from "./schema";
 import { issueDateLabel } from "./dates";
+import { parseMdLinks } from "./mdLinks";
 
 function escapeHtml(text: string): string {
   return text.replace(
@@ -94,7 +95,19 @@ export function issueToHtml(issue: BriefIssue, canonicalUrl: string): string {
     );
     out.push(`<h3>${escapeHtml(weekly.through_line.title)}</h3>`);
     for (const paragraph of weekly.through_line.body_md.split(/\n{2,}/)) {
-      out.push(`<p>${escapeHtml(paragraph.trim())}</p>`);
+      // Feed readers need absolute hrefs; internal links get the site origin.
+      const html = parseMdLinks(paragraph.trim())
+        .map((segment) =>
+          segment.href
+            ? `<a href="${escapeHtml(
+                segment.href.startsWith("/")
+                  ? `https://yadneshsalvi.com${segment.href}`
+                  : segment.href,
+              )}">${escapeHtml(segment.text)}</a>`
+            : escapeHtml(segment.text),
+        )
+        .join("");
+      out.push(`<p>${html}</p>`);
     }
     out.push("<h3>What mattered</h3>");
     for (const pick of weekly.what_mattered) {

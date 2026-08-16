@@ -415,7 +415,7 @@ function fatWeekly() {
       week_in_five: Array.from({ length: 5 }, () => LONG),
       through_line: {
         title: "The through line",
-        body_md: `${LONG}\n\n${LONG}\n\n${LONG}\n\n${LONG}`,
+        body_md: `${LONG} In [The Anchor Test](https://example.com/anchor-test) and [an internal one](/newsletter/story/abc123).\n\n${LONG}\n\n${LONG}\n\n${LONG}`,
       },
       what_mattered: fatList("mattered", 24, "research").map((story) => ({
         story,
@@ -712,5 +712,35 @@ test("the size check costs a placeholder at the width of a real signed link", ()
   );
   assert.equal(measured.limit, EMAIL_BYTE_LIMIT);
 });
+
+test("the through line's markdown links become real anchors", () => {
+  const issue = fatWeekly();
+  const rendered = renderIssueEmail(issue, LINKS);
+  const origin = new URL(LINKS.webUrl).origin;
+
+  assert.ok(
+    rendered.html.includes('<a href="https://example.com/anchor-test">The Anchor Test</a>'),
+    "an external markdown link did not become an anchor in the HTML part",
+  );
+  assert.ok(
+    rendered.html.includes(`<a href="${origin}/newsletter/story/abc123">an internal one</a>`),
+    "an internal markdown link was not absolutized in the HTML part",
+  );
+  assert.ok(
+    rendered.text.includes("The Anchor Test (https://example.com/anchor-test)"),
+    "the text part lost the external link",
+  );
+  assert.equal(
+    rendered.html.includes("[The Anchor Test]("),
+    false,
+    "raw markdown link syntax reached the HTML part",
+  );
+  assert.equal(
+    rendered.text.includes("[The Anchor Test]("),
+    false,
+    "raw markdown link syntax reached the text part",
+  );
+});
+
 
 console.log(`\n${passed} passed`);
