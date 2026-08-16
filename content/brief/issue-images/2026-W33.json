@@ -1,0 +1,107 @@
+{
+ "issue_id": "2026-W33",
+ "type": "weekly",
+ "renders": 8,
+ "cost_usd": 2.0,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A tall measuring stick stands alone on a rolling plain while a small figure at its base looks away from it toward a tangle of forking paths that run off into the distance.",
+   "bytes": [
+    40678,
+    38766
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A single tall measuring stick planted upright in the middle of a wide, uneven plain. At its base a small figure stands with its back to the stick, looking out at a landscape of paths that fork, dip into hollows and disappear behind rises. The stick's markings stop well below the height of the terrain around it. Plenty of open sky above and ground below; the subject sits in the centre of the frame.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-15T23:45:53Z"
+  },
+  {
+   "key": "1916eb026f72314c",
+   "story_id": "1916eb026f72314c",
+   "light_name": "1916eb026f72314c-light.webp",
+   "dark_name": "1916eb026f72314c-dark.webp",
+   "alt": "A row of identical passing test tubes on a lab bench, with a lone slice of pizza on the floor beside it casting a shadow over them.",
+   "bytes": [
+    52708,
+    49316
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A tidy laboratory bench with a neat row of identical glass test tubes, each holding the same clear liquid and each marked with a small tick. On the floor beside the bench, out of the row, sits a single slice of pizza on a paper plate, casting a long shadow across the bench. The bench and the plate sit in the middle of the frame with room around them.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-15T23:46:58Z"
+  },
+  {
+   "key": "b059abbbeda215d0",
+   "story_id": "b059abbbeda215d0",
+   "light_name": "b059abbbeda215d0-light.webp",
+   "dark_name": "b059abbbeda215d0-dark.webp",
+   "alt": "A tape player feeds a cable into the keyboard of a computer whose screen is off, with a small trophy sitting on the same desk.",
+   "bytes": [
+    40860,
+    40290
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A desk with a computer whose screen is switched off and dark. Beside it, an old reel-to-reel tape player is running, its reels turning, with a cable leading from the tape player straight into the computer's keyboard. On the far corner of the desk sits a small trophy. The desk is centred with space around it.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-15T23:47:59Z"
+  },
+  {
+   "key": "0b2744e224d2a974",
+   "story_id": "0b2744e224d2a974",
+   "light_name": "0b2744e224d2a974-light.webp",
+   "dark_name": "0b2744e224d2a974-dark.webp",
+   "alt": "A chalkboard number line with a shaded band running from a mark labelled 41.6% to a mark labelled 67.2%, and a small sealed check mark in the corner.",
+   "bytes": [
+    20592,
+    20246
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 2,
+   "prompt": "A wide chalkboard with a single long horizontal number line drawn across it. A shaded band along the line begins at a tick labelled 41.6% and extends right to a tick labelled 67.2%, with the rest of the line to the right left blank. In the lower corner of the board, a small wax seal with a check mark pressed into it. The number line runs through the middle of the frame with margin on all sides.",
+   "labels": [
+    "41.6%",
+    "67.2%"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-15T23:52:01Z"
+  }
+ ]
+}

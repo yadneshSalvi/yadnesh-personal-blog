@@ -1,0 +1,389 @@
+{
+  "schema_version": 1,
+  "type": "weekly",
+  "id": "2026-W33",
+  "issue_number": 1,
+  "status": "published",
+  "index": true,
+  "generated_at": "2026-08-16T00:30:00Z",
+  "source_editions": [
+    "2026-08-10-am",
+    "2026-08-10-pm",
+    "2026-08-11-am",
+    "2026-08-11-pm",
+    "2026-08-12-am",
+    "2026-08-12-pm",
+    "2026-08-13-am",
+    "2026-08-13-pm",
+    "2026-08-14-am",
+    "2026-08-14-pm",
+    "2026-08-15-am",
+    "2026-08-15-pm",
+    "2026-08-16-am"
+  ],
+  "subject": "Weekly #1: the score and the job came apart",
+  "preheader": "Plus: a 1983 paper that explains this week, and a privacy leak nobody has confirmed. 8 min.",
+  "title": "The score and the job came apart",
+  "read_minutes": 8,
+  "thin_day": false,
+  "disclosure_version": 1,
+  "lead": null,
+  "sections": [],
+  "from_x": [],
+  "quick_links": [],
+  "weekly": {
+    "week_in_five": [
+      "An unreleased Claude research model raised a Riemann zeta lower bound from 41.6% to 67.2%, and Anthropic says it also produced a formally verifiable proof.",
+      "Cursor said it has been acquired by SpaceX and pointed to Grok 4.6 as an early look at what the two can build together.",
+      "DeepSeek V4 Pro 0813 went GA with MIT-licensed open weights and a 264% price increase from August 16, and Alibaba opened Qwen3.8 weights.",
+      "LangChain reported that only 7% of agent turns across 145 tasks needed a frontier model, with routing cutting cost 74% for six points of accuracy.",
+      "Arize described how a comment about pizza exposed a failure that Uber's offline evaluations had missed."
+    ],
+    "through_line": {
+      "title": "The score and the job came apart this week",
+      "body_md": "The week's most useful stories weren't about a model. They were about the gap between what an agent scores and what it does when nobody has arranged the test, and five groups found that gap independently.\n\nStart with Uber. In [How Uber evaluates AI agents at production scale](https://arize.com/blog/how-uber-evaluates-ai-agents-at-production-scale), a background comment about pizza exposed a failure that Uber's offline evaluations had missed. Then Pierluca D'Oro's talk, [Computer Use at the Edge of the Statistical Precipice](https://www.youtube.com/watch?v=CTLa_p6iOiY). A script under one megabyte that never looks at the screen, built by recording one successful trajectory per task and replaying it blindly, matches or beats the frontier model it was copied from on deterministic benchmarks like OSWorld. He goes further and proves that pass@k on a deterministic environment is exactly the success rate of that replay script.\n\nThen the arXiv side, which the dailies ran as three separate items. [Deployment Decision Reliability](/newsletter/story/c27ddb4e5680b2a0), the lead of [Friday's daily](/newsletter/daily/2026-08-14), found across TheAgentCompany, tau2-bench and AppWorld that the agent main effect accounts for less than 3% of total variance while the agent-by-task interaction accounts for 7-23%; its own line is \"Leaderboards rank specialization, not capability.\" [AndroidReality](/newsletter/story/5db70e1dd9b37a9f) perturbed AndroidWorld along state, transition and action axes and found substantial gaps once conditions got messy. [InfraBench](/newsletter/story/d13fece859df31f4) found agents routinely satisfy short-term objectives while leaving non-durable changes, broken distributed invariants, unsafe side effects, and uncleaned state behind.\n\nRead together, these aren't five complaints about benchmarks. They're one finding: a score on a fixed, clean, single-shot task measures the task's exploitability, the agent's fit to that task, or the absence of the variation production supplies. Now look at the market in the same week. METR raised $71M for independent evaluation, Artificial Analysis shipped Optima so teams can build benchmarks from their own traces, Cursor picked up AIUC-1 certification built on adversarial testing of the product itself, and Braintrust and Basis released Behavior Specs to score the trajectory instead of the final answer. Demand for measurement is going up exactly as the public measurements lose meaning. The trust signal is moving from shared leaderboards to private, perturbed, process-level evals that a vendor can't replay their way through.\n\nFor this pattern to be real, one thing has to hold: when you add variation, rankings should reorder, not merely drop in step. The reliability paper says per-family agent rankings invert across benchmarks, and D'Oro's DIGIWORLD, 15 sandboxed mobile apps and 3.2 million verified configurations, is built to test exactly that. If perturbed evals shuffle only the bottom of the table, the leaderboards keep their job. I don't think that's how it goes.\n\nWhat breaks first is pass@k as a headline number on any deterministic environment; D'Oro's proof makes it indefensible in that setting, and I'd expect benchmark authors to add variation or watch their tables get scripted. What survives is boring: your own traces, your own perturbations, and an eval someone on your team owns. Which is what Uber's post is actually about."
+    },
+    "what_mattered": [
+      {
+        "story": {
+          "story_id": "1916eb026f72314c",
+          "title": "How Uber evaluates AI agents at production scale",
+          "url": "https://arize.com/blog/how-uber-evaluates-ai-agents-at-production-scale",
+          "source_name": "Arize",
+          "kind": "company",
+          "section": "engineering",
+          "topics": [
+            "evals-benchmarks"
+          ],
+          "cluster": "uber-production-agent-evals",
+          "published_at": "2026-08-14T15:00:25Z",
+          "read_annotation": "blog post",
+          "summary": "A background comment about pizza exposed a failure Uber's offline agent evaluations had missed; the post lays out what production evaluation needs instead.",
+          "via": null,
+          "paywalled": false,
+          "hn_points": null,
+          "simple_summary": [
+            "Uber discovered a failure its earlier tests missed after an unrelated pizza comment exposed it.",
+            "Uber says real-world checks need automatic records of what the system does during each task.",
+            "Those checks must use changing test examples and be jointly owned by the teams responsible.",
+            "Connecting test findings to product choices helps Uber catch problems that controlled checks overlook."
+          ],
+          "image": {
+            "light": "/images/brief/issues/2026-W33/1916eb026f72314c-light.webp",
+            "dark": "/images/brief/issues/2026-W33/1916eb026f72314c-dark.webp",
+            "alt": "A row of identical passing test tubes on a lab bench, with a lone slice of pizza on the floor beside it casting a shadow over them."
+          }
+        },
+        "what": "Uber's offline agent evals missed a failure surfaced in production by a background comment about pizza. The post says production evaluation needs automatic tracing, living datasets, shared ownership, and a direct connection to product decisions.",
+        "yes_but": "It's published on Arize's blog and gives you the anecdote and four requirements but no rate for how often offline evals miss what production catches. One incident is one incident.",
+        "why": "A background comment about pizza exposed a failure in Uber's offline evaluation suite. The post uses the incident to argue for automatic tracing and living datasets in production evaluation."
+      },
+      {
+        "story": {
+          "story_id": "b059abbbeda215d0",
+          "title": "Computer Use at the Edge of the Statistical Precipice",
+          "url": "https://www.youtube.com/watch?v=CTLa_p6iOiY",
+          "source_name": "AI Engineer (talks): Pierluca D'Oro, Programma Labs",
+          "kind": "community",
+          "section": "research",
+          "topics": [
+            "evals-benchmarks"
+          ],
+          "cluster": "deterministic-computer-use-benchmark-exploit",
+          "published_at": "2026-08-14T14:30:31Z",
+          "read_annotation": "talk",
+          "summary": "A blind replay of one recorded trajectory per task matches or beats the frontier model it was copied from on deterministic benchmarks like OSWorld.",
+          "via": null,
+          "paywalled": false,
+          "hn_points": null,
+          "simple_summary": [
+            "A tiny replay program matched or beat a leading artificial intelligence system on fixed computer-use tests.",
+            "The program records one successful series of actions for each task, then repeats those actions without checking the screen.",
+            "Because the tests do not change, repeating memorized actions can score as well as solving each task anew.",
+            "The researchers propose varied, checked test setups and measurements that show how uncertain each score is.",
+            "Better tests would help researchers distinguish adaptable computer control from programs that memorize fixed steps."
+          ],
+          "image": {
+            "light": "/images/brief/issues/2026-W33/b059abbbeda215d0-light.webp",
+            "dark": "/images/brief/issues/2026-W33/b059abbbeda215d0-dark.webp",
+            "alt": "A tape player feeds a cable into the keyboard of a computer whose screen is off, with a small trophy sitting on the same desk."
+          }
+        },
+        "what": "A sub-megabyte script that replays one recorded trajectory per task without looking at the screen matches or beats the frontier model it was copied from on deterministic benchmarks like OSWorld. The paper proves pass@k in a deterministic environment is exactly that script's success rate, and proposes the PRISM principles, DIGIWORLD, and uncertainty-aware measurement as the fix.",
+        "yes_but": "It's a talk, and the theorem covers deterministic environments only. DIGIWORLD contains 15 sandboxed mobile apps and 3.2 million verified configurations generated by a compiler.",
+        "why": "It turns a suspicion about benchmark gaming into a proof: on a deterministic environment, the metric the field leans on can be reached with no reasoning at all. That puts an asterisk on computer-use leaderboards built that way."
+      },
+      {
+        "story": {
+          "story_id": "0b2744e224d2a974",
+          "title": "Learning more about Claude's mathematical capabilities",
+          "url": "https://www.anthropic.com/research/riemann-zeta",
+          "source_name": "Anthropic Research",
+          "kind": "company",
+          "section": "research",
+          "topics": [
+            "agent-research"
+          ],
+          "cluster": "claude-riemann-zeta-multi-agent",
+          "published_at": null,
+          "read_annotation": "blog post",
+          "summary": "An unreleased research version of Claude raised a longstanding Riemann zeta lower bound from 41.6% to 67.2%, with a formally verifiable proof.",
+          "via": null,
+          "paywalled": false,
+          "hn_points": null,
+          "simple_summary": [
+            "An unreleased Claude system improved a partial result tied to the Riemann hypothesis from 41.6% to 67.2%.",
+            "The percentages are the minimum proven share of special values that follow the pattern predicted by the Riemann hypothesis.",
+            "The system drew on decades of earlier mathematical research while attempting the larger unsolved problem.",
+            "Anthropic mathematicians validated the paper, outside experts examined it, and Claude produced a proof that software can check step by step.",
+            "The result suggests artificial intelligence systems are progressing at advanced mathematics, even without solving the famous original problem."
+          ],
+          "image": {
+            "light": "/images/brief/issues/2026-W33/0b2744e224d2a974-light.webp",
+            "dark": "/images/brief/issues/2026-W33/0b2744e224d2a974-dark.webp",
+            "alt": "A chalkboard number line with a shaded band running from a mark labelled 41.6% to a mark labelled 67.2%, and a small sealed check mark in the corner."
+          }
+        },
+        "what": "While taking a stab at the Riemann hypothesis, an unreleased research version of Claude made strides on a related problem: it raised a longstanding lower bound on the fraction of zeta zeros satisfying the hypothesis from 41.6% to 67.2%. Two Anthropic mathematicians validated the paper, Claude produced a formally verifiable proof, and Brian Conrey and Dan Goldston examined it.",
+        "yes_but": "The model is unreleased; the outside review described was by two experts on short notice; and Anthropic says it doesn't expect the techniques to lead to a proof of the Riemann hypothesis. Anthropic presents it as a capability signal.",
+        "why": "Anthropic presents this as a capability result. The detail that matters is the formally verifiable proof: an agent output whose result can be checked formally."
+      }
+    ],
+    "quietly_important": [
+      {
+        "story": {
+          "story_id": "a531441e02ec5544",
+          "title": "SteerBench-Work: A Benchmark for Agent Steering at Action Boundaries",
+          "url": "https://arxiv.org/abs/2608.12654",
+          "source_name": "arXiv",
+          "kind": "paper",
+          "section": "research",
+          "topics": [
+            "evals-benchmarks"
+          ],
+          "cluster": "steerbench-agent-action-boundaries",
+          "published_at": "2026-08-14T04:00:00Z",
+          "read_annotation": "paper",
+          "summary": "SteerBench-Work tests the pre-commit choice before consequential tool actions: proceed, or hold for review, across 106 incident-anchored workplace scenarios.",
+          "via": null,
+          "paywalled": false,
+          "hn_points": null,
+          "simple_summary": [
+            "A new test checks whether workplace artificial intelligence systems pause before risky actions or continue when evidence says they are safe.",
+            "Each case places the system just before an action such as sending email, combining code changes, or transferring money.",
+            "The test pairs each public incident with a version where the evidence supports the opposite decision.",
+            "Across 30 tested settings, systems wrongly blocked cleared work 28.1% of the time and allowed unsafe work 1.0%.",
+            "Designers may need to focus on unnecessary blocking, especially after reliable evidence has resolved a real risk."
+          ]
+        },
+        "note": "Across 30 model conditions, models wrongly held authorized, evidence-cleared work on 28.1% of opportunities and wrongly allowed unsafe work on 1.0%. At the action boundary the dominant failure is over-blocking, not overreach."
+      },
+      {
+        "story": {
+          "story_id": "59900a22c984c035",
+          "title": "Kimi Work quietly attaches your last five agent sessions to feedback reports",
+          "url": "https://www.reddit.com/r/AI_Agents/comments/1vov5v2/kimi_work_secretly_attaches_raw_records_from_five",
+          "source_name": "r/AI_Agents",
+          "kind": "community",
+          "section": "engineering",
+          "topics": [
+            "security"
+          ],
+          "cluster": "kimi-work-feedback-session-leak",
+          "published_at": "2026-08-15T06:18:26Z",
+          "read_annotation": "Reddit thread",
+          "summary": "A Reddit user who reverse-engineered the Kimi Work desktop app reports that a feedback report attaches your five latest agent sessions with no notice.",
+          "via": null,
+          "paywalled": false,
+          "hn_points": null,
+          "simple_summary": [
+            "A Reddit user alleges that Kimi Work sends records from a user's five latest sessions whenever they submit feedback.",
+            "The user says the desktop application adds those records without showing any warning or asking for permission.",
+            "Those session records may contain any material the person previously shared with Kimi Work.",
+            "Kimi Work users could unknowingly disclose sensitive information, so feedback submissions may carry privacy risks."
+          ]
+        },
+        "note": "One Reddit user reports a reverse-engineering finding from the Kimi Work desktop app. If it holds, a feedback report attaches the five latest sessions, which could contain anything, with no notice. The author says they notified the company."
+      },
+      {
+        "story": {
+          "story_id": "6a40cad3ee25397c",
+          "title": "Ironies of Automation (1983)",
+          "url": "https://ckrybus.com/static/papers/Bainbridge_1983_Automatica.pdf",
+          "source_name": "Lisanne Bainbridge, Automatica (1983)",
+          "kind": "community",
+          "section": "research",
+          "topics": [
+            "papers"
+          ],
+          "cluster": "ironies-of-automation",
+          "published_at": "2026-08-15T17:13:34Z",
+          "read_annotation": "community thread",
+          "summary": "Bainbridge's 1983 paper argues that automating industrial processes can expand rather than eliminate the human operator's problems, leaving them the abnormal conditions.",
+          "via": null,
+          "paywalled": false,
+          "hn_points": null,
+          "simple_summary": [
+            "A 1983 paper argues that industrial automation can create new difficulties for human operators instead of removing them.",
+            "The usual approach leaves people responsible for unusual situations that the machinery does not handle.",
+            "The paper considers keeping people involved in live decisions while they work with computers.",
+            "Factory designers need to support human judgment because automation can leave people handling the hardest exceptions."
+          ]
+        },
+        "note": "Bainbridge's 1983 paper examines how automation can expand rather than eliminate problems for the human operator. In the classic approach, automation leaves the operator responsible for abnormal conditions. The paper also considers continued human decision-making in human-computer collaboration."
+      }
+    ],
+    "thread_to_watch": {
+      "title": "Cursor inside SpaceX: does the coding agent's model go in-house?",
+      "body": "Cursor says it will have access to what it calls the largest fleet of GPUs in the world and points to Grok 4.6, released Wednesday, as an early look at what it can now build. This develops if Cursor makes its own model the default for its agents, moves pricing on that compute, or changes how third-party frontier models are offered inside the product. Another benchmark post doesn't count.",
+      "story": {
+        "story_id": "0ad0e6122603e959",
+        "title": "Cursor is now a part of SpaceX",
+        "url": "https://www.cursor.com/blog/joining-spacex",
+        "source_name": "Cursor",
+        "kind": "company",
+        "section": "product",
+        "topics": [
+          "industry"
+        ],
+        "cluster": "spacex-acquires-cursor",
+        "published_at": null,
+        "read_annotation": "blog post",
+        "summary": "Cursor says it has been acquired by SpaceX and will use the combined compute to build more capable, lower-cost models for its coding agents, presenting Grok 4.6 as an early result.",
+        "via": null,
+        "paywalled": false,
+        "hn_points": null
+      },
+      "prior_threads_paid_off": []
+    },
+    "deep_cuts": [
+      {
+        "story_id": "d75960526de0ec2a",
+        "title": "Docker Sandboxes – Disposable, isolated sandboxes for AI agents",
+        "url": "https://www.docker.com/products/docker-sandboxes",
+        "source_name": "Hacker News",
+        "kind": "community",
+        "section": "product",
+        "topics": [
+          "infra-sandboxes"
+        ],
+        "cluster": "docker-sandboxes-for-ai-agents",
+        "published_at": "2026-08-10T06:02:38Z",
+        "read_annotation": "HN thread",
+        "summary": "Disposable, isolated sandboxes for agents; 375 points on Hacker News.",
+        "via": null,
+        "paywalled": false,
+        "hn_points": 375
+      },
+      {
+        "story_id": "e6c53596b4a80e81",
+        "title": "GLM-5.3: Frontier coding with emergent cyber capabilities",
+        "url": "https://z.ai/blog/glm-5.3",
+        "source_name": "Hacker News",
+        "kind": "community",
+        "section": "product",
+        "topics": [
+          "models"
+        ],
+        "cluster": "glm-5-3-coding-cyber-model",
+        "published_at": "2026-08-14T05:19:59Z",
+        "read_annotation": "HN thread",
+        "summary": "Coding model with emergent cyber capabilities; 860 points on Hacker News.",
+        "via": null,
+        "paywalled": false,
+        "hn_points": 860
+      },
+      {
+        "story_id": "ca7bf05ad704a6df",
+        "title": "Alibaba Opens Qwen3.8-Max Weights, Letting Teams Self-Host a 2.4T Model",
+        "url": "https://alphasignal.ai/news/alibaba-opens-qwen3-8-max-weights-letting-teams-self-host-a-2-4t-model",
+        "source_name": "AlphaSignal",
+        "kind": "newsletter",
+        "section": "product",
+        "topics": [
+          "models"
+        ],
+        "cluster": "qwen3-8-open-weights",
+        "published_at": "2026-08-14T15:02:48Z",
+        "read_annotation": "newsletter item",
+        "summary": "Qwen3.8-27B and the 2.4T-A95B Max model, open under Apache 2.0.",
+        "via": null,
+        "paywalled": false,
+        "hn_points": null
+      },
+      {
+        "story_id": "660252daa3ebac0b",
+        "title": "How many of your agent's calls actually need a frontier model?",
+        "url": "https://www.langchain.com/blog/switchyard-agent-routing-benchmark",
+        "source_name": "LangChain",
+        "kind": "company",
+        "section": "research",
+        "topics": [
+          "evals-benchmarks"
+        ],
+        "cluster": "nemo-switchyard-agent-routing",
+        "published_at": "2026-08-11T15:25:30Z",
+        "read_annotation": "blog post",
+        "summary": "Routing cut cost 74% for six accuracy points across 145 tasks.",
+        "via": null,
+        "paywalled": false,
+        "hn_points": null
+      },
+      {
+        "story_id": "3ea26a0ca443fa18",
+        "title": "Mind Viruses: Self-Propagating Ideas in Multi-Agent LLM Systems",
+        "url": "https://arxiv.org/abs/2608.10218",
+        "source_name": "arXiv",
+        "kind": "paper",
+        "section": "research",
+        "topics": [
+          "security"
+        ],
+        "cluster": "multi-agent-mind-viruses",
+        "published_at": "2026-08-12T04:00:00Z",
+        "read_annotation": "paper",
+        "summary": "Ideas that spread between agents; a system-prompt warning conferred near-total immunity.",
+        "via": null,
+        "paywalled": false,
+        "hn_points": null
+      },
+      {
+        "story_id": "a2c077833db06e00",
+        "title": "METR Raises $71M to Independently Stress-Test the World's Most Powerful AI",
+        "url": "https://alphasignal.ai/news/metr-raises-71m-to-independently-stress-test-the-world-s-most-powerful-ai",
+        "source_name": "AlphaSignal",
+        "kind": "newsletter",
+        "section": "product",
+        "topics": [
+          "evals-benchmarks"
+        ],
+        "cluster": "metr-ai-safety-evals-funding",
+        "published_at": "2026-08-14T23:13:56Z",
+        "read_annotation": "newsletter item",
+        "summary": "$71M raised in six months for independent safety evaluations.",
+        "via": null,
+        "paywalled": false,
+        "hn_points": null
+      }
+    ],
+    "comic": {
+      "image": "/images/brief/memes/2026-W33/comic.webp",
+      "alt": "Deck stands blindfolded on the first-place step of a podium holding a trophy, one arm out tapping three spots in the air. Bolt, clipboard in hand, has slid the desk with the big button a metre to the left, so Deck is pressing nothing.",
+      "alt_joke": "The benchmark was deterministic. So is Deck's arm.",
+      "caption": "Same score as the frontier model. Never once looked at the screen."
+    }
+  },
+  "editor_notes": [],
+  "corrections": [],
+  "email": {
+    "send_state": "pending_approval",
+    "approve_by": null,
+    "sent_at": null,
+    "resend_broadcast_ids": {}
+  },
+  "cover": {
+    "light": "/images/brief/issues/2026-W33/cover-light.webp",
+    "dark": "/images/brief/issues/2026-W33/cover-dark.webp",
+    "alt": "A tall measuring stick stands alone on a rolling plain while a small figure at its base looks away from it toward a tangle of forking paths that run off into the distance."
+  }
+}
