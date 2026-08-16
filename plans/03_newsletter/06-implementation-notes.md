@@ -75,6 +75,13 @@ Yadnesh's answers and what verification against the live repos/APIs found.
   issue PR merges, the pipeline calls `POST {BRIEF_SITE_URL}/api/brief/notify`
   (auth: `BRIEF_PIPELINE_SECRET` bearer) and the site sends the notification via Zoho.
   Keeps SMTP creds in one place (Vercel).
+- **The held path uses the same route** (`{..., "needs_review": true, "pr_url",
+  "reasons": []}`), and is the one call that arms nothing: it writes no send-state and
+  never reads the issue off disk, because a held issue's PR is not merged and its JSON
+  is therefore not in the deployment answering the request. Requiring it to be there is
+  what made this path silent for the first real weekly (2026-W33): the PR opened, the
+  pipeline stopped, and the owner found out by asking why no mail had come. Plan 02 §5
+  had always specified the notification; only the code was missing.
 - **Subscriber store + send-state store:** one small managed DB provisioned through the
   Vercel Marketplace (Upstash Redis unless something blocks it), holding: subscribers
   (email, cadence, confirmed_at, unsubscribed_at, consent log fields), send-state per

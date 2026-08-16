@@ -66,7 +66,15 @@ const {
   personalizeIssueEmail,
   renderIssueEmail,
 } = await import("../src/lib/brief/issueEmail.ts");
-const { buildApprovalEmail } = await import("../src/lib/brief/approvalEmail.ts");
+const {
+  MAX_REVIEW_REASONS,
+  MAX_REVIEW_REASON_CHARS,
+  buildApprovalEmail,
+  buildNeedsReviewEmail,
+  needsReviewSubject,
+  reviewPrLink,
+  reviewReasons,
+} = await import("../src/lib/brief/approvalEmail.ts");
 // Content assertions against the HTML part have to escape the way the renderer
 // does, or an apostrophe in a fixture fails a test about something else.
 const { escapeHtml } = await import("../src/lib/brief/emailChrome.ts");
@@ -680,6 +688,107 @@ test("an issue with no humor produces an approval email with no images", () => {
   );
   // And the reader-facing render of the same issue never has one either.
   assertNoImages(renderIssueEmail(plain, LINKS), "no-humor issue email");
+});
+
+/* ── Held for review ────────────────────────────────────────────────────── */
+
+/**
+ * The mail that goes out when the fact-gate or the validator refuses an issue.
+ *
+ * The 2026-W33 weekly is the reason it exists: it was held, the PR opened, and
+ * nothing was sent, so the only way to find out was to notice no mail had come.
+ * These assert the two halves of getting that right. The owner has to be told why
+ * and where, and the mail must carry nothing that could send the issue it is
+ * complaining about.
+ */
+const REVIEW = {
+  base: "https://yadneshsalvi.com",
+  type: "weekly",
+  id: "2026-W33",
+  prUrl: "https://github.com/yadneshSalvi/yadnesh-personal-blog/pull/6",
+  reasons: [
+    "weekly.through_line could not be grounded and cannot be demoted; issue held for review",
+    "weekly.deep_cuts[0].summary could not be grounded and cannot be demoted; issue held for review",
+  ],
+};
+
+test("the needs-review mail names the issue in its subject", () => {
+  const mail = buildNeedsReviewEmail(REVIEW);
+  assert.equal(mail.subject, "[brief] NEEDS REVIEW: weekly 2026-W33");
+  assert.equal(needsReviewSubject("daily", "2026-08-15"), "[brief] NEEDS REVIEW: daily 2026-08-15");
+});
+
+test("it carries every reason and the PR, in both parts", () => {
+  const mail = buildNeedsReviewEmail(REVIEW);
+  for (const part of ["html", "text"]) {
+    for (const reason of REVIEW.reasons) {
+      const needle = part === "html" ? escapeHtml(reason) : reason;
+      assert.ok(mail[part].includes(needle), `the ${part} part is missing a reason`);
+    }
+    assert.ok(mail[part].includes(REVIEW.prUrl), `the ${part} part is missing the PR link`);
+  }
+  assertNoEmDash(mail, "needs-review");
+});
+
+test("it says plainly that nothing ships until the PR is dealt with", () => {
+  const mail = buildNeedsReviewEmail(REVIEW);
+  for (const part of ["html", "text"]) {
+    assert.ok(
+      mail[part].includes("Nothing publishes and nothing sends until that PR is merged or closed"),
+      `the ${part} part does not say the pipeline has stopped`,
+    );
+  }
+});
+
+test("it can never send the issue it is complaining about", () => {
+  const mail = buildNeedsReviewEmail(REVIEW);
+  for (const part of ["html", "text"]) {
+    // The approval mail's one-tap approve link has no business in a mail about an
+    // issue no human has cleared yet.
+    assert.equal(mail[part].includes("/api/brief/send-action"), false, `${part}: an action link`);
+    assert.equal(/approve and send/i.test(mail[part]), false, `${part}: an approve affordance`);
+  }
+});
+
+test("a missing PR link degrades to something a human can still act on", () => {
+  const mail = buildNeedsReviewEmail({ ...REVIEW, prUrl: null, reasons: [] });
+  for (const part of ["html", "text"]) {
+    assert.ok(mail[part].includes("needs-review"), `${part}: no way to find the PR`);
+    assert.ok(mail[part].includes("No reason was recorded."), `${part}: no reason placeholder`);
+  }
+});
+
+test("the PR link is parsed, not trusted", () => {
+  assert.equal(reviewPrLink("https://github.com/yadneshSalvi/x/pull/6"), "https://github.com/yadneshSalvi/x/pull/6");
+  for (const hostile of [
+    "javascript:alert(1)",
+    "http://github.com/a/b/pull/1", // not https
+    "https://github.com.evil.test/a/b", // suffix, not the host
+    "https://evil.test/github.com/pull/1",
+    "",
+    "  ",
+    42,
+    null,
+    { url: "https://github.com/a/b" },
+  ]) {
+    assert.equal(reviewPrLink(hostile), null, `accepted ${JSON.stringify(hostile)}`);
+  }
+});
+
+test("reasons are bounded before they reach an inbox", () => {
+  assert.deepEqual(reviewReasons("not a list"), []);
+  assert.deepEqual(reviewReasons([" spaced ", "", 7, null, "kept"]), ["spaced", "kept"]);
+  assert.equal(reviewReasons(Array(200).fill("x")).length, MAX_REVIEW_REASONS);
+  assert.equal(reviewReasons(["y".repeat(9999)])[0].length, MAX_REVIEW_REASON_CHARS);
+});
+
+test("a hostile reason cannot inject markup", () => {
+  const mail = buildNeedsReviewEmail({
+    ...REVIEW,
+    reasons: ['<script>alert("x")</script> & <b>bold</b>'],
+  });
+  assert.equal(mail.html.includes("<script>"), false, "a reason reached the HTML unescaped");
+  assert.ok(mail.html.includes("&lt;script&gt;"), "the reason is missing entirely");
 });
 
 /* ── Personalization ────────────────────────────────────────────────────── */

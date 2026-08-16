@@ -29,6 +29,125 @@ export function approvalSubject(issue: BriefIssue): string {
   return `[brief] approve: ${issue.subject}`;
 }
 
+export function needsReviewSubject(type: "daily" | "weekly", id: string): string {
+  return `[brief] NEEDS REVIEW: ${type} ${id}`;
+}
+
+/** How many held-for-review reasons reach the email, and how long each may be. */
+export const MAX_REVIEW_REASONS = 25;
+export const MAX_REVIEW_REASON_CHARS = 500;
+
+/**
+ * The PR link, or null.
+ *
+ * It arrives over the wire from the pipeline and goes into an email as an href, so
+ * it is parsed rather than trusted: https only, and only on GitHub, which is the one
+ * place a PR for this repo can be.
+ */
+export function reviewPrLink(value: unknown): string | null {
+  if (typeof value !== "string" || value.trim() === "") return null;
+  try {
+    const url = new URL(value.trim());
+    const host = url.hostname.toLowerCase();
+    if (url.protocol !== "https:") return null;
+    if (host !== "github.com" && !host.endsWith(".github.com")) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+/** The pipeline's reasons, bounded. Anything that is not a non-empty string is not one. */
+export function reviewReasons(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((entry): entry is string => typeof entry === "string")
+    .map((entry) => entry.trim().slice(0, MAX_REVIEW_REASON_CHARS))
+    .filter((entry) => entry !== "")
+    .slice(0, MAX_REVIEW_REASONS);
+}
+
+/**
+ * The other end of the pipeline: an issue the fact-gate or the validator refused to
+ * clear, sitting in an unmerged PR.
+ *
+ * It takes no BriefIssue, on purpose. A held issue's PR is not merged, so its JSON is
+ * not in the deployment this route runs in and there is nothing to read. Everything
+ * here comes off the wire from the pipeline.
+ *
+ * The 2026-W33 weekly is why it exists. It was held, the PR opened, and nobody was
+ * told; the owner found out by asking why no mail had come. Silence is the one thing
+ * a review gate cannot afford, because a gate nobody hears from is indistinguishable
+ * from a pipeline that did not run.
+ */
+export function buildNeedsReviewEmail(input: {
+  base: string;
+  type: "daily" | "weekly";
+  id: string;
+  /** Raw from the pipeline. Sanitized here, so the route can pass the body through. */
+  prUrl: unknown;
+  reasons: unknown;
+}): BuiltEmail {
+  const footer: BriefEmailFooter = { archiveUrl: archiveUrl(input.base) };
+  const label = `${input.type === "daily" ? "Daily" : "Weekly"} ${input.id}`;
+  const standstill =
+    "Nothing publishes and nothing sends until that PR is merged or closed. There is " +
+    "no timer on this one: left alone it stays exactly where it is.";
+  const prUrl = reviewPrLink(input.prUrl);
+  const parsed = reviewReasons(input.reasons);
+  const reasons = parsed.length > 0 ? parsed : ["No reason was recorded."];
+
+  const bodyHtml = [
+    `<h1>${escapeHtml(`${label} is held for review`)}</h1>`,
+    `<p class="lede">${escapeHtml(
+      `${issueDateLabel(input.type, input.id)} · the fact-gate or the validator did not clear it`,
+    )}</p>`,
+    `<p>${escapeHtml(standstill)}</p>`,
+    `<h2>Why it was held</h2>`,
+    `<ul>${reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join("")}</ul>`,
+    `<h2>Decide</h2>`,
+    `<p>${
+      prUrl
+        ? `${emailLink(prUrl, "Open the PR")}<br>`
+        : `The pipeline did not report a PR link. Look for the <code>needs-review</code> label.<br>`
+    }${emailLink(prUrl ?? issueSourceUrl(input.type, input.id), "Read the issue JSON")}</p>`,
+    `<p class="lede">${escapeHtml(
+      "Fix it in the PR and merge to publish it, or close the PR to drop the issue. " +
+        "The approval mail with the send decision only arrives once the PR has merged.",
+    )}</p>`,
+  ].join("\n");
+
+  return {
+    subject: needsReviewSubject(input.type, input.id),
+    html: renderBriefEmailHtml({
+      preheader: `Held for review. ${reasons[0]}`,
+      bodyHtml,
+      footer,
+    }),
+    text: renderBriefEmailText({
+      lines: [
+        `${label} is held for review`,
+        `${issueDateLabel(input.type, input.id)} · the fact-gate or the validator did not clear it`,
+        "",
+        standstill,
+        "",
+        "WHY IT WAS HELD",
+        ...reasons.map((reason) => `* ${reason}`),
+        "",
+        "DECIDE",
+        prUrl
+          ? `Open the PR: ${prUrl}`
+          : "The pipeline did not report a PR link. Look for the needs-review label.",
+        `Read the issue JSON: ${prUrl ?? issueSourceUrl(input.type, input.id)}`,
+        "",
+        "Fix it in the PR and merge to publish it, or close the PR to drop the issue. " +
+          "The approval mail with the send decision only arrives once the PR has merged.",
+      ],
+      footer,
+    }),
+  };
+}
+
 /** A deadline a human can act on, in the timezone the human lives in. */
 function deadlineLabel(approveBy: string): string {
   const date = new Date(approveBy);

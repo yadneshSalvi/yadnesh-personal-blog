@@ -11,9 +11,25 @@
 // Idempotent by design. Calling it twice re-sends the notification, which is
 // what you want when the first one landed in spam, and never rewinds an issue
 // that has already gone out.
+//
+// The pipeline also calls it for the other outcome, an issue the fact-gate or
+// the validator held:
+//
+//   { "type", "id", "needs_review": true, "pr_url": "https://github.com/...",
+//     "reasons": ["...", "..."] }
+//
+// That branch arms nothing. It cannot even look the issue up: a held issue's PR
+// is not merged, so its JSON is not in this deployment, and requiring it to be
+// there is what made the held path silent in the first place.
 
 import { NextResponse } from "next/server";
-import { approvalSubject, buildApprovalEmail, issueSourceUrl } from "@/lib/brief/approvalEmail";
+import {
+  approvalSubject,
+  buildApprovalEmail,
+  buildNeedsReviewEmail,
+  issueSourceUrl,
+  needsReviewSubject,
+} from "@/lib/brief/approvalEmail";
 import { getIssue } from "@/lib/brief/issues";
 import { renderIssueEmail } from "@/lib/brief/issueEmail";
 import { isMailerConfigured, sendBriefEmail } from "@/lib/brief/mailer";
@@ -53,6 +69,54 @@ export async function POST(request: Request) {
       { ok: false, error: 'Body needs {"type":"daily"|"weekly","id":"<issue id>"}.' },
       { status: 400 },
     );
+  }
+
+  const base = siteBaseUrl(request);
+
+  if (body.needs_review === true) {
+    if (!isMailerConfigured()) {
+      return NextResponse.json({ ok: false, error: "No mail driver is configured." }, { status: 503 });
+    }
+    const to = process.env.BRIEF_APPROVER_EMAIL;
+    if (!to) {
+      return NextResponse.json(
+        { ok: false, error: "BRIEF_APPROVER_EMAIL is not set, so there is nobody to tell." },
+        { status: 503 },
+      );
+    }
+    // Deliberately no send-state write. An issue nobody has reviewed must not be
+    // holding an armed two-hour window, and arming one here would send the very
+    // issue the gate refused to clear.
+    // pr_url and reasons are sanitized by the builder, which is where the rules
+    // about what may reach that email live.
+    const message = buildNeedsReviewEmail({
+      base,
+      type,
+      id,
+      prUrl: body.pr_url,
+      reasons: body.reasons,
+    });
+    try {
+      await sendBriefEmail({
+        to,
+        subject: message.subject,
+        html: message.html,
+        text: message.text,
+        kind: "transactional",
+      });
+    } catch (error) {
+      console.error("[brief] needs-review notification failed to send", error);
+      return NextResponse.json(
+        { ok: false, error: "The needs-review notification could not be sent." },
+        { status: 502 },
+      );
+    }
+    return NextResponse.json({
+      ok: true,
+      needs_review: true,
+      subject: needsReviewSubject(type, id),
+      armed: false,
+    });
   }
 
   const issue = getIssue(type, id);
@@ -112,7 +176,6 @@ export async function POST(request: Request) {
     state = existing;
   }
 
-  const base = siteBaseUrl(request);
   const links = issueEmailLinks(base, issue);
   const preview = renderIssueEmail(issue, links);
 
