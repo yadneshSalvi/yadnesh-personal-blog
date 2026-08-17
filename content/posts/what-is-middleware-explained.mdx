@@ -1,0 +1,264 @@
+---
+title: "Middleware, explained from scratch: one idea, three frameworks"
+subtitle: "The same nine-line shape shows up in FastAPI, Django, and LangChain's Deep Agents. Once you see it, you'll spot it everywhere."
+description: "What middleware is, how the onion works, and why FastAPI, Django, and Deep Agents all use the same shape. Explained plainly with real code."
+image: "/images/posts/what-is-middleware-explained/fig-1.png"
+imageAlt: "Concentric rings around a center labeled route; a request arrow passes inward through middleware 1 then middleware 2, and a response arrow returns outward through the same rings in reverse."
+createdAt: "2026-08-17T10:57:51Z"
+updatedAt: "2026-08-17T10:57:51Z"
+tags: ["middleware", "fastapi", "django", "deepagents", "langchain"]
+---
+
+Nine lines of Python. Add them to any FastAPI app and every single response your server sends will carry a stamp saying how long it took to make. You don't touch a single route. You don't edit a single function that does real work. You bolt one thing on at the door, and it applies to everything behind the door.
+
+That's middleware. By the end of this page you'll be able to explain what it is to someone who has never written a web server, read a middleware stack in FastAPI or Django and know exactly what order things run in, and recognise the same idea wearing a new outfit inside AI agents (LangChain's Deep Agents are built almost entirely out of it).
+
+Here's the nine-line version, straight from the [FastAPI middleware tutorial](https://fastapi.tiangolo.com/tutorial/middleware/):
+
+```python
+import time
+from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.perf_counter()
+    response = await call_next(request)
+    process_time = time.perf_counter() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
+```
+
+The rest of this post explains those nine lines, then shows you the exact same shape in Django (with a few extra tricks) and then in an AI agent, where there's no web request at all and it still works.
+
+<Figure src="/images/posts/what-is-middleware-explained/fig-1.png" alt="Concentric rings around a center labeled route; a request arrow passes inward through middleware 1 then middleware 2, and a response arrow returns outward through the same rings in reverse." caption="The whole idea in one shape: in through each layer, back out through the same layers in reverse." width={1536} height={1024} />
+
+## The one idea: a doorman who sees everyone
+
+Picture a building with one entrance. Inside are dozens of offices. Each office does one job: one handles refunds, one handles sign-ups, one prints reports.
+
+Now put a doorman at the entrance. Every visitor passes the doorman on the way in. Every visitor passes the doorman again on the way out. The doorman can:
+
+- Look at the visitor before letting them through (check their badge, note the time they arrived).
+- Let them go on to whichever office they were heading for.
+- Look at them again on the way out (stamp their receipt, note how long they stayed).
+- Or turn them away at the door, so no office ever sees them.
+
+The offices don't know the doorman exists. They do their one job. All the "applies to everyone" work lives at the door.
+
+In a web server, the offices are your routes (the functions that answer specific URLs). The visitors are requests (a browser or another program asking your server for something). The doorman is middleware. That's the whole idea. Everything else on this page is detail about how three different frameworks build the door.
+
+One more thing to file away: you can have more than one doorman, standing in a line. A visitor passes doorman 1, then doorman 2, then reaches the office. On the way out they pass doorman 2 first, then doorman 1. Same line, walked in reverse. Django's docs call this an onion, and it's the best word for it. Hold onto it, because the reverse-on-the-way-out rule is the thing people get wrong.
+
+## FastAPI: the doorman is a function
+
+Back to the nine lines. Read them as a doorman's shift:
+
+```python
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.perf_counter()          # visitor arrives: note the time
+    response = await call_next(request)       # send them to their office, wait
+    process_time = time.perf_counter() - start_time
+    response.headers["X-Process-Time"] = str(process_time)  # stamp on the way out
+    return response
+```
+
+Three parts:
+
+1. **Before.** Anything above `call_next` runs when the request comes in, before any route sees it. Here it's one line: start a stopwatch.
+2. **Hand off.** `call_next(request)` is FastAPI handing the visitor to the rest of the building. It comes back with the `response` the route produced. This is the line that makes it middleware rather than a route: it doesn't answer the request itself, it passes it on and waits.
+3. **After.** Anything below `call_next` runs on the way out. Here: stop the stopwatch and write the number into a header called `X-Process-Time`. (A header is a small labelled note attached to a response, separate from the page or data itself. FastAPI's docs suggest the `X-` prefix for custom ones.)
+
+The `@app.middleware("http")` line at the top is what registers this function as a doorman rather than an ordinary function nobody calls.
+
+Run this and hit any URL on the app. The response comes back with `X-Process-Time: 0.0004...` on it. Every URL. You wrote it once.
+
+### Stacking doormen in FastAPI
+
+Add two middlewares and the onion rule kicks in. FastAPI's docs are explicit about the order, and it's slightly counterintuitive: **the last middleware you add is the outermost.** So with
+
+```python
+app.add_middleware(MiddlewareA)
+app.add_middleware(MiddlewareB)
+```
+
+the request goes B, then A, then your route. The response comes back A, then B. B was added last, so B is the outer skin of the onion and sees the request first and the response last.
+
+<Figure src="/images/posts/what-is-middleware-explained/fig-2.png" alt="Nested boxes B around A around route; the request arrow enters B, then A, then the route, and the response arrow returns through A then B; B is marked as added last." caption="FastAPI's rule: the last middleware you add is the outermost, so it sees the request first and the response last." width={1536} height={1024} />
+
+Two small details from the same page that will save you a confused afternoon:
+
+- If a route uses a dependency with `yield` (code that runs setup before the route and cleanup after), that cleanup runs *after* the middleware, not before.
+- Background tasks (work you schedule to happen once the response is sent) also run after all the middleware.
+
+So your `X-Process-Time` measures the route, not the cleanup or the background work. Good to know before you trust the number.
+
+**Checkpoint.** You can now read a FastAPI middleware and point at the before, the hand-off, and the after. That's the entire mechanism. Everything from here is the same three parts in different clothes.
+
+## Django: the doorman is a wrapper, and it can slam the door
+
+Django has had middleware for much longer, and its [middleware docs](https://docs.djangoproject.com/en/6.0/topics/http/middleware/) describe it as a light, low-level plugin system for globally altering the framework's input or output. "Globally" is the key word: change one thing, it applies to every request.
+
+Here's Django's simplest middleware, verbatim from the docs:
+
+```python
+def simple_middleware(get_response):
+    # One-time configuration and initialization.
+
+    def middleware(request):
+        # Code to be executed for each request before
+        # the view (and later middleware) are called.
+
+        response = get_response(request)
+
+        # Code to be executed for each request/response after
+        # the view is called.
+
+        return response
+
+    return middleware
+```
+
+Squint and it's the FastAPI shape. `get_response` is Django's name for `call_next`. Before it: the way in. After it: the way out. The one new wrinkle is the outer function: Django calls `simple_middleware(get_response)` once, at startup, and keeps the inner `middleware` function around to run per request. So you get a spot for one-time setup (open a connection, load a config) that FastAPI's decorator version doesn't give you.
+
+A "view" in Django is what FastAPI calls a route: the function that does the real work for a URL.
+
+### Turning it on: the MIDDLEWARE list
+
+Django doesn't use a decorator. You list your doormen in settings, in order. This is what a fresh project ships with:
+
+```python
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+```
+
+Seven doormen, top to bottom, before your view ever runs. Security headers, sessions (remembering who a browser is between visits), CSRF protection, figuring out which logged-in user this is, and so on. None of your views contain any of that code. It's all at the door.
+
+And order matters, for a reason you can now predict. Django's docs give the example directly: `AuthenticationMiddleware` reads the user out of the session, so it has to run *after* `SessionMiddleware` has set the session up. Top of the list runs first on the way in. Bottom of the list is closest to the view.
+
+Notice this is the opposite convention from FastAPI's `add_middleware`, where the last one added is outermost. Same onion, different way of writing the list down. Every time you meet a new framework, this is the first question to ask: which end of the list is the outside?
+
+### Slamming the door: short-circuiting
+
+Here's the trick I said to hold onto. A middleware doesn't *have* to call `get_response`. If it returns a response of its own without calling it, the request never reaches anything further in. Django's docs put it exactly: none of the layers inside that one, including the view, will see the request or the response. The response goes back out only through the layers it already came in through.
+
+<Figure src="/images/posts/what-is-middleware-explained/fig-3.png" alt="A request travels down through a session layer and an auth layer, then turns around at auth with a 403 response and goes back out; the messages layer and view below are faded because they never ran." caption="Slamming the door: a layer that returns without handing off means nothing inside it ever runs." width={1536} height={1024} />
+
+That's how a "you must be logged in" check works without every view repeating it. Doorman number 5 looks at the badge, finds none, and hands back a 403 on the spot. Offices 6 and 7 and the view never hear about it.
+
+### The extra hooks
+
+Django's middleware classes can also define a few named methods for specific moments. You won't need them on day one, but they answer "where would I hook in if…":
+
+- `process_view(request, view_func, view_args, view_kwargs)`: runs right before the view. Return `None` to continue, or a response to skip the view entirely.
+- `process_exception(request, exception)`: runs if the view raises an error. Return a response to recover, or `None` to let normal error handling take over.
+- `process_template_response(request, response)`: runs after the view when the response is a template that hasn't been rendered yet, so you can change the template or its data before it turns into HTML.
+
+One more that I like: a middleware's `__init__` can raise `MiddlewareNotUsed`, and Django will quietly drop it from the chain at startup. Handy for "only in debug" doormen.
+
+**Checkpoint.** You now know two frameworks' middleware. Both are: before, hand off, after, in an onion, with the option to refuse. Django adds a startup slot, a settings list, and named hooks for specific moments. Now the fun part.
+
+## Deep Agents: there's no request, and it still works
+
+An agent is an AI that can take actions on its own, not only answer questions. Concretely, an agent is a loop: call the model, see if it asked to use a tool (run a search, read a file, send an email), run the tool, feed the result back, call the model again, stop when the model stops asking for tools.
+
+There's no browser. No URL. No HTTP request or response. So what would a doorman even stand in front of?
+
+LangChain's answer: stand in front of the *steps of the loop*. Every model call is a doorway. Every tool call is a doorway. The whole run is a doorway. Put a doorman at each, and you get exactly the FastAPI and Django shape, applied to an AI instead of a web server.
+
+<Figure src="/images/posts/what-is-middleware-explained/fig-4.png" alt="A loop between a model box and a tools box, with a bracket around the model labeled wrap model and a bracket around the tools labeled wrap tool, and a start arrow entering the loop." caption="No HTTP request in sight. The doorways are the model call and the tool call, and middleware wraps each one." width={1536} height={1024} />
+
+The [LangChain middleware docs](https://docs.langchain.com/oss/python/langchain/middleware) name the hooks:
+
+- `before_agent` and `after_agent`: once per run, at the very start and very end.
+- `before_model` and `after_model`: around every call to the language model.
+- `wrap_model_call`: wraps the model call itself, so you can retry it, swap the model, change the prompt.
+- `wrap_tool_call`: wraps every tool the model asks to run.
+
+And the ordering rule for a stack of them is, in the docs' words, "before_* run in order, after_* reversed, wrap nested". That's the onion, spelled out. With `middleware=[m1, m2, m3]`, the `before_model` hooks run 1, 2, 3; the `wrap_model_call` hooks nest so 1 wraps 2 wraps 3 wraps the model; and `after_model` runs 3, 2, 1. Same rule as Django's list: top is outermost.
+
+Here's what a `wrap_model_call` looks like, from LangChain's [custom middleware page](https://docs.langchain.com/oss/python/langchain/middleware/custom):
+
+```python
+from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
+from typing import Callable
+
+@wrap_model_call
+def retry_model(
+    request: ModelRequest,
+    handler: Callable[[ModelRequest], ModelResponse],
+) -> ModelResponse:
+    for attempt in range(3):
+        try:
+            return handler(request)
+        except Exception as e:
+            if attempt == 2:
+                raise
+            print(f"Retry {attempt + 1}/3 after error: {e}")
+```
+
+Read it against the FastAPI version and the family resemblance is hard to miss. `handler(request)` is `call_next(request)` is `get_response(request)`. Code before it runs before the model. Code after it (or, here, around it) shapes what comes back. This one retries a flaky model call up to three times, and not a single line of your agent's own logic knows that's happening.
+
+Slamming the door exists here too. An `after_model` hook can return `{"jump_to": "end"}` and the loop stops right there. The docs' example checks whether the model's reply contains a blocked word and, if it does, replaces it with a refusal and jumps to the end. That's `process_view` returning a response, or a Django layer refusing to call `get_response`, in agent clothes.
+
+### Why Deep Agents are the best example of all
+
+Here's the part I find genuinely elegant. LangChain's [Deep Agents](https://reference.langchain.com/python/deepagents/middleware) don't *use* middleware as an add-on. They're *made of* it. The reference describes "a modular middleware architecture where each core capability is implemented as composable middleware." Reading through the deepagents source for `create_deep_agent`, the default stack is (roughly, and it moves fast):
+
+- `FilesystemMiddleware`: gives the agent `ls`, `read_file`, `write_file`, `edit_file`, `glob`, `grep` tools and the instructions for using them.
+- `SubAgentMiddleware`: gives it a `task` tool to hand work to sub-agents.
+- `SummarizationMiddleware`: when the conversation gets too long, compresses the older part so the model doesn't run out of room.
+- `PatchToolCallsMiddleware`: repairs malformed tool calls so a small formatting slip doesn't crash the run.
+- Then your own middleware, inserted after that base stack.
+- Then a tail: `AnthropicPromptCachingMiddleware` (cheaper repeated calls), and, when you ask for them, `MemoryMiddleware` and `HumanInTheLoopMiddleware` (pause and ask a person before certain tools run).
+
+Each one is a doorman at the model-call or tool-call door. Want an agent without a filesystem? Leave that layer out. Want to log every tool call? Add a layer with `wrap_tool_call`. Want it to stop and ask you before it sends an email? That's `HumanInTheLoopMiddleware` with `{"send_email": True}`. The agent's core loop never changes. All the capability is at the doors.
+
+Compare that with how most agent frameworks worked two years ago: one giant loop with `if` statements for every feature. Same problem middleware solved for web servers fifteen years ago, same solution.
+
+## Three frameworks, one shape
+
+| | FastAPI | Django | LangChain / Deep Agents |
+|---|---|---|---|
+| What's being wrapped | an HTTP request | an HTTP request | a model call, a tool call, or the whole run |
+| "Pass it on" is called | `call_next(request)` | `get_response(request)` | `handler(request)` |
+| How you register it | `@app.middleware("http")` or `add_middleware` | the `MIDDLEWARE` list in settings | `middleware=[...]` on `create_agent` / `create_deep_agent` |
+| Which end is outermost | last added | top of the list | first in the list |
+| Refuse / stop early | return your own response | return without calling `get_response` | `jump_to: "end"` |
+
+If you remember one row, make it the third-from-last: every framework picks a convention for which end of the list is the outside, and they don't agree. Check it before you assume.
+
+## What I'd do with this
+
+A few concrete uses that follow from the mechanism, not from a feature list:
+
+- **Timing and logging live at the door, never in routes or tools.** The FastAPI example is the pattern. Same for a `wrap_tool_call` that logs the tool name and how long it ran. You get it on everything, for free, and you can remove it in one place.
+- **Auth and guardrails are short-circuits.** A missing badge should never reach the office. In an agent, an `after_model` that catches a policy violation and jumps to `end` is the same move.
+- **Retries and fallbacks belong in a wrapper.** The `retry_model` example above; LangChain also ships `ModelFallbackMiddleware` for switching models on failure. Your agent logic stays clean.
+- **When something runs "in the wrong order", check the onion first.** Nine times out of ten it's the outermost-vs-innermost convention. FastAPI: last added is outer. Django and LangChain: top of the list is outer.
+- **Read your framework's built-in stack.** Django's seven default middlewares and Deep Agents' default stack are both worth ten minutes. They tell you what your app is already doing to every request that you didn't write.
+
+## Honest caveats
+
+- FastAPI's `@app.middleware("http")` is a convenience over the lower-level ASGI middleware system underneath (that's why `add_middleware` exists too). For most apps the decorator is enough; the ordering rule above is from FastAPI's own docs.
+- The Deep Agents default stack is what the source showed at the time of writing, and it has some conditional layers (skills, memory, async sub-agents) that only appear when you ask for them. Treat my list as a snapshot, not a spec.
+- Middleware is powerful precisely because it's invisible from inside a route or a tool. That's also its cost: when a request behaves strangely, the cause is often two files away in a layer you forgot was there. Keep the stack short and readable.
+
+## What you can now explain
+
+- Middleware is a doorman: code that runs before and after every request (or every model call), without the routes knowing.
+- The three parts, in every framework: before, hand off (`call_next` / `get_response` / `handler`), after.
+- Stacked middleware forms an onion: in through each layer in order, back out in reverse.
+- A layer can refuse to hand off, and nothing inside it ever runs.
+- FastAPI, Django, and LangChain's Deep Agents build the same door with different names, and Deep Agents go furthest by making every capability a layer.
+
+Sources for this piece: the [FastAPI middleware tutorial](https://fastapi.tiangolo.com/tutorial/middleware/), the [Django 6.0 middleware docs](https://docs.djangoproject.com/en/6.0/topics/http/middleware/), the [Deep Agents middleware reference](https://reference.langchain.com/python/deepagents/middleware), plus LangChain's [middleware overview](https://docs.langchain.com/oss/python/langchain/middleware) and [custom middleware guide](https://docs.langchain.com/oss/python/langchain/middleware/custom) for the hook names and ordering rules.
