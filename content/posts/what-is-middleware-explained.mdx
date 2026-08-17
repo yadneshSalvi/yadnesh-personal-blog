@@ -32,7 +32,7 @@ async def add_process_time_header(request: Request, call_next):
 
 The rest of this post explains those nine lines, then shows you the exact same shape in Django (with a few extra tricks) and then in an AI agent, where there's no web request at all and it still works.
 
-<Figure src="/images/posts/what-is-middleware-explained/fig-1.png" alt="Concentric rings around a center labeled route; a request arrow passes inward through middleware 1 then middleware 2, and a response arrow returns outward through the same rings in reverse." caption="The whole idea in one shape: in through each layer, back out through the same layers in reverse." width={1536} height={1024} />
+<Figure src="/images/posts/what-is-middleware-explained/fig-1.png" srcDark="/images/posts/what-is-middleware-explained/fig-1-dark.png" alt="Concentric rings around a center labeled route; a request arrow passes inward through middleware 1 then middleware 2, and a response arrow returns outward through the same rings in reverse." caption="The whole idea in one shape: in through each layer, back out through the same layers in reverse." width={1536} height={1024} />
 
 ## The one idea: a doorman who sees everyone
 
@@ -86,7 +86,7 @@ app.add_middleware(MiddlewareB)
 
 the request goes B, then A, then your route. The response comes back A, then B. B was added last, so B is the outer skin of the onion and sees the request first and the response last.
 
-<Figure src="/images/posts/what-is-middleware-explained/fig-2.png" alt="Nested boxes B around A around route; the request arrow enters B, then A, then the route, and the response arrow returns through A then B; B is marked as added last." caption="FastAPI's rule: the last middleware you add is the outermost, so it sees the request first and the response last." width={1536} height={1024} />
+<Figure src="/images/posts/what-is-middleware-explained/fig-2.png" srcDark="/images/posts/what-is-middleware-explained/fig-2-dark.png" alt="Nested boxes B around A around route; the request arrow enters B, then A, then the route, and the response arrow returns through A then B; B is marked as added last." caption="FastAPI's rule: the last middleware you add is the outermost, so it sees the request first and the response last." width={1536} height={1024} />
 
 Two small details from the same page that will save you a confused afternoon:
 
@@ -151,7 +151,7 @@ Notice this is the opposite convention from FastAPI's `add_middleware`, where th
 
 Here's the trick I said to hold onto. A middleware doesn't *have* to call `get_response`. If it returns a response of its own without calling it, the request never reaches anything further in. Django's docs put it exactly: none of the layers inside that one, including the view, will see the request or the response. The response goes back out only through the layers it already came in through.
 
-<Figure src="/images/posts/what-is-middleware-explained/fig-3.png" alt="A request travels down through a session layer and an auth layer, then turns around at auth with a 403 response and goes back out; the messages layer and view below are faded because they never ran." caption="Slamming the door: a layer that returns without handing off means nothing inside it ever runs." width={1536} height={1024} />
+<Figure src="/images/posts/what-is-middleware-explained/fig-3.png" srcDark="/images/posts/what-is-middleware-explained/fig-3-dark.png" alt="A request travels down through a session layer and an auth layer, then turns around at auth with a 403 response and goes back out; the messages layer and view below are faded because they never ran." caption="Slamming the door: a layer that returns without handing off means nothing inside it ever runs." width={1536} height={1024} />
 
 That's how a "you must be logged in" check works without every view repeating it. Doorman number 5 looks at the badge, finds none, and hands back a 403 on the spot. Offices 6 and 7 and the view never hear about it.
 
@@ -175,7 +175,7 @@ There's no browser. No URL. No HTTP request or response. So what would a doorman
 
 LangChain's answer: stand in front of the *steps of the loop*. Every model call is a doorway. Every tool call is a doorway. The whole run is a doorway. Put a doorman at each, and you get exactly the FastAPI and Django shape, applied to an AI instead of a web server.
 
-<Figure src="/images/posts/what-is-middleware-explained/fig-4.png" alt="A loop between a model box and a tools box, with a bracket around the model labeled wrap model and a bracket around the tools labeled wrap tool, and a start arrow entering the loop." caption="No HTTP request in sight. The doorways are the model call and the tool call, and middleware wraps each one." width={1536} height={1024} />
+<Figure src="/images/posts/what-is-middleware-explained/fig-4.png" srcDark="/images/posts/what-is-middleware-explained/fig-4-dark.png" alt="A loop between a model box and a tools box, with a bracket around the model labeled wrap model and a bracket around the tools labeled wrap tool, and a start arrow entering the loop." caption="No HTTP request in sight. The doorways are the model call and the tool call, and middleware wraps each one." width={1536} height={1024} />
 
 The [LangChain middleware docs](https://docs.langchain.com/oss/python/langchain/middleware) name the hooks:
 
