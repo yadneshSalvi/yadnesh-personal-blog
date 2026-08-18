@@ -1,0 +1,33 @@
+{
+ "issue_id": "2026-08-18",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-08-17-pm-m1",
+   "image": "/images/brief/memes/2026-08-18/2026-08-17-pm-m1.webp",
+   "alt": "A tidy lawn with a spotless information booth under a striped awning, signed 'LANGUAGE SERVER', 'FREE TODAY' and 'PRECISE', a red carpet rolled out to its counter and a smiling robot attendant leaning on some books. A worn mud path curves past the booth, missing the carpet, and two small figures walk it toward a 'grep' sign by the hedge.",
+   "alt_joke": "The hedge has a hole. The booth has a carpet.",
+   "caption": "Free today. Not on the way to anything.",
+   "concept": "A pristine, free, staffed language-server information booth on a lawn, and a worn mud path curving straight past it toward a sign marked grep",
+   "winner": true
+  },
+  {
+   "id": "2026-08-17-pm-m2",
+   "image": "/images/brief/memes/2026-08-18/2026-08-17-pm-m2.webp",
+   "alt": "A gym wall. A large framed chart titled 'PROGRESS' shows one line labelled 'BENCH' climbing steeply off the top of the chart while two lines labelled 'SQUAT' and 'RUN' lie flat along the bottom axis. Beside the chart stands a generic robot with a huge barrel chest and thick arms on thin stick legs, holding a small trophy, a bench press rack behind it. A treadmill in the corner still has its plastic wrap on.",
+   "alt_joke": "The treadmill is still in its wrapper.",
+   "caption": "Leg day was not in the eval set.",
+   "concept": "A gym progress chart where the BENCH line rockets and SQUAT and RUN never leave the floor, next to a robot built to match",
+   "winner": false
+  },
+  {
+   "id": "2026-08-18-am-m2",
+   "image": "/images/brief/memes/2026-08-18/2026-08-18-am-m2.webp",
+   "alt": "A quiet office corridor at night. In the centre is an ordinary door with a small wired window. A sign on the door reads 'IRREVERSIBLE ACTIONS' with a second line 'HUMAN REQUIRED', and beside the handle is a fingerprint reader glowing softly. Through the window, three oversized controls are visible on a console: a big red button labelled 'DROP TABLE', a lever labelled 'DEPLOY FRIDAY', and a plain grey button labelled 'REPLY ALL'. A generic small robot stands patiently beside the door holding two paper coffee cups, one in each hand, looking down the empty corridor. A wall clock reads a little after three.",
+   "alt_joke": "It brought two coffees. Both are for the human.",
+   "caption": "The token is long-lived. The human it wakes at 3am is not.",
+   "concept": "A plain office door signed IRREVERSIBLE ACTIONS, HUMAN REQUIRED, with a fingerprint reader; through its window sit three controls labelled DROP TABLE, DEPLOY FRIDAY and REPLY ALL, and a robot waits outside holding a coffee for a human who has not arrived",
+   "winner": false
+  }
+ ]
+}

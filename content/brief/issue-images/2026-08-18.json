@@ -1,0 +1,143 @@
+{
+ "issue_id": "2026-08-18",
+ "type": "daily",
+ "renders": 7,
+ "cost_usd": 1.75,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A robot on the left holds pipes that pass through inspection windows in a central wall before reaching a database, servers and a chat bubble on the right; a key ring hangs on the far side of the wall.",
+   "bytes": [
+    69594,
+    66690
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A small generic robot on the left holds a bundle of pipes that run rightward. In the centre, a solid wall with a single inspection gate; each pipe passes through its own small window in the gate, where a magnifying lens looks at what flows through. A ring of keys hangs on a hook on the far side of the wall, out of the robot's reach. To the right, plain shapes for a database cylinder, a cluster of server boxes and a chat bubble receive the pipes. Everything centred with generous margin on all sides.",
+   "labels": [
+    "AGENT",
+    "PROXY",
+    "PRODUCTION"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-18T00:11:41Z"
+  },
+  {
+   "key": "06930894d7276f4a",
+   "story_id": "06930894d7276f4a",
+   "light_name": "06930894d7276f4a-light.webp",
+   "dark_name": "06930894d7276f4a-dark.webp",
+   "alt": "Two lanes: on top a long scroll passes under a stamp unchanged; below, the same scroll goes into a machine and comes out short and full of gaps, with shreds beside it.",
+   "bytes": [
+    34828,
+    33920
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two horizontal lanes stacked in the centre of the frame. Top lane: a long unbroken paper scroll runs left to right and passes under a single rubber stamp; the scroll continues out the right side intact. Bottom lane: the same scroll enters a boxy machine with a funnel on top, and out the right side comes a much shorter strip with visible gaps torn out of it, next to a small pile of shredded pieces. Keep both lanes well inside the margins.",
+   "labels": [
+    "CACHED",
+    "REWRITTEN"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-18T00:12:45Z"
+  },
+  {
+   "key": "926fb43dc42d7bff",
+   "story_id": "926fb43dc42d7bff",
+   "light_name": "926fb43dc42d7bff-light.webp",
+   "dark_name": "926fb43dc42d7bff-dark.webp",
+   "alt": "A robot practises against its own reflection in a mirror on the left; on the right the same robot faces a semicircle of five differently shaped training dummies.",
+   "bytes": [
+    44178,
+    42240
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 3,
+   "cost_usd": 0.75,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Left half: a small generic robot practises in front of a single tall mirror, and the reflection is an identical robot making the exact same pose. Right half: the same robot faces a loose semicircle of five plain training dummies, each a different height and shape, some seated, some standing. A thin vertical divider between the halves. Everything centred with wide margins.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-18T00:16:43Z"
+  },
+  {
+   "key": "b317002c74767e22",
+   "story_id": "b317002c74767e22",
+   "light_name": "b317002c74767e22-light.webp",
+   "dark_name": "b317002c74767e22-dark.webp",
+   "alt": "Three connected boxes: a sealed document with a key, a box inside a box holding a gear, and a turnstile with a checkmark and a cross; a small robot feeds paper into the first.",
+   "bytes": [
+    36184,
+    34878
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Three plain boxes in a row across the middle of the frame, connected by arrows left to right. First box: a document with a wax seal and a small key beside it. Second box: a smaller box drawn inside a larger box, with a running gear inside the inner one. Third box: a turnstile gate with a checkmark on one side and a cross on the other. A small robot stands at the far left feeding a slip of paper into the first box. Keep the row well inside the frame edges.",
+   "labels": [
+    "SIGNED WRITES",
+    "SANDBOX",
+    "GATEWAY"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-18T00:17:40Z"
+  },
+  {
+   "key": "b353131c2d8f749b",
+   "story_id": "b353131c2d8f749b",
+   "light_name": "b353131c2d8f749b-light.webp",
+   "dark_name": "b353131c2d8f749b-dark.webp",
+   "alt": "A robot slides a slip across a desk, a hand with a stamp hovers over it, and the slip drops into a slot on a small machine; a ledger strip below records tick marks.",
+   "bytes": [
+    40894,
+    38520
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A desk seen from the front, centred. On the left a small robot slides a paper slip across the desk. In the middle a hand holding a rubber stamp hovers over the slip. On the right, past the stamp, the slip drops into a slot on top of a small machine with a lever. Below the desk, a long ledger strip runs the full width with a row of small tick marks recording each slip. Generous margin around everything.",
+   "labels": [
+    "PROPOSE",
+    "AUTHORIZE",
+    "EXECUTE"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-18T00:18:49Z"
+  }
+ ]
+}
