@@ -1,0 +1,455 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-08-18",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-08-18T00:20:00Z",
+ "source_editions": [
+  "2026-08-17-pm",
+  "2026-08-18-am"
+ ],
+ "subject": "Claw Patrol firewall, full context beats compaction, harmful skills",
+ "preheader": "Plus: 6 papers, 2 talks, a 56,000-line Fortran migration. 5 min.",
+ "title": "Deno's Claw Patrol treats agents as untrusted software, and full history beats compaction",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "6eaca35496df8156",
+   "title": "Security Firewall for Agents",
+   "url": "https://www.youtube.com/watch?v=MkRYPFIMCSA",
+   "source_name": "Ryan Dahl (Deno)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "claw-patrol-agent-firewall",
+   "published_at": "2026-08-17T18:30:06Z",
+   "read_annotation": "talk",
+   "summary": "Ryan Dahl presents Claw Patrol, an MIT-licensed proxy that inspects an agent's outbound traffic below HTTP and holds its credentials outside the agent.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Deno created Claw Patrol, software that checks what action-taking artificial intelligence sends outside itself.",
+    "It sits outside the artificial intelligence and examines outgoing data, including database connections that bypass normal web traffic.",
+    "It keeps passwords and access keys hidden, so the artificial intelligence never receives them.",
+    "Written rules decide which outgoing requests are allowed.",
+    "Teams can enforce limits outside artificial intelligence that has access to live databases and company services."
+   ]
+  },
+  "what": "Ryan Dahl showed Claw Patrol, an MIT-licensed proxy Deno puts in front of incident-response agents that read and write production Postgres, Kubernetes, ClickHouse, AWS, GitHub and Slack. It treats the agent as untrusted software and parses every byte leaving it.",
+  "details": "It works below HTTP, so an agent that spawns psql and tunnels to a database through an EKS endpoint hits the same rules as an API call; no MCP definition or HTTP filter sees that path. Rules live in HCL, in git, unit tested against fixture requests; Deno's own file runs about a thousand lines. Credentials stay in the proxy, never in the agent.",
+  "yes_but": "This is one company's design shown in a talk, not a measured defense. Everything rests on the policy file being complete, and a thousand lines of HCL is a thousand places to leave a gap; the excerpt reports no measurement of what the rules miss.",
+  "yes_but_waived": null,
+  "why": "If your agents hold production credentials and your defense is the model refusing, you now have a runnable proxy and a layout to copy: secrets and enforcement move into a process the agent can't reach, and the rules become tested code."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "06930894d7276f4a",
+     "title": "Context Engineering in 2026",
+     "url": "https://www.youtube.com/watch?v=WP3hjUXd918",
+     "source_name": "Louis-François Bouchard, Omar Solano and Samridhi Vaid (Towards AI)",
+     "kind": "community",
+     "section": "research",
+     "topics": [
+      "memory-context"
+     ],
+     "cluster": "full-history-vs-context-compaction",
+     "published_at": "2026-08-17T16:26:35Z",
+     "read_annotation": "talk",
+     "summary": "Across 11 context presets on an open-source AI tutor, sending the full history beat every compaction technique on recall, cost and latency, because 97% of tokens came from cache and rewriting the context invalidates it. Full history recovered specific details 95% of the time against 32% after summarizing.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A test of 11 setups found that keeping complete conversations beat every tested shortening method on memory, cost, and response speed.",
+      "Previously processed conversation text can be reused, making repeated text much cheaper to handle.",
+      "Rewriting conversations as summaries prevents that reuse, so shortening must be very large before it saves money.",
+      "Keeping full conversations recovered specific details 95% of the time, compared with 32% after summarizing.",
+      "People building conversational artificial intelligence may save money and preserve details by keeping history, unless local memory limits prevent it."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-18/06930894d7276f4a-light.webp",
+      "dark": "/images/brief/issues/2026-08-18/06930894d7276f4a-dark.webp",
+      "alt": "Two lanes: on top a long scroll passes under a stamp unchanged; below, the same scroll goes into a machine and comes out short and full of gaps, with shreds beside it."
+     }
+    },
+    {
+     "story_id": "ca54fa551094aa88",
+     "title": "Does a Language Server Save Tokens for Coding Agents? A Measurement Methodology and Preliminary Study",
+     "url": "https://arxiv.org/abs/2608.13568",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "lsp-token-efficiency-coding-agents",
+     "published_at": "2026-08-17T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A preliminary study of LSP against grep at equal task success, on Python and TypeScript repos with Claude Opus 4.8, Sonnet 4.6 and Haiku 4.5. On symbol localization the LSP cost 6% to 118% more tokens and the agent ignored it when free; on reference completeness it bought precision, not savings.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A preliminary study found code-analysis software usually processed more text than basic search while completing the same task.",
+      "Basic search finds matching words everywhere, including definitions, uses, and comments.",
+      "Code-analysis software distinguishes those roles, but requires setup and separate lookups for each named item.",
+      "That precision helped find complete references, but it did not reduce the text processed.",
+      "Developers choosing search tools for code-writing artificial intelligence should not assume precision reduces the amount of text processed."
+     ]
+    },
+    {
+     "story_id": "2245a3d62b081d45",
+     "title": "Agent Skills Can Be Harmful: An Empirical Study of Skill-Induced Failures in LLM Agents",
+     "url": "https://arxiv.org/abs/2608.11888",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "skill-induced-agent-failures",
+     "published_at": "2026-08-12T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A differential method pins a failed or costlier run on the skill it loaded by comparing it with a no-skill or matched-skill run of the same task. On SkillsBench and SWE-Skills-Bench that yields 307 skill-induced failures, 125 functional and 182 efficiency.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A study found 307 cases where reusable instructions caused artificial intelligence to fail tasks or work less efficiently.",
+      "Researchers compared each instructed run with the same task completed without those instructions or with a similar set.",
+      "These side-by-side comparisons show what changed and whether the instructions caused failure or extra cost.",
+      "SkillTriage organizes the differences into consistent reports supported by evidence from both runs.",
+      "Teams adding reusable instructions can use this method to check whether they improve results or quietly increase costs."
+     ]
+    },
+    {
+     "story_id": "926fb43dc42d7bff",
+     "title": "One Frozen Simulator Is Not Enough: Simulator Collapse in Multi-Agent RL",
+     "url": "https://arxiv.org/abs/2608.12253",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "simulator-collapse-in-multi-agent-rl",
+     "published_at": "2026-08-12T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Train a policy against one LLM user simulator and it overfits that simulator's dominant mode, then transfers poorly to other simulators and real users. Verbalized Sampling lifts held-out success by up to 9%; co-training against a population of simulators reaches 14%.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A study found that training with one simulated user made artificial intelligence perform poorly with other simulators and real people.",
+      "The artificial intelligence learned narrow tactics that worked mainly against the simulated user's most common behavior.",
+      "Verbalized Sampling makes the simulated user produce a wider range of responses instead of its usual pattern.",
+      "Co-Training practices against several changing simulators, preventing the system from adapting to only one.",
+      "Teams training human-facing artificial intelligence need varied simulated users to prepare behavior that works beyond one simulator."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-18/926fb43dc42d7bff-light.webp",
+      "dark": "/images/brief/issues/2026-08-18/926fb43dc42d7bff-dark.webp",
+      "alt": "A robot practises against its own reflection in a mirror on the left; on the right the same robot faces a semicircle of five differently shaped training dummies."
+     }
+    },
+    {
+     "story_id": "3efde39a4b379e9a",
+     "title": "Retry, Switch, or Abstain? Learning Strategy-Aware Tool-Use Policies via Controlled Error Injection",
+     "url": "https://arxiv.org/abs/2608.11977",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "bench2robust-tool-failure-recovery",
+     "published_at": "2026-08-12T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "BENCH2ROBUST injects transient, persistent and silent tool failures into benchmarks that never fail, so retry, switch and stop become trainable choices. Across 7 models from 4 families the recovery gap is near universal; Bayesian Tool Memory adds up to 16.8 points without retraining.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers created controlled tests where tools can fail briefly, permanently, or without reporting an error.",
+      "Each task forces action-taking artificial intelligence to retry, switch tools, or stop when no workable option remains.",
+      "A memory system records tool reliability, helping the artificial intelligence choose whether to retry, switch, or stop.",
+      "Guided practice separately teaches recovery behavior that remains useful when the memory system is absent.",
+      "This gives teams a way to prepare action-taking artificial intelligence for failures that ordinary tests leave out."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "b317002c74767e22",
+     "title": "Build zero-trust AI agents with Google's Agent Development Kit",
+     "url": "https://developers.googleblog.com/build-zero-trust-ai-agents-with-googles-agent-development-kit",
+     "source_name": "Google Developers Blog",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "zero-trust-security-for-google-adk-agents",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Google's guide for ADK agents that mutate production state names three infrastructure boundaries in place of system prompts: hardware-backed cryptographic signatures on database writes, gVisor kernel-level sandboxing for dynamic code, and deterministic semantic gateways that validate I/O.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Google published a guide for securing artificial intelligence systems that can change live databases and run code.",
+      "Each database change must carry a hardware-protected digital signature proving that an approved machine authorized it.",
+      "New code runs inside gVisor, an isolated space designed to keep harmful programs away from the server.",
+      "Fixed checking rules inspect information entering and leaving, instead of trusting written instructions to the system.",
+      "These barriers aim to prevent hostile instructions from changing data or taking over servers."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-18/b317002c74767e22-light.webp",
+      "dark": "/images/brief/issues/2026-08-18/b317002c74767e22-dark.webp",
+      "alt": "Three connected boxes: a sealed document with a key, a box inside a box holding a gear, and a turnstile with a checkmark and a cross; a small robot feeds paper into the first."
+     }
+    },
+    {
+     "story_id": "b353131c2d8f749b",
+     "title": "Agentao: A Governed Local-First Runtime for Tool-Using LLM Agents",
+     "url": "https://arxiv.org/abs/2608.13574",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "agentao-governed-agent-runtime",
+     "published_at": "2026-08-17T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A local-first runtime that separates what the model proposes from what the host authorizes and executes, with permissions, memory, replay, sub-agents and traces as explicit layers. The paper claims no formal safety guarantees; the point is an inspectable architecture.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers presented Agentao, software for controlling artificial intelligence systems that use tools and change information on a user's computer.",
+      "The artificial intelligence system proposes an action, but the computer's controlling software decides whether to allow and perform it.",
+      "Separate layers record permissions, stored information, repeated runs, added tools, delegated helpers, and communication with other systems.",
+      "Its records let people inspect what happened and reproduce earlier actions.",
+      "The design could help people oversee these systems, but the researchers do not claim it guarantees safety."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-18/b353131c2d8f749b-light.webp",
+      "dark": "/images/brief/issues/2026-08-18/b353131c2d8f749b-dark.webp",
+      "alt": "A robot slides a slip across a desk, a hand with a stamp hovers over it, and the slip drops into a slot on a small machine; a ledger strip below records tick marks."
+     }
+    },
+    {
+     "story_id": "9eb652c47b6e8e46",
+     "title": "An Agentic Workflow for Legacy HPC Modernization: Converting the Two-Electron-Integral Core of GAMESS",
+     "url": "https://arxiv.org/abs/2608.12249",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "engineering",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "agentic-legacy-hpc-modernization",
+     "published_at": "2026-08-12T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Three prompt-specialized Claude Code roles, in isolated worktrees, converted 56,448 lines across twelve files and 225 subroutines of GAMESS from Fortran 77 to Fortran 2008, working from a spec the agents wrote and revised. Humans held a few gates; an exact domain oracle marked where safe delegation ends.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers used three specialized Claude Code setups to update scientific software from Fortran 77 to Fortran 2008.",
+      "Fortran is a programming language, and the work moved old files into a newer version of that language.",
+      "The setups followed a written plan they created and revised, while working in separate copies to avoid conflicts.",
+      "People approved a few stages, while an exact scientific checker tested whether converted calculations stayed correct.",
+      "The approach could help scientific teams update large old programs, while keeping people in charge where exact checking ends."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2089399057659596847",
+   "title": "Cursor launches Origin, its own code hosting platform",
+   "url": "https://x.com/cursor_ai/status/2089399057659596847",
+   "source_name": "@cursor_ai",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "x-2089399057659596847",
+   "published_at": "2026-08-17T17:08:49.000Z",
+   "read_annotation": "X post",
+   "summary": "Cursor says Origin, its code hosting platform, is live in beta from today: you sync repos from GitHub, and Vercel, Buildkite and Depot integrations are available already, with more promised.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Cursor launched an early test version of Origin, its own service for storing and managing software projects.",
+    "Users get started by connecting software projects stored on GitHub to Origin.",
+    "Origin already connects with Vercel, Buildkite, and Depot, with more connections promised.",
+    "Cursor says Origin is fast, easy to use, and closely connected with its coding product.",
+    "Cursor users gain another place to store software projects while retaining connections to several existing services."
+   ]
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "925588dcd5f86701",
+   "title": "Rethinking Agent Security as a Networking Problem",
+   "url": "https://arxiv.org/abs/2608.12172",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "agent-security-network-enforcement",
+   "published_at": "2026-08-12T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Centralized control, distributed enforcement, capabilities: networking principles for agent security",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "9334775059546a41",
+   "title": "Step-up authentication for AI agents",
+   "url": "https://workos.com/blog/step-up-authentication-ai-agents",
+   "source_name": "WorkOS",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "step-up-authentication-for-mcp-agents",
+   "published_at": "2026-08-17T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "A human check before a long-lived MCP token does something irreversible",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "636250e7af4bce79",
+   "title": "The Sleeping Agent: What Gist-Based Context Compression Loses and Why",
+   "url": "https://arxiv.org/abs/2608.11775",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "gist-context-compression-memory-loss",
+   "published_at": "2026-08-12T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Gist compression beats truncation on facts, loses on temporal questions",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "4be5832010191238",
+   "title": "Not All Tokens Are Equal: Inflation-Aware Routing for Agentic LLM Systems",
+   "url": "https://arxiv.org/abs/2608.13571",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "inflation-aware-agent-routing",
+   "published_at": "2026-08-17T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Retries inflate true workflow cost; a router that predicts it first",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "7364450579545990",
+   "title": "How to Kill the Code Review",
+   "url": "https://www.youtube.com/watch?v=YgEv7IQzGdM",
+   "source_name": "Ankit Jain (Aviator)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "agentic-code-review-workflow",
+   "published_at": "2026-08-17T20:00:08Z",
+   "read_annotation": "talk",
+   "summary": "Capture the agent session as acceptance criteria when nobody reads diffs",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "b353131c2d8f749b",
+   "text": "Four items today put enforcement somewhere the model can't touch: Deno's proxy, Google's signed writes and sandboxes, Agentao's host-authorized execution, and the networking paper in the quick links. That's a consensus forming, and it's the right one. A prompt is a request; a proxy is a rule."
+  },
+  {
+   "after_story": "06930894d7276f4a",
+   "text": "Read this next to the Sleeping Agent paper below: compression won on facts there and lost on time. The Towards AI numbers say the cheap move under caching is to keep everything until your window forces you not to, and the compaction paper says what you lose when it does."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-08-18/2026-08-17-pm-m1.webp",
+  "alt": "A tidy lawn with a spotless information booth under a striped awning, signed 'LANGUAGE SERVER', 'FREE TODAY' and 'PRECISE', a red carpet rolled out to its counter and a smiling robot attendant leaning on some books. A worn mud path curves past the booth, missing the carpet, and two small figures walk it toward a 'grep' sign by the hedge.",
+  "alt_joke": "The hedge has a hole. The booth has a carpet.",
+  "caption": "Free today. Not on the way to anything.",
+  "concept": "A pristine, free, staffed language-server information booth on a lawn, and a worn mud path curving straight past it toward a sign marked grep",
+  "story_id": "ca54fa551094aa88"
+ },
+ "hedge": {
+  "quote": "Across human and mouse brain, heart, tonsil, colon, and prostate datasets, SpatialAgent outperformed established computational baselines and matched or surpassed expert scientists in key tasks.",
+  "story": {
+   "story_id": "f48db47f34a0f8c5",
+   "title": "SpatialAgent: An autonomous AI agent for spatial biology",
+   "url": "https://www.semanticscholar.org/paper/aa48e736ac2813e86e74bd00257cf28f272abd9d",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "spatialagent-for-spatial-biology",
+   "published_at": "2026-08-12T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "An autonomous agent for spatial biology with a Plan-Act-Conclude loop, tool and skill retrieval, and claim-verification modules, evaluated across human and mouse tissues.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "The key tasks are not named, and neither is which of them were matched rather than surpassed."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-08-18T02:20:19Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-08-18/cover-light.webp",
+  "dark": "/images/brief/issues/2026-08-18/cover-dark.webp",
+  "alt": "A robot on the left holds pipes that pass through inspection windows in a central wall before reaching a database, servers and a chat bubble on the right; a key ring hangs on the far side of the wall."
+ }
+}
