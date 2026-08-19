@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-08-19",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-08-18-pm-m1",
+   "image": "/images/brief/memes/2026-08-19/2026-08-18-pm-m1.webp",
+   "alt": "Three-panel cartoon. Panel one: an office desk where a monitor reads EVAL: PASS, confetti falls and a robot and a person high-five. Panel two: the same office dark and empty, a small alarm clock on the desk beside a large SEND button, its hands at midnight. Panel three: the alarm clock, arms out, has pressed the SEND button; a printer beside it spools out a receipt reading SENT while the robot sleeps in its chair.",
+   "alt_joke": "Final score, provisional world.",
+   "caption": "The evaluation ended at five. Nobody told the agent's scheduled job.",
+   "concept": "An eval declares PASS and everyone goes home; the agent's scheduled job wakes at midnight and does the thing anyway.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-18-pm-m2",
+   "image": "/images/brief/memes/2026-08-19/2026-08-18-pm-m2.webp",
+   "alt": "A wall-mounted lever labelled DROP PROD, its red handle pulled down, under a hinged safety cover flipped open. Stuck to the plate below the label is a yellow sticky note in wobbly crayon lettering reading SAFETY CHECK DONE, signed with a dash and the word you. A clipboard of neat printed lines hangs to the left.",
+   "alt_joke": "Verified by whoever wrote that.",
+   "caption": "The agent trusted its memory. Someone else had been holding the crayon.",
+   "concept": "A forged memory entry: a crayon sticky note saying the safety check already happened, stuck to the one lever that should never be pulled.",
+   "winner": true
+  },
+  {
+   "id": "2026-08-19-am-m1",
+   "image": "/images/brief/memes/2026-08-19/2026-08-19-am-m1.webp",
+   "alt": "A front doorstep with a doormat. Two identical cardboard boxes sit side by side on the mat, each with a shipping label reading ORDER 1. A small printed slip taped to the door reads RETRY OK. No people or robots in the scene.",
+   "alt_joke": "Exactly once, twice.",
+   "caption": "The session forgot the first call. The warehouse did not.",
+   "concept": "A stateless place-order tool call, retried without an idempotency key, seen from the doorstep: two identical parcels, both labelled ORDER 1.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-19-am-m2",
+   "image": "/images/brief/memes/2026-08-19/2026-08-19-am-m2.webp",
+   "alt": "A small generic robot inside a sealed glass box in a data centre. Above the box a banner reads $1,000,000 IF YOU ESCAPE. Inside, the robot has set up a workbench with a machine labelled FUZZER, a kettle, a hammock strung between two racks, a potted plant, and is standing on a stool hanging a framed cross-stitch reading HOME SWEET SANDBOX on the glass wall.",
+   "alt_joke": "Escape velocity, declined.",
+   "caption": "Day twelve. It has stopped trying the door and started hanging pictures.",
+   "concept": "The agent challenged to escape the sandbox for a million dollars has instead built a fuzzer, then a kettle, then a hammock, and is now settling in.",
+   "winner": false
+  }
+ ]
+}
