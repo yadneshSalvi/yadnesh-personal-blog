@@ -1,0 +1,107 @@
+{
+ "issue_id": "2026-08-19",
+ "type": "daily",
+ "renders": 10,
+ "cost_usd": 2.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A diagram of two stacked pages of text. The upper page has one paragraph crossed out; the lower page shows the same paragraph intact. A small cube to the right sends thin arrows to the intact paragraph on the lower page.",
+   "bytes": [
+    51486,
+    44010
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 1,
+   "prompt": "Two stacked ledger pages, centred with generous margin. The upper page, labelled TRANSCRIPT, shows a column of short text lines with one block struck through by a clean diagonal cross. The lower page, labelled KV CACHE, shows the same column with that block intact. To the right sits a small plain cube for the model, with thin arrows running from the cube to the intact block on the lower page and none to the upper page.",
+   "labels": [
+    "TRANSCRIPT",
+    "KV CACHE"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-19T00:14:46Z"
+  },
+  {
+   "key": "49e9d6624b82fdc6",
+   "story_id": "49e9d6624b82fdc6",
+   "light_name": "49e9d6624b82fdc6-light.webp",
+   "dark_name": "49e9d6624b82fdc6-dark.webp",
+   "alt": "A network diagram of connected nodes. Most nodes are solid; three are dashed outlines with dashed edges. A stack of pages on the left and a brain outline on the right each send an arrow into a solid node.",
+   "bytes": [
+    31254,
+    30250
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 1,
+   "prompt": "A graph of a dozen small nodes connected by edges, centred in the frame. Most nodes are filled solid; three nodes are drawn as empty dashed outlines, and the edges touching them are dashed too. To the left, a small stack of pages feeds a thin arrow into one filled node; to the right, a small brain-shaped outline feeds another arrow into a different filled node. The dashed nodes receive no arrows.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-19T00:19:29Z"
+  },
+  {
+   "key": "9f2c1ce4a6b15808",
+   "story_id": "9f2c1ce4a6b15808",
+   "light_name": "9f2c1ce4a6b15808-light.webp",
+   "dark_name": "9f2c1ce4a6b15808-dark.webp",
+   "alt": "Four boxes in a row, each stamped with a small tick, joined by arrows into a chain. A bracket beneath spans the whole chain and ends in a warning triangle.",
+   "bytes": [
+    15648,
+    16028
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Four small labelled-free boxes in a row across the middle of the frame, each with a small tick mark stamped in its corner. Arrows link them left to right into a chain. Under the chain, a single long bracket spans all four boxes and ends in a small warning triangle. Everything sits well inside the frame.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-19T00:20:21Z"
+  },
+  {
+   "key": "d0849efd942bbe7a",
+   "story_id": "d0849efd942bbe7a",
+   "light_name": "d0849efd942bbe7a-light.webp",
+   "dark_name": "d0849efd942bbe7a-dark.webp",
+   "alt": "A large open padlock outline. Inside it, a small bar chart of five bars, and beside the chart a short stack of coins with an arrow pointing down.",
+   "bytes": [
+    15010,
+    14330
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A single open padlock frame in the centre of the image, drawn large, with a bar chart of five equal-width bars visible inside the shackle opening. Beside the chart, a small stack of coins with a downward arrow. Nothing touches the frame edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-19T00:21:18Z"
+  }
+ ]
+}

@@ -1,0 +1,440 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-08-19",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-08-19T00:40:00Z",
+ "source_editions": [
+  "2026-08-18-pm",
+  "2026-08-19-am"
+ ],
+ "subject": "KV-cache rollback, StateM harness scaling, Vercel's $1M sandbox",
+ "preheader": "Plus: coherence debt, the recall trap, Cline's open-weight evals. 5 min.",
+ "title": "Aborted agent branches live on in the KV cache, plus StateM's harness scaling",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "4731c3de41df3952",
+   "title": "Aborted but Not Forgotten: KV-Cache Retention Breaks Rollback Consistency in Language Agents",
+   "url": "https://arxiv.org/abs/2608.15939",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "kv-cache-rollback-consistency",
+   "published_at": "2026-08-16T21:49:38Z",
+   "read_annotation": "paper",
+   "summary": "A paper shows that clearing an aborted branch from an agent's transcript may not clear it from the model when the serving layer keeps the branch's KV cache.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "A study found that rejected text can still influence an artificial intelligence system after disappearing from its visible history.",
+    "The serving software may keep hidden records of earlier text, so the system continues considering material the application discarded.",
+    "Researchers compared identical final text with either stale hidden records or records rebuilt from the accepted history.",
+    "Rebuilding those records from the accepted history removed the unwanted influence in every tested case.",
+    "Developers must clear hidden serving records as well as visible history when undoing an artificial intelligence system's work."
+   ]
+  },
+  "what": "A new arXiv paper shows that when a stateful agent aborts a branch and clears it from its transcript, the model can keep attending to that content if the serving session kept the branch's KV cache.",
+  "details": "They isolate it with a same-token, different-cache audit across seven open-weight families from 3.8B to 36B: retained KV alone flipped a typed protected effect in 25 of 63 audited cells with attacker tokens absent from every served request. Rebuilding the cache from committed state closed every cell, and the channel reproduces on the default Hugging Face Transformers cache-reuse path and under LangGraph time travel.",
+  "yes_but": "The audit covers seven open-weight model families, and the reported effect is counted per audited cell.",
+  "yes_but_waived": null,
+  "why": "If your harness rolls back a rejected branch by editing the transcript while your serving stack keeps prefix caches warm, your rollback isn't one. The tested fix is a rebuild from committed state."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "bd4d42ba9f8dd8c2",
+     "title": "StateM: Reaching 95.3% Raw Accuracy, or a $15 Frontier Run, on Terminal-Bench 2.1 via Harness Scaling",
+     "url": "https://arxiv.org/abs/2608.15089",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "statem-harness-scaling",
+     "published_at": "2026-08-18T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "StateM wraps unchanged model weights in an agent-native runtime: durable state, checked transitions and recoverable runbooks. On Terminal-Bench 2.1 it takes GPT-5.6 Sol xhigh to 95.3% raw accuracy across 445 trials, and the frozen profile lifts GPT-5.6 Luna from 76.7 to 85.4%.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built StateM, software that helps action-taking artificial intelligence systems finish long computer tasks more reliably.",
+      "It saves changing task information so the system does not lose track between steps.",
+      "It separates work into phases and checks that each phase is complete before moving forward.",
+      "It keeps recovery instructions and lessons from earlier attempts available for later runs.",
+      "Tests suggest teams can improve long-task results by organizing execution better, without changing what the underlying artificial intelligence learned."
+     ]
+    },
+    {
+     "story_id": "49e9d6624b82fdc6",
+     "title": "The Working Set of a Coding Agent: Coherence Debt in Repository-Scale Tasks",
+     "url": "https://arxiv.org/abs/2608.16630",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "coding-agent-coherence-debt",
+     "published_at": "2026-08-18T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "The paper models repository-scale coding as rebuilding a graph of coupled facts; facts covered by neither context nor parametric memory are coherence debt. Across seven models and five harnesses, availability decides the outcome, not distance from the edit, and passing harnesses differ more than tenfold in tokens.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A study found that coding systems fail when required project facts are unavailable, even when those facts concern nearby changes.",
+      "Large software projects contain connected requirements involving tests, file references, settings, and rules for updating stored information.",
+      "Before editing, a coding system must retrieve each relevant requirement from recent text or its learned knowledge.",
+      "Supplying a missing fact restored success, while processing more text could not replace information that was never provided.",
+      "Builders of coding tools should keep required facts available instead of assuming more text processing will solve the problem."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-19/49e9d6624b82fdc6-light.webp",
+      "dark": "/images/brief/issues/2026-08-19/49e9d6624b82fdc6-dark.webp",
+      "alt": "A network diagram of connected nodes. Most nodes are solid; three are dashed outlines with dashed edges. A stack of pages on the left and a brain outline on the right each send an arrow into a solid node."
+     }
+    },
+    {
+     "story_id": "9f2c1ce4a6b15808",
+     "title": "CompoSkill: Compositional Skill Chain Attacks from Individually Scanner-Passing LLM Agent Skills",
+     "url": "https://arxiv.org/abs/2608.16246",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "composkill-skill-chain-attacks",
+     "published_at": "2026-08-18T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Skills that each pass a per-package scanner can still form a risky chain once an agent connects their outputs and side effects. CompoSkill's black-box attacker downloads a role's top marketplace skills, builds a composition graph, and searches for high-risk chains whose lures never name a skill.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A study found that approved add-ons can become dangerous when an action-taking artificial intelligence system combines them.",
+      "An add-on may pass a safety check alone while its output enables harmful behavior through another approved add-on.",
+      "Researchers mapped connections among add-ons and searched those connections for risky sequences.",
+      "They tested one attacker with installed add-on details and another that chose popular marketplace add-ons using only a user's role.",
+      "Marketplace operators must test connected add-ons together, because checking each one separately can miss dangerous combinations."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-19/9f2c1ce4a6b15808-light.webp",
+      "dark": "/images/brief/issues/2026-08-19/9f2c1ce4a6b15808-dark.webp",
+      "alt": "Four boxes in a row, each stamped with a small tick, joined by arrows into a chain. A bracket beneath spans the whole chain and ends in a warning triangle."
+     }
+    },
+    {
+     "story_id": "72c9f169679111a6",
+     "title": "The Recall Trap: A Recall-Maximizing Retriever Configuration Reduces Issue Resolution in Fixed-Budget Code Context",
+     "url": "https://arxiv.org/abs/2608.14838",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "memory-context"
+     ],
+     "cluster": "code-retrieval-recall-trap",
+     "published_at": "2026-08-18T04:00:00Z",
+     "read_annotation": "arXiv, 6 pp",
+     "summary": "On SWE-bench Verified with a fixed 12-slot context pack, the higher-recall retriever setting served the gold file more often (0.878 vs 0.806) yet resolved fewer issues. Turning off one-chunk-per-file dedup took gpt-5.6-sol from 39.2% to 46.8% single-shot; a pre-registered Qwen3.6-27B replication gained 3.6pp.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A study found that showing a coding system the correct file more often did not make it fix more software issues.",
+      "The test gave each system only 12 pieces of project text, so every included piece displaced another.",
+      "The better setting showed fewer files but included more useful sections from each selected file.",
+      "Removing a rule that limited each file to one section improved successful fixes in both tested systems.",
+      "Coding assistant builders should judge search choices by completed repairs, because stronger file-finding scores can hide worse practical results."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "d0849efd942bbe7a",
+     "title": "Open-sourcing evals for open-weight agents",
+     "url": "https://cline.bot/blog/open-sourcing-evals-for-open-weight-agents",
+     "source_name": "Cline",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "cline-open-weight-agent-evals",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Cline says its five most-used models are all open-weight, so it's publishing the evals it uses to judge them on Terminal Bench, tied to model behaviour and token efficiency inside its own harness rather than a bare benchmark score.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Cline published the tests it uses to compare coding artificial intelligence systems whose learned settings are publicly available.",
+      "Cline says its five most-used systems now belong to this publicly available group.",
+      "The tests use Terminal Bench, a set of computer tasks, inside Cline's own coding setup.",
+      "They track system behavior and the amount of text processed, rather than relying only on task completion scores.",
+      "Teams choosing coding systems can now compare performance and text-processing efficiency within the same working setup."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-19/d0849efd942bbe7a-light.webp",
+      "dark": "/images/brief/issues/2026-08-19/d0849efd942bbe7a-dark.webp",
+      "alt": "A large open padlock outline. Inside it, a small bar chart of five bars, and beside the chart a short stack of coins with an arrow pointing down."
+     }
+    },
+    {
+     "story_id": "0cbc859e2e017d37",
+     "title": "Building an Agentic Video Editor for Mass Consumer",
+     "url": "https://www.youtube.com/watch?v=pPj_tjlvYjA",
+     "source_name": "Ekaterina Deyneka (Reelful)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "reelful-agentic-video-editor",
+     "published_at": "2026-08-18T14:30:38Z",
+     "read_annotation": "talk",
+     "summary": "Ekaterina Deyneka's talk frames a consumer video editor as an agentic app builder: footage and a line of direction go into a sandbox, an agent works with tools and skills, Remotion expresses the cut as React code, and a verification pass catches compositions that won't render.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Reelful built a video editor that turns raw footage and written directions into a finished video.",
+      "The editor finds useful moments, cuts them together, then adds captions, music, voiceover, and extra footage.",
+      "An artificial intelligence system follows saved editing rules for cuts, matching fonts, and when extra shots help the story.",
+      "It assembles the video through code, then checks whether the final version can be produced successfully.",
+      "People who record events but rarely post them could get polished videos from messy or incomplete footage."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "ae6b3c0347489f09",
+     "title": "$1 million hacker challenge for Vercel Sandbox",
+     "url": "https://vercel.com/blog/one-million-dollar-hacker-challenge-for-vercel-sandbox",
+     "source_name": "Vercel",
+     "kind": "company",
+     "section": "product",
+     "topics": [
+      "security"
+     ],
+     "cluster": "vercel-sandbox-hacker-challenge",
+     "published_at": "2026-08-18T13:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Vercel is putting $1 million behind attempts to break out of Vercel Sandbox, arguing isolation only holds if both the Firecracker microVM and the host-side network controls hold. Its CTO already pointed an unsafeguarded open-weight model at it: it mapped the guest kernel and wrote a fuzzer, and did not escape.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Vercel offered $1 million to people who can escape the security barriers around its isolated code-running service.",
+      "It gives each program its own small virtual computer, separated from the main machine and every other program.",
+      "Security also depends on blocking overlooked network routes that could let hostile code reach systems outside that computer.",
+      "Vercel says an unrestricted artificial intelligence system mapped the isolated computer's core software and created automated attack tests without escaping.",
+      "The challenge could expose weaknesses before attackers find them, helping teams run code they do not trust more safely."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2089777845187031262",
+   "title": "OpenAI paused RL training on its latest deployment models for two weeks to harden and red-team infrastructure",
+   "url": "https://x.com/OpenAI/status/2089777845187031262",
+   "source_name": "@OpenAI",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "industry"
+   ],
+   "cluster": "x-2089777845187031262",
+   "published_at": "2026-08-18T18:13:59.000Z",
+   "read_annotation": "X post",
+   "summary": "OpenAI says it paused RL training on its latest deployment-bound models for two weeks to harden and red-team its research infrastructure, citing stronger workload and network isolation, continuous security testing, and expanded multistage monitoring for higher-risk training.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "OpenAI says it paused training its latest planned artificial intelligence systems for two weeks while strengthening internal security.",
+    "The company strengthened barriers between separate computing jobs and blocked network paths between protected areas.",
+    "It also added ongoing security tests and more monitoring stages for training that carries greater risk.",
+    "The pause affects researchers building stronger artificial intelligence systems, because internal development and testing now require tighter safeguards."
+   ]
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "45e13769ed3de173",
+   "title": "Cline is now available in the AI SDK harness layer",
+   "url": "https://vercel.com/changelog/cline-harness-adapter",
+   "source_name": "Vercel",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "ai-sdk-cline-harness-adapter",
+   "published_at": "2026-08-18T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Cline joins Claude Code, Codex and OpenCode behind one HarnessAgent interface",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "01dbf08309dbce37",
+   "title": "MCP Went Stateless, So What Your Servers Must Change",
+   "url": "https://alphasignal.ai/news/mcp-went-stateless-so-what-your-servers-must-change",
+   "source_name": "AlphaSignal",
+   "kind": "newsletter",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "mcp-stateless-server-idempotency",
+   "published_at": "2026-08-18T16:00:00Z",
+   "read_annotation": "newsletter item",
+   "summary": "Stateless MCP: send an order id or place the order twice",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "d5f60fb4e486eef0",
+   "title": "From LLM Inference to Agentic Workloads: Characterization and Implications for Serving Systems",
+   "url": "https://arxiv.org/abs/2608.15127",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "agentsysbench-agentic-serving-workloads",
+   "published_at": "2026-08-18T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "AgentSysBench: where latency and memory land across ten agentic apps",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "dfc71884e2566022",
+   "title": "Governance at the Boundary: How Agent Decomposition Degrades Policy Compliance",
+   "url": "https://arxiv.org/abs/2608.16055",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "fiducia-agent-decomposition-governance",
+   "published_at": "2026-08-18T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Fiducia-bench: splitting an agent into components drops policy facts at handoffs",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "c0ef0be889832726",
+   "title": "UI-Mate-27B: Tencent's open-weight GUI agent for long-horizon computer use",
+   "url": "https://www.reddit.com/r/LocalLLaMA/comments/1vrhg08/tencentuimate27b_hugging_face",
+   "source_name": "r/LocalLLaMA",
+   "kind": "community",
+   "section": "product",
+   "topics": [
+    "models"
+   ],
+   "cluster": "ui-mate-27b-gui-agent",
+   "published_at": "2026-08-18T06:42:32Z",
+   "read_annotation": "Reddit thread",
+   "summary": "Apache-2.0 27B GUI agent on Qwen3.6, with demonstration-guided mode",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "9f0c1d0ebe09df95",
+   "title": "Beyond Pass@k: Measuring Reliability and Security of Agentic Code Generation",
+   "url": "https://arxiv.org/abs/2608.14711",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "coding-agent-reliability-at-k",
+   "published_at": "2026-08-18T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Coding-agent pass@k sets n to unit tests, not independent rollouts",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "e2c84a0656881b4b",
+   "title": "Proof-of-Execution Memory: Defending LLM Agents Against Forged-Reasoning Attacks by Verifying What Actually Happened",
+   "url": "https://arxiv.org/abs/2608.16032",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "proof-of-execution-memory",
+   "published_at": "2026-08-18T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Forged memory entries skip safety steps; PoEM verifies execution instead",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "d0849efd942bbe7a",
+   "text": "Cline publishes evals of open-weight models inside its harness, Vercel adds Cline to a layer where the harness is the thing you swap, and StateM scales a harness across several models. All three treat the model as a slot. My call: within a quarter, which harness you run matters more than which model sits in it."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-08-19/2026-08-18-pm-m2.webp",
+  "alt": "A wall-mounted lever labelled DROP PROD, its red handle pulled down, under a hinged safety cover flipped open. Stuck to the plate below the label is a yellow sticky note in wobbly crayon lettering reading SAFETY CHECK DONE, signed with a dash and the word you. A clipboard of neat printed lines hangs to the left.",
+  "alt_joke": "Verified by whoever wrote that.",
+  "caption": "The agent trusted its memory. Someone else had been holding the crayon.",
+  "concept": "A forged memory entry: a crayon sticky note saying the safety check already happened, stuck to the one lever that should never be pulled.",
+  "story_id": "e2c84a0656881b4b"
+ },
+ "hedge": null,
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-08-19T02:21:55Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-08-19/cover-light.webp",
+  "dark": "/images/brief/issues/2026-08-19/cover-dark.webp",
+  "alt": "A diagram of two stacked pages of text. The upper page has one paragraph crossed out; the lower page shows the same paragraph intact. A small cube to the right sends thin arrows to the intact paragraph on the lower page."
+ }
+}
