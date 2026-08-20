@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-08-20",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-08-19-pm-m1",
+   "image": "/images/brief/memes/2026-08-20/2026-08-19-pm-m1.webp",
+   "alt": "A cutaway drawing of a stone fortress on a hill. The front has a raised drawbridge over a moat, a lowered portcullis, and guard towers with small signs reading RUNTIME, STATE and ACTIONS. Around the side, at ground level, a plain wooden door stands slightly ajar with a doormat in front of it reading config.yaml; one corner of the mat is turned up and a key lies underneath. No characters.",
+   "alt_joke": "Drawbridge up. Back door ajar.",
+   "caption": "The audit praised the moat.",
+   "concept": "An agent harness drawn as a fortress: every runtime phase armoured to the teeth, and the configuration phase is a side door with a doormat and the key under it.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-19-pm-m2",
+   "image": "/images/brief/memes/2026-08-20/2026-08-19-pm-m2.webp",
+   "alt": "A clinic exam room. A person sits on an exam table with a speech balloon reading 'Could I get a second opinion?'. A generic robot doctor with a stethoscope gestures toward a half-open curtain, behind which four identical robots stand in a row, each wearing a different hat, all nodding and holding identical clipboards.",
+   "alt_joke": "Same weights, different hat.",
+   "caption": "The committee concurred unanimously.",
+   "concept": "A patient asks a robot doctor for a second opinion; the second, third, fourth and fifth opinions are the same robot in different hats, and they already agree.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-20-am-m1",
+   "image": "/images/brief/memes/2026-08-20/2026-08-20-am-m1.webp",
+   "alt": "A server room on fire, racks burning on both sides and smoke along the ceiling, while an untouched monitor in the center calmly displays a large error reading ROLLBACK DOES NOT TYPECHECK above a badge reading 0 UNSAFE ACTIONS. A mug of coffee steams beside the keyboard.",
+   "alt_joke": "Soundness achieved. Servers pending.",
+   "caption": "The hotfix failed review. The fire remains in production.",
+   "concept": "A server room burns while the incident terminal serenely rejects the rollback for a type error.",
+   "winner": true
+  },
+  {
+   "id": "2026-08-20-am-m2",
+   "image": "/images/brief/memes/2026-08-20/2026-08-20-am-m2.webp",
+   "alt": "An awards-gala stage. A small robot in a bow tie at the podium holds a trophy labeled TASK COMPLETE and says Thank you, judge in a speech balloon. A judge robot holds up a scorecard reading 10. Behind them a stage curtain is too short to hide a heap of unfinished work: an open server rack with cables hanging out and a toppled stack of tickets.",
+   "alt_joke": "The acceptance speech also scored a 10.",
+   "caption": "Next season the ceremony adds a heckler.",
+   "concept": "A robot accepts the Task Completion trophy and thanks the judge while the undone task looms behind the stage curtain.",
+   "winner": false
+  }
+ ]
+}
