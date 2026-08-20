@@ -1,0 +1,112 @@
+{
+ "issue_id": "2026-08-20",
+ "type": "daily",
+ "renders": 6,
+ "cost_usd": 1.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A map with a start flag and a finish flag connected by a faint dotted line, while a bold path detours in a wide loop through three tollbooths before rejoining and reaching the finish, marked with a checkmark.",
+   "bytes": [
+    32406,
+    28804
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "An overhead map view. A start flag on the left and a finish flag on the right, joined by a short, faint dotted straight line. The route actually traveled is one bold path that leaves the start flag, bulges into a wide loop through three small tollbooth gates spaced along the detour, then rejoins the dotted line just before the finish flag, where a small checkmark stands. Everything centered with generous margin on all sides.",
+   "labels": [
+    "TASK COMPLETE"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-20T00:18:23Z"
+  },
+  {
+   "key": "2f9f604733c0d4b8",
+   "story_id": "2f9f604733c0d4b8",
+   "light_name": "2f9f604733c0d4b8-light.webp",
+   "dark_name": "2f9f604733c0d4b8-dark.webp",
+   "alt": "A judge's podium between two facing lecterns, with an arrow arcing from each lectern toward the podium and a scoring paddle resting on top.",
+   "bytes": [
+    22020,
+    22160
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A tall judge's podium in the center of the frame, with two identical lecterns facing it from the left and the right. From each lectern, an arced arrow curves toward the podium, the two arrows meeting in front of it. A single scoring paddle rests flat on top of the podium. Clean composition, all three structures well inside the frame.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-20T00:21:22Z"
+  },
+  {
+   "key": "8ec424e1286cd73d",
+   "story_id": "8ec424e1286cd73d",
+   "light_name": "8ec424e1286cd73d-light.webp",
+   "dark_name": "8ec424e1286cd73d-dark.webp",
+   "alt": "Paper slips on a conveyor approach a heavy gate with a stamping station; approved slips continue toward a rack of hanging tools while rejected slips fall into a bin.",
+   "bytes": [
+    57380,
+    55138
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A conveyor belt of paper slips moving from the left toward a heavy, thick-walled gate in the center of the frame. Just before the gate sits a stamping station with one large stamp poised above the belt. Beyond the gate, approved slips continue on the belt toward a wall rack of hanging tools on the right. Below the stamping station, a bin catches rejected slips, two slips mid-fall. Gate centered, everything clear of the edges.",
+   "labels": [
+    "PROPOSE",
+    "DECIDE"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-20T00:23:00Z"
+  },
+  {
+   "key": "958a9b26eff030f9",
+   "story_id": "958a9b26eff030f9",
+   "light_name": "958a9b26eff030f9-light.webp",
+   "dark_name": "958a9b26eff030f9-dark.webp",
+   "alt": "A glass room containing a conveyor loop connecting tools, documents, and a small globe, while a figure outside reads a ticker tape emerging from a slot in the glass.",
+   "bytes": [
+    63746,
+    59980
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A cross-section of a glass-walled room occupying the left two thirds of the frame: inside, a closed loop of conveyor belt connects a workbench of tools, a stack of documents, and a small globe, with slips of paper riding the belt. Outside the glass on the right, a single figure sits at a small desk reading a ticker tape that feeds out of a narrow slot in the glass wall, the tape printed with paired slips. Both the room and the figure sit well inside the frame.",
+   "labels": [
+    "HARNESS",
+    "TRAINER"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-20T00:24:48Z"
+  }
+ ]
+}
