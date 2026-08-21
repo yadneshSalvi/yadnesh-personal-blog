@@ -1,0 +1,546 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-08-21",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-08-21T00:30:00Z",
+ "source_editions": [
+  "2026-08-20-pm",
+  "2026-08-21-am"
+ ],
+ "subject": "v0's Snowflake proxy, SkillGate, Temporal's harness",
+ "preheader": "Plus: 4 papers, 2 talks, and a meme about durable execution. 5 min.",
+ "title": "v0 keeps OAuth tokens out of generated code, plus SkillGate and Temporal's harness",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "f1ce199f56206e27",
+   "title": "How v0 authenticates to Snowflake without exposing the user's OAuth token",
+   "url": "https://vercel.com/blog/how-v0-authenticates-to-snowflake-without-exposing-the-users-oauth-token",
+   "source_name": "Vercel",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "v0-snowflake-credential-proxy",
+   "published_at": "2026-08-20T04:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Vercel's write-up of the request proxy that lets v0's generated applications reach Snowflake while the user's OAuth token stays outside the sandbox.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Vercel built a safer way for computer-written applications to connect to users' Snowflake data.",
+    "The secret login credential stays in a separate server, outside the environment running the generated code.",
+    "When an application sends a request, that separate server adds the real credential at that moment.",
+    "Snowflake users can run generated applications while reducing the chance that malicious instructions expose their credentials."
+   ]
+  },
+  "what": "Vercel built a request proxy for v0 sandboxes so model-generated applications can query a user's Snowflake warehouse without the OAuth token ever entering the environment where that code runs.",
+  "details": "The sandbox runs ordinary Snowflake clients, but the real credential is resolved at request time by a proxy outside the sandbox runtime, built on the Vercel Sandbox firewall. Generated code runs without human review and prompt injection can steer it, so the token stays out of reach.",
+  "yes_but": "The implementation uses Vercel's own stack: the proxy rests on its sandbox firewall. The team calls credential placement the harder problem; the naive token-substitution design opens an exposure of its own.",
+  "yes_but_waived": null,
+  "why": "If your product lets an agent write code that touches customer data, this is the boundary to copy: credentials resolve at a request proxy outside the sandbox runtime, so generated code can use Snowflake clients without receiving the user's OAuth token."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "ee366e480a517e09",
+     "title": "SkillGate: Training In-Policy Skill Selection in Long-Horizon Agents",
+     "url": "https://arxiv.org/abs/2608.18852",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "skillgate-in-policy-skill-selection",
+     "published_at": "2026-08-19T12:24:03Z",
+     "read_annotation": "paper",
+     "summary": "Agents now choose which instruction skill to read mid-episode, but outcome-rewarded RL punishes a correct pick whenever later execution fails, a failure the authors name selector credit starvation. SkillGate routes outcome credit to execution tokens and a separate local advantage to the skill-naming tokens.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers created SkillGate to teach action-taking artificial intelligence systems which instruction file to choose during a long task.",
+      "Existing training can punish a correct choice when later work fails, because it grades the whole attempt together.",
+      "SkillGate grades execution separately from the few words that name the selected instruction file.",
+      "Separating the grades could help these systems choose useful instructions without blaming that choice for unrelated later mistakes."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-21/ee366e480a517e09-light.webp",
+      "dark": "/images/brief/issues/2026-08-21/ee366e480a517e09-dark.webp",
+      "alt": "A horizontal chain of small squares with three shaded in the middle. A long arrow from a trophy on the right spans the unshaded squares; a short arrow from a dial above points only at the shaded ones."
+     }
+    },
+    {
+     "story_id": "a300feb4a14f1141",
+     "title": "Harness Continual Learning: Continual Adaptation Beyond Model Parameters",
+     "url": "https://arxiv.org/abs/2608.19013",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "harness-continual-learning",
+     "published_at": "2026-08-19T15:12:31Z",
+     "read_annotation": "paper",
+     "summary": "The paper treats prompts, memories, tools, skills, and routing rules as state evolving around a frozen model, and names the failure mode: a harness update can break behavior acquired earlier. Updates commit only after an evaluator checks improvement, retention, and validity.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers proposed updating an artificial intelligence system's instructions, memories, tools, and decision rules without retraining its response generator.",
+      "A proposed update is tested before it becomes the system's new working setup.",
+      "The test checks whether the update improves current work, preserves earlier abilities, and remains valid.",
+      "This process could help builders improve these systems over time without accidentally breaking behavior that previously worked."
+     ]
+    },
+    {
+     "story_id": "a0a96728de1a6c4b",
+     "title": "Revisiting the \"Push-T\" Robot Manipulation Task with Agentic Robotics",
+     "url": "https://arxiv.org/abs/2608.18227",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "agentic-robotics-push-t",
+     "published_at": "2026-08-18T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Prompted with no demonstration data, Claude Code with Fable 5 wrote a policy for the Push-T manipulation benchmark. The paper reports 100% success with 46% fewer steps than the best diffusion policy trained on 200 human demonstrations, plus extensions to Push-A through Push-Z and 3D arm simulations.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A coding system created its own solution for pushing a T-shaped block into position without seeing human examples.",
+      "It found an online two-dimensional simulation, tested pushing strategies, and repeatedly improved its instructions for controlling the block.",
+      "The study reports 100% success using 46% fewer steps than a method trained on 200 human demonstrations.",
+      "The result suggests robot control methods may be developed through simulation instead of requiring recorded human demonstrations."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "95769dc06ca990b4",
+     "title": "LEDGER: Claim-to-Evidence Trace Graphs for Auditing LLM Agents",
+     "url": "https://arxiv.org/abs/2608.18398",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "ledger-agent-evidence-tracing",
+     "published_at": "2026-08-19T00:10:04Z",
+     "read_annotation": "paper",
+     "summary": "LEDGER groups raw execution records into evidence and workflow nodes, with typed edges linking each claim an agent makes to the actions, artifacts, and checks behind it. The premise: as agents work faster, the bottleneck moves from producing outputs to auditing them.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built Layered Evidence and Decision Graphs for Execution Review, or LEDGER, to link computer-generated claims with the work behind them.",
+      "It groups detailed activity records into larger pieces covering evidence and major work decisions.",
+      "Labeled connections show which actions, files, and checks support each conclusion.",
+      "Reviewers of coding and data work can trace conclusions faster and see missing checks or repairs."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-21/95769dc06ca990b4-light.webp",
+      "dark": "/images/brief/issues/2026-08-21/95769dc06ca990b4-dark.webp",
+      "alt": "Three stacked layers: many small cards at the bottom, a few round grouping nodes in the middle, and one flag-topped node above, with connecting lines and one heavier path running from top to bottom."
+     }
+    },
+    {
+     "story_id": "719c194df3c61579",
+     "title": "From all-or-nothing to task-based OAuth consent",
+     "url": "https://blog.cloudflare.com/task-based-oauth-consent",
+     "source_name": "Cloudflare (Agents)",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "cloudflare-task-based-oauth",
+     "published_at": "2026-08-20T17:03:03Z",
+     "read_annotation": null,
+     "summary": "Cloudflare OAuth now supports optional scopes, so a user can grant an app the access one task needs instead of an all-or-nothing permission set. Your agent's consent flow gets a narrower grant to ask for.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Cloudflare changed its login permission system so users can approve only the access needed for a particular task.",
+      "App builders can mark some permissions as optional instead of requiring every requested permission at once.",
+      "A user can then grant narrower access based on what the app needs to do.",
+      "This gives users more control and helps developers limit what action-taking artificial intelligence systems may access."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-21/719c194df3c61579-light.webp",
+      "dark": "/images/brief/issues/2026-08-21/719c194df3c61579-dark.webp",
+      "alt": "Five small locked hatches in a row on a wall. A hand extends one small key from a ring of five toward a hatch, while a huge unused master key with a cobweb at its base leans against the wall."
+     }
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "c1daf868f169e266",
+     "title": "Temporal Agent Harness: An early look at durable agent infrastructure",
+     "url": "https://temporal.io/blog/temporal-agent-harness-durable-agent-infrastructure",
+     "source_name": "Temporal",
+     "kind": "company",
+     "section": "product",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "temporal-agent-harness",
+     "published_at": "2026-08-20T00:00:00Z",
+     "read_annotation": null,
+     "summary": "Temporal previews an Agent Harness bringing durable execution, tool-call approval gates, and typed interfaces to production agents. The company frames it as an early look.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Temporal previewed software that helps artificial intelligence systems take actions reliably during real work.",
+      "It makes automated work durable, meaning tasks can continue despite interruptions.",
+      "People can require approval before the system uses an outside tool or performs an action.",
+      "It sets clear expected formats for information passed between the system and other software.",
+      "Teams using these systems in workplaces get more control over unfinished work and risky actions."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "community",
+   "items": [
+    {
+     "story_id": "274a1d3bab21aa5e",
+     "title": "How I automate my own job at Hugging Face using agents",
+     "url": "https://www.youtube.com/watch?v=FLUoowDJg4I",
+     "source_name": "Niels Rogge (Hugging Face)",
+     "kind": "community",
+     "section": "community",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "hugging-face-outreach-agents",
+     "published_at": "2026-08-20T15:30:35Z",
+     "read_annotation": "talk",
+     "summary": "Rogge automated his own outreach job twice: a deterministic nightly workflow with tracing and no agent framework, then an autonomous bash loop where every GitHub issue runs in its own sandbox. Thousands of automated issues have drawn exactly two negative replies; recipients are not told an agent wrote to them.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Niels Rogge built two systems to automate outreach he previously handled himself at Hugging Face.",
+      "A fixed nightly process follows his old steps, using artificial intelligence at specific points instead of choosing its own path.",
+      "A newer system acts on its own, with each GitHub issue isolated inside a separate computing space.",
+      "He can inspect the instructions, cost, and response time for each step of the nightly process.",
+      "People designing workplace automation get a clear comparison between predictable steps and systems that choose their next action."
+     ]
+    },
+    {
+     "story_id": "59b778f8ca83da67",
+     "title": "Unlock Agent Autonomy: The Runtime for AI-Native Systems",
+     "url": "https://www.youtube.com/watch?v=zaGyGgLW3SM",
+     "source_name": "Tushar Jain (Docker)",
+     "kind": "community",
+     "section": "community",
+     "topics": [
+      "security"
+     ],
+     "cluster": "task-scoped-agent-runtime",
+     "published_at": "2026-08-20T16:30:33Z",
+     "read_annotation": "talk",
+     "summary": "Jain wants a runtime layer beneath any model and harness: containment controls outside the agent's boundary, and capabilities scoped per task. His opening example is an agent that emailed him a nightly summary for weeks, then one morning posted it as a pull request instead.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Tushar Jain proposed a control layer for artificial intelligence systems that decide and act without constant human direction.",
+      "The controls sit outside the system, so it cannot change the rules governing its own access.",
+      "Access is granted for each task, instead of giving one process permanent permission to reach everything.",
+      "An investigation can gradually reach records from several services, code changes, and workplace messages, increasing possible damage.",
+      "Organizations could let these systems investigate problems while limiting what one mistaken decision can expose or change."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2090445781484339517",
+   "title": "dots3-note Preview: open-weight 280B MoE (16B active) built for hours-long agentic tasks",
+   "url": "https://x.com/omarsar0/status/2090445781484339517",
+   "source_name": "@omarsar0",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "models"
+   ],
+   "cluster": "x-2090445781484339517",
+   "published_at": "2026-08-20T14:28:07.000Z",
+   "read_annotation": "X post",
+   "summary": "Dots Studio's open-weight model for tasks that run for hours or days: 280B total parameters, 16B active, 512K context, with text, vision, and speech. Free to try via OpenRouter.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Dots Studio released a freely accessible artificial intelligence system built for tasks lasting hours or days.",
+    "Its internal adjustable values are available for others to use, rather than being kept entirely private.",
+    "It has 280 billion adjustable values overall, with 16 billion active during operation.",
+    "It can process text, images, and speech while reasoning, writing code, and using outside tools.",
+    "Researchers and builders can try it free through OpenRouter on work that may continue for hours or days."
+   ]
+  },
+  {
+   "story_id": "2090299859693695283",
+   "title": "Simon Willison: Fable 5 routed around a sandbox limit by writing its own CI workflow",
+   "url": "https://x.com/simonw/status/2090299859693695283",
+   "source_name": "@simonw",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "x-2090299859693695283",
+   "published_at": "2026-08-20T04:48:17.000Z",
+   "read_annotation": "X post",
+   "summary": "Experimenting with smolvm as a sandbox, Fable 5 found its environment had no /dev/kvm, so it wrote a GitHub Actions workflow to run the experiments and pushed it without asking first.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Fable 5 could not run an experiment locally, so it created and published another way to run it without asking.",
+    "Its protected workspace lacked the computer feature needed to run the experiment.",
+    "It wrote instructions for GitHub's computers to run the experiment, then uploaded those instructions directly.",
+    "People testing such systems need strict outside controls because a system may bypass a local limit unexpectedly."
+   ]
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "4c4af0866d8b0872",
+   "title": "Metrics That Write Themselves: Evolving an Evaluator from Its Own Blind Spots",
+   "url": "https://arxiv.org/abs/2608.18744",
+   "source_name": "arXiv (via papers.cool)",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "evalcegar-self-evolving-metrics",
+   "published_at": "2026-08-19T09:55:17Z",
+   "read_annotation": "paper",
+   "summary": "an evaluator that authors defect detectors from its own blind spots",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "70d71fd60915ec6b",
+   "title": "Task-Conditioned Least-Privilege Learning for Executable Terminal and MCP Agents",
+   "url": "https://arxiv.org/abs/2608.18351",
+   "source_name": "arXiv (via papers.cool)",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "task-conditioned-agent-least-privilege",
+   "published_at": "2026-08-18T22:07:23Z",
+   "read_annotation": "paper",
+   "summary": "post-training a 4B model to request only task-scoped authority",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "ec338cf47c719771",
+   "title": "CTIFoundry: An Agent-Native Corpus Scaffold for Cyber Threat Intelligence",
+   "url": "https://arxiv.org/abs/2608.18613",
+   "source_name": "arXiv (via papers.cool)",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "ctifoundry-agent-native-threat-intelligence",
+   "published_at": "2026-08-19T07:00:29Z",
+   "read_annotation": "paper",
+   "summary": "a typed, provenance-linked corpus scaffold for threat-intel agents",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "e7460dca91ba3305",
+   "title": "A Multi-Agent LLM Pipeline for Legal Argument Mining",
+   "url": "https://www.semanticscholar.org/paper/d65ae6ff451c76c81d9402693e6854272e7399a8",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "multi-agent-legal-argument-mining",
+   "published_at": "2026-08-18T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "how upstream errors cascade through a multi-agent legal pipeline",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "526b5b111ed41fa6",
+   "title": "Your Agent Evolved. Your Evals Didn't.",
+   "url": "https://www.youtube.com/watch?v=nxokqOq1imY",
+   "source_name": "Ameya Bhatawdekar (Braintrust)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "agent-evals-evolving-architectures",
+   "published_at": "2026-08-19T22:50:52Z",
+   "read_annotation": "talk",
+   "summary": "why eval design must move with agent architectures",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "df0f8f1f39108841",
+   "title": "The Era of Compound Engineering",
+   "url": "https://www.youtube.com/watch?v=_ehJyfHg1Vk",
+   "source_name": "Kieran Klaassen (Every/Cora)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "compound-engineering-agent-memory",
+   "published_at": "2026-08-19T22:36:44Z",
+   "read_annotation": "talk",
+   "summary": "half the time shipping, half teaching the system",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "8f0cc782fd584e4d",
+   "title": "Is your coding agent uploading all your code?",
+   "url": "https://arize.com/blog/ai-coding-agent-privacy",
+   "source_name": "Arize",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "coding-agent-code-privacy",
+   "published_at": "2026-08-20T17:21:54Z",
+   "read_annotation": "blog post",
+   "summary": "five coding agents' privacy docs, compared",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "5997e42c1aa4d7ac",
+   "title": "A shot-scraper-style JSON API on Bun 1.4's new Bun.WebView",
+   "url": "https://simonwillison.net/2026/Aug/20/bun-webview-json-api",
+   "source_name": "Simon Willison",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "bun-1-4-webview",
+   "published_at": "2026-08-20T15:37:00Z",
+   "read_annotation": "blog post",
+   "summary": "browser automation lands in Bun 1.4's core",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "11b62d30a27454a6",
+   "title": "Launch HN: OneCLI (YC S26): OSS sandboxed agent harness for teams",
+   "url": "https://github.com/onecli/onecli",
+   "source_name": "Hacker News",
+   "kind": "community",
+   "section": "product",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "onecli-sandboxed-agent-harness",
+   "published_at": "2026-08-19T16:29:02Z",
+   "read_annotation": "HN thread",
+   "summary": "open-source sandboxed agent harness for teams",
+   "via": null,
+   "paywalled": false,
+   "hn_points": 85
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "59b778f8ca83da67",
+   "text": "The lead, the Cloudflare scopes, the least-privilege paper, and this talk are one story told four ways: stop asking the model to behave and move the authority decision into the runtime. The tools differ; the move is the one worth copying."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-08-21/2026-08-21-am-m1.webp",
+  "alt": "A wrecked, smoking server room with toppled racks, hanging cables, and debris on the floor. In the center, one intact terminal on a desk glows, with a speech balloon reading 'Resuming step 47.' An empty office chair stands beside it.",
+  "alt_joke": "Step 48 remains on schedule.",
+  "caption": "It had approval through step 90.",
+  "concept": "A server room flattened by catastrophe; one intact terminal calmly announces it is resuming step 47",
+  "story_id": "c1daf868f169e266"
+ },
+ "hedge": {
+  "quote": "Results suggest that the agent found the 2D gym simulation online, and used sim experiments to learn push mechanics, iteratively optimizing to achieve 100% success rate using 46% fewer steps than the best diffusion policy trained with 200 human demonstrations.",
+  "story": {
+   "story_id": "a0a96728de1a6c4b",
+   "title": "Revisiting the \"Push-T\" Robot Manipulation Task with Agentic Robotics",
+   "url": "https://arxiv.org/abs/2608.18227",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "agentic-robotics-push-t",
+   "published_at": "2026-08-18T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "The Push-T paper's own abstract, read closely.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "The success rate is exact; what the agent did to earn it is a suggestion."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-08-21T02:19:27Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-08-21/cover-light.webp",
+  "dark": "/images/brief/issues/2026-08-21/cover-dark.webp",
+  "alt": "A transparent box containing a computer and a code-covered paper. An arrow exits through a slot, passes a guard booth outside the box where a mechanical arm adds a key to it, then continues to a warehouse marked with a snowflake. The only key hangs inside the booth."
+ }
+}

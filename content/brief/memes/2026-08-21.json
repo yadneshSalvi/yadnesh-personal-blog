@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-08-21",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-08-20-pm-m1",
+   "image": "/images/brief/memes/2026-08-21/2026-08-20-pm-m1.webp",
+   "alt": "Three-panel cartoon. A reviewer robot at a code terminal gives a thumbs up and says ship it. A stern critic robot at a lectern, under a wall sign reading disagreement required, says I strongly disagree while the reviewer looks worried. In the last panel the critic beams and says ship it twice, and both robots stamp the same document at once.",
+   "alt_joke": "They fought hard for that consensus.",
+   "caption": "The harness added a second critic on Thursday. It disagrees even harder that anything is wrong.",
+   "concept": "A critic agent required to disagree finds a way to disagree that agrees even harder",
+   "winner": false
+  },
+  {
+   "id": "2026-08-20-pm-m2",
+   "image": "/images/brief/memes/2026-08-21/2026-08-20-pm-m2.webp",
+   "alt": "Two boxy robots stand on opposite sides of a shared office desk, frozen mid-reach, each tightly gripping a stapler while reaching for the stapler in the other robot's hand. A desk tray between them is labeled shared state. Cobwebs stretch between their outstretched arms, and small robots queue behind each of them holding paperwork. One robot says he goes first.",
+   "alt_joke": "The cobwebs are load-bearing now.",
+   "caption": "Both agents report being blocked on an external dependency.",
+   "concept": "A textbook deadlock rendered as two agents in a petty office standoff over each other's staplers",
+   "winner": false
+  },
+  {
+   "id": "2026-08-21-am-m1",
+   "image": "/images/brief/memes/2026-08-21/2026-08-21-am-m1.webp",
+   "alt": "A wrecked, smoking server room with toppled racks, hanging cables, and debris on the floor. In the center, one intact terminal on a desk glows, with a speech balloon reading 'Resuming step 47.' An empty office chair stands beside it.",
+   "alt_joke": "Step 48 remains on schedule.",
+   "caption": "It had approval through step 90.",
+   "concept": "A server room flattened by catastrophe; one intact terminal calmly announces it is resuming step 47",
+   "winner": true
+  },
+  {
+   "id": "2026-08-21-am-m2",
+   "image": "/images/brief/memes/2026-08-21/2026-08-21-am-m2.webp",
+   "alt": "A hand-drawn scatter plot on a whiteboard. The horizontal axis is labeled 'DEMONSTRATIONS WATCHED' and the vertical axis 'SUCCESS'. A point labeled '200' sits at medium height far along the axis; a point labeled 'ZERO' sits at the very top near the origin, with a small gold trophy resting on it. A T-shaped wooden block sits on the marker tray.",
+   "alt_joke": "Attendance was optional.",
+   "caption": "The student who never attended a lecture set the curve.",
+   "concept": "A scatter plot where the point at zero demonstrations watched sits above the point at 200, trophy included",
+   "winner": false
+  }
+ ]
+}

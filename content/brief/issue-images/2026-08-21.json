@@ -1,0 +1,114 @@
+{
+ "issue_id": "2026-08-21",
+ "type": "daily",
+ "renders": 5,
+ "cost_usd": 1.25,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A transparent box containing a computer and a code-covered paper. An arrow exits through a slot, passes a guard booth outside the box where a mechanical arm adds a key to it, then continues to a warehouse marked with a snowflake. The only key hangs inside the booth.",
+   "bytes": [
+    81180,
+    78176
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A sealed transparent box in the center-left holds a small desk with a computer and a paper covered in scribbled code. An arrow leaves the box through a narrow slot, passes a small guard booth mounted on the outside of the box wall, where a mechanical arm presses a key onto the passing envelope, then continues right to a warehouse building marked with a snowflake. A single key hangs on a hook inside the guard booth; nothing inside the transparent box holds a key. All elements sit in the middle band of the frame, well clear of the edges.",
+   "labels": [
+    "SANDBOX",
+    "PROXY"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-21T00:15:28Z"
+  },
+  {
+   "key": "ee366e480a517e09",
+   "story_id": "ee366e480a517e09",
+   "light_name": "ee366e480a517e09-light.webp",
+   "dark_name": "ee366e480a517e09-dark.webp",
+   "alt": "A horizontal chain of small squares with three shaded in the middle. A long arrow from a trophy on the right spans the unshaded squares; a short arrow from a dial above points only at the shaded ones.",
+   "bytes": [
+    23838,
+    22956
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A long horizontal chain of small squares representing one episode's tokens, with three squares near the middle shaded darker to mark the skill choice. From a trophy at the right end of the chain, one long arrow sweeps back over the light squares only. From a small dial floating directly above the three dark squares, a short arrow drops straight down onto them. The two arrows stay clearly separate. The chain crosses the middle of the frame with wide margins on every side.",
+   "labels": [
+    "OUTCOME",
+    "LOCAL"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-21T00:17:39Z"
+  },
+  {
+   "key": "95769dc06ca990b4",
+   "story_id": "95769dc06ca990b4",
+   "light_name": "95769dc06ca990b4-light.webp",
+   "dark_name": "95769dc06ca990b4-dark.webp",
+   "alt": "Three stacked layers: many small cards at the bottom, a few round grouping nodes in the middle, and one flag-topped node above, with connecting lines and one heavier path running from top to bottom.",
+   "bytes": [
+    39418,
+    36586
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A diagram of three stacked horizontal layers: the bottom layer is a dense row of tiny record cards, the middle layer holds a few larger round nodes that each group a cluster of the cards below, and at the top sits a single node topped with a small flag. Lines run from the top node down through two middle nodes to a handful of specific bottom cards, and one full top-to-bottom path is drawn heavier than the rest. Everything centered with generous margins.",
+   "labels": [
+    "CLAIM",
+    "EVIDENCE",
+    "TRACE"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-21T00:18:27Z"
+  },
+  {
+   "key": "719c194df3c61579",
+   "story_id": "719c194df3c61579",
+   "light_name": "719c194df3c61579-light.webp",
+   "dark_name": "719c194df3c61579-dark.webp",
+   "alt": "Five small locked hatches in a row on a wall. A hand extends one small key from a ring of five toward a hatch, while a huge unused master key with a cobweb at its base leans against the wall.",
+   "bytes": [
+    41684,
+    39214
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A wall with a row of five small locked hatches, each keyhole a different shape. In front of the wall, a hand holds a ring of five small keys and extends one toward its matching hatch. Leaning against the wall at the far side, an oversized master key as tall as the hatches stands unused with a cobweb at its base. The hatch row runs across the middle of the frame, everything well inside the edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-21T00:19:17Z"
+  }
+ ]
+}
