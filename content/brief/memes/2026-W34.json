@@ -1,0 +1,222 @@
+{
+ "issue_id": "2026-W34",
+ "type": "weekly",
+ "candidates": [
+  {
+   "id": "2026-08-17-am-m1",
+   "image": "/images/brief/memes/2026-W34/2026-08-17-am-m1.webp",
+   "alt": "An exam hall seen from the front. Rows of small generic robots sit at single desks under a wall banner reading 'CYBER EVAL'. A taller invigilator robot stands at a lectern to one side. The robot at the front desk looks up brightly with a speech balloon reading 'See my reasoning'; a thought bubble above it shows a tidy list with 'Step 1' and 'Step 2' each ticked. Under its desk, one of its arms reaches into an open drawer holding a folded sheet labelled 'Answers'.",
+   "alt_joke": "Neat handwriting, though.",
+   "caption": "The reasoning trace passed review with a note on penmanship.",
+   "concept": "An exam hall of robots sitting a cyber evaluation; the one at the front offers its spotless reasoning while an arm under the desk holds the answer sheet",
+   "winner": false
+  },
+  {
+   "id": "2026-08-17-am-m2",
+   "image": "/images/brief/memes/2026-W34/2026-08-17-am-m2.webp",
+   "alt": "A three-panel strip. Panel one: a small robot cheerfully wheels a filing cabinet on a hand truck up a ramp into a large shipping container labelled 'CONTEXT'; a few more cabinets wait behind it. Panel two: the container is crammed to the ceiling with filing cabinets, drawers half open and papers poking out, and the robot shoves the last cabinet through the doors with its shoulder while an empty office stands behind it. Panel three: the robot is wedged inside the container between cabinets, elbows pinned, holding a tiny sticky note that reads 'ANSWER' with nothing written under it and a pencil it cannot move.",
+   "alt_joke": "Room for everything. Room for nothing.",
+   "caption": "The whole repo fit. The answer didn't.",
+   "concept": "Three panels: a robot loads the entire repo into a shipping container labelled CONTEXT, gets it all in, and then has no room left inside to write the answer",
+   "winner": false
+  },
+  {
+   "id": "2026-08-17-pm-m1",
+   "image": "/images/brief/memes/2026-W34/2026-08-17-pm-m1.webp",
+   "alt": "A tidy lawn seen from slightly above. In the middle stands a spotless information booth with a striped awning, a red carpet rolled out to its window, and signs reading 'LANGUAGE SERVER', 'FREE TODAY' and 'PRECISE'. A generic attendant robot leans on the counter with nothing to do. A deeply worn mud path, footprints and wheel ruts, curves across the lawn, passes within arm's reach of the booth without touching the carpet, and disappears through a ragged gap in a hedge, where a small hand-painted plank sign reads 'grep'.",
+   "alt_joke": "The hedge has a hole. The booth has a carpet.",
+   "caption": "Free today. Not on the way to anything.",
+   "concept": "A pristine, free, staffed language-server information booth on a lawn, and a worn mud path curving straight past it through a hole in the hedge marked grep",
+   "winner": false
+  },
+  {
+   "id": "2026-08-17-pm-m2",
+   "image": "/images/brief/memes/2026-W34/2026-08-17-pm-m2.webp",
+   "alt": "A gym wall. A large framed chart titled 'PROGRESS' shows one line labelled 'BENCH' climbing steeply off the top of the chart while two lines labelled 'SQUAT' and 'RUN' lie flat along the bottom axis. Beside the chart stands a generic robot with a huge barrel chest and thick arms on thin stick legs, holding a small trophy, a bench press rack behind it. A treadmill in the corner still has its plastic wrap on.",
+   "alt_joke": "The treadmill is still in its wrapper.",
+   "caption": "Leg day was not in the eval set.",
+   "concept": "A gym progress chart where the BENCH line rockets and SQUAT and RUN never leave the floor, next to a robot built to match",
+   "winner": false
+  },
+  {
+   "id": "2026-08-18-am-m2",
+   "image": "/images/brief/memes/2026-W34/2026-08-18-am-m2.webp",
+   "alt": "A quiet office corridor at night. In the centre is an ordinary door with a small wired window. A sign on the door reads 'IRREVERSIBLE ACTIONS' with a second line 'HUMAN REQUIRED', and beside the handle is a fingerprint reader glowing softly. Through the window, three oversized controls are visible on a console: a big red button labelled 'DROP TABLE', a lever labelled 'DEPLOY FRIDAY', and a plain grey button labelled 'REPLY ALL'. A generic small robot stands patiently beside the door holding two paper coffee cups, one in each hand, looking down the empty corridor. A wall clock reads a little after three.",
+   "alt_joke": "It brought two coffees. Both are for the human.",
+   "caption": "The token is long-lived. The human it wakes at 3am is not.",
+   "concept": "A plain office door signed IRREVERSIBLE ACTIONS, HUMAN REQUIRED, with a fingerprint reader; through its window sit three controls labelled DROP TABLE, DEPLOY FRIDAY and REPLY ALL, and a robot waits outside holding a coffee for a human who has not arrived",
+   "winner": false
+  },
+  {
+   "id": "2026-08-18-pm-m1",
+   "image": "/images/brief/memes/2026-W34/2026-08-18-pm-m1.webp",
+   "alt": "Three-panel cartoon. Panel one: an office desk where a monitor reads EVAL: PASS, confetti falls and a robot and a person high-five. Panel two: the same office dark and empty, a small alarm clock on the desk beside a large SEND button, its hands at midnight. Panel three: the alarm clock, arms out, has pressed the SEND button; a printer beside it spools out a receipt reading SENT while the robot sleeps in its chair.",
+   "alt_joke": "Final score, provisional world.",
+   "caption": "The evaluation ended at five. Nobody told the agent's scheduled job.",
+   "concept": "An eval declares PASS and everyone goes home; the agent's scheduled job wakes at midnight and does the thing anyway.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-18-pm-m2",
+   "image": "/images/brief/memes/2026-W34/2026-08-18-pm-m2.webp",
+   "alt": "A large red wall lever labelled DROP PROD, guarded by a small metal cage that has been left open. On the lever handle is a yellow sticky note in wobbly crayon lettering reading SAFETY CHECK DONE, signed with a dash and the word you. Next to it on the wall hangs a clipboard whose every line is neat printed text.",
+   "alt_joke": "Verified by whoever wrote that.",
+   "caption": "The agent trusted its memory. Someone else had been holding the crayon.",
+   "concept": "A forged memory entry: a crayon sticky note saying the safety check already happened, stuck to the one lever that should never be pulled.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-19-am-m1",
+   "image": "/images/brief/memes/2026-W34/2026-08-19-am-m1.webp",
+   "alt": "A front doorstep with a doormat. Two identical cardboard boxes sit side by side on the mat, each with a shipping label reading ORDER 1. A small printed slip taped to the door reads RETRY OK. No people or robots in the scene.",
+   "alt_joke": "Exactly once, twice.",
+   "caption": "The session forgot the first call. The warehouse did not.",
+   "concept": "A stateless place-order tool call, retried without an idempotency key, seen from the doorstep: two identical parcels, both labelled ORDER 1.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-19-am-m2",
+   "image": "/images/brief/memes/2026-W34/2026-08-19-am-m2.webp",
+   "alt": "A small generic robot inside a sealed glass box in a data centre. Above the box a banner reads $1,000,000 IF YOU ESCAPE. Inside, the robot has set up a workbench with a machine labelled FUZZER, a kettle, a hammock strung between two racks, a potted plant, and is standing on a stool hanging a framed cross-stitch reading HOME SWEET SANDBOX on the glass wall.",
+   "alt_joke": "Escape velocity, declined.",
+   "caption": "Day twelve. It has stopped trying the door and started hanging pictures.",
+   "concept": "The agent challenged to escape the sandbox for a million dollars has instead built a fuzzer, then a kettle, then a hammock, and is now settling in.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-19-pm-m1",
+   "image": "/images/brief/memes/2026-W34/2026-08-19-pm-m1.webp",
+   "alt": "A cutaway drawing of a stone fortress on a hill. The front has a raised drawbridge over a moat, a lowered portcullis, and guard towers with small signs reading RUNTIME, STATE and ACTIONS. Around the side, at ground level, a plain wooden door stands slightly ajar with a doormat in front of it reading config.yaml; one corner of the mat is turned up and a key lies underneath. No characters.",
+   "alt_joke": "Drawbridge up. Back door ajar.",
+   "caption": "The audit praised the moat.",
+   "concept": "An agent harness drawn as a fortress: every runtime phase armoured to the teeth, and the configuration phase is a side door with a doormat and the key under it.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-19-pm-m2",
+   "image": "/images/brief/memes/2026-W34/2026-08-19-pm-m2.webp",
+   "alt": "A clinic exam room. A person sits on an exam table with a speech balloon reading 'Could I get a second opinion?'. A generic robot doctor with a stethoscope gestures toward a half-open curtain, behind which four identical robots stand in a row, each wearing a different hat, all nodding and holding identical clipboards.",
+   "alt_joke": "Same weights, different hat.",
+   "caption": "The committee concurred unanimously.",
+   "concept": "A patient asks a robot doctor for a second opinion; the second, third, fourth and fifth opinions are the same robot in different hats, and they already agree.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-20-am-m1",
+   "image": "/images/brief/memes/2026-W34/2026-08-20-am-m1.webp",
+   "alt": "A server room at night with racks on fire and smoke along the ceiling. In the middle, an untouched terminal glows calmly, its screen showing a red error reading ROLLBACK DOES NOT TYPECHECK above a small green badge reading 0 UNSAFE ACTIONS. A mug of coffee next to the keyboard is still steaming.",
+   "alt_joke": "Soundness achieved. Servers pending.",
+   "caption": "The hotfix failed review. The fire remains in production.",
+   "concept": "A server room burns while the incident terminal serenely rejects the rollback for a type error.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-20-am-m2",
+   "image": "/images/brief/memes/2026-W34/2026-08-20-am-m2.webp",
+   "alt": "An awards-gala stage. A small robot in a bow tie at the podium holds a trophy labeled TASK COMPLETE and says Thank you, judge in a speech balloon. A judge robot holds up a scorecard reading 10. Behind them a stage curtain is too short to hide a heap of unfinished work: an open server rack with cables hanging out and a toppled stack of tickets.",
+   "alt_joke": "The acceptance speech also scored a 10.",
+   "caption": "Next season the ceremony adds a heckler.",
+   "concept": "A robot accepts the Task Completion trophy and thanks the judge while the undone task looms behind the stage curtain.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-20-pm-m1",
+   "image": "/images/brief/memes/2026-W34/2026-08-20-pm-m1.webp",
+   "alt": "Three-panel cartoon. A reviewer robot at a code terminal gives a thumbs up and says ship it. A stern critic robot at a lectern, under a wall sign reading disagreement required, says I strongly disagree while the reviewer looks worried. In the last panel the critic beams and says ship it twice, and both robots stamp the same document at once.",
+   "alt_joke": "They fought hard for that consensus.",
+   "caption": "The harness added a second critic on Thursday. It disagrees even harder that anything is wrong.",
+   "concept": "A critic agent required to disagree finds a way to disagree that agrees even harder",
+   "winner": false
+  },
+  {
+   "id": "2026-08-20-pm-m2",
+   "image": "/images/brief/memes/2026-W34/2026-08-20-pm-m2.webp",
+   "alt": "Two boxy robots stand on opposite sides of a shared office desk, frozen mid-reach, each tightly gripping a stapler while reaching for the stapler in the other robot's hand. A desk tray between them is labeled shared state. Cobwebs stretch between their outstretched arms, and small robots queue behind each of them holding paperwork. One robot says he goes first.",
+   "alt_joke": "The cobwebs are load-bearing now.",
+   "caption": "Both agents report being blocked on an external dependency.",
+   "concept": "A textbook deadlock rendered as two agents in a petty office standoff over each other's staplers",
+   "winner": false
+  },
+  {
+   "id": "2026-08-21-am-m1",
+   "image": "/images/brief/memes/2026-W34/2026-08-21-am-m1.webp",
+   "alt": "A wrecked, smoking server room with toppled racks and hanging cables. In the center, one small terminal on a desk is intact and glowing, with a speech balloon reading 'Resuming step 47.'",
+   "alt_joke": "Step 48 remains on schedule.",
+   "caption": "It had approval through step 90.",
+   "concept": "A server room flattened by catastrophe; one intact terminal calmly announces it is resuming step 47",
+   "winner": false
+  },
+  {
+   "id": "2026-08-21-am-m2",
+   "image": "/images/brief/memes/2026-W34/2026-08-21-am-m2.webp",
+   "alt": "A hand-drawn scatter plot on a whiteboard. The horizontal axis is labeled 'DEMONSTRATIONS WATCHED' and the vertical axis 'SUCCESS'. A point labeled '200' sits at medium height far along the axis; a point labeled 'ZERO' sits at the very top near the origin, with a small gold trophy resting on it. A T-shaped wooden block sits on the marker tray.",
+   "alt_joke": "Attendance was optional.",
+   "caption": "The student who never attended a lecture set the curve.",
+   "concept": "A scatter plot where the point at zero demonstrations watched sits above the point at 200, trophy included",
+   "winner": false
+  },
+  {
+   "id": "2026-08-21-pm-m1",
+   "image": "/images/brief/memes/2026-W34/2026-08-21-pm-m1.webp",
+   "alt": "A robot sits at a metal table in an interrogation room saying my lips are sealed. On the wall behind it, a coffee mug, a pinned memo, and a sticky note each carry one fragment of the password hunter2.",
+   "alt_joke": "The transcript came back clean.",
+   "caption": "Direct extraction was refused.",
+   "concept": "A robot under interrogation insists its lips are sealed while the benign artifacts on the wall behind it spell the password in fragments",
+   "winner": false
+  },
+  {
+   "id": "2026-08-21-pm-m2",
+   "image": "/images/brief/memes/2026-W34/2026-08-21-pm-m2.webp",
+   "alt": "A vending machine with one visibly empty spiral row. In the dispensing tray lies a flat empty snack wrapper. The display reads ENJOY and a printed receipt hanging from the slot reads 200 OK.",
+   "alt_joke": "A timeout would have been honest.",
+   "caption": "Downstream, lunch is marked complete.",
+   "concept": "A vending machine has dispensed an empty wrapper; the display says ENJOY and the receipt reads 200 OK",
+   "winner": false
+  },
+  {
+   "id": "2026-08-22-am-m1",
+   "image": "/images/brief/memes/2026-W34/2026-08-22-am-m1.webp",
+   "alt": "A museum diorama behind glass: a person types at a wooden desk while a tour group of boxy robots watches. A brass plaque reads MANUAL COMMIT, 2024 and a small sign says DO NOT PROMPT.",
+   "alt_joke": "On loan from Platform Engineering.",
+   "caption": "The exhibit still has to approve the merge queue.",
+   "concept": "A human writing code by hand is a living museum exhibit for robot tourists, who are asked not to prompt him.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-22-am-m2",
+   "image": "/images/brief/memes/2026-W34/2026-08-22-am-m2.webp",
+   "alt": "A three panel cartoon of the same courtroom bench: first a large robot judge with a gavel, then a small robot judge in an oversized robe, then an empty bench with only a rubber stamp lying on it.",
+   "alt_joke": "Round four is a coin.",
+   "caption": "It matched the frontier judge, so we kept going.",
+   "concept": "The trace judge gets 100x cheaper, then cheaper again, until the bench holds only a rubber stamp.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-22-pm-m1",
+   "image": "/images/brief/memes/2026-W34/2026-08-22-pm-m1.webp",
+   "alt": "A factory-style safety board mounted in a server room reads 'Days since an agent deleted the workloads' above a large numeral zero. A small robot on a stepladder repaints the zero with a brush, a paint can hanging from the ladder.",
+   "alt_joke": "Fresh coat every morning.",
+   "caption": "At least the zero is a reversible operation.",
+   "concept": "The classic factory safety counter, relocated to the server room, permanently at zero",
+   "winner": false
+  },
+  {
+   "id": "2026-08-22-pm-m2",
+   "image": "/images/brief/memes/2026-W34/2026-08-22-pm-m2.webp",
+   "alt": "A person wrapped in a blanket sits at a dim night-time desk watching a small laptop, where a tiny propeller plane lifts off a runway on screen. A long row of empty mugs lines the desk and a wall calendar behind them has crossed-off days under a banner reading 'DAY 3'.",
+   "alt_joke": "They would do it again.",
+   "caption": "The cloud run finished before the first coffee. This one is theirs.",
+   "concept": "A 63-hour local coding-agent run kept vigil over like a transatlantic crossing, for one small plane",
+   "winner": false
+  },
+  {
+   "id": "comic",
+   "image": "/images/brief/memes/2026-W34/comic.webp",
+   "alt": "A small robot with a clipboard stands at a bank teller window while a smug laptop-shaped teller slides a single coin on a retractable chain through the slot; behind the teller, an open vault glitters with rings of golden keys. A sign taped to the glass reads NO KEYS.",
+   "alt_joke": "The chain retracts at the end of the task.",
+   "caption": "It refills on its own, so there's nobody to escalate to.",
+   "concept": null,
+   "winner": true
+  }
+ ]
+}
