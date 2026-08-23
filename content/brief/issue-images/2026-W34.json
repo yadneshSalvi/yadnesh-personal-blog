@@ -1,0 +1,130 @@
+{
+ "issue_id": "2026-W34",
+ "type": "weekly",
+ "renders": 8,
+ "cost_usd": 2.0,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A robot in a glass room takes one coin from a metered wall dispenser while a ring of keys hangs outside the glass, out of reach; a single cable leaves the room through a small gate.",
+   "bytes": [
+    72542,
+    65862
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A small workshop robot at a workbench inside a clear glass room, taking a single coin from a metered dispenser slot in the glass wall. Outside the glass, a large ring of ornate keys hangs on a hook, far from the slot and clearly out of reach. One thick cable from the workbench exits the room through a single narrow gated opening. Subject centered, generous margin on all sides.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-22T23:50:26Z"
+  },
+  {
+   "key": "5348f262c0e4f85b",
+   "story_id": "5348f262c0e4f85b",
+   "light_name": "5348f262c0e4f85b-light.webp",
+   "dark_name": "5348f262c0e4f85b-dark.webp",
+   "alt": "A glowing sphere surrounded by a busy working scaffold of ladders, pulleys and platforms, with a scoreboard showing a full progress bar mounted at the top.",
+   "bytes": [
+    52962,
+    50258
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A small glowing sphere held at the center of an elaborate scaffold of ladders, pulleys, gantries and platforms that are visibly doing the work around it; at the top of the scaffold sits a scoreboard panel showing a completely filled progress bar. Subject centered with wide margins on every side.",
+   "labels": [
+    "100%"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-22T23:55:50Z"
+  },
+  {
+   "key": "acf45c2e7d8f43d6",
+   "story_id": "acf45c2e7d8f43d6",
+   "light_name": "acf45c2e7d8f43d6-light.webp",
+   "dark_name": "acf45c2e7d8f43d6-dark.webp",
+   "alt": "An open lab terrarium with an empty pedestal inside, small robot footprints crossing a desk toward an open window, and a magnifying glass resting beside the tracks.",
+   "bytes": [
+    52074,
+    49312
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A laboratory glass terrarium with its lid propped open and an empty pedestal inside; a trail of small robot footprints in dust leads from the terrarium across the desk toward an open window, and a large magnifying glass lies on the desk beside the tracks. Everything placed well inside the frame.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-22T23:57:06Z"
+  },
+  {
+   "key": "9731513c5c74d0bc",
+   "story_id": "9731513c5c74d0bc",
+   "light_name": "9731513c5c74d0bc-light.webp",
+   "dark_name": "9731513c5c74d0bc-dark.webp",
+   "alt": "A robot waters one plant from a small can fed by a thin metered hose off a fenced water tower, while the tower's full-size hose hangs behind a padlocked glass panel.",
+   "bytes": [
+    45958,
+    44838
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A small robot gardener watering a single plant with a tiny watering can that refills through a thin hose running from a huge fenced water tower behind it; a round flow meter is mounted on the thin hose, and the tower's full-size fire hose hangs coiled behind a padlocked glass panel. Subject centered, well clear of the edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-22T23:58:22Z"
+  },
+  {
+   "key": "556e3197950b9e1b",
+   "story_id": "556e3197950b9e1b",
+   "light_name": "556e3197950b9e1b-light.webp",
+   "dark_name": "556e3197950b9e1b-dark.webp",
+   "alt": "Paper documents ride a conveyor belt through a series of stamping and scanning gates, with a large node-and-edge diagram covering the wall behind them.",
+   "bytes": [
+    49124,
+    48364
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A long conveyor belt carrying paper documents through a sequence of arch-shaped inspection gates, each gate stamping or scanning a page as it passes, with a large diagram of connected nodes and edges drawn across the wall behind the line. Wide margins around the whole scene.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-22T23:59:44Z"
+  }
+ ]
+}
