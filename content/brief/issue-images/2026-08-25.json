@@ -1,0 +1,118 @@
+{
+ "issue_id": "2026-08-25",
+ "type": "daily",
+ "renders": 6,
+ "cost_usd": 1.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A wall of small filing drawers behind a checkpoint desk. A guard robot stamps a queue of identical index cards approved while a mechanical arm hands one retrieved card to a second robot.",
+   "bytes": [
+    103220,
+    100528
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "An agent's long-term memory drawn as a wall of small filing drawers, centered in the frame. In front of it, a checkpoint desk where a guard robot inspects incoming index cards one at a time and stamps each one approved; every card in the queue looks identical and plainly written, and nothing on any card's surface could reveal which one is false. To one side, a retrieval arm hands one of those same cards to a working robot that accepts it without looking up. Keep the drawers, desk, and robots well inside the frame with margin on all sides.",
+   "labels": [
+    "APPROVED"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-25T00:17:06Z"
+  },
+  {
+   "key": "039eb63a91dfa83c",
+   "story_id": "039eb63a91dfa83c",
+   "light_name": "039eb63a91dfa83c-light.webp",
+   "dark_name": "039eb63a91dfa83c-dark.webp",
+   "alt": "Three walled lanes of text merging into one open trough where the flows mix; a robot examines the merged stream after the walls end.",
+   "bytes": [
+    50710,
+    49046
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Three separate channels of flowing text, each in its own walled lane, converging into a single flat trough where the lane walls end and the three flows mix into one indistinguishable stream. Past the merge point, a reader robot studies the mixed stream with no way to tell which lane any line came from. Keep the funnel centered and clear of the edges.",
+   "labels": [
+    "USER",
+    "TOOL",
+    "RETRIEVED"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-25T00:18:24Z"
+  },
+  {
+   "key": "91326033e15285f3",
+   "story_id": "91326033e15285f3",
+   "light_name": "91326033e15285f3-light.webp",
+   "dark_name": "91326033e15285f3-dark.webp",
+   "alt": "Two floor plans side by side: a room with boarded doors but gap-filled walls that dotted paths pass through, and the same room inside one thick wall with a single gate that stops the paths.",
+   "bytes": [
+    33152,
+    31054
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A top-down floor plan drawn twice, side by side. Left: a room holding a single document sits with every doorway boarded over, but the surrounding walls are broken by many small gaps through which dotted paths reach the document anyway. Right: the same room enclosed by one thick unbroken outer wall with a single gate, and every dotted path stopping at that wall. Keep both plans centered with margin from the edges.",
+   "labels": [
+    "SPEC",
+    "TOOL BLOCKS",
+    "SYSTEM WALL"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-25T00:21:08Z"
+  },
+  {
+   "key": "c55c08c15cf54d4c",
+   "story_id": "c55c08c15cf54d4c",
+   "light_name": "c55c08c15cf54d4c-light.webp",
+   "dark_name": "c55c08c15cf54d4c-dark.webp",
+   "alt": "Two matching stacks of labeled blocks joined by thin lines to a shared store of small tags; one differing pair of blocks is highlighted and bracketed together.",
+   "bytes": [
+    37270,
+    35328
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two tall stacks of rectangular blocks side by side, each stack a prompt assembled from parts: a system message block, a skill block, a tool block, a question block. Each block ties by a thin line to a small tag in a shared store of tags drawn between the stacks. All blocks match across the two stacks except one pair, which is visually distinct and joined by a short bracket. Everything centered with clear margin.",
+   "labels": [
+    "PROMPT A",
+    "PROMPT B",
+    "DIFF"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-25T00:22:47Z"
+  }
+ ]
+}
