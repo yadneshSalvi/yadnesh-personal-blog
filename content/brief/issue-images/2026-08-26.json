@@ -1,0 +1,86 @@
+{
+ "issue_id": "2026-08-26",
+ "type": "daily",
+ "renders": 6,
+ "cost_usd": 1.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "Five frames in a row, each holding a shorter version of a text sheet, with one heavy line that fades out by the fourth frame.",
+   "bytes": [
+    54674,
+    48432
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A single long sheet of dense text enters from the left and passes through five progressively smaller frames arranged left to right across the centre of the picture, each frame holding a shorter version of the sheet. One line on the sheet is drawn thicker than the others; it stays visible in the first two frames, thins in the third, and is absent from the fourth and fifth, while the ordinary lines compress evenly. The whole sequence sits in the middle band of the frame with generous margins on every side.",
+   "labels": [
+    "ROUND 1",
+    "ROUND 5"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-26T00:16:44Z"
+  },
+  {
+   "key": "19aa37787a9ec4fe",
+   "story_id": "19aa37787a9ec4fe",
+   "light_name": "19aa37787a9ec4fe-light.webp",
+   "dark_name": "19aa37787a9ec4fe-dark.webp",
+   "alt": "Two doorways side by side: one open with a pinned note beside it and a small robot walking through, one blocked by a turnstile bar with the robot stopped in front.",
+   "bytes": [
+    35800,
+    35204
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two doorways side by side, centred in the frame. On the left, a handwritten note is pinned to a corkboard beside an open doorway, and a small robot reads the note and then walks through the opening. On the right, the same doorway is closed by a solid turnstile bar with no note anywhere, and the small robot stands stopped in front of it. Both scenes sit in the middle of the picture with generous space around them.",
+   "labels": [
+    "DO NOT",
+    "DENY"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-26T00:17:55Z"
+  },
+  {
+   "key": "9be30fee52135874",
+   "story_id": "9be30fee52135874",
+   "light_name": "9be30fee52135874-light.webp",
+   "dark_name": "9be30fee52135874-dark.webp",
+   "alt": "Two rows of five figures holding cards; in the top row the cards show five different shapes, in the bottom row all five cards show the same circle.",
+   "bytes": [
+    51132,
+    49666
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two rows of five small figures, centred in the frame. In the top row each figure holds up a card with a different shape on it: a circle, a triangle, a square, a star, a hexagon. Short arrows point down from each figure to a second row, where the same five figures each hold up an identical card showing only the circle. The two rows are stacked in the middle of the picture with margins on every side.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-26T00:19:06Z"
+  }
+ ]
+}

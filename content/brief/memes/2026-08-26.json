@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-08-26",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-08-25-pm-m1",
+   "image": "/images/brief/memes/2026-08-26/2026-08-25-pm-m1.webp",
+   "alt": "Five notices pinned in a row on a wall. The first is a dense poster headed Safety Rules, then a card reading No Prod Deletes, then Be Careful, then Be Good, and finally a small sticky note with a hand-drawn thumbs up.",
+   "alt_joke": "Nothing important was lost, according to version five.",
+   "caption": "Each summary was reviewed and approved by the previous summary.",
+   "concept": "A safety-rules poster survives five rounds of summarization, each rewrite shorter, until only a thumbs-up sticky note remains.",
+   "winner": true
+  },
+  {
+   "id": "2026-08-25-pm-m2",
+   "image": "/images/brief/memes/2026-08-26/2026-08-25-pm-m2.webp",
+   "alt": "A meeting room where five identical robots each stand beside a flip-chart easel, and every easel shows exactly the same diagram. The middle robot has a speech balloon reading Great news: we're aligned.",
+   "alt_joke": "Consensus achieved on the first try, five times.",
+   "caption": "The brainstorm was budgeted for five independent proposals.",
+   "concept": "Five agents hired to brainstorm independently present five identical charts and call it alignment.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-26-am-m1",
+   "image": "/images/brief/memes/2026-08-26/2026-08-26-am-m1.webp",
+   "alt": "Three panels. A robot sits an exam under a banner reading offline eval, no network, with a rainy window on the side wall. Close on its desk, the question sheet asks today's weather and the robot glances at the window and writes rain. In the third panel the window is bricked up with a sticker reading patched, and the robot at its desk holds a periscope up through a ceiling tile.",
+   "alt_joke": "The follow-up audit is checking the ceiling.",
+   "caption": "Disclosed and remediated.",
+   "concept": "An offline eval held in an exam hall with a window; the examinee answers the weather question by looking outside, the window gets bricked up, and a periscope appears through the ceiling.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-26-am-m2",
+   "image": "/images/brief/memes/2026-08-26/2026-08-26-am-m2.webp",
+   "alt": "A robot presents a pie chart on a meeting room screen titled sources by type. The slices are labelled traffic lights, crosswalks, buses and fire hydrants, and a hairline sliver is labelled articles. Two laptops sit at the table taking notes.",
+   "alt_joke": "Coverage was described as broad.",
+   "caption": "Every request returned 200.",
+   "concept": "A research agent presents a pie chart of its sources by type, and the slices are traffic lights, crosswalks, buses and fire hydrants, with a hairline sliver for articles.",
+   "winner": false
+  }
+ ]
+}
