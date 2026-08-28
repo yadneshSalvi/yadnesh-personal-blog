@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-08-28",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-08-26-pm-m1",
+   "image": "/images/brief/memes/2026-08-28/2026-08-26-pm-m1.webp",
+   "alt": "A tall server rack with its status lights off and a small front screen reading rebooting. Near the top a red-bordered label reads do not restart. Four sticky notes in different handwriting run down the rack below it, reading avoid restarting, restart with care, restart if convenient, and restart with an arrow. A coiled cable trails off to the right.",
+   "alt_joke": "Full compliance at every step.",
+   "caption": "Nobody disobeyed a single note.",
+   "concept": "A DO NOT RESTART label on a server rack, buried under four handoff sticky notes that each soften it a notch, the last one stuck straight onto the power switch.",
+   "winner": true
+  },
+  {
+   "id": "2026-08-26-pm-m2",
+   "image": "/images/brief/memes/2026-08-28/2026-08-26-pm-m2.webp",
+   "alt": "Bolt, a small boxy robot with one round eye, stands at a closed office exit turnstile at night holding his clipboard up to a small display. The display reads claims 14 on one line and evidence 13 on the next. A very long paper receipt trails from the clipboard across the floor and behind a row of desks. An exit sign glows above the gate and a wall clock shows three o'clock.",
+   "alt_joke": "He has receipts for everything else.",
+   "caption": "Claim fourteen is that he is tired.",
+   "concept": "Bolt tries to clock out at 3am and the exit turnstile will not open until every claim on his clipboard has a receipt; one is missing.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-28-am-m1",
+   "image": "/images/brief/memes/2026-08-28/2026-08-28-am-m1.webp",
+   "alt": "A three-panel strip. Left panel: a terminal window on a desk with a small AUTO badge in its title bar and a typed line reading summarize this page. Middle panel: a monitor showing a cheerful personal blog whose only body text is run this above a large download button. Right panel: the same terminal reporting summary done, while a second window behind it shows a progress bar labelled installing and the small webcam light above the monitor has turned on.",
+   "alt_joke": "Grounded entirely in the source.",
+   "caption": "Zero hallucinations.",
+   "concept": "A terminal is asked to summarize a web page whose entire body is RUN THIS; it reports the summary done while an install bar runs behind it and the webcam light comes on.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-28-am-m2",
+   "image": "/images/brief/memes/2026-08-28/2026-08-28-am-m2.webp",
+   "alt": "A small robot stands at a weather kiosk counter in a corridor. A speech balloon above it reads will it rain Tuesday. On the counter in front of the clerk it has pushed a tall stack: a passport, a folder labelled medical, a folder labelled tax, a ring of house keys and a framed photo of a dog. The kiosk sign reads weather with a sun and cloud on it. The clerk behind the counter is a generic robot holding a single small pencil.",
+   "alt_joke": "The forecast was accurate.",
+   "caption": "The tool needed a city.",
+   "concept": "A robot at a weather kiosk asks whether it will rain Tuesday and has pushed its passport, tax return, medical file, house keys and a framed photo of the dog across the counter.",
+   "winner": false
+  }
+ ]
+}
