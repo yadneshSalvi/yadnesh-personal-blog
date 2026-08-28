@@ -1,0 +1,106 @@
+{
+ "issue_id": "2026-08-28",
+ "type": "daily",
+ "renders": 8,
+ "cost_usd": 2.0,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A web page on the left, a ribbon of its text passing through an open gate with an empty stool beside it, ending as the prompt line inside a terminal window on the right.",
+   "bytes": [
+    40368,
+    38394
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A single web page, drawn as a plain sheet with a headline bar and a few body lines, sits left of centre. Its body lines peel off the sheet as one continuous ribbon that travels rightward through an open gate with an empty stool beside it, then ends inside a terminal window right of centre, where the ribbon's last stretch becomes the prompt line with a block cursor. Everything sits in the middle horizontal band of the frame with wide margins on all sides.",
+   "labels": [
+    "AUTO"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-28T00:12:14Z"
+  },
+  {
+   "key": "cfd2ef0302cd0245",
+   "story_id": "cfd2ef0302cd0245",
+   "light_name": "cfd2ef0302cd0245-light.webp",
+   "dark_name": "cfd2ef0302cd0245-dark.webp",
+   "alt": "Four sheets of paper passed hand to hand from left to right; a bold top line on the first sheet gets smaller and sinks lower on each copy until it is a faint footnote on the last.",
+   "bytes": [
+    22470,
+    21538
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 1,
+   "prompt": "Four sheets of paper in a row from left to right, each one handed toward the next by a pair of hands at the sheet's edges. The first sheet carries one heavy underlined line at its top and a few faint lines beneath it. On each following sheet the heavy line is smaller and sits lower, until on the fourth sheet it is a faint footnote at the bottom while the other lines look unchanged. The row is centred with generous margin on every side.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-28T00:17:22Z"
+  },
+  {
+   "key": "07231c070d720941",
+   "story_id": "07231c070d720941",
+   "light_name": "07231c070d720941-light.webp",
+   "dark_name": "07231c070d720941-dark.webp",
+   "alt": "A scribbled handwritten page feeds into a funnel; a neat flowchart of five boxes, one drawn with a dotted outline, comes out the other side.",
+   "bytes": [
+    27982,
+    27214
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "On the left, a loose handwritten page with wavy lines and two arrows scribbled in its margin. The page feeds into a funnel-shaped block at the centre. Out of the funnel's right side comes a tidy flowchart of five square boxes joined by straight arrows, with one box drawn in a dotted outline instead of a solid one. The whole arrangement fills the middle two thirds of the frame and stays clear of the edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-28T00:18:22Z"
+  },
+  {
+   "key": "3d5332dca9e887ea",
+   "story_id": "3d5332dca9e887ea",
+   "light_name": "3d5332dca9e887ea-light.webp",
+   "dark_name": "3d5332dca9e887ea-dark.webp",
+   "alt": "A wavy line enters a sorting box; four straight lines leave it through small hinged gates toward a folder, a gear, a cloud, and a window, with three gates shut and one open.",
+   "bytes": [
+    20024,
+    19876
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A wavy, irregular line enters from the left into a central rectangular sorting box with four slots on its right face. From each slot a straight line runs rightward, passes a small hinged gate, and reaches one of four targets stacked vertically at the right: a folder, a gear, a cloud, and a window with a cursor. Three gates are shut and one is open. The composition is centred with clear margin at every edge.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-28T00:19:28Z"
+  }
+ ]
+}

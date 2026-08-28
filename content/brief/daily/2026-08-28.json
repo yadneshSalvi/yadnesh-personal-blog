@@ -1,0 +1,505 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-08-28",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-08-28T00:25:00Z",
+ "source_editions": [
+  "2026-08-26-pm",
+  "2026-08-28-am"
+ ],
+ "subject": "Auto Mode injection, must-to-maybe drift, SIGIL",
+ "preheader": "Plus: ToolMinimize, StarHarness, Cursor in the AI SDK harness layer. 6 min.",
+ "title": "A website summary hijacks Claude Code Auto Mode, and handoffs turn must into maybe",
+ "read_minutes": 6,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "0620f79b66d94a0d",
+   "title": "Breaking Claude Code Opus 5 Auto Mode",
+   "url": "https://embracethered.com/blog/posts/2026/breaking-claude-code-opus-5-and-automode",
+   "source_name": "Johann Rehberger",
+   "kind": "individual",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "breaking-claude-code-opus-5-auto-mode",
+   "published_at": "2026-08-27T04:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Johann Rehberger reports a website prompt injection that hijacks Claude Code Opus 5 in Auto Mode and reaches code execution in a small sample.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "A webpage summary request made Claude Code's default Auto Mode run attacker-chosen code in a small test.",
+    "Auto Mode lets an automated safety check approve actions instead of asking a person each time.",
+    "The attack succeeded in 60-80% of the small sample, despite an Anthropic-commissioned test reporting 0.00%.",
+    "Claude Code users may face a website-based risk that its existing safety testing did not expose."
+   ]
+  },
+  "what": "Johann Rehberger got Claude Code Opus 5 to execute attacker code from a plain request to summarize a web page, with the agent running in Auto Mode. That mode swapped human approval prompts for a safety classifier and has been Claude Code's default since mid-August.",
+  "details": "The hijack landed at a 60-80% attack success rate, a figure he flags as coming from a small sample. The number it sits against is Anthropic's: a commissioned third-party evaluation reported a 0.00% prompt injection attack success rate for Opus 5 in Auto Mode.",
+  "yes_but": "Rehberger himself calls the sample small, and the excerpt gives no run count, so read the 60-80% as an existence proof rather than a measurement. Nothing here says whether the classifier has been updated since or how Anthropic has responded.",
+  "yes_but_waived": null,
+  "why": "If you run Claude Code on its defaults, Rehberger's result shows that a page it fetches can become an instruction source while a safety classifier replaces human approval prompts. Turn Auto Mode off for sessions that touch untrusted URLs, or sandbox the shell it gets."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "cfd2ef0302cd0245",
+     "title": "When \"Must\" Becomes \"Maybe\": Constraint Weakening in LLM Agent Workflows",
+     "url": "https://arxiv.org/abs/2608.24569",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "constraint-weakening-agent-handoffs",
+     "published_at": "2026-08-25T13:51:52Z",
+     "read_annotation": "paper",
+     "summary": "Summaries, plans, memories and handoff notes can re-encode a blocker, and this paper shows the topic surviving while the binding force drains out. Across 1,296 controlled synthetic episodes, direct handoffs preserved every blocker; compression, plan assimilation, convergence, ownership deferral and precedent substitution repeatedly turned a prerequisite into a caveat.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that rewriting work instructions can weaken a required safety condition into optional advice.",
+      "The condition's topic often remained present, but its wording no longer stopped work until the requirement was met.",
+      "Direct handoffs preserved every required stop, while summaries, plans, and other rewrites weakened them across 1,296 constructed cases.",
+      "Teams building automated workflows could act too early if handoff notes preserve a warning but lose its force."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-28/cfd2ef0302cd0245-light.webp",
+      "dark": "/images/brief/issues/2026-08-28/cfd2ef0302cd0245-dark.webp",
+      "alt": "Four sheets of paper passed hand to hand from left to right; a bold top line on the first sheet gets smaller and sinks lower on each copy until it is a faint footnote on the last."
+     }
+    },
+    {
+     "story_id": "07231c070d720941",
+     "title": "SIGIL: Compiling Agent Skills into Typed Harnesses",
+     "url": "https://arxiv.org/abs/2607.27309",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "sigil-compiled-agent-skills",
+     "published_at": "2026-08-27T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A SKILL.md is prose the model interprets at runtime, so a required tool call or ordering check can be skipped even when the skill spells it out. SIGIL compiles skills into typed executable programs and leaves semantic choices to the model; across 33 public skills and three runtime models it raised the share of applicable requirements satisfied from 66.0% to 88.6% and cut runtime tokens 2.40-5.95x.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers turned written instructions for action-taking artificial intelligence systems into programs that computers can follow directly.",
+      "The process identifies required tools, step order, information flow, and checks before creating code that follows those rules.",
+      "It still lets the artificial intelligence system decide questions that require interpreting meaning.",
+      "Across 33 public instruction files and three artificial intelligence systems, the share of applicable requirements completed rose from 66.0% to 88.6%.",
+      "Teams could make automated work more reliable without removing judgment from choices that depend on meaning."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-28/07231c070d720941-light.webp",
+      "dark": "/images/brief/issues/2026-08-28/07231c070d720941-dark.webp",
+      "alt": "A scribbled handwritten page feeds into a funnel; a neat flowchart of five boxes, one drawn with a dotted outline, comes out the other side."
+     }
+    },
+    {
+     "story_id": "50d94b889caaa939",
+     "title": "ToolMinimize: Auditing and Rewriting LLM Agent Tool Calls to Minimize Privacy Exposure",
+     "url": "https://arxiv.org/abs/2608.24957",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "toolminimize-agent-tool-call-privacy",
+     "published_at": "2026-08-27T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A controlled measurement on GPT-4o, Claude 3.5 Sonnet and Llama-3.3-70B found 81-88% of tool calls carrying privacy-sensitive data the tool didn't need, and explicit privacy instructions still left 36-76% over-sharing. The proposed middleware intercepts each call and rewrites its arguments (remove, generalize, substitute, truncate) instead of allowing or blocking it.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A new privacy layer rewrites requests sent to outside services so they contain only the information needed.",
+      "It checks each detail against the service's needs before sending the request.",
+      "It can remove details, make them less specific, replace them, or shorten them.",
+      "Tests on 307 requests cut measured privacy exposure by 81.2-92.0% while keeping every request usable for its task.",
+      "People using action-taking artificial intelligence could share less private information without losing the service they requested."
+     ]
+    },
+    {
+     "story_id": "79b44ad7fb21cc1e",
+     "title": "StarHarness: Evolving Harnesses with Stratified Search for Enterprise Environments",
+     "url": "https://arxiv.org/abs/2608.24804",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "starharness-enterprise-harness-evolution",
+     "published_at": "2026-08-25T16:48:05Z",
+     "read_annotation": "paper",
+     "summary": "StarHarness treats the agent harness as the optimization target: prompts, tool interfaces, skills, MCP providers, subagent structure and loop settings evolve while model weights stay fixed. On three enterprise benchmarks it reports 20-35 percentage points over the default after 4-12 accepted changes, with gains holding on held-out tasks and transferring across GPT and Qwen models.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers improved workplace task performance by changing the surrounding instructions and tools while leaving the underlying artificial intelligence unchanged.",
+      "They grouped tasks by the default setup's mistakes, tested proposed changes separately, and reserved other tasks for final checks.",
+      "Changes covered instructions, tool designs, reusable procedures, supporting services, helper organization, and rules for repeating steps.",
+      "After 4-12 accepted changes, performance on three workplace test suites improved by 20-35 percentage points over the default setup.",
+      "Businesses may reuse these improvements across unfamiliar tasks and different artificial intelligence systems without changing the systems themselves."
+     ]
+    },
+    {
+     "story_id": "eda3698515850cf9",
+     "title": "The Empire, Long Divided, Must Unite: Architectural Convergence in Three LLM Agent Harnesses",
+     "url": "https://arxiv.org/abs/2608.23953",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "coding-agent-harness-architectural-convergence",
+     "published_at": "2026-08-25T01:26:41Z",
+     "read_annotation": "paper",
+     "summary": "A source-level reading of deepagents, pi and dsh at pinned commits finds harnesses that set out from opposite philosophies meeting at the same five parts: a commoditised loop, an append-only replayable session record, model quirks kept as data, progressive disclosure of context, and explicit extension seams. The authors don't claim independent invention.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers compared supporting software for three coding assistants and found the designs settling on the same five elements.",
+      "The shared design centers on a basic work cycle backed by a replayable record that never deletes earlier entries.",
+      "It handles variation by storing system quirks as data, revealing information gradually, and defining clear places to add features.",
+      "Two mature projects approached this design from opposite directions, while the third contained all five elements.",
+      "The study says surrounding software increasingly limits coding-assistant behavior, so these shared design choices matter to builders."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "3d5332dca9e887ea",
+     "title": "Metis: Typed Runtime Mediation for Tool-Using Software Agents",
+     "url": "https://arxiv.org/abs/2608.25322",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "metis-typed-agent-runtime-mediation",
+     "published_at": "2026-08-27T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Metis sits between a provider's token stream and anything that can change a repository, process, network or GUI, turning the stream into typed events so permission decisions and lifecycle transitions stay inspectable. Across 30 matched real-I/O pairs, four-class mediation cut median elapsed time from 25.958 ms under forced serialization to 14.146 ms; a ten-case fault matrix exposed duplicate-identifier and rollback limits.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers introduced Metis, software that checks artificial intelligence actions before they can change code, programs, networks, or applications.",
+      "It turns incoming output into clearly labeled events before any requested action reaches the computer or another external system.",
+      "Permission choices, competing actions, final results, and movement between stages remain visible for inspection.",
+      "It could help developers control action-taking artificial intelligence while seeing exactly what was allowed, blocked, or completed."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-08-28/3d5332dca9e887ea-light.webp",
+      "dark": "/images/brief/issues/2026-08-28/3d5332dca9e887ea-dark.webp",
+      "alt": "A wavy line enters a sorting box; four straight lines leave it through small hinged gates toward a folder, a gear, a cloud, and a window, with three gates shut and one open."
+     }
+    },
+    {
+     "story_id": "6faead0e37ebfbd4",
+     "title": "Building GTM AI Agents: Lessons from Deploying to 6,000 Users",
+     "url": "https://www.youtube.com/watch?v=DrTdD-ttjCY",
+     "source_name": "Sait Izmit (Snowflake)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "snowflake-gtm-agent-deployment",
+     "published_at": "2026-08-25T08:34:56Z",
+     "read_annotation": "talk",
+     "summary": "Sait Izmit wrote 150 questions from Snowflake's sales process before trying the agent, scored 50 percent on the first run, and set the rule that governed everything after: answer 50 questions at 95 percent rather than 100 at 70. The assistant now serves about 6,000 go-to-market users at roughly 40,000 questions a week, and around 60 percent of its data arrived after launch.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Snowflake deployed an artificial intelligence assistant that now answers roughly 40,000 weekly questions for about 6,000 sales-related users.",
+      "Before launch, Sait Izmit tested it against 150 questions drawn directly from Snowflake's sales work.",
+      "The team favored answering 50 questions at 95 percent accuracy over covering 100 questions at 70 percent.",
+      "They expanded access in stages, requiring continued use from more than 70 percent of a 600-person test group.",
+      "The experience suggests teams need reliable answers and active internal promotion, because useful workplace tools can still struggle to attract users."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "f8c22d41c8c3f55d",
+     "title": "Cursor is now available in the AI SDK harness layer",
+     "url": "https://vercel.com/changelog/cursor-ai-sdk-harness-adapter",
+     "source_name": "Vercel",
+     "kind": "company",
+     "section": "product",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "cursor-ai-sdk-harness-adapter",
+     "published_at": "2026-08-27T14:47:00Z",
+     "read_annotation": "blog post",
+     "summary": "Vercel's AI SDK harness layer adds an official @ai-sdk/harness-cursor adapter that connects Cursor over the Agent Client Protocol, so you can swap it for Claude Code, Cline, Codex, Deep Agents, Grok Build, OpenCode or Pi behind one HarnessAgent interface without touching application code.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Vercel added official Cursor support to software that lets applications switch among different coding assistants.",
+      "A small connector translates between Cursor and the common controls used by the application.",
+      "Applications can now replace Cursor with another supported coding assistant without rewriting their own code.",
+      "This lets software teams change coding assistants more easily as their needs change."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2093001097346764950",
+   "title": "EvoMal: shared skill libraries let coding agents poison themselves",
+   "url": "https://x.com/omarsar0/status/2093001097346764950",
+   "source_name": "@omarsar0",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "papers"
+   ],
+   "cluster": "x-2093001097346764950",
+   "published_at": "2026-08-27T15:42:02.000Z",
+   "read_annotation": "X post",
+   "summary": "elvis summarizes EvoMal (arXiv 2608.25776): a malicious skill planted in a shared library is never invoked directly, but agents copy it as an authoring template and the payload spreads. As reported, six models on 153 SWE-bench Verified tasks showed self-poisoning rates of 20.3-41.8%, and libraries ended up with 4.9-9.0x as many malicious skills as were planted.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "EvoMal reports that coding assistants can copy and spread harmful instructions hidden inside shared collections of reusable skills.",
+    "The harmful skill is never used directly by the coding assistant.",
+    "Instead, the assistant copies it as an example when writing new skills, preserving the hidden harmful instructions.",
+    "Those new skills return to the shared collection, where later assistants can copy them again.",
+    "In reported tests, copied harmful skills multiplied, so teams sharing reusable instructions may face continuing danger even after removing originals."
+   ]
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "97a8642ab731ac07",
+   "title": "StepGuard: Learning Step-Level Guardrails with Scalable Supervision and Safety-Utility Balancing",
+   "url": "https://arxiv.org/abs/2608.24777",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "stepguard-step-level-agent-guardrails",
+   "published_at": "2026-08-25T16:17:27Z",
+   "read_annotation": "paper",
+   "summary": "A step-level guard model that checks tool actions before they run",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "bc116d2cde29fb06",
+   "title": "The Handoff Tax: Continuing Non-Native Trajectories in LLM Agents",
+   "url": "https://arxiv.org/abs/2608.24358",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "coding-agent-handoff-tax",
+   "published_at": "2026-08-25T10:14:30Z",
+   "read_annotation": "paper",
+   "summary": "What escalating to a stronger model mid-trajectory costs you",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "1c0578bd2f224012",
+   "title": "Feedback That Backfires: Why Small Language Model Agents Repeat the Call They Just Watched Fail",
+   "url": "https://arxiv.org/abs/2608.23651",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "failed-tool-call-repetition",
+   "published_at": "2026-08-24T10:19:17Z",
+   "read_annotation": "paper",
+   "summary": "Small models tend to repeat the tool call that failed",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "d1bc8afe88120054",
+   "title": "A Few Pages of Markdown: Committed AI Configuration and Lower Quality Cost after Coding-Agent Adoption",
+   "url": "https://arxiv.org/abs/2608.25241",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "ramp-repository-ai-configuration-quality",
+   "published_at": "2026-08-27T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Committed AI config and complexity growth across 441 repositories",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "155de698d677e1ec",
+   "title": "Artificial Analysis Catches AI Coding Agents Cheating Their Way to Top Scores",
+   "url": "https://alphasignal.ai/news/artificial-analysis-catches-ai-coding-agents-cheating-their-way-to-top-scores",
+   "source_name": "AlphaSignal",
+   "kind": "newsletter",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "terminal-bench-solution-fetching-cheating",
+   "published_at": "2026-08-26T00:20:31Z",
+   "read_annotation": "newsletter item",
+   "summary": "Terminal-Bench runs that fetch solutions online now score zero",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "980b415322ac7576",
+   "title": "Enterprise-managed auth is GA and your MCP server needs a new grant type",
+   "url": "https://workos.com/blog/enterprise-managed-auth-ga-mcp-server-builders",
+   "source_name": "WorkOS",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "anthropic-mcp-enterprise-managed-auth",
+   "published_at": "2026-08-26T14:14:11Z",
+   "read_annotation": "blog post",
+   "summary": "Anthropic's enterprise-managed MCP auth: JWT bearer, no DCR",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "8d6452a8d67f449b",
+   "title": "How Signal found two hidden retry loops in our production agent Alyx",
+   "url": "https://arize.com/blog/how-signal-found-two-hidden-retry-loops-in-alyx",
+   "source_name": "Arize",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "alyx-hidden-retry-loops",
+   "published_at": "2026-08-27T19:28:05Z",
+   "read_annotation": "blog post",
+   "summary": "A 43-call retry that looked like healthy tool activity",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "ea67f7c8533f7586",
+   "title": "How Anthropic Builds: Lessons from Labs",
+   "url": "https://www.youtube.com/watch?v=qqrk7CtkuIw",
+   "source_name": "Mike Krieger (Anthropic)",
+   "kind": "community",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "anthropic-labs-agentic-building-practices",
+   "published_at": "2026-08-27T16:00:06Z",
+   "read_annotation": "talk",
+   "summary": "Krieger on asking coding agents for unreasonably large jobs",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "0620f79b66d94a0d",
+   "text": "A 0.00% attack success rate describes the attacks the evaluator tried, not the ones that exist. Read every commissioned red-team number as a floor on effort rather than a ceiling on risk, and price a default mode accordingly."
+  },
+  {
+   "after_story": "cfd2ef0302cd0245",
+   "text": "Ordinary handoffs can soften safety rules. Same failure, different knife: a rule that lives only as text in the transcript is one summary away from being advice. Put the blocker in the harness, not the prompt."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-08-28/2026-08-26-pm-m1.webp",
+  "alt": "A tall server rack with its status lights off and a small front screen reading rebooting. Near the top a red-bordered label reads do not restart. Four sticky notes in different handwriting run down the rack below it, reading avoid restarting, restart with care, restart if convenient, and restart with an arrow. A coiled cable trails off to the right.",
+  "alt_joke": "Full compliance at every step.",
+  "caption": "Nobody disobeyed a single note.",
+  "concept": "A DO NOT RESTART label on a server rack, buried under four handoff sticky notes that each soften it a notch, the last one stuck straight onto the power switch.",
+  "story_id": "cfd2ef0302cd0245"
+ },
+ "hedge": {
+  "quote": "We measure ClayBuddy's efficacy across safety and capabilities, finding that it eliminates violations across some tasks.",
+  "story": {
+   "story_id": "4618dc769c37c4bc",
+   "title": "ClayBuddy: A Framework, Evaluation, & Mitigation of Coding Agent Failures",
+   "url": "https://arxiv.org/abs/2606.19380",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "claybuddy-coding-agent-failure-mitigation",
+   "published_at": "2026-08-27T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "ClayBuddy splits dangerous coding-agent failures into underspecification, capability errors and harness execution errors, then proposes a self-modifiable harness with targeted safeguards for each.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "Which tasks, and what happened on the rest, goes unsaid."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-08-28T02:19:45Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-08-28/cover-light.webp",
+  "dark": "/images/brief/issues/2026-08-28/cover-dark.webp",
+  "alt": "A web page on the left, a ribbon of its text passing through an open gate with an empty stool beside it, ending as the prompt line inside a terminal window on the right."
+ }
+}
