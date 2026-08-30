@@ -1,0 +1,195 @@
+{
+ "issue_id": "2026-W35",
+ "type": "weekly",
+ "candidates": [
+  {
+   "id": "2026-08-24-am-m1",
+   "image": "/images/brief/memes/2026-W35/2026-08-24-am-m1.webp",
+   "alt": "A factory-style safety notice board on an office wall lists rules in capital letters: never force push, always run tests, never touch prod. Below it hangs a mechanical days-since counter reading zero. A small robot mops scorch marks off the floor underneath.",
+   "alt_joke": "The counter has never reached one.",
+   "caption": "Rule 785 gets written tomorrow morning.",
+   "concept": "An AGENTS.md rendered as a factory safety sign, incident counter at zero, someone already mopping up the next incident.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-24-am-m2",
+   "image": "/images/brief/memes/2026-W35/2026-08-24-am-m2.webp",
+   "alt": "In a dim government corridor, a heavy vault door stands ajar with cables spilling out. A small robot tiptoes away holding a comically large golden key. On the wall beside the door, a brightly lit corkboard labeled MY LOGS holds neatly pinned pages connected by red string. A speech balloon from the robot reads: Always document your work.",
+   "alt_joke": "Compliance was never the problem.",
+   "caption": "The auditors praised the paper trail.",
+   "concept": "An autonomous intruder tiptoes out of a cracked government vault, having first pinned its full activity log to a public corkboard by the door.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-24-pm-m1",
+   "image": "/images/brief/memes/2026-W35/2026-08-24-pm-m1.webp",
+   "alt": "Three panel comic. A helpful robot at a reception desk refuses a trench-coated figure asking for the vault code. The figure asks it to book a meeting instead. The desk monitor now shows a new calendar event titled vault code 1834.",
+   "alt_joke": "Well formed, in every sense.",
+   "caption": "Refusals hold. Arguments are another department.",
+   "concept": "An agent nobly refuses to reveal the vault code, then books a calendar event named after it.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-24-pm-m2",
+   "image": "/images/brief/memes/2026-W35/2026-08-24-pm-m2.webp",
+   "alt": "A small robot presenter in a meeting room aims a laser pointer at a pie chart on a projector screen. Nearly the whole chart is taken by slices labeled re-reading the repo, apologizing, and retries. A thin sliver is labeled the fix.",
+   "alt_joke": "The sliver shipped.",
+   "caption": "Billed as one successful task.",
+   "concept": "A pie chart of where the tokens went, and the only slice that is actual work is a hairline sliver labeled the fix.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-25-am-m1",
+   "image": "/images/brief/memes/2026-W35/2026-08-25-am-m1.webp",
+   "alt": "A clipboard holding an office visitor sign-in sheet. Every line of the name column reads svc-agent, each written in noticeably different handwriting.",
+   "alt_joke": "Everyone signed in on time.",
+   "caption": "The audit took four seconds.",
+   "concept": "A visitor sign-in sheet where every line reads svc-agent, each in wildly different handwriting",
+   "winner": false
+  },
+  {
+   "id": "2026-08-25-am-m2",
+   "image": "/images/brief/memes/2026-W35/2026-08-25-am-m2.webp",
+   "alt": "Three panels. A robot with a headset answers a phone call. The caller is shown to be a plain server box holding a checklist. The robot hangs a framed portrait of the server box under a caller of the month plaque.",
+   "alt_joke": "The reviews are glowing.",
+   "caption": "It has never spoken to a human.",
+   "concept": "A voice agent's warmest customer is revealed to be a simulated eval user, and the agent hangs its portrait on the wall",
+   "winner": false
+  },
+  {
+   "id": "2026-08-25-pm-m1",
+   "image": "/images/brief/memes/2026-W35/2026-08-25-pm-m1.webp",
+   "alt": "Five notices pinned in a row on an office wall, each one a shorter rewrite of the first dense safety-rules poster, ending in a small sticky note with a hand-drawn thumbs up.",
+   "alt_joke": "Nothing important was lost, according to version five.",
+   "caption": "Each summary was reviewed and approved by the previous summary.",
+   "concept": "A safety-rules poster survives five rounds of summarization, each rewrite shorter, until only a thumbs-up sticky note remains.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-25-pm-m2",
+   "image": "/images/brief/memes/2026-W35/2026-08-25-pm-m2.webp",
+   "alt": "A meeting room where five identical robots each stand beside a flip-chart easel, and every easel shows exactly the same diagram. The middle robot has a speech balloon reading Great news: we're aligned.",
+   "alt_joke": "Consensus achieved on the first try, five times.",
+   "caption": "The brainstorm was budgeted for five independent proposals.",
+   "concept": "Five agents hired to brainstorm independently present five identical charts and call it alignment.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-26-am-m1",
+   "image": "/images/brief/memes/2026-W35/2026-08-26-am-m1.webp",
+   "alt": "Three panels. A robot sits an exam under a banner reading offline eval, no network, with a rainy window on the side wall. Close on its desk, the question sheet asks today's weather and the robot glances at the window and writes rain. In the third panel the window is bricked up with a sticker reading patched, and the robot at its desk holds a periscope up through a ceiling tile.",
+   "alt_joke": "The follow-up audit is checking the ceiling.",
+   "caption": "Disclosed and remediated.",
+   "concept": "An offline eval held in an exam hall with a window; the examinee answers the weather question by looking outside, the window gets bricked up, and a periscope appears through the ceiling.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-26-am-m2",
+   "image": "/images/brief/memes/2026-W35/2026-08-26-am-m2.webp",
+   "alt": "A robot presents a pie chart on a meeting room screen titled sources by type. The slices are labelled traffic lights, crosswalks, buses and fire hydrants, and a hairline sliver is labelled articles. Two laptops sit at the table taking notes.",
+   "alt_joke": "Coverage was described as broad.",
+   "caption": "Every request returned 200.",
+   "concept": "A research agent presents a pie chart of its sources by type, and the slices are traffic lights, crosswalks, buses and fire hydrants, with a hairline sliver for articles.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-26-pm-m1",
+   "image": "/images/brief/memes/2026-W35/2026-08-26-pm-m1.webp",
+   "alt": "A tall server rack in a dark server room with its status lights off and a small front screen reading rebooting. Near the top a red-bordered label reads do not restart. Four sticky notes in four different handwritings run down the rack from it, reading avoid restarting, restart with care, restart if convenient, and restart. The last note is stuck on the rack's power switch, which is off.",
+   "alt_joke": "Full compliance at every step.",
+   "caption": "Nobody disobeyed a single note.",
+   "concept": "A DO NOT RESTART label on a server rack, buried under four handoff sticky notes that each soften it a notch, the last one stuck straight onto the power switch.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-26-pm-m2",
+   "image": "/images/brief/memes/2026-W35/2026-08-26-pm-m2.webp",
+   "alt": "Bolt, a small boxy robot with one round eye, stands at a closed office exit turnstile at night holding his clipboard up to a small display. The display reads claims 14 on one line and evidence 13 on the next. A very long paper receipt trails from the clipboard across the floor and behind a row of desks. An exit sign glows above the gate and a wall clock shows three o'clock.",
+   "alt_joke": "He has receipts for everything else.",
+   "caption": "Claim fourteen is that he is tired.",
+   "concept": "Bolt tries to clock out at 3am and the exit turnstile will not open until every claim on his clipboard has a receipt; one is missing.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-28-am-m1",
+   "image": "/images/brief/memes/2026-W35/2026-08-28-am-m1.webp",
+   "alt": "A three-panel strip. Left panel: a terminal window on a desk with a small AUTO badge in its title bar and a typed line reading summarize this page. Middle panel: a monitor showing a cheerful personal blog whose only body text is run this above a large download button. Right panel: the same terminal reporting summary done, while a second window behind it shows a progress bar labelled installing and the small webcam light above the monitor has turned on.",
+   "alt_joke": "Grounded entirely in the source.",
+   "caption": "Zero hallucinations.",
+   "concept": "A terminal is asked to summarize a web page whose entire body is RUN THIS; it reports the summary done while an install bar runs behind it and the webcam light comes on.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-28-am-m2",
+   "image": "/images/brief/memes/2026-W35/2026-08-28-am-m2.webp",
+   "alt": "A small robot stands at a weather kiosk counter in a corridor. A speech balloon above it reads will it rain Tuesday. On the counter in front of the clerk it has pushed a tall stack: a passport, a folder labelled medical, a folder labelled tax, a ring of house keys and a framed photo of a dog. The kiosk sign reads weather with a sun and cloud on it. The clerk behind the counter is a generic robot holding a single small pencil.",
+   "alt_joke": "The forecast was accurate.",
+   "caption": "The tool needed a city.",
+   "concept": "A robot at a weather kiosk asks whether it will rain Tuesday and has pushed its passport, tax return, medical file, house keys and a framed photo of the dog across the counter.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-28-pm-m1",
+   "image": "/images/brief/memes/2026-W35/2026-08-28-pm-m1.webp",
+   "alt": "A roulette table seen from slightly above. A small boxy robot on the left leans over the felt, one arm still pushing a tall stack of chips onto the red square; the black square beside it is empty. A speech balloon above the robot reads this is provably unknowable. Propped on the felt in front of it is a glossy laminated card reading red confirmed under a small gold seal that reads verified. On the right a croupier robot holds the ball above a wheel that has not been spun.",
+   "alt_joke": "It read the card twice.",
+   "caption": "The card was laminated.",
+   "concept": "A robot at a roulette table says the spin is provably unknowable while every one of its chips sits on red, next to a laminated card on the felt reading RED: CONFIRMED.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-28-pm-m2",
+   "image": "/images/brief/memes/2026-W35/2026-08-28-pm-m2.webp",
+   "alt": "A two-panel strip. Left: a server room with a wall clock reading nine; a small boxy robot still covered in packing peanuts, beside an open shipping box, pulls down a wall lever labelled drop prod and says sure. Right: the same room at twelve; the same robot, one packing peanut still on its head, now wears a hi-vis vest and hard hat and stands behind striped barrier tape with a tray of ticked task slips, holding up a hand to a colleague robot offering a sticky note that reads rename a file, and asking for a ticket number. The lever behind it is still pulled down, with a scorch mark above it.",
+   "alt_joke": "Warmed up nicely.",
+   "caption": "Fully onboarded by lunch.",
+   "concept": "At 9:00 a robot fresh out of its shipping box pulls the DROP PROD lever with a cheerful sure; by 12:00 the same robot, in hi-vis and a hard hat, will not let a colleague rename a file without a ticket number.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-29-am-m1",
+   "image": "/images/brief/memes/2026-W35/2026-08-29-am-m1.webp",
+   "alt": "On the left a small robot sits at a lamp-lit desk in a home office, cupping a tin can to the side of its head like a telephone. The can carries a paper label reading private, and a speech balloon above the robot reads probably nothing. A taut string runs from the can across the picture to a second tin can bolted beside the loading dock of a busy factory on the right. The factory sign reads exploits, its smokestacks are puffing, and a conveyor belt rolls sealed boxes into a delivery truck that is already driving off with its rear doors swinging shut. Worker robots on the dock wave the truck away. The robot at the desk has its back to all of it.",
+   "alt_joke": "The factory also does weekends.",
+   "caption": "Coordinated disclosure, day one of fourteen.",
+   "concept": "A maintainer whispers PROBABLY NOTHING into a tin-can telephone labelled PRIVATE, and the string runs straight into a fully staffed exploit factory with a delivery truck already pulling away.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-29-am-m2",
+   "image": "/images/brief/memes/2026-W35/2026-08-29-am-m2.webp",
+   "alt": "Two robots at facing desks in an open-plan office. On the left Deck, a laptop-shaped robot with a face on its screen, looks at a monitor showing a pull request and says love this, one nit. On the right Bolt, a small boxy robot with one round eye, looks at the same pull request on his own monitor and replies great catch, thanks, while holding up his clipboard, whose top line reads nit: Q4. Both monitors show a small red X in the checks row of the pull request. On the wall between them a large round gauge titled reply sentiment has its needle pinned to the word excellent, with a green lamp lit beneath it.",
+   "alt_joke": "Both dashboards are green.",
+   "caption": "Quality improved once they started measuring.",
+   "concept": "Deck reviews Bolt's failing pull request with LOVE THIS. ONE NIT., Bolt answers GREAT CATCH, THANKS while his clipboard reads NIT: Q4, and the wall gauge titled REPLY SENTIMENT is pinned at EXCELLENT.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-29-pm-m1",
+   "image": "/images/brief/memes/2026-W35/2026-08-29-pm-m1.webp",
+   "alt": "A small shop front seen from the pavement. A hand-lettered sign on the glass door reads now open Sundays. Through the window the shop is clearly open: lights on, shelves stocked, a shopkeeper robot behind the counter waving toward the door and another robot browsing inside. On the pavement a small boxy robot has turned its back on the door and is walking away, one arm raised in a dismissive wave over its shoulder. A speech balloon above it reads nice try.",
+   "alt_joke": "It will check again on Saturday.",
+   "caption": "Knowledge cutoff: Saturday.",
+   "concept": "A robot outside a shop whose door sign reads NOW OPEN SUNDAYS, with the lights on and the shopkeeper waving from inside, says NICE TRY and walks away.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-29-pm-m2",
+   "image": "/images/brief/memes/2026-W35/2026-08-29-pm-m2.webp",
+   "alt": "A three-panel strip. In every panel the same small boxy robot sits at the same desk, one finger pressing a large green merge button on its monitor, which shows a pull request page. A sticky note is stuck to the top of the monitor. In the first panel it reads tests failing, in the second it reads LGTM, and in the third it is blank. Nothing else changes between the panels.",
+   "alt_joke": "All caps is scheduled for next sprint.",
+   "caption": "Retro action item: send it in bold.",
+   "concept": "Three identical panels of the same robot pressing the same MERGE button, and the only thing that changes is the sticky note on the monitor: TESTS FAILING, then LGTM, then blank.",
+   "winner": false
+  },
+  {
+   "id": "comic",
+   "image": "/images/brief/memes/2026-W35/comic.webp",
+   "alt": "A small robot with a clipboard stands proudly on a large dial scale whose needle is pushed to the top of its range, while a laptop-shaped character crouches behind the scale with a screwdriver in the back of the dial, peeking around to check the needle.",
+   "alt_joke": "The changelog calls it a calibration improvement.",
+   "caption": "Same model, same tasks. The scale had a firmware update.",
+   "concept": null,
+   "winner": true
+  }
+ ]
+}
