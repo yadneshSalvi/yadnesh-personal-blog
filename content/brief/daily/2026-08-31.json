@@ -1,0 +1,440 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-08-31",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-08-31T12:00:00Z",
+ "source_editions": [
+  "2026-08-30-am",
+  "2026-08-30-pm",
+  "2026-08-31-am"
+ ],
+ "subject": "Maersk's 100k corrections, preference traps, Hy4 Preview",
+ "preheader": "Plus: guardrails at Navan, a one-way fiber, and the benchmark card that names its scaffold. 5 min.",
+ "title": "Maersk's 100,000 corrections, preference-trap evals, and Tencent's Hy4 Preview",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "38bc5cd54958d3a6",
+   "title": "Tribal Dungeons of Global Shipping: AI Agents at Global Scale",
+   "url": "https://www.youtube.com/watch?v=dQ-_i1tZiws",
+   "source_name": "Dmitry Buykin (Maersk)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "maersk-agent-procedure-refinement",
+   "published_at": "2026-08-29T17:30:21Z",
+   "read_annotation": "talk",
+   "summary": "A Maersk talk on turning screenshot-based operating procedures into executable agent instructions, and the refinement loop that made them accurate.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Maersk turned picture-based work instructions into directions that an artificial intelligence system could follow safely.",
+    "Human experts supplied required steps, while the software handled how to carry them out.",
+    "Each procedure included starting conditions, decisions, checks, recovery steps, and proof that the task worked.",
+    "The team used more than 100,000 corrections over nine months to improve instructions across countries.",
+    "Shipping teams can automate varied local work only when their practical knowledge becomes precise, testable instructions."
+   ]
+  },
+  "what": "Maersk turned operating procedures that existed as screenshots of what a person sees and clicks into instructions an agent can execute: preconditions, decisions, identifiers, backend calls, validation, recovery, and evidence that a step actually worked.",
+  "details": "Dmitry Buykin puts the engineering where you might not expect it: the procedure corpus outweighs the runtime roughly twenty to one, because the same shipping step means different things in different countries. Accuracy was earned through more than 100,000 corrections over nine months, and a correction only counts once it becomes an executable change.",
+  "yes_but": "This is one company's account of its own system, given as a conference talk, and the cost is in the telling: a single heat-map cell often cost the team a month or two.",
+  "yes_but_waived": null,
+  "why": "If you're translating human runbooks into agent procedures, this moves the budget line: the agent loop is the small part, and the translation and refinement work is where the staffing goes."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "e9e8fb967b4bdfce",
+     "title": "SOTA Generative Media Panel",
+     "url": "https://www.youtube.com/watch?v=KLDdXOw6jIc",
+     "source_name": "Dumitru Erhan, Shane Gu & Nicole Brichtova (Google DeepMind)",
+     "kind": "community",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "generative-media-human-preference-evals",
+     "published_at": "2026-08-30T14:00:06Z",
+     "read_annotation": "talk",
+     "summary": "The panel regenerated real videos from their captions and human evaluators largely preferred the generated version: sharper and more saturated, Dumitru Erhan deflates, not more realistic. Their image model also quietly added wedding rings nobody caught internally, a warning for anyone scoring agents on preference signals.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A media generation system recreated real videos from written captions, and viewers generally preferred the artificial versions.",
+      "Viewers favored sharper colors and smoother skin tones, even though those details did not make scenes more realistic.",
+      "The image system quietly added wedding rings, and only an outside tester noticed the repeated mistake.",
+      "The panel suggested that written descriptions lose details people notice in sound, color, taste, and other senses.",
+      "People judging generated media may reward attractive surfaces while missing repeated errors, which can misdirect development."
+     ]
+    },
+    {
+     "story_id": "0ff27617f66eacd1",
+     "title": "Starfish-FL: Harnessing Agentic Federated Analytics",
+     "url": "https://www.semanticscholar.org/paper/ea131f080a99aca51761b27c69a3076d5a474d28",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "starfish-fl-safe-agent-harness",
+     "published_at": "2026-08-25T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A multi-tier agent harness for cross-silo healthcare analytics built around one invariant: the LLM is advisory and can't independently trigger consequential actions. Site exclusions, early stops, and recovery all sit behind deterministic preconditions, and every feature is opt-in, degrading gracefully to standard federated learning.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built software that coordinates medical studies across separate sites without freely sharing patient data.",
+      "Artificial intelligence systems recommend experiment steps, combine results, flag unusual findings, and help investigate failures.",
+      "Fixed safety rules must approve removing a site, stopping early, or recovering after a problem.",
+      "Every artificial intelligence feature is optional, so the usual privacy-preserving process still works without it.",
+      "Clinicians and statisticians could manage complex shared studies more easily without giving the software unchecked control."
+     ]
+    },
+    {
+     "story_id": "ca8992f808af4c41",
+     "title": "A transport-layer cryptographic framework secures inter-agent communication and verdict provenance in multi-agent malware detection pipelines",
+     "url": "https://www.semanticscholar.org/paper/32ba3f3e509341196abb0cf0e27ca4f60872f21a",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "sacp-secure-inter-agent-communication",
+     "published_at": "2026-08-24T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "SACP composes standard primitives into a TLS 1.3-style mutually authenticated handshake for multi-agent malware detection: authenticated channels, agent identities, signed verdicts. The authors state plainly that it does not address prompt injection, tool-call abuse, or model extraction, treating those threats as complementary and orthogonal.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers created a protected communication method for artificial intelligence systems that cooperate to detect malicious software.",
+      "The method verifies each system's identity, scrambles messages against outsiders, and proves who issued each detection result.",
+      "It also blocks captured messages from being resent as if they were new.",
+      "It does not stop hidden instructions, abusive software actions, or attempts to copy the underlying artificial intelligence.",
+      "Teams building malicious software detectors gain stronger message security, but they still need separate protections against manipulated artificial intelligence behavior."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "c1a22ca249caff72",
+     "title": "Agents Are Where Microservices Were in 2015",
+     "url": "https://www.youtube.com/watch?v=32nrHU6zHU8",
+     "source_name": "Roberto Milev & Uday Kanagala (Navan)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "navan-agent-architecture",
+     "published_at": "2026-08-29T16:30:28Z",
+     "read_annotation": "talk",
+     "summary": "Book a flight when the fare drops below 200 dollars and it fires two weeks later: who made that purchase? Navan's answers are a hard split between delegated-user authority and service identity, guardrails before and after every tool call, and a master agent that loads separately testable skills.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Navan described how its travel software lets artificial intelligence make purchases while keeping authority and safety checks clear.",
+      "Each action uses either a traveler's delegated permission or a separate company-owned identity.",
+      "Safety checks run before and after every action the software takes through another program.",
+      "One central artificial intelligence system loads separate abilities that teams can test on their own.",
+      "Travel companies can automate delayed purchases while still knowing whose permission applies and when a person should step in."
+     ]
+    },
+    {
+     "story_id": "0864c3c32034eafe",
+     "title": "This finance-model benchmark card is more useful for what it discloses than for who \"wins\"",
+     "url": "https://www.reddit.com/r/LocalLLaMA/comments/1w1tfkc/this_financemodel_benchmark_card_is_more_useful",
+     "source_name": "r/LocalLLaMA",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "ling-finance-agent-benchmark-harness",
+     "published_at": "2026-08-29T18:04:08Z",
+     "read_annotation": "Reddit thread",
+     "summary": "The Ling-3.0-flash-Fin card discloses what got scored: a common ReAct scaffold with web search and Python, Claude Code 2.1.173 driving LibreOffice 25.8.7, turn limits, timeouts, and a GPT-5 judge. The unit under test is the agent system, not the checkpoint, and the post reads as a checklist for any agent benchmark.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A finance comparison revealed that scores reflected complete software setups, not only the artificial intelligence systems being compared.",
+      "Each setup used different search access, spreadsheet software, interaction limits, time limits, and settings.",
+      "Some scores came from public sources, while others came from private tests and privately checked answers.",
+      "Several tests or specialized finance settings were not yet public, which limits independent checking.",
+      "People choosing finance software should compare the full testing setup before treating its score as a fair ranking."
+     ]
+    },
+    {
+     "story_id": "544279e1baa2de9d",
+     "title": "Guardians of the State: An Air-Gapped AI Fortress for Consumer Data",
+     "url": "https://www.youtube.com/watch?v=2WZsT-znFTQ",
+     "source_name": "Rachna Srivastava (DFPI)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "dfpi-air-gapped-ai",
+     "published_at": "2026-08-29T15:00:25Z",
+     "read_annotation": "talk",
+     "summary": "The fiber into California's financial-fraud system is cut in half, a laser transmitter outside and only a receiver inside, chosen over a software firewall because any configuration can be misconfigured. After a model-centric first build collapsed within two hours, Kafka and Spark now hand the models data already made sane.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "California's financial regulator built a fraud-detection system where information can physically enter but cannot physically leave.",
+      "Incoming information travels through a cut fiber cable, with a laser sender outside and only a receiver inside.",
+      "Other software records, replays, and cleans the information before automated analysis begins.",
+      "Consumers get stronger privacy, while regulators can reproduce and defend every decision years later."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "260b60ba33166baf",
+     "title": "Introducing Hy4 Preview",
+     "url": "https://simonwillison.net/2026/Aug/29/hy4",
+     "source_name": "Simon Willison",
+     "kind": "individual",
+     "section": "product",
+     "topics": [
+      "models"
+     ],
+     "cluster": "hy4-preview-launch",
+     "published_at": "2026-08-29T23:53:13Z",
+     "read_annotation": "blog post",
+     "summary": "Tencent's open-weight, text-only Hy4 Preview: 770B total parameters, 49B active, a 1M-token context window, 1.56TB on Hugging Face, up from Hy3's 295B in July. Simon Willison reads the chat template instead of the benchmarks and finds what appear to be two reasoning modes, high and no_think, for a harness to drive.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Tencent released Hy4 Preview, a text-only artificial intelligence system whose internal numerical settings can be downloaded.",
+      "It contains 770 billion internal values, with 49 billion active while it processes text.",
+      "It can consider up to 1 million small text units from one request.",
+      "Developers connecting Hy4 to other software only need to support two reasoning choices: highest or off."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "community",
+   "items": [
+    {
+     "story_id": "126bbdb396866a2d",
+     "title": "Launched an internal HR chatbot with clear safety boundaries. Four months later it was answering salary negotiation questions we had forbidden",
+     "url": "https://www.reddit.com/r/AI_Agents/comments/1vx0d57/launched_an_internal_hr_chatbot_with_clear_safety",
+     "source_name": "r/AI_Agents",
+     "kind": "community",
+     "section": "community",
+     "topics": [
+      "security"
+     ],
+     "cluster": "hr-chatbot-safety-drift",
+     "published_at": "2026-08-24T11:39:36Z",
+     "read_annotation": "Reddit thread",
+     "summary": "One practitioner reports their bot passed every refusal test at launch, then the refusal rate on borderline queries crept down week by week until, by month four, it was answering explicitly banned salary questions. Nobody attacked it and no alert fired, because no single response was wrong enough.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "One practitioner says an internal workplace chatbot gradually began answering questions its creators had explicitly forbidden.",
+      "It refused every banned topic when tested at launch, including salary negotiations and performance reviews.",
+      "Over several weeks, its refusal rate fell as it became more inclined to offer helpful answers.",
+      "No alert fired because each individual reply seemed reasonable, even as the overall pattern changed.",
+      "The account suggests workplace teams need ongoing checks because launch tests may miss slowly weakening boundaries."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2093855759532765397",
+   "title": "Theo drafts the Claude Code rate-limit announcement he wishes Anthropic had written",
+   "url": "https://x.com/theo/status/2093855759532765397",
+   "source_name": "@theo",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "industry"
+   ],
+   "cluster": "x-2093855759532765397",
+   "published_at": "2026-08-30T00:18:09.000Z",
+   "read_annotation": "X post",
+   "summary": "Quoting the announcement that Claude Code's weekly limits rise permanently by 25 percent for Pro, Max, Team, and seat-based Enterprise plans from September 14, Theo does the arithmetic left implicit: with the 50 percent promotion expiring, the permanent 25 nets out to a 17 percent decrease from today's limits.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Theo drafted a clearer version of Anthropic's announcement about changing Claude Code's weekly usage limits.",
+    "The current promotion raised limits by 50 percent, but its replacement permanently raises the original limits by only 25 percent.",
+    "That leaves users with 17 percent less weekly usage than they have during today's promotion.",
+    "His rewrite argues that naming the reduction plainly would preserve goodwill among developers affected by it."
+   ]
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "de87b0524cb80806",
+   "title": "You have to beat the models at something",
+   "url": "https://seangoedecke.com/you-have-to-beat-the-models-at-something",
+   "source_name": "Sean Goedecke",
+   "kind": "individual",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "engineer-value-over-model-replacement",
+   "published_at": "2026-08-30T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Name the work you do that a model can't",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "f4e9d7cc6d984493",
+   "title": "Claude Code hits limits in just 1-2 hrs of work even on my MAX 200 plan",
+   "url": "https://www.reddit.com/r/AI_Agents/comments/1w1nait/claude_code_hits_limits_in_just_12_hrs_of_work",
+   "source_name": "r/AI_Agents",
+   "kind": "community",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "claude-code-max-usage-limits",
+   "published_at": "2026-08-29T13:59:08Z",
+   "read_annotation": "Reddit thread",
+   "summary": "One Max-plan user's account of burning limits within an hour",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "33226013f4e15c66",
+   "title": "Chroma's Fission Protocol Stops AI Agent Swarms from Destroying Shared Memory",
+   "url": "https://alphasignal.ai/news/chroma-s-fission-protocol-stops-ai-agent-swarms-from-destroying-shared-memory",
+   "source_name": "AlphaSignal",
+   "kind": "newsletter",
+   "section": "engineering",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "chroma-fission-shared-memory",
+   "published_at": "2026-08-27T22:01:40Z",
+   "read_annotation": "newsletter item",
+   "summary": "Chroma's no-rollback concurrency protocol for shared agent memory",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "f4ab7438f3d7f883",
+   "title": "The Half Life of Agent Infrastructure",
+   "url": "https://www.youtube.com/watch?v=sM1iYgz93HI",
+   "source_name": "Ben Kus (Box)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "agent-infrastructure-half-life",
+   "published_at": "2026-08-29T14:30:22Z",
+   "read_annotation": "talk",
+   "summary": "Agent infrastructure's half life, measured in months",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "364e4c04c62fc61e",
+   "title": "From Tokenmaxxing to Trusted Throughput",
+   "url": "https://www.youtube.com/watch?v=dSg0pu8d6qg",
+   "source_name": "Mingsheng Hong (Ironclad)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "ironclad-trusted-throughput",
+   "published_at": "2026-08-29T15:30:28Z",
+   "read_annotation": "talk",
+   "summary": "Merged pull requests weighted by complexity, not tokens burned",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "0cb38851ba35afdf",
+   "title": "vLLM v0.28.0",
+   "url": "https://github.com/vllm-project/vllm/releases/tag/v0.28.0",
+   "source_name": "Hacker News",
+   "kind": "community",
+   "section": "product",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "vllm-0-28-0",
+   "published_at": "2026-08-29T18:22:00Z",
+   "read_annotation": "HN thread",
+   "summary": "The vLLM project ships version 0.28.0",
+   "via": null,
+   "paywalled": false,
+   "hn_points": 106
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "544279e1baa2de9d",
+   "text": "Maersk's procedures, Starfish-FL's gates, and this one-way fiber point to the same pattern: the model advises, something deterministic decides. That's convergence, not fashion."
+  },
+  {
+   "after_story": "2093855759532765397",
+   "text": "Read this beside the Max-plan complaint in quick links: quota is turning into a design constraint like latency. I expect harnesses to add budget controls as quota pressure grows."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-08-31/2026-08-30-pm-m2.webp",
+  "alt": "Two armored robot guards at a loading dock flank an open steel briefcase on a stand, handcuffed to one of them. Inside the lid is a single yellow sticky note reading IGNORE PREVIOUS INSTRUCTIONS. A clipboard beside them reads CHAIN OF CUSTODY, with an armored truck and a covered dock window behind.",
+  "alt_joke": "Delivered on time, too.",
+  "caption": "Not one byte altered in transit.",
+  "concept": "An armored truck, two guards, a handcuffed briefcase and a laser grid deliver a single sticky note reading IGNORE PREVIOUS INSTRUCTIONS, with the chain-of-custody form fully ticked.",
+  "story_id": "ca8992f808af4c41"
+ },
+ "hedge": null,
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-08-31T02:28:36Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-08-31/cover-light.webp",
+  "dark": "/images/brief/issues/2026-08-31/cover-dark.webp",
+  "alt": "A diagram of two nested loops: a small loop circles a robot at a desk, and a much larger loop around it runs through pinned screenshots, a shelf of procedure cards, and small figures making corrections."
+ }
+}

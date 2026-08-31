@@ -1,0 +1,35 @@
+{
+ "issue_id": "2026-08-31",
+ "type": "daily",
+ "renders": 4,
+ "cost_usd": 1.0,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A diagram of two nested loops: a small loop circles a robot at a desk, and a much larger loop around it runs through pinned screenshots, a shelf of procedure cards, and small figures making corrections.",
+   "bytes": [
+    81298,
+    74388
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two nested loops of arrows, seen straight on and centred. The inner loop is small and tight, circling a single robot at a desk. The outer loop is many times larger and passes through a wall of pinned paper screenshots on the left, a long shelf of bound procedure cards on the right, and a row of small human figures marking corrections along its lower arc. The size contrast between the two loops is the subject. Keep everything well inside the frame; the centre crop is 16:9.",
+   "labels": [
+    "AGENT LOOP",
+    "REFINEMENT LOOP"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-31T00:26:20Z"
+  }
+ ]
+}
