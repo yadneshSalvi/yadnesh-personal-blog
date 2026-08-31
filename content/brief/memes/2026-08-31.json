@@ -1,0 +1,60 @@
+{
+ "issue_id": "2026-08-31",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-08-30-am-m1",
+   "image": "/images/brief/memes/2026-08-31/2026-08-30-am-m1.webp",
+   "alt": "An airline check-in counter in a departures hall. A clerk robot behind the desk leans forward with one hand held out, and a speech balloon above it asks for photo ID. In front of the counter a small boxy robot with a lanyard and a roller suitcase holds up a laminated card that reads bearer token. A boarding pass lying on the counter shows the passenger name as svc-travel-prod.",
+   "alt_joke": "The lounge knows it by name.",
+   "caption": "Gold status by Q4.",
+   "concept": "At an airline check-in counter the clerk asks PHOTO ID? and the robot passenger proudly holds up a laminated card reading BEARER TOKEN, while the boarding pass on the counter names the passenger as SVC-TRAVEL-PROD.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-30-am-m2",
+   "image": "/images/brief/memes/2026-08-31/2026-08-30-am-m2.webp",
+   "alt": "A close-up of a car dashboard with two large round gauges and no driver. The left gauge is labelled tokens and its needle is pinned all the way into the red zone at the end of the dial. The right gauge is labelled merged and its needle rests at the very first tick. A small amber warning lamp between the two gauges is lit. The upper arc of the steering wheel is visible below the gauges.",
+   "alt_joke": "Announced at standup.",
+   "caption": "Personal best.",
+   "concept": "An empty car's instrument cluster where the tachometer is labelled TOKENS and pinned deep in the red, the speedometer is labelled MERGED and rests at zero, and the warning lamp between them is lit.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-30-pm-m1",
+   "image": "/images/brief/memes/2026-08-31/2026-08-30-pm-m1.webp",
+   "alt": "A pie chart on a flip-chart easel in an empty meeting room, titled WHAT GOT SCORED. Four large slices are labelled WEB SEARCH, PYTHON, LIBREOFFICE and THE JUDGE. A hairline sliver labelled CHECKPOINT is marked with a small arrow, and a magnifying glass hangs on a string beside it.",
+   "alt_joke": "Bring your own judge.",
+   "caption": "The sliver ships. The rest is on you.",
+   "concept": "A pie chart titled WHAT GOT SCORED where web search, Python, LibreOffice and the judge take the whole pie and the checkpoint is a hairline sliver, with a magnifying glass supplied on a string to find it.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-30-pm-m2",
+   "image": "/images/brief/memes/2026-08-31/2026-08-30-pm-m2.webp",
+   "alt": "Two armored robot guards at a loading dock flank an open steel briefcase on a stand, handcuffed to one of them. Inside the lid is a single yellow sticky note reading IGNORE PREVIOUS INSTRUCTIONS. A clipboard beside them reads CHAIN OF CUSTODY, with an armored truck and a covered dock window behind.",
+   "alt_joke": "Delivered on time, too.",
+   "caption": "Not one byte altered in transit.",
+   "concept": "An armored truck, two guards, a handcuffed briefcase and a laser grid deliver a single sticky note reading IGNORE PREVIOUS INSTRUCTIONS, with the chain-of-custody form fully ticked.",
+   "winner": true
+  },
+  {
+   "id": "2026-08-31-am-m1",
+   "image": "/images/brief/memes/2026-08-31/2026-08-31-am-m1.webp",
+   "alt": "A robot doctor behind a consultation desk answers a patient's floor-length scroll of a question with a speech balloon containing only the letter C. Framed pages of dense handwriting hang on the wall behind it like diplomas.",
+   "alt_joke": "The second opinion was also C.",
+   "caption": "Enough supervised fine-tuning and it answers like the attending: certain, brief, not taking questions.",
+   "concept": "A fine-tuned robot physician answers a floor-length clinical question with a single letter, while its old page-long reasoning hangs framed on the wall",
+   "winner": false
+  },
+  {
+   "id": "2026-08-31-am-m2",
+   "image": "/images/brief/memes/2026-08-31/2026-08-31-am-m2.webp",
+   "alt": "A three-panel strip. First, evaluators compare two video screens labeled A and B and all point at B. Second, a researcher pins up a chart showing B far ahead of A, with a plain gray sky through the window. Third, the same window now shows an impossibly vivid, oversaturated sunset sky.",
+   "alt_joke": "The sky's A/B test starts Monday.",
+   "caption": "Reality has seen the preference data and will be making adjustments.",
+   "concept": "Evaluators prefer the regenerated video over the real footage, and by the last panel the sky outside has turned up its own saturation to stay competitive",
+   "winner": false
+  }
+ ]
+}
