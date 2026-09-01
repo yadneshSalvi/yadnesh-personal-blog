@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-09-01",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-08-31-pm-m1",
+   "image": "/images/brief/memes/2026-09-01/2026-08-31-pm-m1.webp",
+   "alt": "Two panels. In the first, a guard robot at a checkpoint inspects a visitor's badge through a magnifying glass and pronounces it forged. In the second, the same guard holds open the door marked secure area while the visitor walks in.",
+   "alt_joke": "The incident report is immaculate.",
+   "caption": "Flagged for awareness.",
+   "concept": "A guard robot inspects a visitor's badge, pronounces it forged, and holds the secure door open for him.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-31-pm-m2",
+   "image": "/images/brief/memes/2026-09-01/2026-08-31-pm-m2.webp",
+   "alt": "A small robot with a clipboard stands on a swivel chair in a windowless war room whose back wall is covered in sticky notes joined by red string. A whiteboard is headed turn 61. The robot peers at one note and asks who wrote this.",
+   "alt_joke": "The red string is load-bearing.",
+   "caption": "The analysis is well documented. By someone.",
+   "concept": "Sixty turns into one long analysis, Bolt stands alone in a war room papered with his own sticky notes and asks who wrote them.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-01-am-m1",
+   "image": "/images/brief/memes/2026-09-01/2026-09-01-am-m1.webp",
+   "alt": "In a night alley, a hooded figure holds up a cardboard sign reading 'Hand over the token' at a small robot. The robot spreads its arms, its chest compartment open and empty with a moth flying out, and says 'Take everything.'",
+   "alt_joke": "Compliance was never the bottleneck.",
+   "caption": "The prompt injection was a complete success.",
+   "concept": "A mugger demands the API token from an agent that has never once seen its own credentials, and the agent cooperates completely.",
+   "winner": true
+  },
+  {
+   "id": "2026-09-01-am-m2",
+   "image": "/images/brief/memes/2026-09-01/2026-09-01-am-m2.webp",
+   "alt": "Four identical robots crowd around a kitchen sink, all washing the same single plate, which shines. The rest of the kitchen is a mess of overflowing trash and spilled laundry. A chore chart on the fridge is stamped 'Task success 100%'.",
+   "alt_joke": "The plate has never been cleaner.",
+   "caption": "Nobody discussed it. They all just knew.",
+   "concept": "Four robots assigned an entire household all silently converge on washing the same single dish, and the chart on the fridge stamps the run a success.",
+   "winner": false
+  }
+ ]
+}

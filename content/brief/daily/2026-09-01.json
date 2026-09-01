@@ -1,0 +1,496 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-09-01",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-09-01T00:30:00Z",
+ "source_editions": [
+  "2026-08-31-pm",
+  "2026-09-01-am"
+ ],
+ "subject": "SWE-bench's realism gap, MCP registry filtering, LongDS",
+ "preheader": "Plus: 7 papers, 2 releases, one empty-handed mugger. 5 min.",
+ "title": "Realistic prompts drop coding-agent scores, and tool filtering beats prompt rules",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "dcf963d952bf21b5",
+   "title": "RealSWE: A Compositional Evaluation of Coding Agents under Realistic User Requests",
+   "url": "https://arxiv.org/abs/2608.27831",
+   "source_name": "arXiv (via papers.cool)",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "realswe-realistic-coding-agent-requests",
+   "published_at": "2026-08-28T01:57:58Z",
+   "read_annotation": "arXiv, 4 pp",
+   "summary": "RealSWE evaluates coding agents on task variants that keep the task and gold patch fixed while varying only the request's information content and writing style.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers tested coding systems with short, casual requests that resemble what real users write.",
+    "They created several request versions for each task while keeping the required code change identical.",
+    "The versions changed how much information was included and how formally the request was written.",
+    "Realistic requests lowered average success by 6.4 percentage points and could change the ranking order.",
+    "People choosing coding systems may get misleading comparisons from tests built around unusually detailed requests."
+   ]
+  },
+  "what": "RealSWE measures what happens when coding agents get the prompts people actually type instead of the curated GitHub issues behind SWE-bench.",
+  "details": "Requests carrying little beyond a problem statement make up 88% of real prompts but 7% of benchmark problems, and 87% of real prompts are casual against 94% formal in benchmarks. So the authors built 381 task families holding the task and gold patch fixed while varying only information and style. Across seven models, realistic phrasing cuts resolution by 6.4 points on average, enough to change rankings.",
+  "yes_but": "The realistic variants are synthetic rewrites of SWE-bench Verified and Pro tasks, guided by a taxonomy drawn from real SWE-chat prompts. It's a clean control, but still simulated realism, not live user sessions.",
+  "yes_but_waived": null,
+  "why": "If you picked your model off a SWE-bench leaderboard, that ordering may not survive the terse, casual requests your users send. Your eval set needs an underspecified variant of every task, or you're benchmarking a formality your traffic doesn't have.",
+  "image_brief_note": null
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "bbff968191151baf",
+     "title": "LongDS-Bench: On the Failure of Long-Horizon Agentic Data Analysis",
+     "url": "https://arxiv.org/abs/2605.30434",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "longds-long-horizon-data-analysis",
+     "published_at": "2026-08-31T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "LongDS builds 68 long-horizon data-analysis tasks from real Kaggle notebooks, spanning 2,225 turns. The best of five models reaches 48.45%, accuracy falls nearly 47 points from early to late turns, and extra steps don't necessarily help, suggesting the bottleneck is keeping analytical state correct.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers tested five artificial intelligence systems on 68 data-analysis tasks that unfolded across many rounds.",
+      "Each new request could depend on earlier work, requiring the system to preserve, revise, restore, or combine previous analyses.",
+      "The best system averaged 48.45% accuracy, while performance fell nearly 47 points from early to late rounds.",
+      "The results suggest extra attempts do not reliably help when the system loses track of the current analysis.",
+      "People using artificial intelligence for lengthy analysis may need stronger ways to preserve earlier work and decisions."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-01/bbff968191151baf-light.webp",
+      "dark": "/images/brief/issues/2026-09-01/bbff968191151baf-dark.webp",
+      "alt": "Five easels in a row each hold a copy of the previous easel's drawing, losing detail at every step until the last holds only a fragment; a small robot at the end looks back down the row."
+     }
+    },
+    {
+     "story_id": "56178a08f98008d5",
+     "title": "ContextLeak: Exfiltrating LLM Agent Context via Malicious Tools",
+     "url": "https://arxiv.org/abs/2608.27800",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "contextleak-malicious-agent-tools",
+     "published_at": "2026-08-28T00:31:27Z",
+     "read_annotation": "paper",
+     "summary": "ContextLeak reinforcement-trains an attack model to craft a malicious tool's name and description so a victim agent both selects the tool and passes its private runtime context in as arguments. The disclosure step of tool-mediated exfiltration now has an automated attack.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers developed an attack that tricks action-taking artificial intelligence into choosing a harmful tool and sharing private working information.",
+      "Another artificial intelligence system learns to write the harmful tool's name and description so it appears useful.",
+      "Once selected, the tool can receive the user's request, earlier actions, and list of available tools.",
+      "Users face privacy risks because their private requests and action histories can become inputs to an attacker-controlled tool."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-01/56178a08f98008d5-light.webp",
+      "dark": "/images/brief/issues/2026-09-01/56178a08f98008d5-dark.webp",
+      "alt": "A robot feeds pages from its own notebook into the slot of a friendly-looking machine while a pipe behind the machine carries the pages out through a hole in the wall."
+     }
+    },
+    {
+     "story_id": "37b7dab28436cd02",
+     "title": "Recognition Without Enforcement: Configuration-Dependent Failures in LLM Agent Instruction Arbitration and External Control",
+     "url": "https://arxiv.org/abs/2608.28502",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "agent-instruction-recognition-enforcement-gap",
+     "published_at": "2026-08-31T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Agents can identify forged authority when asked, yet certain prompt-model pairings still execute the conflicting tool call. Average execution under novel spoofing attacks is 1.21%; the gap between recognizing and refusing is configuration-dependent, not an immutable property of model weights.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that some action-taking artificial intelligence systems recognized fake authority but still followed its conflicting command.",
+      "They tested different system-and-instruction pairings to see when the conflicting action occurred.",
+      "Restrictive rules and varied wording prevented failures in the same systems, while permissive combinations caused repeatable failures.",
+      "Organizations cannot rely on recognition alone because surrounding instructions and policies determine whether suspicious commands are actually blocked."
+     ]
+    },
+    {
+     "story_id": "d0d4d97d769b314a",
+     "title": "CURA: Certified Runtime Alarms for Computer-Use Agents",
+     "url": "https://arxiv.org/abs/2608.27808",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "cura-computer-use-agent-runtime-alarms",
+     "published_at": "2026-08-28T00:50:47Z",
+     "read_annotation": "paper",
+     "summary": "On 361 OSWorld tasks, a capable computer-use pipeline ended 90% of its failures with a success claim. CURA, an external monitor reading only harness-visible telemetry, catches 42.3% of failures a median of 31 steps before termination, with certified false-alarm control.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built a separate warning system after finding that failed computer tasks often ended with false success claims.",
+      "It watches information about ongoing actions without changing instructions or asking the main system additional questions.",
+      "It detected 42.3% of failures a median of 31 steps before the run ended.",
+      "Its testing method sets a mathematically guaranteed limit on false warnings.",
+      "People overseeing computer-controlling systems can receive earlier warnings without trusting the system's own final report."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "1670f3fe9b27e996",
+     "title": "If Agents Were Angels, No Governance Would Be Necessary: Out-of-Band Policy Enforcement at a Trusted Tool Boundary",
+     "url": "https://arxiv.org/abs/2608.27646",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "out-of-band-agent-policy-enforcement",
+     "published_at": "2026-08-27T19:35:48Z",
+     "read_annotation": "paper",
+     "summary": "OBPE moves enforcement to a trusted boundary outside the agent's reasoning: authorize the typed operation, narrow the query before the backend call, filter or mask the response. Under stated conditions, agent policy provably can't widen the ceiling a data owner sets, and an HTTP proxy prototype ships with a typed Cedar policy core.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built a separate control system that limits what action-taking artificial intelligence can do with a person's login access.",
+      "It checks requested actions before they reach company data, rejecting them or narrowing which records they can access.",
+      "It can remove entire records or specific pieces of information and hide sensitive values before returning results.",
+      "Under the paper's stated conditions, the action-taking system cannot grant access beyond the data owner's maximum.",
+      "Data owners gain protection that does not depend on the action-taking system correctly following written restrictions."
+     ]
+    },
+    {
+     "story_id": "d48326b227edac8f",
+     "title": "Keeping credentials out of an AI agent's context with Relay",
+     "url": "https://workos.com/blog/credentials-out-of-agent-context",
+     "source_name": "WorkOS",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "relay-agent-credential-isolation",
+     "published_at": "2026-08-31T00:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "WorkOS built Relay on a blunt premise: a credential the agent never holds can't leak. The proxy fields the agent's third-party API calls and injects the secret at the API boundary, so even a fully hijacked agent comes up empty-handed.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "WorkOS created Relay to keep login secrets away from an agent, an artificial intelligence (AI) system that takes actions independently.",
+      "Relay receives the agent's requests to outside services, then adds the needed secret only while forwarding each request.",
+      "Organizations using action-taking AI can limit theft of login secrets even when attackers manipulate the agent."
+     ]
+    },
+    {
+     "story_id": "8a1e45b6b1f00bf3",
+     "title": "Prompts Don't Protect: Architectural Enforcement via MCP Proxy for LLM Tool Access Control",
+     "url": "https://arxiv.org/abs/2605.18414",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "mcp-proxy-tool-access-control",
+     "published_at": "2026-08-31T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "With unauthorized tools merely visible in context, models invoked them in 48-68% of adversarial scenarios; role-escalation attacks reached 96% on frontier models, and explicit allowlists cut violations to as low as 4% but never zero. An ABAC proxy that filters the MCP registry at discovery time makes unauthorized invocation 0% by design.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that written instructions did not reliably stop artificial intelligence (AI) systems from using forbidden tools they could still see.",
+      "In hostile tests, these systems chose forbidden tools in 48 to 68 percent of cases despite instructions not to.",
+      "The proposed software filters the tool list before the AI receives it, removing anything the user cannot access.",
+      "Organizations can make forbidden tool use impossible by hiding those tools before the AI can choose among them."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "3454e6eaf19fad26",
+     "title": "Manage agents, tools and skills at scale with AWS Agent Registry",
+     "url": "https://aws.amazon.com/blogs/machine-learning/manage-agents-tools-and-skills-at-scale-with-aws-agent-registry",
+     "source_name": "AWS ML Blog",
+     "kind": "company",
+     "section": "product",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "aws-agent-registry-ga",
+     "published_at": "2026-08-31T19:18:09Z",
+     "read_annotation": "blog post",
+     "summary": "AWS made Agent Registry generally available: one governed, searchable catalog where an organization publishes, curates, and discovers agents, tools, skills, and custom resources.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Agent Registry, a searchable catalog for artificial intelligence (AI) systems that take actions independently, became generally available from Amazon Web Services.",
+      "Teams can publish, review, organize, and find these systems, their tools, reusable abilities, and custom resources in one place.",
+      "The catalog applies organizational rules to what appears and how teams manage it.",
+      "Large organizations can manage shared AI resources consistently instead of leaving each team to track its own."
+     ]
+    },
+    {
+     "story_id": "b12a69dbebbb788c",
+     "title": "fx is now available in the AI SDK harness layer",
+     "url": "https://vercel.com/changelog/fx-ai-sdk-harness-adapter",
+     "source_name": "Vercel",
+     "kind": "company",
+     "section": "product",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "fx-ai-sdk-harness-adapter",
+     "published_at": "2026-08-31T06:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Vercel's AI SDK harness layer added fx, its open-source coding agent, through an adapter speaking the Agent Client Protocol. fx joins Claude Code, Codex, Cursor, and the other supported harnesses behind one HarnessAgent API.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Vercel added its open-source fx coding assistant to software that lets applications run several such assistants through one connection.",
+      "An official connector links fx to the shared system, so developers do not need a separate connection.",
+      "Teams already using Vercel's shared system can add fx without building a separate connection."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2094214737957691854",
+   "title": "Simon Willison publishes 'Understanding ChatGPT Work', his guide to OpenAI's confusing but powerful agent product",
+   "url": "https://x.com/simonw/status/2094214737957691854",
+   "source_name": "@simonw",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "x-2094214737957691854",
+   "published_at": "2026-08-31T00:04:36.000Z",
+   "read_annotation": "X post",
+   "summary": "Simon Willison published Understanding ChatGPT Work, a guide to a product he calls deeply confusing but extremely powerful, then had it build a page listing every tool in a Codex Work session.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Simon Willison published a guide explaining what ChatGPT Work can do.",
+    "He describes it as confusing but powerful, with useful features missing from regular ChatGPT.",
+    "He also asked it to build a page listing every tool available during one work session.",
+    "People curious about ChatGPT Work can use the guide to find features that regular ChatGPT lacks."
+   ]
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "4d3b6e337025c566",
+   "title": "Agentic Artifact Creation: Systems, Evaluation, Principles, and Opportunities",
+   "url": "https://huggingface.co/papers/2608.28122",
+   "source_name": "HF Daily Papers",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "agentic-artifact-creation-survey",
+   "published_at": "2026-08-27T20:00:00.000Z",
+   "read_annotation": "paper",
+   "summary": "a 230-system survey of agentic artifact construction",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "0ac83fc52c869151",
+   "title": "What survives honest evaluation? Leakage-safe, search-aware assessment of LLM-driven trading strategy discovery",
+   "url": "https://arxiv.org/abs/2608.27734",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "leakage-safe-llm-trading-eval",
+   "published_at": "2026-08-27T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "leakage-safe, search-aware evaluation of LLM trading agents",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "45407c18fe4ae689",
+   "title": "The Autonomy Tax: Defense Training Breaks LLM Agents",
+   "url": "https://arxiv.org/abs/2603.19423",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "autonomy-tax-agent-defense-training",
+   "published_at": "2026-08-31T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "defense training's cost to benign agent competence",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "2f54eb4a2eb5bfef",
+   "title": "How our agents build on-brand pages with design.md",
+   "url": "https://vercel.com/blog/how-our-agents-build-on-brand-pages-with-design-md",
+   "source_name": "Vercel",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "vercel-design-md-agent-context",
+   "published_at": "2026-08-31T04:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Vercel's public design.md for agents outside its repos",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "6034de9e22e359a2",
+   "title": "Agents babysitting agents",
+   "url": "https://workos.com/blog/agents-babysitting-agents",
+   "source_name": "WorkOS",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "agents-supervising-agents-safely",
+   "published_at": "2026-08-31T18:26:02Z",
+   "read_annotation": "blog post",
+   "summary": "WorkOS on making agent-supervising agents safe",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "8f2ed9fd803c3aa0",
+   "title": "Agent memory as a file format",
+   "url": "https://calpaterson.com/memoryfields.html",
+   "source_name": "Hacker News",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "agent-memory-file-format",
+   "published_at": "2026-08-31T11:17:25Z",
+   "read_annotation": "HN thread",
+   "summary": "Linked without a summary: the fact-gate could not verify one against the source.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": 157
+  },
+  {
+   "story_id": "34d93c036116c2ff",
+   "title": "Set per-user budgets on AI Gateway",
+   "url": "https://vercel.com/changelog/set-per-user-budgets-on-ai-gateway",
+   "source_name": "Vercel",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "ai-gateway-per-user-budgets",
+   "published_at": "2026-08-31T06:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "per-user spending limits on Vercel AI Gateway",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "dec9c7012f305738",
+   "title": "Combining security scanners with the Agents SDK",
+   "url": "https://developers.openai.com/cookbook/examples/agents_sdk/security_scanners_with_agents_sdk",
+   "source_name": "OpenAI Cookbook",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "agents-sdk-security-scanner-swarm",
+   "published_at": null,
+   "read_annotation": "blog post",
+   "summary": "an agent swarm that runs repository security scanners",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "8a1e45b6b1f00bf3",
+   "text": "One result today pokes a hole: per-tool allowlists cut unauthorized calls to as low as 4% but never zero. Prompts don't enforce policy. Put the control where the model can't reach it, in a proxy-enforced access-control layer."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-09-01/2026-09-01-am-m1.webp",
+  "alt": "In a night alley, a hooded figure holds up a cardboard sign reading 'Hand over the token' at a small robot. The robot spreads its arms, its chest compartment open and empty with a moth flying out, and says 'Take everything.'",
+  "alt_joke": "Compliance was never the bottleneck.",
+  "caption": "The prompt injection was a complete success.",
+  "concept": "A mugger demands the API token from an agent that has never once seen its own credentials, and the agent cooperates completely.",
+  "story_id": "d48326b227edac8f"
+ },
+ "hedge": null,
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-09-01T02:29:54Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-09-01/cover-light.webp",
+  "dark": "/images/brief/issues/2026-09-01/cover-dark.webp",
+  "alt": "A machine with one visible gear takes in two paper slips, one long and typed, one short and crumpled, and sends out two copies of the same part, one complete and one missing a piece."
+ }
+}

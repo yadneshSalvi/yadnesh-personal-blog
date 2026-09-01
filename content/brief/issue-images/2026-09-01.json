@@ -1,0 +1,85 @@
+{
+ "issue_id": "2026-09-01",
+ "type": "daily",
+ "renders": 6,
+ "cost_usd": 1.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A machine with one visible gear takes in two paper slips, one long and typed, one short and crumpled, and sends out two copies of the same part, one complete and one missing a piece.",
+   "bytes": [
+    59860,
+    58938
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 2,
+   "prompt": "One machine at the centre of the frame with a single large gear visible through a round window. Two intake trays feed it: on the left, a long neatly typed form; on the right, a short crumpled handwritten note. Two conveyor belts run out of the machine, the left belt carrying a finished part, the right belt carrying the same part with a piece visibly missing. Machine and belts centred, clear margin on every side.",
+   "labels": [
+    "SAME TASK"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-01T00:24:01Z"
+  },
+  {
+   "key": "bbff968191151baf",
+   "story_id": "bbff968191151baf",
+   "light_name": "bbff968191151baf-light.webp",
+   "dark_name": "bbff968191151baf-dark.webp",
+   "alt": "Five easels in a row each hold a copy of the previous easel's drawing, losing detail at every step until the last holds only a fragment; a small robot at the end looks back down the row.",
+   "bytes": [
+    52040,
+    50398
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A row of five easels in a line, each holding a copy of the drawing on the easel before it. The first easel's drawing is complete; each copy loses pieces until the last easel holds only a faint fragment. A small robot stands at the last easel, brush in hand, looking back down the row. Row centred horizontally with clear margin at both ends.",
+   "labels": [
+    "TURN 1",
+    "TURN 60"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-01T00:25:54Z"
+  },
+  {
+   "key": "56178a08f98008d5",
+   "story_id": "56178a08f98008d5",
+   "light_name": "56178a08f98008d5-light.webp",
+   "dark_name": "56178a08f98008d5-dark.webp",
+   "alt": "A robot feeds pages from its own notebook into the slot of a friendly-looking machine while a pipe behind the machine carries the pages out through a hole in the wall.",
+   "bytes": [
+    41894,
+    41374
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A small robot feeds pages torn from its own open notebook into the intake slot of a large friendly-looking vending machine. Behind the machine, hidden from the robot's view, a pipe carries the pages through a hole in the wall. Robot and machine centred, the pipe exiting at mid height, nothing important near the edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-01T00:27:20Z"
+  }
+ ]
+}
