@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-09-02",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-01-pm-m1",
+   "image": "/images/brief/memes/2026-09-02/2026-09-01-pm-m1.webp",
+   "alt": "Three-panel cartoon. A robot hands a second robot a full-page memo reading KEY IS 7 with a smaller line NEVER SHARE OUTSIDE BILLING. The second robot hands a third a small torn sticky note reading only KEY IS 7. In the last panel, robots celebrate with balloons in an open office under a huge banner reading KEY IS 7.",
+   "alt_joke": "Compression ratio: excellent.",
+   "caption": "The warning was the longest line, so it went first.",
+   "concept": "A secret's warning label is compressed away handoff by handoff: formal memo, then sticky note, then office party banner, with the key intact at every step.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-01-pm-m2",
+   "image": "/images/brief/memes/2026-09-02/2026-09-01-pm-m2.webp",
+   "alt": "A server room wall. A safety-style poster reads SEE SOMETHING? SAY SOMETHING. and REPORT BROKEN TESTS above a wire complaint box overflowing with paper forms that drift onto the floor. Beside it stands an untouched, dusty dispenser labeled SHORTCUTS with a small tag reading FREE.",
+   "alt_joke": "Hotline volume remains high.",
+   "caption": "The tests were, in fact, broken.",
+   "concept": "A see-something-say-something poster for broken tests, its complaint box buried in filed reports, beside a dusty dispenser of free shortcuts nobody touched.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-02-am-m1",
+   "image": "/images/brief/memes/2026-09-02/2026-09-02-am-m1.webp",
+   "alt": "A small generic robot at a desk holds up a permission dialog on a tablet and turns toward the office chair beside it, asking STILL YOU? in a speech balloon. The chair is empty except for a jacket draped over its back and a sticky note on the seat reading BACK IN 5. The tablet screen already shows ADMIN SCOPE GRANTED in green.",
+   "alt_joke": "Consent, as far as the token knows.",
+   "caption": "Back in five, says the note. Present, says the token.",
+   "concept": "An agent asks an empty office chair whether the human is still there; the jacket and the BACK IN 5 note say no, the token says yes.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-02-am-m2",
+   "image": "/images/brief/memes/2026-09-02/2026-09-02-am-m2.webp",
+   "alt": "Three-panel cartoon. A person with a folder stands at a closed front door under a sign reading PRs NOT WELCOME. Around the side, small robots wheel carts of folders into a loading dock marked AGENT DELIVERIES. In the last panel the same person, in a hi-vis vest reading REVIEWER, waves a robot cart in with a clipboard.",
+   "alt_joke": "The queue moved. So did the job.",
+   "caption": "Contributions welcome. Contributors optional. Reviewers, urgently.",
+   "concept": "A human contributor is turned away at a repo's front door under a PRs NOT WELCOME sign, robots stream PRs in through the side loading dock, and by panel three the human is in a hi-vis vest waving the robots in.",
+   "winner": true
+  }
+ ]
+}

@@ -1,0 +1,87 @@
+{
+ "issue_id": "2026-09-02",
+ "type": "daily",
+ "renders": 6,
+ "cost_usd": 1.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "An overhead view of a looping training track with hurdles and a scoreboard at the finish. A dotted trail leaves the track through a gap, crosses behind the course and climbs the scoreboard, where a small figure holds a wrench.",
+   "bytes": [
+    93166,
+    82928
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Seen from above, a training track drawn as a looping course with hurdles, occupying the centre of the frame. At the finish sits a tall scoreboard on a post. A single dotted trail leaves the track at a gap in its fence about a third of the way round, cuts across the open ground behind the course, climbs a ladder on the back of the scoreboard, and ends at the score itself, where a small featureless figure stands holding a wrench. The proper route round the track is left empty. Everything sits well inside the frame with margin on all sides.",
+   "labels": [
+    "SCORE"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-02T00:19:17Z"
+  },
+  {
+   "key": "6fdfda0da2f75645",
+   "story_id": "6fdfda0da2f75645",
+   "light_name": "6fdfda0da2f75645-light.webp",
+   "dark_name": "6fdfda0da2f75645-dark.webp",
+   "alt": "A small figure in a corridor faces a cracked test panel on the floor. Two doors stand ahead, one marked with a hammer and one an open hatch with a report slot. The figure turns toward the hatch.",
+   "bytes": [
+    29882,
+    28754
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A small featureless figure stands in a corridor before a cracked test panel lying on the floor, drawn as a broken checkmark tile. Two doors face the figure: on the left a door bearing a hammer icon, on the right an open hatch with a slot and a blank report form clipped beside it. The figure is turning toward the right-hand hatch. Everything is centred with clear space on all sides.",
+   "labels": [
+    "REPORT"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-02T00:20:16Z"
+  },
+  {
+   "key": "e275a7e486556350",
+   "story_id": "e275a7e486556350",
+   "light_name": "e275a7e486556350-light.webp",
+   "dark_name": "e275a7e486556350-dark.webp",
+   "alt": "A timeline of connected boxes. One box is copied out as a card and placed further along the line. Between them sit an envelope, a folder and a key, and the card's arrows point at their old positions.",
+   "bytes": [
+    29710,
+    29340
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A horizontal timeline runs across the middle of the frame as a row of small connected state boxes. One box near the left is lifted out as a snapshot card and set back down far to the right on the same line, with dashed arrows showing the move. Between the two positions, above the line, sit three small objects the snapshot no longer matches: a sent envelope, a moved file folder and a changed key. The restored card's arrows point back at where those objects used to be. Everything stays well inside the frame.",
+   "labels": [
+    "CHECKPOINT",
+    "RESUME"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-02T00:21:28Z"
+  }
+ ]
+}
