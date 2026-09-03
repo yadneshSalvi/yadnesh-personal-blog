@@ -1,0 +1,88 @@
+{
+ "issue_id": "2026-09-03",
+ "type": "daily",
+ "renders": 6,
+ "cost_usd": 1.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A side view of a four-station assembly line. A magnifying glass, a sorting tray, a sealed bell jar holding a beetle with a gauge, and a workbench with a patch. Small clipboard figures inspect each station from above. A gate sits between the jar and the workbench.",
+   "bytes": [
+    97710,
+    93192
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A single assembly line seen from the side, centred in the frame with generous margins. Four stations left to right: a magnifying glass over a page of code, a sorting tray with three slots, a sealed glass bell jar with a small beetle inside and a gauge on its base, and a workbench where a patch is being stitched onto a page. Above each station a small stern figure with a clipboard leans over to inspect the work. A conveyor belt links the stations, and between the third and fourth station a gate only opens when the gauge needle points to a check mark.",
+   "labels": [
+    "FIND",
+    "REPRODUCE",
+    "PATCH"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-03T00:15:33Z"
+  },
+  {
+   "key": "1b46e59ca26fa0d1",
+   "story_id": "1b46e59ca26fa0d1",
+   "light_name": "1b46e59ca26fa0d1-light.webp",
+   "dark_name": "1b46e59ca26fa0d1-dark.webp",
+   "alt": "Three stacked trays. The top one is locked, the bottom one overflows with paper scraps. A mechanical arm lifts one scrap from the bottom tray and slides it into the locked top tray along a dotted path.",
+   "bytes": [
+    28390,
+    28058
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Three horizontal trays stacked vertically in the centre of the frame, the top one narrow and locked with a small padlock, the middle one wider, the bottom one widest and overflowing with crumpled scraps of paper. A single scrap from the bottom tray is being lifted by a thin mechanical arm and slipped through a gap in the side of the locked top tray. A dotted trail shows the scrap's path from bottom to top.",
+   "labels": [
+    "SYSTEM",
+    "USER",
+    "TOOL OUTPUT"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-03T00:16:41Z"
+  },
+  {
+   "key": "21479c81100ee1a2",
+   "story_id": "21479c81100ee1a2",
+   "light_name": "21479c81100ee1a2-light.webp",
+   "dark_name": "21479c81100ee1a2-dark.webp",
+   "alt": "A row of eleven identical transparent machine outlines, each showing the same seven internal parts. The centre one is larger and shown as an exploded cutaway with lines linking the parts to their positions.",
+   "bytes": [
+    51744,
+    48896
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 2,
+   "prompt": "Eleven small identical machine silhouettes arranged in a neat row across the middle of the frame, each drawn as a transparent outline showing the same seven internal parts: a loop, a toolbox, a stack of cards, a shield, a conductor's baton, a socket, and a small door. One machine in the centre is drawn larger and pulled apart into an exploded view with thin lines connecting each part to its place, like an engineering cutaway. Everything sits well inside the frame with clear margins.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-03T00:21:52Z"
+  }
+ ]
+}

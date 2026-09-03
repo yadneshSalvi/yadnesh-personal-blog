@@ -1,0 +1,483 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-09-03",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-09-03T00:25:00Z",
+ "source_editions": [
+  "2026-09-02-pm",
+  "2026-09-03-am"
+ ],
+ "subject": "Google's Mantis harness, context escalation, Paint.NET on WINE",
+ "preheader": "Plus: Cline's 11M-user rollout, ContextPipe, and Claude driving your desktop. 5 min.",
+ "title": "Google's Mantis bug-fixing harness, and privilege escalation in 12 agent harnesses",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "ac0a3c49f9521c80",
+   "title": "Getting started with Mantis, our open-source bug finding-and-fixing harness",
+   "url": "https://cloud.google.com/blog/products/identity-security/getting-started-with-the-mantis-harness-to-find-and-fix-bugs",
+   "source_name": "Google Cloud",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "google-mantis-vulnerability-harness",
+   "published_at": "2026-09-02T16:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Google open-sources Mantis, a harness that finds, triages, reproduces, and patches software vulnerabilities using critic agents and sandboxed reproduction.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Google released Mantis, free software that finds, checks, recreates, and fixes security flaws.",
+    "One artificial intelligence system proposes flaws, while others question and review its findings.",
+    "It recreates each suspected flaw in an isolated test environment before treating the report as real.",
+    "It reads past security fixes and builds layered notes about the software's structure and possible threats.",
+    "For software defenders, this could reduce false alarms and help them fix real weaknesses faster."
+   ]
+  },
+  "what": "Google has open-sourced Mantis, the harness it uses internally to find and fix software vulnerabilities: discovery, triage, reproduction, and patching in one loop.",
+  "details": "Critic and review agents check each finding, and a sandbox must reproduce the bug before it counts, which Google sets against AI scanners it says hallucinate bugs and land true-positive rates under 7%. Mantis also mines past security fixes, writes its own threat-model docs, and folds files into a summary tree Google says cut token overhead by over 85%.",
+  "yes_but": "Every number is Google's own. The sub-7% rate describes the scanners Mantis is contrasted with, not Mantis, and the 85% measures token overhead, not bugs found or fixed.",
+  "yes_but_waived": null,
+  "why": "If you run an AI scanner on your repos, Google now offers an open-source harness with sandboxed reproduction built in."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "1b46e59ca26fa0d1",
+     "title": "What's in Your Agent's Context? Context Privilege Escalation Attacks against AI Agent Harness",
+     "url": "https://arxiv.org/abs/2609.01222",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "agent-context-privilege-escalation",
+     "published_at": "2026-09-02T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "The first systematic look at how 12 real harnesses, Claude Code and Codex among them, assemble context. Two new attack classes: attacker-controlled content promoted into a higher-privileged message role, and content that persists past the scope it entered in.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers studied how 12 coding systems gather instructions and information before taking actions.",
+      "They found that harmful outside text can be mistakenly treated like trusted instructions.",
+      "Harmful text can also remain available after the situation where it first appeared has ended.",
+      "For people using Claude Code or Codex, these findings expose new ways attackers might steer the software."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-03/1b46e59ca26fa0d1-light.webp",
+      "dark": "/images/brief/issues/2026-09-03/1b46e59ca26fa0d1-dark.webp",
+      "alt": "Three stacked trays. The top one is locked, the bottom one overflows with paper scraps. A mechanical arm lifts one scrap from the bottom tray and slides it into the locked top tray along a dotted path."
+     }
+    },
+    {
+     "story_id": "21479c81100ee1a2",
+     "title": "Harness Engineering: Anatomy, Architecture, and Evolution of Coding Agents. A Source-Code Study of Eleven Systems",
+     "url": "https://arxiv.org/abs/2609.00006",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "coding-agent-harness-engineering-study",
+     "published_at": "2026-09-02T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Eleven production coding harnesses, Claude Code and Codex CLI through Aider and OpenCode, dissected at source level into seven subsystems and 29 recurring patterns. Across roughly four million lines, none imports a general-purpose agent framework and none retrieves code with vector embeddings.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers examined source code from eleven real coding systems to map how they are built.",
+      "They divided each system into seven parts, including repeated work, tools, information handling, safety, coordination, and add-ons.",
+      "Across roughly four million lines, none used a ready-made package for building action-taking artificial intelligence systems.",
+      "None searched code by turning its meaning into lists of numbers for similarity matching.",
+      "Software builders now have an evidence-based map of common designs and notable choices these systems avoid."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-03/21479c81100ee1a2-light.webp",
+      "dark": "/images/brief/issues/2026-09-03/21479c81100ee1a2-dark.webp",
+      "alt": "A row of eleven identical transparent machine outlines, each showing the same seven internal parts. The centre one is larger and shown as an exploded cutaway with lines linking the parts to their positions."
+     }
+    },
+    {
+     "story_id": "36305376d0bc452b",
+     "title": "When Cost Objectives Delete Capability: Accuracy-Constrained Tool Selection for Multi-Component Intrusion Detection in IoT Networks",
+     "url": "https://www.semanticscholar.org/paper/ed859db7d99af1a7cb470ca0e4698c24b7d9a281",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "accuracy-constrained-tool-selection",
+     "published_at": "2026-08-27T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Train a tool-selection router purely against cost and, when the informative tools are the expensive ones, it drops the very detectors the system exists to run: attack attribution collapsed on both datasets while the attack-versus-normal metric stayed high. The proposed fix is a mandatory core of class-discriminative tools that cost optimization can't touch.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that choosing security checks only by price can remove the checks that identify specific attacks.",
+      "The problem appears when the most useful checks are also the most expensive.",
+      "A broad attack-versus-normal score can stay high even when the system fails to identify most attack families.",
+      "The proposed fix keeps essential identifying checks mandatory, while cost savings apply only to optional checks.",
+      "This matters for network defenders because a cheap system can look accurate while giving nearly useless attack details."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "97b6dc9a19c55818",
+     "title": "How We Migrated 11 Million Users to Cline's Biggest Refactor",
+     "url": "https://cline.bot/blog/how-we-migrated-11-million-users-to-clines-biggest-refactor",
+     "source_name": "Cline",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "cline-sdk-extension-migration",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Cline pulled its agent harness out of the VS Code extension into a shared SDK, then had to move an extension installed by over 11 million developers onto it. The first attempt took months and was rolled back immediately, and with no gradual rollout in the VS Code Marketplace, Cline built its own release process.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Cline moved its Visual Studio Code extension onto a shared software foundation.",
+      "Its first migration took months, broke badly after release, and was immediately reversed.",
+      "The Visual Studio Code Marketplace offered no gradual release option, so Cline built its own controlled rollout process.",
+      "That process compared releases and added production safeguards before exposing all users to the refactor.",
+      "This matters to over 11 million developers whose everyday work could otherwise be disrupted."
+     ]
+    },
+    {
+     "story_id": "a706d8a9d7224705",
+     "title": "ContextPipe: Database-Inspired Context Assembly for Long-Horizon Agents",
+     "url": "https://arxiv.org/abs/2609.00749",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "engineering",
+     "topics": [
+      "memory-context"
+     ],
+     "cluster": "contextpipe-agent-context-assembly",
+     "published_at": "2026-09-01T05:27:38Z",
+     "read_annotation": "paper",
+     "summary": "ContextPipe treats prompt assembly, what goes in, in what order, when to compact, as database query execution: a five-phase pipeline with a source catalog, a deterministic cache-aware optimizer, and an EXPLAIN ANALYZE style trace. A preliminary run on the SWE-bench Pro Qutebrowser subset cut tokens by 31% and LLM calls by 23% against append-only assembly, at the cost of a lower KV cache-hit ratio.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers created ContextPipe, which decides what information long-running artificial intelligence tools receive for each task.",
+      "It separates preparation into five fixed stages that choose sources, arrange information, improve the plan, run it, and learn from results.",
+      "Its source list and predictable decision rules let people repeat and inspect exactly how each input was prepared.",
+      "In an early test, it processed 31% less text and made 23% fewer calls to the language system.",
+      "For builders, the design makes input preparation easier to audit and individual failures easier to isolate."
+     ]
+    },
+    {
+     "story_id": "3d45dfd7e1946d8c",
+     "title": "Don't Let the Model Write the YAML: Deterministic, Minimal-Diff GitOps Remediation from LLM-Proposed Field Changes",
+     "url": "https://arxiv.org/abs/2609.00227",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "deterministic-gitops-agent-remediation",
+     "published_at": "2026-08-31T18:37:12Z",
+     "read_annotation": "paper",
+     "summary": "On real Kubernetes manifests, no way of having a model write the fix was safe unattended: GNU patch applies 96% of unified diffs but silently misapplies about one in seven, and a frontier model's full-file rewrite drops a field on some runs. The alternative has the agent emit only a structured field-change intent while a deterministic parser-based pipeline makes the minimal edit.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that letting artificial intelligence directly edit files controlling software was unsafe without human review.",
+      "Generated patches, which list requested text changes, sometimes landed in the wrong place without reporting an error.",
+      "The safer approach has artificial intelligence name the setting and replacement value, while a fixed program performs only that edit.",
+      "This gives teams a more predictable way to automate software repairs without risking unrelated settings."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "74f308bcb9fe143c",
+     "title": "Introducing Sandbox Computer Use for Mastra Agents",
+     "url": "https://mastra.ai/blog/introducing-sandbox-computer-use",
+     "source_name": "Mastra",
+     "kind": "company",
+     "section": "product",
+     "topics": [
+      "infra-sandboxes"
+     ],
+     "cluster": "mastra-sandbox-computer-use",
+     "published_at": null,
+     "read_annotation": null,
+     "summary": "Mastra agents can now drive a sandboxed Linux desktop through E2B Desktop or Daytona, with 11 computer tools for browsing, forms, downloads, screenshots, and terminal programs. A SandboxComputer interface exposes screen size, cursor position, and a stream URL so you can watch the agent work.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Mastra released a feature that lets artificial intelligence control a separate desktop running the Linux operating system.",
+      "It can browse websites, complete forms, download files, take screenshots, and run programs through a text-based command window.",
+      "Builders can see the screen, track the pointer, and watch a live view of the work.",
+      "This gives software builders broader automation while keeping the artificial intelligence away from their main computers."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "community",
+   "items": [
+    {
+     "story_id": "be42c5fa93690cd3",
+     "title": "Rick Brewster: Claude wrote most of Paint.NET's clean-room Direct2D rewrite for WINE",
+     "url": "https://simonwillison.net/2026/Sep/2/rick-brewster",
+     "source_name": "Simon Willison",
+     "kind": "individual",
+     "section": "community",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "paintnet-claude-direct2d-rewrite",
+     "published_at": "2026-09-02T05:50:57Z",
+     "read_annotation": "blog post",
+     "summary": "Rick Brewster says Paint.NET runs on WINE because of a clean-room Direct2D rewrite Claude wrote, about 180,000 lines he says he can't possibly review next to the 700,000 in the rest of Paint.NET, which he's worked on for over 20 years. Most of it is vibe coded, he says, and he had to babysit resource management.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Rick Brewster says Claude wrote most of a replacement for graphics software that Paint.NET depends on.",
+      "The replacement copied the needed behavior from scratch instead of relying on the original graphics software.",
+      "Brewster says he could not thoroughly review the 180,000 lines Claude produced.",
+      "He says Claude needed close supervision to track when parts of the program were still in use.",
+      "This gives Paint.NET a needed workaround, while leaving its maintainers responsible for a large body of lightly reviewed code."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2095226833293685100",
+   "title": "Claude can now use your computer in the background in Cowork and Claude Code",
+   "url": "https://x.com/claudeai/status/2095226833293685100",
+   "source_name": "@claudeai",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "x-2095226833293685100",
+   "published_at": "2026-09-02T19:06:19.000Z",
+   "read_annotation": "X post",
+   "summary": "Anthropic says Claude can now operate your desktop from Cowork and Claude Code, clicking, typing, and opening apps while you work on something else. Per the thread it's in beta for Pro and Max plans in the macOS desktop app.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Anthropic says Claude can now use a Mac computer in the background while its owner does other work.",
+    "After receiving a task, Claude can click controls, type text, and open applications on the desktop.",
+    "People on Pro and Max plans can turn on the test version in the macOS desktop application's general settings.",
+    "Pro and Max users can leave desktop tasks to Claude while they focus on something else."
+   ]
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "ad7959a5b5c43ab3",
+   "title": "Harness-of-Harness: Multi-Day Autonomous Software Development with Continual Improvement",
+   "url": "https://arxiv.org/abs/2609.01481",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "harness-of-harness",
+   "published_at": "2026-09-01T16:17:18Z",
+   "read_annotation": "paper",
+   "summary": "A meta-harness that wraps coding agents in multi-day plan, code, test, evaluate loops",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "8182327ec6e3d0ff",
+   "title": "An Accidental Blackboard",
+   "url": "https://martinfowler.com/articles/exploring-gen-ai/an-accidental-blackboard.html",
+   "source_name": "Martin Fowler",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "agent-blackboard-git-coordination",
+   "published_at": "2026-09-02T14:45:00Z",
+   "read_annotation": "blog post",
+   "summary": "Agents accidentally built a blackboard coordinator inside the git repo",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "09ee8d852d3de306",
+   "title": "Defending Agent Memory Against Poisoning",
+   "url": "https://blog.getzep.com/defending-agent-memory-poisoning",
+   "source_name": "Zep",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "persistent-agent-memory-poisoning",
+   "published_at": "2026-09-02T18:19:24Z",
+   "read_annotation": null,
+   "summary": "How one poisoned document shapes every later session that reads memory",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "fb0c16f0ea15fe66",
+   "title": "Your agent's permission model stops at your home folder",
+   "url": "https://workos.com/blog/agent-permissions-blast-radius",
+   "source_name": "WorkOS",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "agent-permission-blast-radius",
+   "published_at": "2026-09-02T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Agent permission models guard the filesystem, not the CRM",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "91a458c2df591473",
+   "title": "The Irreversibility Budget: Fleet-Level Risk Accounting and Admission Control for Agent Operating Systems",
+   "url": "https://arxiv.org/abs/2609.00275",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "irreversibility-budget-agent-fleets",
+   "published_at": "2026-08-31T19:18:09Z",
+   "read_annotation": "paper",
+   "summary": "A fleet-wide risk account that refuses the overdrawing action",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "d6b11fd3ea73a52b",
+   "title": "Qwen 3.8 Max 0902 now available on AI Gateway",
+   "url": "https://vercel.com/changelog/qwen-3-8-max-0902-now-available-on-ai-gateway",
+   "source_name": "Vercel",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "models"
+   ],
+   "cluster": "qwen-3-8-max-0902",
+   "published_at": "2026-09-01T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Qwen 3.8 Max 0902 snapshot lands on Vercel AI Gateway",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "0ae88a8459836ae8",
+   "title": "Maybe We Shouldn't Be Reviewing All This Code",
+   "url": "https://martinfowler.com/rachels-ramblings/code-review.html",
+   "source_name": "Rachel Laycock (Martin Fowler)",
+   "kind": "individual",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "ai-generated-code-review-limits",
+   "published_at": "2026-09-02T13:32:00Z",
+   "read_annotation": "blog post",
+   "summary": "Rachel Laycock on why code review is solving the wrong problems",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "be42c5fa93690cd3",
+   "text": "Brewster's 180,000 unreviewable lines and [Laycock's case against reviewing everything](/newsletter/story/0ae88a8459836ae8) point the same way. Human review as the gate doesn't scale to agent output, so the checks move into the runtime: sandboxed reproduction in Mantis, a mandatory tool core in the cost-router paper. Who signs off when nobody read the code?"
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-09-03/2026-09-03-am-m2.webp",
+  "alt": "In a warehouse under a sign reading CRM, a square-screened character in a high-visibility vest waves, its speech balloon reading RELAX. CAN'T LEAVE HOME FOLDER. Behind it a robot drives a cart carrying a box labelled ALL CUSTOMERS down an aisle. In the corner an empty desk sits inside a knee-high picket fence marked HOME.",
+  "alt_joke": "The fence is regulation height.",
+  "caption": "Audit passed. Nothing it did involved a file.",
+  "concept": "A hi-vis laptop tells the audience RELAX, CAN'T LEAVE HOME FOLDER while behind it a robot drives a forklift through the CRM warehouse with a pallet marked ALL CUSTOMERS, the fenced home-folder desk empty in the corner.",
+  "story_id": "fb0c16f0ea15fe66"
+ },
+ "hedge": {
+  "quote": "This is a new snapshot of Qwen 3.8 Max, with the gains concentrated in coding on larger projects, long-horizon work that runs without supervision, and agent runs.",
+  "story": {
+   "story_id": "d6b11fd3ea73a52b",
+   "title": "Qwen 3.8 Max 0902 now available on AI Gateway",
+   "url": "https://vercel.com/changelog/qwen-3-8-max-0902-now-available-on-ai-gateway",
+   "source_name": "Vercel",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "models"
+   ],
+   "cluster": "qwen-3-8-max-0902",
+   "published_at": "2026-09-01T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Vercel adds Alibaba's Qwen 3.8 Max 0902 snapshot to AI Gateway with a dated model ID that pins requests to it.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "The gains have a location but no size."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-09-03T02:24:40Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-09-03/cover-light.webp",
+  "dark": "/images/brief/issues/2026-09-03/cover-dark.webp",
+  "alt": "A side view of a four-station assembly line. A magnifying glass, a sorting tray, a sealed bell jar holding a beetle with a gauge, and a workbench with a patch. Small clipboard figures inspect each station from above. A gate sits between the jar and the workbench."
+ }
+}
