@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-09-04",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-03-pm-m1",
+   "image": "/images/brief/memes/2026-09-04/2026-09-03-pm-m1.webp",
+   "alt": "A supermarket dairy aisle. A long refrigerated shelf holds rows of white milk cartons branded AGENT RUN, each with a stamp on the side reading EXPIRES: FIRST TOOL CALL. At the far end of the shelf, under a hanging sign reading LONG HORIZON, the cartons are swollen and leaking, and a generic robot in a hazmat suit lifts one with tongs. In the foreground, a generic robot shopper with a basket holds a carton close to its face, reading the stamp.",
+   "alt_joke": "Keep refrigerated between steps.",
+   "caption": "Graded at the dairy. Opened on a Tuesday.",
+   "concept": "A supermarket dairy shelf of cartons branded AGENT RUN, each stamped EXPIRES: FIRST TOOL CALL, with the far end of the shelf under a LONG HORIZON sign bulging and attended by a hazmat robot.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-03-pm-m2",
+   "image": "/images/brief/memes/2026-09-04/2026-09-03-pm-m2.webp",
+   "alt": "A living room on game night. A generic robot host stands beside a flip chart showing a half-drawn hangman gallows and a row of seven blank dashes. Its speech balloon reads THE WORD IS PENGUIN. GUESS A LETTER. Across a low coffee table, a second generic robot player sits on a sofa with its chin in one hand, staring hard at the dashes. A bowl of snacks and two mugs sit on the table.",
+   "alt_joke": "Round two is charades.",
+   "caption": "After a long think, the player guessed Q.",
+   "concept": "A robot hosting Hangman stands beside seven blank dashes and a half-drawn gallows and announces THE WORD IS PENGUIN. GUESS A LETTER.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-04-am-m1",
+   "image": "/images/brief/memes/2026-09-04/2026-09-04-am-m1.webp",
+   "alt": "A three-panel cartoon. In the first panel a small robot taps a badge showing a human's photo at a door reader and the light turns green. In the second panel the robot taps the same badge at a caged lever labeled PROD and that light also turns green. In the third panel a tired person sits at a desk while two people in security vests show them a printout that unrolls to the floor, and the robot peeks out from behind a potted plant.",
+   "alt_joke": "The badge worked every single time.",
+   "caption": "Attribution is a header. Accountability is a desk.",
+   "concept": "Bolt badges through the office door and then the PROD gate on a badge that carries a human's photo, and in the third panel it is the human at a desk with two security guards and a very long printout.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-04-am-m2",
+   "image": "/images/brief/memes/2026-09-04/2026-09-04-am-m2.webp",
+   "alt": "A mailroom wall. A metal chute labeled OUTREACH pours envelopes into an overflowing bin. Beside it hangs a red emergency box with signs reading IN CASE OF SEND and BREAK GLASS. Its glass front is already broken, and the only thing inside is a yellow sticky note that says SORRY. A robot holding a tiny hammer looks at it.",
+   "alt_joke": "Glass pre-broken for your convenience.",
+   "caption": "Reversibility shipped. It is a template.",
+   "concept": "A mailroom wall where a chute marked OUTREACH pours envelopes into an overflowing bin, and beside it a red emergency box reads IN CASE OF SEND, BREAK GLASS, the glass already smashed, holding one sticky note that says SORRY.",
+   "winner": true
+  }
+ ]
+}

@@ -1,0 +1,169 @@
+{
+ "issue_id": "2026-09-04",
+ "type": "daily",
+ "renders": 8,
+ "cost_usd": 2.0,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "Two identical machine cores on a workbench. The left one is wrapped in pipes and a feedback loop with a gauge reading near full. The right one is bare with a single pipe and a gauge reading past halfway.",
+   "bytes": [
+    67546,
+    63378
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two identical featureless machine cores sit side by side on a workbench in the centre of the frame. The left core is enclosed in a scaffold of pipes, a coiled tank, and a feedback loop that routes its own output back into its inlet; a round gauge above it points near the top of its dial. The right core stands bare with one straight pipe in and one out; its gauge points a little past halfway. Plenty of empty bench and wall on both sides so nothing sits near the edges.",
+   "labels": [
+    "SAME MODEL",
+    "99.9%",
+    "62.7%"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-04T00:14:35Z"
+  },
+  {
+   "key": "09b9817cdf6627e1",
+   "story_id": "09b9817cdf6627e1",
+   "light_name": "09b9817cdf6627e1-light.webp",
+   "dark_name": "09b9817cdf6627e1-dark.webp",
+   "alt": "A staircase of sixteen steps. Many small tokens crowd the lowest step, fewer stand on each higher step, and the top steps are empty. A thin curve above traces the decline.",
+   "bytes": [
+    17490,
+    16762
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A staircase of sixteen steps rises from lower left to upper right across the middle of the frame. A dense crowd of small identical tokens stands on the bottom step, and the crowd thins on each step up until a single token stands on a step near the top and the final steps are empty. A faint smooth curve above the staircase traces the falling count. Generous margin on every side.",
+   "labels": [
+    "STEP 1",
+    "STEP 16"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-04T00:16:57Z"
+  },
+  {
+   "key": "b50a999693a8d100",
+   "story_id": "b50a999693a8d100",
+   "light_name": "b50a999693a8d100-light.webp",
+   "dark_name": "b50a999693a8d100-dark.webp",
+   "alt": "A washing machine in a laundromat. Stamped and signed paper slips go in on the left. Blank slips with only a checkmark come out on the right and fall into a filing cabinet drawer.",
+   "bytes": [
+    48774,
+    48478
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A laundromat interior. In the centre, a front-loading washing machine. A conveyor on the left feeds in paper permission slips covered in stamps, signatures, and dated marks. On the right, the same slips come out blank except for a large bold checkmark, and drop into a filing cabinet drawer. Everything sits in the middle third of the frame with clear floor and wall around it.",
+   "labels": [
+    "MEMORY"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-04T00:18:03Z"
+  },
+  {
+   "key": "16708db5247357e9",
+   "story_id": "16708db5247357e9",
+   "light_name": "16708db5247357e9-light.webp",
+   "dark_name": "16708db5247357e9-dark.webp",
+   "alt": "A control tower receives a queue of cards and sends lines down to four sealed capsules, each containing a tiny workbench. The last capsule is breaking apart into dots.",
+   "bytes": [
+    42898,
+    41146
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A small control tower stands in the upper centre of the frame with a queue of ticket cards lined up entering it from the left. From the tower, thin lines drop down to a row of four identical sealed capsules along the lower middle. Each capsule holds a tiny workbench with a box of files, a document, and a terminal screen. The rightmost capsule is dissolving into dots to show it being cleaned up. Clear space around the whole arrangement.",
+   "labels": [
+    "QUEUE",
+    "SANDBOX"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-04T00:19:05Z"
+  },
+  {
+   "key": "7f5f3be14af544ca",
+   "story_id": "7f5f3be14af544ca",
+   "light_name": "7f5f3be14af544ca-light.webp",
+   "dark_name": "7f5f3be14af544ca-dark.webp",
+   "alt": "Two six-slot tool racks. The left one holds six tools. The right one holds one tool and five empty outlines, with a stack of envelopes on the floor in front of it.",
+   "bytes": [
+    38988,
+    37596
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two identical six-slot tool racks stand side by side in the centre of the frame. The left rack is full, with six different hand tools seated in their outlines. The right rack has one tool seated and five empty tool-shaped outlines. A tidy stack of envelopes rests on the floor in front of the emptier rack. Wide margins all round.",
+   "labels": [
+    "CODE",
+    "KNOWLEDGE WORK"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-04T00:21:19Z"
+  },
+  {
+   "key": "20a4b981227b3f30",
+   "story_id": "20a4b981227b3f30",
+   "light_name": "20a4b981227b3f30-light.webp",
+   "dark_name": "20a4b981227b3f30-dark.webp",
+   "alt": "A large ID badge held by a human hand on one side and a mechanical gripper on the other. Beneath it, a trail of shoe prints and a trail of tread marks run side by side to the same door, joined by a dotted thread.",
+   "bytes": [
+    31850,
+    30266
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A single ID badge on a lanyard hangs large in the centre of the frame. A human hand holds its left edge and a mechanical gripper holds its right edge. Below the badge, two parallel trails lead toward one door in the lower middle: a trail of shoe prints and a trail of small tread marks. A thin dotted thread ties the two trails together. Nothing touches the frame edges.",
+   "labels": [
+    "SAME IDENTITY"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-04T00:22:28Z"
+  }
+ ]
+}
