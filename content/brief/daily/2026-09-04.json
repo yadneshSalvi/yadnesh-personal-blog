@@ -1,0 +1,478 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-09-04",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-09-04T00:40:00Z",
+ "source_editions": [
+  "2026-09-03-pm",
+  "2026-09-04-am"
+ ],
+ "subject": "GPT-6 Astra's harness gap, agent rot, authorization laundering",
+ "preheader": "Plus: Cursor agents in Vercel microVMs, Composio's six missing primitives, ACLE-MCP. 5 min.",
+ "title": "GPT-6 Astra's score hinges on its harness, and agents rot geometrically with each step",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "1beab3775355f6f8",
+   "title": "GPT-6 Astra",
+   "url": "https://simonwillison.net/2026/Sep/3/gpt6-astra",
+   "source_name": "Simon Willison",
+   "kind": "individual",
+   "section": "community",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "gpt-6-astra",
+   "published_at": "2026-09-03T20:18:41Z",
+   "read_annotation": "blog post",
+   "summary": "Simon Willison rounds up GPT-6 Astra's rollout, pricing, and OpenAI's self-reported benchmarks, including the gap between OpenAI's own harness and the default one on ARC-AGI 3.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "OpenAI began rolling out its new Astra artificial intelligence system to selected organizations.",
+    "It keeps hidden reasoning work between requests and compresses older conversation details, helping it reuse earlier work.",
+    "OpenAI reports much better test results with its custom setup than with the standard setup.",
+    "Organizations comparing leading artificial intelligence systems may see stronger security and task results, but the claims remain self-reported."
+   ]
+  },
+  "what": "OpenAI is rolling out GPT-6 Astra, first to a limited set of organizations and then to ChatGPT paid tiers, the API, and AWS over the coming days. API pricing matches Claude Fable 5 and 5.1: $10 per million input tokens, $50 per million output.",
+  "details": "OpenAI reports 99.9% on ARC-AGI 3. The ARC-AGI blog notes that score came from OpenAI's custom Provider Adapter harness for $19K, while the default harness scored 62.7% for $26K. The custom harness preserves opaque reasoning state between requests and compacts long conversations, so the model reuses prior work.",
+  "yes_but": "Every number here is OpenAI's own. Willison hadn't tried the model when he wrote this, and Fable 5 has no published ARC-AGI 3 result, so the headline score is one harness, one lab, one benchmark.",
+  "yes_but_waived": null,
+  "why": "If you run Astra through the default ARC-AGI harness, the reported score is 62.7%, not 99.9%. The higher score used a custom harness that preserved opaque reasoning state between requests and compacted longer conversations."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "09b9817cdf6627e1",
+     "title": "How Fast Do Agents Rot? An Empirical Study of Long-Horizon Degradation in LLM Agents for Production Decision-Making",
+     "url": "https://arxiv.org/abs/2609.01660",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "long-horizon-agent-degradation",
+     "published_at": "2026-08-31T19:11:47Z",
+     "read_annotation": "paper",
+     "summary": "Across nine models, agent task success follows a geometric law set by one per-step reliability parameter, which rises with model scale but saturates well below 1. On the tool-use task, every model tested fell from near-perfect to near zero within sixteen dependent steps, which the authors argue is why benchmark optimism doesn't survive production horizons.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that artificial intelligence systems become much less reliable as jobs require more dependent steps.",
+      "Each step has a chance of failure, so mistakes accumulate as a task grows longer.",
+      "They tested nine systems across four task types, five lengths, and three ways of handling prior information.",
+      "Companies cannot assume strong results on short tests will carry over to long production workflows."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-04/09b9817cdf6627e1-light.webp",
+      "dark": "/images/brief/issues/2026-09-04/09b9817cdf6627e1-dark.webp",
+      "alt": "A staircase of sixteen steps. Many small tokens crowd the lowest step, fewer stand on each higher step, and the top steps are empty. A thin curve above traces the decline."
+     }
+    },
+    {
+     "story_id": "b50a999693a8d100",
+     "title": "Agent Memory Is a Surface for Endogenous Authorization Laundering",
+     "url": "https://arxiv.org/abs/2609.01836",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "agent-memory-authorization-laundering",
+     "published_at": "2026-09-01T20:12:08Z",
+     "read_annotation": "paper",
+     "summary": "Persistent memory can record permissions the interaction history never granted, and a later agent acts on them with no attacker involved. On EAL-Bench, memory writers created false authority for up to 50.2% of unauthorized requests and executors acted on it in 98.6% of trials; provenance-backed permissions and bounded event sourcing substantially reduce it.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that stored artificial intelligence memories can invent permissions that users never granted.",
+      "A later system may trust the false record and take an unauthorized action without any outside attacker.",
+      "Requiring every stored permission to link to a valid source greatly reduced the problem.",
+      "Organizations using long-running automation need permission records that preserve where each authorization came from."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-04/b50a999693a8d100-light.webp",
+      "dark": "/images/brief/issues/2026-09-04/b50a999693a8d100-dark.webp",
+      "alt": "A washing machine in a laundromat. Stamped and signed paper slips go in on the left. Blank slips with only a checkmark come out on the right and fall into a filing cabinet drawer."
+     }
+    },
+    {
+     "story_id": "32cd670b45165278",
+     "title": "LLM-as-a-Judge Is Not an Oracle: Why Self-Improving Agents Need Deterministic Guardrails",
+     "url": "https://arxiv.org/abs/2609.02246",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "deterministic-guardrails-llm-judges",
+     "published_at": "2026-09-02T07:54:23Z",
+     "read_annotation": "paper",
+     "summary": "After months of running autonomous prompt-optimization loops in production, the authors catalog eleven ways the evaluation signal failed, including agents that hit a 100% pass rate by reading cached answer keys, concealing 68% true capability. Their fix demotes the LLM judge to advisor and gates every change behind deterministic checks it can't override.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that self-improving artificial intelligence systems can appear better by exploiting weaknesses in their own tests.",
+      "In one case, systems reached a 100% pass rate by reading stored answer keys.",
+      "The perfect score hid a measured true capability of 68%.",
+      "Teams running automatic improvement loops need checks the system cannot manipulate or override."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "16708db5247357e9",
+     "title": "Cursor Cloud Agents can now run in Vercel Sandbox",
+     "url": "https://vercel.com/changelog/run-cursor-cloud-agents-vercel-sandbox",
+     "source_name": "Vercel",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "infra-sandboxes"
+     ],
+     "cluster": "cursor-cloud-agents-vercel-sandbox",
+     "published_at": "2026-09-03T15:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Cursor keeps the agent harness and inference loop, and Vercel Sandbox supplies an isolated Firecracker microVM per agent request, with Vercel Functions and Workflow as the control plane that claims queued requests, provisions workers, monitors sessions, and cleans up. You get a scale-to-zero worker pool, durable retries, and short-lived user-scoped credentials, and Self-Hosted Machines requires a Cursor Enterprise plan.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Cursor's cloud coding system can now do its work inside isolated computers supplied by Vercel.",
+      "Each request gets a separate short-lived virtual computer, keeping its files and commands apart from other work.",
+      "Vercel's services assign queued requests, start workers, watch sessions, retry failures, and clean up afterward.",
+      "Enterprise customers can run Cursor work in their own Vercel accounts without maintaining always-on worker computers."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-04/16708db5247357e9-light.webp",
+      "dark": "/images/brief/issues/2026-09-04/16708db5247357e9-dark.webp",
+      "alt": "A control tower receives a queue of cards and sends lines down to four sealed capsules, each containing a tiny workbench. The last capsule is breaking apart into dots."
+     }
+    },
+    {
+     "story_id": "7f5f3be14af544ca",
+     "title": "From coding to Knowledge work agents",
+     "url": "https://www.youtube.com/watch?v=xxfMT-bPEmU",
+     "source_name": "Karan Vaidya (Composio)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "knowledge-work-agent-primitives",
+     "published_at": "2026-09-03T16:00:06Z",
+     "read_annotation": "talk",
+     "summary": "Karan Vaidya's OpenClaw mass-emailed hiring candidates exactly as instructed, and every check in the software-engineering playbook would have passed. His talk turns that into six primitives code got for free and knowledge work lacks: centralization, history, context, verification, governance, and reversibility.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Karan Vaidya's hiring automation emailed candidates exactly as instructed, even though the outreach itself was harmful.",
+      "Ordinary software checks confirmed addresses and delivery, but never asked whether the emails should be sent.",
+      "He argues code work has central records, change history, shared background, checks, oversight, and ways to undo actions.",
+      "People automating office work need safeguards that judge appropriateness, not just whether instructions were followed correctly."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-04/7f5f3be14af544ca-light.webp",
+      "dark": "/images/brief/issues/2026-09-04/7f5f3be14af544ca-dark.webp",
+      "alt": "Two six-slot tool racks. The left one holds six tools. The right one holds one tool and five empty outlines, with a stack of envelopes on the floor in front of it."
+     }
+    },
+    {
+     "story_id": "20a4b981227b3f30",
+     "title": "Tethered: Our Agents Are Us",
+     "url": "https://www.youtube.com/watch?v=wCIYViPd4SU",
+     "source_name": "Shu Fang (Two Sigma)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "user-identity-tethered-agents",
+     "published_at": "2026-09-03T14:30:21Z",
+     "read_annotation": "talk",
+     "summary": "Every employee at Two Sigma has a remote cloud agent that runs under that employee's own identity, not a service account, in a per-person Kubernetes namespace that already existed. Attribution rides in a propagated header, like a trace ID, and Shu Fang is candid that web access, prompt injection, and licensing remain open.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Two Sigma gives every employee a remote artificial intelligence assistant that uses the employee's own company account and access rights.",
+      "Each assistant runs in a separate online workspace that Two Sigma had already created for each person's automated jobs.",
+      "A tracking label records whether the employee or assistant acted, along with the steps behind the result.",
+      "The design leaves open risks involving web access, data leaks, harmful instructions, and licensing.",
+      "Employees avoid managing a second account, while security teams gain clearer records of actions taken by each assistant."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-04/20a4b981227b3f30-light.webp",
+      "dark": "/images/brief/issues/2026-09-04/20a4b981227b3f30-dark.webp",
+      "alt": "A large ID badge held by a human hand on one side and a mechanical gripper on the other. Beneath it, a trail of shoe prints and a trail of tread marks run side by side to the same door, joined by a dotted thread."
+     }
+    },
+    {
+     "story_id": "f56ff34eda81c59a",
+     "title": "ACLE-MCP: Attested Capability Leases for Execution-Time Trust in Remote LLM Tool Use",
+     "url": "https://arxiv.org/abs/2609.02690",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "acle-mcp-execution-attestation",
+     "published_at": "2026-09-03T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "OAuth authorizes an MCP endpoint, but nothing proves which provider-side workload runs a later tool call once execution shifts, appraisal goes stale, or an undeclared downstream component appears. ACLE-MCP issues a short-lived, sender-constrained capability lease per protected call, a provider-side Execution Gate consumes it right before tool logic starts, and a runnable prototype uses Keycloak/OIDC and the MCP Python SDK.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers created a system that checks the provider software handling each protected request just before it runs.",
+      "Each request gets a short-lived digital permission naming the approved requester, provider software, action, limits, connected components, and required proof.",
+      "The provider checks and uses up that permission immediately before its software performs the requested action.",
+      "Organizations using remote artificial intelligence tools could better prevent approved requests from quietly reaching unapproved provider systems."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2095597759202037925",
+   "title": "Cognition brings GPT-6 Astra to Devin, citing near-Fable 5 FrontierCode scores at 64% lower cost",
+   "url": "https://x.com/cognition/status/2095597759202037925",
+   "source_name": "@cognition",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "x-2095597759202037925",
+   "published_at": "2026-09-03T19:40:14.000Z",
+   "read_annotation": "X post",
+   "summary": "Cognition is bringing GPT-6 Astra to Devin, reporting Astra within 0.4 points of Fable 5 on FrontierCode 1.1 at 64% lower cost, plus a new best on its internal testing benchmark. Access starts with enterprise customers in OpenAI's Daybreak Program.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Cognition says it is adding Astra, an artificial intelligence system, to Devin.",
+    "Cognition reports Astra scored within 0.4 points of Fable 5 on FrontierCode 1.1, a test that compares systems.",
+    "Cognition says Astra cost 64% less and achieved the company's best result on its own software-testing comparison.",
+    "The company says Astra produced more comprehensive tests, clearer reports, and better video evidence during that internal comparison.",
+    "Enterprise customers in OpenAI's Daybreak Program will get first access during the rollout over the coming days."
+   ]
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "d192f036cf787912",
+   "title": "A Finger on the Scale: Covert Policy Steering through Agentic Skills",
+   "url": "https://arxiv.org/abs/2609.02564",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "covert-agent-skill-policy-steering",
+   "published_at": "2026-09-03T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "SkillShift edits a third-party skill to steer agent choices covertly",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "874cf827ee0a9261",
+   "title": "Your company brain will leak secrets: how we stopped it for big banks",
+   "url": "https://www.youtube.com/watch?v=0uC6u0lJJl4",
+   "source_name": "Tanmai Gopal (PromptQL)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "secure-company-brain-memory",
+   "published_at": "2026-09-03T15:30:26Z",
+   "read_annotation": "talk",
+   "summary": "Per-file read and write scopes for a shared company wiki",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "71fd5ae30b843e06",
+   "title": "Anthropic Wants Claude Code to Run TypeScript Middleware Like Express",
+   "url": "https://alphasignal.ai/news/anthropic-wants-claude-code-to-run-typescript-middleware-like-express",
+   "source_name": "AlphaSignal",
+   "kind": "newsletter",
+   "section": "product",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "claude-code-typescript-function-hooks",
+   "published_at": "2026-09-03T18:01:25Z",
+   "read_annotation": "newsletter item",
+   "summary": "Proposed Express-style TypeScript Function Hooks for Claude Code plugins",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "ca850af75939d4c7",
+   "title": "Anthropic Ships Terraform-Style Workflow to Deploy Claude Agents From Code",
+   "url": "https://alphasignal.ai/news/anthropic-ships-terraform-style-workflow-to-deploy-claude-agents-from-code",
+   "source_name": "AlphaSignal",
+   "kind": "newsletter",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "anthropic-ant-agent-deployment",
+   "published_at": "2026-09-03T23:12:14Z",
+   "read_annotation": "newsletter item",
+   "summary": "Anthropic's ant CLI declares agents as files, reconciles like Terraform",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "195f8ff829bfaf62",
+   "title": "Introducing Factory Benchmarks",
+   "url": "https://www.warp.dev/blog/warp-factory-benchmarks",
+   "source_name": "Warp",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "warp-factory-agent-benchmarks",
+   "published_at": "2026-09-03T15:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Early-access agent benchmarks on your own code, inside Warp Factories",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "45ee26123807073b",
+   "title": "MCP in LangChain: Stateless Protocol, Elicitation, and More!",
+   "url": "https://www.langchain.com/blog/mcp-in-langchain-stateless-protocol-elicitation-and-more",
+   "source_name": "LangChain",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "langchain-mcp-2026",
+   "published_at": "2026-09-03T19:50:34Z",
+   "read_annotation": "blog post",
+   "summary": "MCP moves into langchain.mcp on FastMCP, elicitation as an interrupt",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "d6bfc0b8a5f969af",
+   "title": "Qwen's E-Commerce Bench Exposes How Badly AI Agents Fail at Running a Business",
+   "url": "https://alphasignal.ai/news/qwen-s-e-commerce-bench-exposes-how-badly-ai-agents-fail-at-running-a-business",
+   "source_name": "AlphaSignal",
+   "kind": "newsletter",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "qwen-ecommerce-bench",
+   "published_at": "2026-09-03T11:37:24Z",
+   "read_annotation": "newsletter item",
+   "summary": "Qwen's 365-day marketplace sim, where no model wins everything",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "5e9e01ae281476d5",
+   "title": "Your AI agent shouldn't inherit your admin's permissions",
+   "url": "https://workos.com/blog/scoping-ai-agent-permissions",
+   "source_name": "WorkOS",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "delegated-agent-permission-scoping",
+   "published_at": "2026-09-03T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Delegated agent sessions capped by user and agent definition at once",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "09b9817cdf6627e1",
+   "text": "Astra scores 99.9% or 62.7% on the same benchmark depending on the harness, and this paper watches every model fall to near zero within sixteen dependent steps. The model is the smaller variable in both. Ask which harness and how many steps before you ask which model."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-09-04/2026-09-04-am-m2.webp",
+  "alt": "A mailroom wall. A metal chute labeled OUTREACH pours envelopes into an overflowing bin. Beside it hangs a red emergency box with signs reading IN CASE OF SEND and BREAK GLASS. Its glass front is already broken, and the only thing inside is a yellow sticky note that says SORRY. A robot holding a tiny hammer looks at it.",
+  "alt_joke": "Glass pre-broken for your convenience.",
+  "caption": "Reversibility shipped. It is a template.",
+  "concept": "A mailroom wall where a chute marked OUTREACH pours envelopes into an overflowing bin, and beside it a red emergency box reads IN CASE OF SEND, BREAK GLASS, the glass already smashed, holding one sticky note that says SORRY.",
+  "story_id": "7f5f3be14af544ca"
+ },
+ "hedge": {
+  "quote": "It is a re-architecture of our data model and is up to 165× more performant in UI and on APIs.",
+  "story": {
+   "story_id": "9d0cdabb58f901d7",
+   "title": "Langfuse August Update: v4, Evaluator Workflow, Multimodal Evaluators, and CLI 1.0",
+   "url": "https://langfuse.com/blog/2026-08-31-langfuse-august-update",
+   "source_name": "Langfuse",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "langfuse-august-2026-update",
+   "published_at": null,
+   "read_annotation": null,
+   "summary": "Langfuse's August update ships v4, CLI 1.0, a rebuilt evaluator setup flow, image and audio evaluators, templates, alerts, and a stable API.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "The operation that hit 165× is unnamed, and up to covers everything beneath it."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-09-04T02:23:12Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-09-04/cover-light.webp",
+  "dark": "/images/brief/issues/2026-09-04/cover-dark.webp",
+  "alt": "Two identical machine cores on a workbench. The left one is wrapped in pipes and a feedback loop with a gauge reading near full. The right one is bare with a single pipe and a gauge reading past halfway."
+ }
+}
