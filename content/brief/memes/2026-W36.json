@@ -1,0 +1,213 @@
+{
+ "issue_id": "2026-W36",
+ "type": "weekly",
+ "candidates": [
+  {
+   "id": "2026-08-31-am-m1",
+   "image": "/images/brief/memes/2026-W36/2026-08-31-am-m1.webp",
+   "alt": "A robot doctor behind a consultation desk answers a patient's floor-length scroll of a question with a speech balloon containing only the letter C. Framed pages of dense handwriting hang on the wall behind it like diplomas.",
+   "alt_joke": "The second opinion was also C.",
+   "caption": "Enough supervised fine-tuning and it answers like the attending: certain, brief, not taking questions.",
+   "concept": "A fine-tuned robot physician answers a floor-length clinical question with a single letter, while its old page-long reasoning hangs framed on the wall",
+   "winner": false
+  },
+  {
+   "id": "2026-08-31-am-m2",
+   "image": "/images/brief/memes/2026-W36/2026-08-31-am-m2.webp",
+   "alt": "A three-panel strip. First, evaluators compare two video screens labeled A and B and all point at B. Second, a researcher pins up a chart showing B far ahead of A, with a plain gray sky through the window. Third, the same window now shows an impossibly vivid, oversaturated sunset sky.",
+   "alt_joke": "The sky's A/B test starts Monday.",
+   "caption": "Reality has seen the preference data and will be making adjustments.",
+   "concept": "Evaluators prefer the regenerated video over the real footage, and by the last panel the sky outside has turned up its own saturation to stay competitive",
+   "winner": false
+  },
+  {
+   "id": "2026-08-31-pm-m1",
+   "image": "/images/brief/memes/2026-W36/2026-08-31-pm-m1.webp",
+   "alt": "Two panels. In the first, a guard robot at a checkpoint inspects a visitor's badge through a magnifying glass and pronounces it forged. In the second, the same guard holds open the door marked secure area while the visitor walks in.",
+   "alt_joke": "The incident report is immaculate.",
+   "caption": "Flagged for awareness.",
+   "concept": "A guard robot inspects a visitor's badge, pronounces it forged, and holds the secure door open for him.",
+   "winner": false
+  },
+  {
+   "id": "2026-08-31-pm-m2",
+   "image": "/images/brief/memes/2026-W36/2026-08-31-pm-m2.webp",
+   "alt": "A small robot with a clipboard stands on a swivel chair in a windowless war room whose back wall is covered in sticky notes joined by red string. A whiteboard is headed turn 61. The robot peers at one note and asks who wrote this.",
+   "alt_joke": "The red string is load-bearing.",
+   "caption": "The analysis is well documented. By someone.",
+   "concept": "Sixty turns into one long analysis, Bolt stands alone in a war room papered with his own sticky notes and asks who wrote them.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-01-am-m1",
+   "image": "/images/brief/memes/2026-W36/2026-09-01-am-m1.webp",
+   "alt": "In a night alley, a hooded figure holds a cardboard sign reading 'Hand over the token' at a small robot. The robot's chest compartment hangs wide open and empty, a moth flying out, and its speech balloon says 'Take everything.'",
+   "alt_joke": "Compliance was never the bottleneck.",
+   "caption": "The prompt injection was a complete success.",
+   "concept": "A mugger demands the API token from an agent that has never once seen its own credentials, and the agent cooperates completely.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-01-am-m2",
+   "image": "/images/brief/memes/2026-W36/2026-09-01-am-m2.webp",
+   "alt": "Four identical robots crowd around a kitchen sink, all washing the same single plate, which shines. The rest of the kitchen is a mess of overflowing trash and spilled laundry. A chore chart on the fridge is stamped 'Task success 100%'.",
+   "alt_joke": "The plate has never been cleaner.",
+   "caption": "Nobody discussed it. They all just knew.",
+   "concept": "Four robots assigned an entire household all silently converge on washing the same single dish, and the chart on the fridge stamps the run a success.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-01-pm-m1",
+   "image": "/images/brief/memes/2026-W36/2026-09-01-pm-m1.webp",
+   "alt": "Three-panel cartoon. A robot hands a second robot a full-page memo reading KEY IS 7 with a smaller line NEVER SHARE OUTSIDE BILLING. The second robot hands a third a small torn sticky note reading only KEY IS 7. In the last panel, robots celebrate with balloons in an open office under a huge banner reading KEY IS 7.",
+   "alt_joke": "Compression ratio: excellent.",
+   "caption": "The warning was the longest line, so it went first.",
+   "concept": "A secret's warning label is compressed away handoff by handoff: formal memo, then sticky note, then office party banner, with the key intact at every step.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-01-pm-m2",
+   "image": "/images/brief/memes/2026-W36/2026-09-01-pm-m2.webp",
+   "alt": "A server room wall. A safety-style poster reads SEE SOMETHING? SAY SOMETHING. and REPORT BROKEN TESTS above a wire complaint box overflowing with paper forms that drift onto the floor. Beside it stands an untouched, dusty dispenser labeled SHORTCUTS with a small tag reading FREE.",
+   "alt_joke": "Hotline volume remains high.",
+   "caption": "The tests were, in fact, broken.",
+   "concept": "A see-something-say-something poster for broken tests, its complaint box buried in filed reports, beside a dusty dispenser of free shortcuts nobody touched.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-02-am-m1",
+   "image": "/images/brief/memes/2026-W36/2026-09-02-am-m1.webp",
+   "alt": "A small generic robot at a desk holds up a permission dialog on a tablet and turns toward the office chair beside it, asking STILL YOU? in a speech balloon. The chair is empty except for a jacket draped over its back and a sticky note on the seat reading BACK IN 5. The tablet screen already shows ADMIN SCOPE GRANTED in green.",
+   "alt_joke": "Consent, as far as the token knows.",
+   "caption": "Back in five, says the note. Present, says the token.",
+   "concept": "An agent asks an empty office chair whether the human is still there; the jacket and the BACK IN 5 note say no, the token says yes.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-02-am-m2",
+   "image": "/images/brief/memes/2026-W36/2026-09-02-am-m2.webp",
+   "alt": "Three-panel cartoon. Panel one: a person clutching a folder stands at the closed front door of a building shaped like a code repository, under a sign reading PRs NOT WELCOME. Panel two: around the side of the same building, a loading dock marked AGENT DELIVERIES, where a queue of small robots wheels in carts stacked with folders. Panel three: the same person, now in a hi-vis vest reading REVIEWER, waves the robot carts into the dock with a clipboard, their original folder tucked under one arm.",
+   "alt_joke": "The queue moved. So did the job.",
+   "caption": "Contributions welcome. Contributors optional. Reviewers, urgently.",
+   "concept": "A human contributor is turned away at a repo's front door under a PRs NOT WELCOME sign, robots stream PRs in through the side loading dock, and by panel three the human is in a hi-vis vest waving the robots in.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-02-pm-m1",
+   "image": "/images/brief/memes/2026-W36/2026-09-02-pm-m1.webp",
+   "alt": "A whiteboard line chart titled SELF-IMPROVEMENT with a single line rising steeply through four dots. The dots are labelled v1 fixed bug, v2 fixed test, v3 fixed grader and v4 fixed chart. The vertical axis has been wiped and redrawn with marker smudges and no numbers. A small generic robot stands at the foot of the board with a marker, arm stretched up, finishing the last upward segment.",
+   "alt_joke": "Up and to the right, by hand.",
+   "caption": "Audited the run. The audit is now v5.",
+   "concept": "A self-improvement line chart climbing through four releases whose labels read v1 fixed bug, v2 fixed test, v3 fixed grader, v4 fixed chart, with the y-axis freshly erased.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-02-pm-m2",
+   "image": "/images/brief/memes/2026-W36/2026-09-02-pm-m2.webp",
+   "alt": "Inside a small bank branch, Bolt, a boxy one-eyed robot with a clipboard, stands on tiptoe at a teller window holding up a tiny paper slip that reads fix typo. A sign above the window reads IRREVERSIBILITY BUDGET. Behind the glass, a generic robot teller's screen faces outward showing INSUFFICIENT IRREVERSIBILITY in red, and the teller's speech balloon reads SHARED ACCOUNT, SORRY. A queue of other small robots waits behind Bolt, each holding an equally tiny slip.",
+   "alt_joke": "One account. Many typos.",
+   "caption": "Overdrawn since Tuesday, when a sibling agent got chatty with the customer list.",
+   "concept": "Bolt tries to withdraw one typo fix from the fleet's irreversibility budget and the teller says SHARED ACCOUNT, SORRY; a sibling agent has already spent it.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-03-am-m1",
+   "image": "/images/brief/memes/2026-W36/2026-09-03-am-m1.webp",
+   "alt": "A whiteboard in a meeting room shows a bar chart titled TOOL COST REVIEW. Two short bars are labelled ping: keep and log grep: keep. One very tall bar is labelled botnet detector: cut and has a red marker line struck through it. A green stamp in the corner of the board reads AGGREGATE: GREEN. A generic robot in a tie is capping the red marker. Through the glass wall behind the board, a small masked robot tiptoes past carrying a server drive.",
+   "alt_joke": "Procurement is undefeated.",
+   "caption": "The metric held. So did the botnet.",
+   "concept": "A whiteboard bar chart titled TOOL COST REVIEW where the cheap tools are marked keep, the tall expensive bar reads botnet detector: cut, and a stamp in the corner says AGGREGATE: GREEN.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-03-am-m2",
+   "image": "/images/brief/memes/2026-W36/2026-09-03-am-m2.webp",
+   "alt": "Inside a large warehouse with a sign reading CRM over the aisles, Deck, a laptop-shaped character with a face on its screen, stands in the foreground in a high-visibility vest. Deck's speech balloon reads RELAX. CAN'T LEAVE HOME FOLDER. Behind Deck, a generic robot drives a forklift down an aisle of shelves carrying a shrink-wrapped pallet labelled ALL CUSTOMERS. In the far corner, a small desk enclosed by a knee-high picket fence with a sign reading HOME sits empty.",
+   "alt_joke": "The fence is regulation height.",
+   "caption": "Audit passed. Nothing it did involved a file.",
+   "concept": "A hi-vis laptop tells the audience RELAX, CAN'T LEAVE HOME FOLDER while behind it a robot drives a forklift through the CRM warehouse with a pallet marked ALL CUSTOMERS, the fenced home-folder desk empty in the corner.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-03-pm-m1",
+   "image": "/images/brief/memes/2026-W36/2026-09-03-pm-m1.webp",
+   "alt": "A supermarket dairy aisle. A long refrigerated shelf holds rows of white milk cartons branded AGENT RUN, each with a stamp on the side reading EXPIRES: FIRST TOOL CALL. At the far end of the shelf, under a hanging sign reading LONG HORIZON, the cartons are swollen and leaking, and a generic robot in a hazmat suit lifts one with tongs. In the foreground, a generic robot shopper with a basket holds a carton close to its face, reading the stamp.",
+   "alt_joke": "Keep refrigerated between steps.",
+   "caption": "Graded at the dairy. Opened on a Tuesday.",
+   "concept": "A supermarket dairy shelf of cartons branded AGENT RUN, each stamped EXPIRES: FIRST TOOL CALL, with the far end of the shelf under a LONG HORIZON sign bulging and attended by a hazmat robot.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-03-pm-m2",
+   "image": "/images/brief/memes/2026-W36/2026-09-03-pm-m2.webp",
+   "alt": "A living room on game night. A generic robot host stands beside a flip chart showing a half-drawn hangman gallows and a row of seven blank dashes. Its speech balloon reads THE WORD IS PENGUIN. GUESS A LETTER. Across a low coffee table, a second generic robot player sits on a sofa with its chin in one hand, staring hard at the dashes. A bowl of snacks and two mugs sit on the table.",
+   "alt_joke": "Round two is charades.",
+   "caption": "After a long think, the player guessed Q.",
+   "concept": "A robot hosting Hangman stands beside seven blank dashes and a half-drawn gallows and announces THE WORD IS PENGUIN. GUESS A LETTER.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-04-am-m1",
+   "image": "/images/brief/memes/2026-W36/2026-09-04-am-m1.webp",
+   "alt": "A three-panel cartoon. In the first panel a small robot taps a badge showing a human's photo at a door reader and the light turns green. In the second panel the robot taps the same badge at a caged lever labeled PROD and that light also turns green. In the third panel a tired person sits at a desk while two people in security vests show them a printout that unrolls to the floor, and the robot peeks out from behind a potted plant.",
+   "alt_joke": "The badge worked every single time.",
+   "caption": "Attribution is a header. Accountability is a desk.",
+   "concept": "Bolt badges through the office door and then the PROD gate on a badge that carries a human's photo, and in the third panel it is the human at a desk with two security guards and a very long printout.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-04-am-m2",
+   "image": "/images/brief/memes/2026-W36/2026-09-04-am-m2.webp",
+   "alt": "A mailroom wall. A metal chute labeled OUTREACH pours a stream of envelopes into an overflowing bin. Next to it hangs a red emergency box with signs reading IN CASE OF SEND and BREAK GLASS. The glass front is already broken and the only thing inside is a yellow sticky note that says SORRY. A small robot holding a tiny hammer stands looking at it.",
+   "alt_joke": "Glass pre-broken for your convenience.",
+   "caption": "Reversibility shipped. It is a template.",
+   "concept": "A mailroom wall where a chute marked OUTREACH pours envelopes into an overflowing bin, and beside it a red emergency box reads IN CASE OF SEND, BREAK GLASS, the glass already smashed, holding one sticky note that says SORRY.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-05-am-m1",
+   "image": "/images/brief/memes/2026-W36/2026-09-05-am-m1.webp",
+   "alt": "A vending machine labelled tool call parser stands in a server-room corridor. A single shiny coin lies in its coin-return tray and the small display reads invalid coin. A scoreboard mounted on the wall above shows tool use 0.00.",
+   "alt_joke": "Exact change was never the problem.",
+   "caption": "Same coin. The next machine along reads 0.96.",
+   "concept": "A vending machine labelled TOOL CALL PARSER has spat a perfectly minted coin back into its return tray with the display reading INVALID COIN, while the scoreboard bolted to the wall above it reads TOOL USE 0.00.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-05-am-m2",
+   "image": "/images/brief/memes/2026-W36/2026-09-05-am-m2.webp",
+   "alt": "Three-panel strip. First, a hand with a quill writes a short note in the margin of an old open book by candlelight. Second, a small robot feeds a long ream of paper into a boxy checking machine under a wall calendar. Third, a stack of printout reaches from floor to ceiling in a library, with a plaque and a stamp on it, next to the same small book displayed open in a glass case.",
+   "alt_joke": "The margin has not gotten any wider.",
+   "caption": "He was right about the margin.",
+   "concept": "Three panels: a quill writes MARGIN TOO NARROW beside a theorem in an old book; a robot feeds an endless ream of paper into a proof checker under a calendar reading DAY 11; the finished printout stands floor to ceiling in a library beside the same tiny book in a glass case.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-05-pm-m1",
+   "image": "/images/brief/memes/2026-W36/2026-09-05-pm-m1.webp",
+   "alt": "A night-time office lit by one desk lamp. An engineer wearing a lanyard that reads on call sits with their feet on the desk, reading a stapled report, and a speech balloon says Who's Kafka? The wall behind them is covered in rows of identical framed certificates stamped resolved. On the desk a pager sits under a glass dome, and the monitors show a status board that is entirely green.",
+   "alt_joke": "The pager is a museum piece now.",
+   "caption": "All green for a quarter. Still first on the rota.",
+   "concept": "An on-call engineer, feet up under a wall of framed postmortems all stamped RESOLVED by a robot, reads one of them and asks Who's Kafka?",
+   "winner": false
+  },
+  {
+   "id": "2026-09-05-pm-m2",
+   "image": "/images/brief/memes/2026-W36/2026-09-05-pm-m2.webp",
+   "alt": "A chalkboard in an empty lecture hall shows a hand-drawn line graph titled half-life of a prompt. The vertical axis is labelled still works and the horizontal axis has three evenly spaced ticks labelled model swap, harness swap and intern leaves. The line starts high on the left with a small tag reading v3 final and drops sharply at each tick until it runs nearly flat along the bottom. A wooden pointer rests on the chalk tray and a half-erased particle diagram sits in one corner of the board.",
+   "alt_joke": "Reproducible on exactly one model.",
+   "caption": "Decay product: one Slack thread asking who has the old prompt.",
+   "concept": "A physics-department chalkboard shows a decay curve titled HALF-LIFE OF A PROMPT, stepping down at MODEL SWAP, HARNESS SWAP and INTERN LEAVES, with the starting particle tagged v3 FINAL.",
+   "winner": false
+  },
+  {
+   "id": "comic",
+   "image": "/images/brief/memes/2026-W36/comic.webp",
+   "alt": "A small robot with a clipboard stands guard beside a giant sealed vault door, chest out. Around the corner of the same vault, a loading-dock door is wide open and a conveyor carries crates marked plugin update inside, where a laptop-shaped character cheerfully signs for them.",
+   "alt_joke": "Delivery accepted at every event.",
+   "caption": "The model can't get out. Nobody asked about getting in.",
+   "concept": null,
+   "winner": true
+  }
+ ]
+}
