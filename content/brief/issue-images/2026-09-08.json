@@ -1,0 +1,170 @@
+{
+ "issue_id": "2026-09-08",
+ "type": "daily",
+ "renders": 7,
+ "cost_usd": 1.75,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "Two identical text strips enter a box; one is partly taken from a shelf of stored slices, the other read fresh. Their exit paths fork and wind through a grid of small tool icons to different endpoints.",
+   "bytes": [
+    52778,
+    50174
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two identical paper strips of text enter a box from the left, one above the other. Inside the box the upper strip's first half is pulled from a shelf of stored slices while the lower strip is read fresh from start to end. On the right the two strips exit and their paths fork apart, winding through a small grid of tool icons along different routes and ending at different points. The box sits in the centre with generous margin on all sides.",
+   "labels": [
+    "CACHE ON",
+    "CACHE OFF"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-08T00:13:02Z"
+  },
+  {
+   "key": "2e566356ef7b9225",
+   "story_id": "2e566356ef7b9225",
+   "light_name": "2e566356ef7b9225-light.webp",
+   "dark_name": "2e566356ef7b9225-dark.webp",
+   "alt": "Five identical small robots each standing in a differently shaped doorway, with a bar of a different height above each doorway.",
+   "bytes": [
+    36310,
+    34020
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "One small identical robot figure drawn five times in a row across the middle of the frame, each standing inside a differently shaped doorway: an arch, a square frame, a narrow slot, a wide gate, a plain opening. Above each doorway a vertical bar of a different height, from very short to tall. The robots are identical; only the doorways and bars differ. Centred with margin on all sides.",
+   "labels": [
+    "SAME POLICY"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-08T00:15:42Z"
+  },
+  {
+   "key": "9fe24041125bc13e",
+   "story_id": "9fe24041125bc13e",
+   "light_name": "9fe24041125bc13e-light.webp",
+   "dark_name": "9fe24041125bc13e-dark.webp",
+   "alt": "A math worksheet between two reviewers: a mirror-image figure with a big stamp and a tall reject pile on the left, a different figure with a pen and a short pile on the right.",
+   "bytes": [
+    45692,
+    44476
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "In the centre a worked sheet of handwritten math on a desk. Two reviewers lean in from either side. On the left, a figure that is a mirror image of the writer's own silhouette holds a large stamp beside a tall pile of rejected sheets. On the right, a differently shaped figure holds a small pen beside a short pile, with one neat correction mark on the sheet. Keep both figures well inside the frame.",
+   "labels": [
+    "SELF",
+    "CROSS-FAMILY"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-08T00:16:55Z"
+  },
+  {
+   "key": "ff3e0cb4b90bfb5c",
+   "story_id": "ff3e0cb4b90bfb5c",
+   "light_name": "ff3e0cb4b90bfb5c-light.webp",
+   "dark_name": "ff3e0cb4b90bfb5c-dark.webp",
+   "alt": "Two phone screens side by side, the left crowded with boxes, the right sparse, with a column of check marks and crosses between them and a small rule card below.",
+   "bytes": [
+    35928,
+    33986
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two versions of the same phone screen side by side in the centre: the left one crowded with many small boxes and buttons, the right one with three well spaced elements and open space. Between them a thin vertical strip of small check marks and crosses, like a diff column. Below the pair, a single small card with a short list of ticked rules. Everything sits within the middle two thirds of the frame.",
+   "labels": [
+    "GENERATED",
+    "REWORKED"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-08T00:17:53Z"
+  },
+  {
+   "key": "21be461d63b6252d",
+   "story_id": "21be461d63b6252d",
+   "light_name": "21be461d63b6252d-light.webp",
+   "dark_name": "21be461d63b6252d-dark.webp",
+   "alt": "A looping conveyor with two robots passing a box and a stopwatch above it, and beneath it a single large button with a short arrow to the same box.",
+   "bytes": [
+    39042,
+    36834
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A long winding conveyor track loops across the middle of the frame, with two small robot figures at separate stations handing a small box from one to the other, and a stopwatch hanging above the track. Directly beneath the track, one large round push button on a plain panel, with a short straight arrow from the button to the same box at the end of the track. Keep all elements away from the edges.",
+   "labels": [
+    "6 MIN",
+    "SECONDS"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-08T00:19:16Z"
+  },
+  {
+   "key": "9492f3a8d8cee693",
+   "story_id": "9492f3a8d8cee693",
+   "light_name": "9492f3a8d8cee693-light.webp",
+   "dark_name": "9492f3a8d8cee693-dark.webp",
+   "alt": "A very tall stack of paper next to a single small index card with three numbered lines, the third circled, and reading glasses resting on the card.",
+   "bytes": [
+    90702,
+    85550
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A tall stack of printed pages, taller than the desk it sits on, occupies the left-centre of the frame. Beside it on the right, a single small index card with three numbered lines, the third line circled. A pair of reading glasses rests on the card, not on the stack. Composition centred with generous margins.",
+   "labels": [
+    "CHANGED",
+    "NOT DONE",
+    "DECIDE"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-08T00:20:22Z"
+  }
+ ]
+}

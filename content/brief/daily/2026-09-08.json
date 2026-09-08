@@ -1,0 +1,525 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-09-08",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-09-08T00:25:00Z",
+ "source_editions": [
+  "2026-09-06-am",
+  "2026-09-06-pm",
+  "2026-09-07-am",
+  "2026-09-07-pm",
+  "2026-09-08-am"
+ ],
+ "subject": "Prefix cache divergence, cross-family reviewers, Tessl skills",
+ "preheader": "Plus: a harness that moves solve rates 4x, and 883 commits to nowhere. 6 min.",
+ "title": "Prefix caching changes agent runs, and cross-family reviewers beat self-review",
+ "read_minutes": 6,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "ee3cd5f7905dece7",
+   "title": "Same Request, Different Answer: Quantization Amplifies Cache-Induced Divergence in LLM Serving",
+   "url": "https://arxiv.org/abs/2609.04748",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "quantization-prefix-cache-divergence",
+   "published_at": "2026-09-04T05:27:34Z",
+   "read_annotation": "paper",
+   "summary": "An eighty-episode agentic tool-use workload measures how prefix caching changes trajectories under fixed seeds, across two engines and four weight formats.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers found that reusing earlier calculations changed the steps an artificial intelligence (AI) assistant took.",
+    "When requests start with the same instructions, the software can reuse earlier calculations instead of repeating them.",
+    "Differences became more common when the assistant stored its internal numbers with less detail.",
+    "For people repeating these tests, turning off reuse produced identical results each time within every tested setup."
+   ]
+  },
+  "what": "A new arXiv paper measures what prefix caching costs in reproducibility and finds the cost climbs with quantization. With model, seed, decoding, and request order fixed, enabling the cache changed an agent's trajectory on 36.2 percent of episodes at 16-bit precision and 75.0 percent at four-bit.",
+  "details": "The workload was eighty multi-turn tool-use episodes, issued serially at batch size one, across two engines and four weight formats. With caching disabled, repeated runs were bit-identical, 0 of 800 episodes diverging. One server-level prompt-cache setting moved run-to-run divergence by 37.5 percentage points.",
+  "yes_but": "A changed trajectory isn't necessarily a worse one. The abstract reports task outcomes changing without a shift in aggregate accuracy, so nothing here says cached runs solve fewer tasks. The two engines and four formats aren't named in the abstract either.",
+  "yes_but_waived": null,
+  "why": "If you compare two harness configs on a quantized local model with caching at its default, the difference you measure may be the cache. Disable it for repeatable evals, or pin the cache configuration and reset its state between runs."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "2e566356ef7b9225",
+     "title": "What Does Multi-Harness RL Learn? Credit Assignment and Portability in Coding Agents",
+     "url": "https://arxiv.org/abs/2609.04518",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "multi-harness-rl-credit-portability",
+     "published_at": "2026-09-03T22:17:02Z",
+     "read_annotation": "arXiv, 25 pp",
+     "summary": "The authors replay frozen task-harness records from Aider, OpenHands, Qwen Code, and SWE-agent from one Qwen3-8B warm start and score each checkpoint on a sealed SWE-bench Verified oracle. Across 24,000 evaluations the evaluation harness moved mean solve rate from 2.14% to 9.27%, a factor of 4.3, while pooling rewards across harnesses moved the held-out result by 0.25 points with an interval spanning zero.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "An artificial intelligence (AI) coding assistant showed no clear benefit from mixing training feedback when tested in an unfamiliar software setup.",
+      "Each setup is software that runs the assistant while it works on coding tasks.",
+      "The researchers compared training that combined success scores across setups with training that kept scores separate for each setup.",
+      "For developers, changing the software running the assistant affected success much more than mixing feedback in these tests."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-08/2e566356ef7b9225-light.webp",
+      "dark": "/images/brief/issues/2026-09-08/2e566356ef7b9225-dark.webp",
+      "alt": "Five identical small robots each standing in a differently shaped doorway, with a bar of a different height above each doorway."
+     }
+    },
+    {
+     "story_id": "6d68ef8b0711ce36",
+     "title": "At Equal Inference Cost, Multi-Agent Structure Does Not Beat a Single Frozen Agent",
+     "url": "https://arxiv.org/abs/2609.04217",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "ma-evolve-equal-cost-agent-teams",
+     "published_at": "2026-09-07T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "With the total number of model calls fixed, an evolved planner-executor-critic team scored 0.769 on ALFWorld against 0.754 for an evolved single executor, p = 0.80, while using 1.8 times more evaluation calls. Leave-one-in analysis traces the realized gain entirely to the executor.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that a team of artificial intelligence (AI) assistants did not clearly outperform a single assistant in their tests.",
+      "The team split work into planning, taking actions, and checking results.",
+      "The researchers allowed each approach the same total number of requests for AI answers.",
+      "For system builders, all measured gains came from improving the assistant taking actions."
+     ]
+    },
+    {
+     "story_id": "9fe24041125bc13e",
+     "title": "Reviewer Capability Governs Rejection Targeting, Not Repair Skill: Evidence from LLM Execute-Review-Revise Pipelines",
+     "url": "https://arxiv.org/abs/2609.04270",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "reviewer-capability-rejection-targeting",
+     "published_at": "2026-09-02T19:21:49Z",
+     "read_annotation": "paper",
+     "summary": "Across 100 olympiad math problems, a cross-family mid-tier reviewer lifted final accuracy from 52 to 64 percent with zero damaged answers. Same-model self-review caught more errors, 0.85 recall, yet produced no significant gain, rejecting 2.1 times as often and falsely rejecting 35 percent of its own correct answers.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "In a math study, an artificial intelligence (AI) system answered more accurately when a different AI checked its work.",
+      "The answering system tried to fix answers that the reviewer rejected.",
+      "When the answering AI checked its own work, it caught more mistakes but wrongly rejected many correct answers.",
+      "For teams using AI reviewers, catching more errors did not guarantee more correct final answers."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-08/9fe24041125bc13e-light.webp",
+      "dark": "/images/brief/issues/2026-09-08/9fe24041125bc13e-dark.webp",
+      "alt": "A math worksheet between two reviewers: a mirror-image figure with a big stamp and a tall reject pile on the left, a different figure with a pen and a short pile on the right."
+     }
+    },
+    {
+     "story_id": "1b525b802e0c97ef",
+     "title": "Evaluating Indirect Prompt Injection Defenses in Tool-Using LLM Agents: Security, Utility, and Replication",
+     "url": "https://www.semanticscholar.org/paper/857a1c7d30ff72cce69c0067e8c4daa739bf41f3",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "agentdojo-injection-defense-replication",
+     "published_at": "2026-08-31T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Four defenses and an undefended control ran on the AgentDojo banking benchmark across GPT-5.4, GPT-5.4-mini, and Claude Sonnet 4.6, with two independent replications (Tool Filter was tested only on the OpenAI models). On GPT-5.4-mini two defenses were associated with lower attack rates and lower benign utility, and none of the four paired comparisons survived Holm correction.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers tested ways to protect artificial intelligence (AI) assistants from malicious instructions hidden in material they read.",
+      "The attacks try to make an assistant follow instructions in outside content instead of its assigned task.",
+      "For one tested system, some protections were linked to fewer successful attacks but worse performance on ordinary tasks.",
+      "For people choosing protections, the apparent security improvements remained uncertain after researchers adjusted their calculations for testing several options."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "ff3e0cb4b90bfb5c",
+     "title": "What your design system can't teach AI agents",
+     "url": "https://tessl.io/blog/what-your-design-system-cant-teach-ai-agents",
+     "source_name": "Tessl",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "tessl-design-judgment-agent-skills",
+     "published_at": "2026-09-02T12:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Tessl's factory ships screens no designer touched, and a design system couldn't teach its agents composition, meaning what goes on a screen and what stays off. So it had agents diff generated screens against hand-redesigned ones, turned the differences into checkable rules, and shipped them as skills that run at creation and at review.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Tessl taught artificial intelligence (AI) to lay out software screens using a designer's corrections.",
+      "The AI compared screens it had created with versions rearranged by a designer.",
+      "Those differences became rules for what belongs on a screen and what should be left out.",
+      "Tessl's team can apply a designer's judgment to every screen without requiring that designer to review each one."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-08/ff3e0cb4b90bfb5c-light.webp",
+      "dark": "/images/brief/issues/2026-09-08/ff3e0cb4b90bfb5c-dark.webp",
+      "alt": "Two phone screens side by side, the left crowded with boxes, the right sparse, with a column of check marks and crosses between them and a small rule card below."
+     }
+    },
+    {
+     "story_id": "21be461d63b6252d",
+     "title": "Figma agent vs. one button: shipping design tokens to npm",
+     "url": "https://blog.gitbutler.com/design-tokens-ai-agent-vs-button",
+     "source_name": "GitButler",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "figma-design-token-agents-vs-button",
+     "published_at": "2026-09-07T10:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "GitButler wired two agents together to release Figma design tokens to npm, and each run took six minutes. A button the plugin has had for years does the same job in seconds.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A developer found that an existing button published shared design settings faster than a new artificial intelligence setup.",
+      "The new setup connected two automated assistants to carry out the publishing task.",
+      "For the developer, using the button meant waiting seconds instead of six minutes to finish the same job."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-08/21be461d63b6252d-light.webp",
+      "dark": "/images/brief/issues/2026-09-08/21be461d63b6252d-dark.webp",
+      "alt": "A looping conveyor with two robots passing a box and a stopwatch above it, and beneath it a single large button with a short arrow to the same box."
+     }
+    },
+    {
+     "story_id": "9492f3a8d8cee693",
+     "title": "I read 40k words of AI output a day. Here's how to stop reading most of it.",
+     "url": "https://www.reddit.com/r/AI_Agents/comments/1w7w1jt/i_read_40k_words_of_ai_output_a_day_heres_how_to",
+     "source_name": "r/AI_Agents",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "coding-agent-concise-completion-reports",
+     "published_at": "2026-09-05T09:29:48Z",
+     "read_annotation": "Reddit thread",
+     "summary": "One developer counted roughly 40k words of agent output a day and cut about a third with a CLAUDE.md or AGENTS.md block: changed files one line each, what you did not do and why, what I need to decide, max 150 words, no recaps. The author says the decisions line is the only part they read.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A developer says instructions for shorter reports reduced the text from their artificial intelligence tools by about a third.",
+      "The instructions limit most reports to 150 words, without introductions or recaps.",
+      "Each report lists changed files, unfinished work with reasons, and decisions the developer needs to make.",
+      "The developer uses the decisions section to find what needs their attention."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-08/9492f3a8d8cee693-light.webp",
+      "dark": "/images/brief/issues/2026-09-08/9492f3a8d8cee693-dark.webp",
+      "alt": "A very tall stack of paper next to a single small index card with three numbered lines, the third circled, and reading glasses resting on the card."
+     }
+    }
+   ]
+  },
+  {
+   "key": "community",
+   "items": [
+    {
+     "story_id": "8985263bef976d81",
+     "title": "I spent 883 commits and 8 months building an LLM agent harness, overengineered it, and abandoned it - lol.",
+     "url": "https://www.reddit.com/r/AI_Agents/comments/1w8h85a/i_spent_883_commits_and_8_months_building_an_llm",
+     "source_name": "r/AI_Agents",
+     "kind": "community",
+     "section": "community",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "overengineered-agent-harness-postmortem",
+     "published_at": "2026-09-06T00:28:06Z",
+     "read_annotation": "Reddit thread",
+     "summary": "Eight months and 883 commits into a harness that was meant to own planning, state, permissions, context, and verification so the model could be a replaceable worker, the author kept adding code graphs, RAG, crash recovery, model routing, and dashboards until more time went into adding systems than using them. Other harnesses got usable, this one got killed, and the author isn't recommending you download it.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A developer gave up on a tool for managing artificial intelligence coding work after eight months.",
+      "The surrounding software was meant to plan the work and check the coding assistant's results.",
+      "The developer kept adding features until building the tool took more effort than using it for actual work.",
+      "The author says other developers should not download it expecting a finished coding tool."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2096271545589190927",
+   "title": "Meta's AIRA₃ autonomous research system wins Kaggle gold fine-tuning a 30B Nemotron model",
+   "url": "https://x.com/AIatMeta/status/2096271545589190927",
+   "source_name": "@AIatMeta",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "x-2096271545589190927",
+   "published_at": "2026-09-05T16:17:37.000Z",
+   "read_annotation": "X post",
+   "summary": "Meta says AIRA₃ placed 8th of about 4,000 teams in a live NVIDIA-run Kaggle competition to fine-tune a 30B Nemotron model, a gold medal graded on a private test set. The gold entry was an ensemble of GPT 5.5 with OpenCode and Claude 4.8 with Claude Code, run as many long-running agents coordinating through a shared forum and filesystem.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Meta says its automated research system won gold in a competition to improve artificial intelligence reasoning.",
+    "Its coding assistants worked separately, sharing ideas and results through a discussion board and common files.",
+    "Competitors received the same information, and their entries were scored using test material kept hidden from them.",
+    "Meta sees this as a sign that its system can improve artificial intelligence reasoning about as well as human experts."
+   ]
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "11c7904c47ef575e",
+   "title": "$τ^τ$-Bench: An Environment for End-To-End, Realistic Agent Construction",
+   "url": "https://arxiv.org/abs/2609.04611",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "hyper-tau-bench-agent-construction",
+   "published_at": "2026-09-04T01:23:47Z",
+   "read_annotation": "paper",
+   "summary": "Building the customer-service agent is the benchmark task",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "9ab1064bd98657d1",
+   "title": "KVMem: Virtualizing Million-Token Agent Workspaces on a Consumer GPU",
+   "url": "https://arxiv.org/abs/2609.04852",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "kvmem-agent-workspaces",
+   "published_at": "2026-09-07T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Paged KV state across GPU, host, and NVMe for agent history",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "c90bb3e7ff3e0910",
+   "title": "Does Your Agent's Memory Survive a Model Upgrade? A Controlled Study of Memory Portability",
+   "url": "https://arxiv.org/abs/2609.05339",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "agent-memory-portability",
+   "published_at": "2026-09-04T16:44:17Z",
+   "read_annotation": "paper",
+   "summary": "Which agent memory formats survive a model swap",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "d6ba223c1dd69b95",
+   "title": "Conformity Breaks Conformal Prediction",
+   "url": "https://arxiv.org/abs/2609.04445",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "conformity-breaks-conformal-prediction",
+   "published_at": "2026-09-03T20:05:47Z",
+   "read_annotation": "paper",
+   "summary": "Unanimous wrong peers break conformal coverage guarantees",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "01b847bc2d8ce162",
+   "title": "Harbor Adapters and Harbor-Index: Infrastructure and a Curated Meta-Dataset for Large-Scale Agentic Evaluation",
+   "url": "https://arxiv.org/abs/2609.04298",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "harbor-adapters-index",
+   "published_at": "2026-09-03T16:26:20Z",
+   "read_annotation": "paper",
+   "summary": "More than 80 agent benchmarks behind one adapter layer",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "39f5d05eadcc3ead",
+   "title": "Repeat-After-Me: Black-Box Adaptive Visual Prompt Injection",
+   "url": "https://arxiv.org/abs/2609.04533",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "repeat-after-me-visual-injection",
+   "published_at": "2026-09-03T22:44:45Z",
+   "read_annotation": "paper",
+   "summary": "Black-box visual prompt injection that reaches tool calls",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "b888e210db1f0868",
+   "title": "The Folder Is the Agent",
+   "url": "https://every.to/source-code/the-folder-is-the-agent",
+   "source_name": "Every (Source Code)",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "folder-as-agent",
+   "published_at": null,
+   "read_annotation": "blog post",
+   "summary": "44 agents as models pointed at folders; swarms added review burden",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "68791d26aaf4f082",
+   "title": "NInfer vs llama.cpp vs vLLM: quality + speed comparison for Qwen3.8-27B NVFP4 on RTX 5090",
+   "url": "https://www.reddit.com/r/LocalLLaMA/comments/1w821fg/ninfer_vs_llamacpp_vs_vllm_quality_speed",
+   "source_name": "r/LocalLLaMA",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "qwen38-27b-inference-engine-comparison",
+   "published_at": "2026-09-05T14:20:25Z",
+   "read_annotation": "Reddit thread",
+   "summary": "Three engines serving one Qwen3.8-27B on one RTX 5090",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "e2964291380af579",
+   "title": "Qwen3.8 Flash Next - Templates Comparison",
+   "url": "https://www.reddit.com/r/LocalLLaMA/comments/1w84mod/qwen38_flash_next_templates_comparison",
+   "source_name": "r/LocalLLaMA",
+   "kind": "community",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "qwen38-flash-next-template-swebench",
+   "published_at": "2026-09-05T16:02:24Z",
+   "read_annotation": "Reddit thread",
+   "summary": "Three chat templates, one model, three SWE-bench Verified rates",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "21be461d63b6252d",
+   "text": "Three firsthand accounts agree: the orchestration cost more than the work it wrapped. Six minutes against a button here, [the 883-commit postmortem](/newsletter/story/8985263bef976d81) below, and [Every's swarm](/newsletter/story/b888e210db1f0868) handing back ten results nobody had context to judge. My read: the harness worth keeping is the one you can remove a layer from unnoticed."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-09-08/2026-09-07-pm-m1.webp",
+  "alt": "A boxy robot with a suitcase sits on a diner stool holding an open menu and says I'll have the. Behind the counter a cook with a monitor for a head slides over a finished plate and asks the usual. A shelf of identical plated meals sits behind the cook.",
+  "alt_joke": "The kitchen only reads the first line.",
+  "caption": "Someone with the same first four words came in earlier.",
+  "concept": "A diner cook says THE USUAL? to a robot that has never been here and is still on the first line of the menu, and slides over a finished plate.",
+  "story_id": "ee3cd5f7905dece7"
+ },
+ "hedge": {
+  "quote": "A persistent daemon then maintains the result, repairing defined classes of failure in the deployment it produced.",
+  "story": {
+   "story_id": "a15578bccb9b33f3",
+   "title": "Octopus Protocol: One-Shot Hardware Discovery and Control for AI Agents via Infrastructure-as-Prompts",
+   "url": "https://arxiv.org/abs/2605.09055",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "octopus-hardware-onboarding",
+   "published_at": "2026-09-07T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A coding agent, not a shipped integration, discovers hardware, generates typed MCP tools, and deploys a live endpoint from one bootstrap command.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "Which failures count as defined is not in the sentence."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-09-08T02:20:29Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-09-08/cover-light.webp",
+  "dark": "/images/brief/issues/2026-09-08/cover-dark.webp",
+  "alt": "Two identical text strips enter a box; one is partly taken from a shelf of stored slices, the other read fresh. Their exit paths fork and wind through a grid of small tool icons to different endpoints."
+ }
+}
