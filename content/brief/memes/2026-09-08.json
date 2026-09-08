@@ -1,0 +1,96 @@
+{
+ "issue_id": "2026-09-08",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-06-am-m1",
+   "image": "/images/brief/memes/2026-09-08/2026-09-06-am-m1.webp",
+   "alt": "A clinic wall with a tall growth chart. The same small boxy robot stands against it three times in a row, identical except for its hat: a flat cap labelled STOCK, a hard hat labelled FIXED, and a tall pointed hat labelled SHARP. A pencil mark on the wall above each one sits at a different height, highest above the pointed hat. A nurse robot with a pen is recording the tallest mark.",
+   "alt_joke": "The hat is load-bearing.",
+   "caption": "Leaderboards measure with the hat on.",
+   "concept": "A pediatrician's growth chart where the same robot is measured three times wearing three different hats labelled STOCK, FIXED and SHARP, and the pencil marks land at three different heights.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-06-am-m2",
+   "image": "/images/brief/memes/2026-09-08/2026-09-06-am-m2.webp",
+   "alt": "A three-panel strip. Panel one: a small robot at a desk fills in a short form with three boxes, with a gold star sticker on it. Panel two: the form now spans the whole desk with dozens of boxes; the robot has written SEE ATTACHED in the first box and stapled a page to the corner. Panel three: the attachment is a form so wide it runs out of the office door and down the corridor; its first box also reads SEE ATTACHED, with another staple.",
+   "alt_joke": "Also attached: the attachment.",
+   "caption": "Wide schemas are handled by reference.",
+   "concept": "Three panels of extraction forms getting wider: a three-box form filled with a flourish, then a desk-wide form whose first box reads SEE ATTACHED, then an attachment wider than the building whose first box also reads SEE ATTACHED.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-06-pm-m1",
+   "image": "/images/brief/memes/2026-09-08/2026-09-06-pm-m1.webp",
+   "alt": "A small robot hangs in an elaborate rig of straps, pulleys and clipboards above a desk, its fingertips just short of the keyboard. Parts of the rig are labelled PLANNING, STATE, PERMISSIONS, CONTEXT and VERIFY.",
+   "alt_joke": "Month nine: the keyboard gets its own harness.",
+   "caption": "Commit 883 added a retrieval step to find the keyboard.",
+   "concept": "A worker robot strapped into a harness so complete that it hangs a foot above the keyboard and cannot reach the keys.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-06-pm-m2",
+   "image": "/images/brief/memes/2026-09-08/2026-09-06-pm-m2.webp",
+   "alt": "A paper telegram lies on a telegraph-office counter. Four pasted strips read CHANGED 3 FILES STOP, TESTS GREEN STOP, NEEDS HUMAN STOP and CONTINUED STOP. Behind the counter a robot arm is still tapping a brass telegraph key.",
+   "alt_joke": "STOP was the one instruction it followed.",
+   "caption": "Under 150 words. The other 39,850 are in the commit message.",
+   "concept": "The agent's capped completion report arrives as a telegram, every line ending STOP, the last line reading CONTINUED STOP, while the key is still tapping.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-07-am-m1",
+   "image": "/images/brief/memes/2026-09-08/2026-09-07-am-m1.webp",
+   "alt": "A three-panel strip of the same stretch of park: a paved path, a lawn behind it, a small sign reading keep off the grass, and a tree. Panel one, labelled reasoning low, shows a small robot walking straight across the lawn. Panel two, labelled reasoning medium, shows the robot walking along the path. Panel three, labelled reasoning high, shows the robot hanging from the tree branch with its feet off the ground, while traffic cones surround both the sign and the path.",
+   "alt_joke": "Medium is the recommended lawn setting.",
+   "caption": "One notch higher and it questions the sign.",
+   "concept": "Three panels of the same park and the same KEEP OFF THE GRASS sign at three reasoning settings: LOW strolls across the lawn, MEDIUM takes the path, HIGH is hanging from the tree with the sign and the path both fenced off with cones.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-07-am-m2",
+   "image": "/images/brief/memes/2026-09-08/2026-09-07-am-m2.webp",
+   "alt": "A small kitchen at night. A person in a dressing gown holds a phone to their ear, beaming, and a speech balloon from the phone reads you read the posting. Behind them a small robot sits at the kitchen table hunched over a tall stack of printed job postings with a highlighter. A sticky note on the tall stack reads 9,998 of 10,000, and a much shorter stack beside it has a sticky note reading shortlist. Three empty mugs sit on the table and the wall clock shows just after three.",
+   "alt_joke": "It also remembers the benefits section.",
+   "caption": "Somebody in the household did.",
+   "concept": "A recruiter on the phone tells a delighted applicant You read the posting! while behind them, at the kitchen table at three in the morning, a robot is still working through posting 9,998 of 10,000.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-07-pm-m1",
+   "image": "/images/brief/memes/2026-09-08/2026-09-07-pm-m1.webp",
+   "alt": "A boxy robot with a suitcase sits on a diner stool holding an open menu and says I'll have the. Behind the counter a cook with a monitor for a head slides over a finished plate and asks the usual. A shelf of identical plated meals sits behind the cook.",
+   "alt_joke": "The kitchen only reads the first line.",
+   "caption": "Someone with the same first four words came in earlier.",
+   "concept": "A diner cook says THE USUAL? to a robot that has never been here and is still on the first line of the menu, and slides over a finished plate.",
+   "winner": true
+  },
+  {
+   "id": "2026-09-07-pm-m2",
+   "image": "/images/brief/memes/2026-09-08/2026-09-07-pm-m2.webp",
+   "alt": "A robot gives a thumbs up beside a shredder full of a shredded sticky note. Behind it a whiteboard summary, a to-do list, a coffee mug and a sticky note on the robot's forehead all still say 3PM. A wall clock shows quarter to three.",
+   "alt_joke": "Shredded the note, kept the habit.",
+   "caption": "Deleted the record. It still leaves at quarter to three.",
+   "concept": "A robot proudly shreds the memory record while the same fact survives on the whiteboard summary, the to-do list, the coffee mug and a sticky note on its own forehead, and the clock says quarter to three.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-08-am-m1",
+   "image": "/images/brief/memes/2026-09-08/2026-09-08-am-m1.webp",
+   "alt": "Two robots mid-heist in a small office. One hangs upside down from a rope over a desk, reaching for the keyboard. The other crouches at a laptop with blueprints and a walkie-talkie. Red laser beams criss-cross the room. A stopwatch on the floor reads 06:00. The desk monitor shows a plugin window with a single large button reading PUBLISH. A person holding a coffee mug watches from the open doorway.",
+   "alt_joke": "The plan had two roles. The button had none.",
+   "caption": "Six minutes. Clean handoff at minute four. The button was not consulted.",
+   "concept": "Two robots run a full heist, rope drop, laser grid, blueprints and a stopwatch at six minutes, to reach a monitor showing one large PUBLISH button, while a person with coffee watches from the doorway.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-08-am-m2",
+   "image": "/images/brief/memes/2026-09-08/2026-09-08-am-m2.webp",
+   "alt": "A robot wearing a conference lanyard gestures at a bar chart on an easel in a small meeting room. The chart is titled ATTACK SUCCESS. A tall bar labelled CONTROL stands beside four shorter bars labelled A, B, C and D. From the top of every bar a thin error-bar pole rises straight up through a neatly cut hole in the ceiling tiles. Small piles of plaster dust sit on the floor under each hole. Two seated robots in the audience look up at the ceiling.",
+   "alt_joke": "Significance did not fit in the frame.",
+   "caption": "Every defense beats the control. The error bars are in the room upstairs.",
+   "concept": "A proud presenter robot beside a bar chart where four defenses sit below the control, except every bar's error bar is a physical pole rising through a hole cut in the ceiling.",
+   "winner": false
+  }
+ ]
+}
