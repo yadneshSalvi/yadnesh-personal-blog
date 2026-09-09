@@ -1,0 +1,447 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-09-09",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-09-09T00:25:00Z",
+ "source_editions": [
+  "2026-09-08-pm",
+  "2026-09-09-am"
+ ],
+ "subject": "Model routing per phase, RASER on Slurm, Amp steering",
+ "preheader": "Plus: 2 papers, a context-mode split, and OpenAI's Navier-Stokes claim. 5 min.",
+ "title": "Per-phase model routing cuts agent cost, RASER on Slurm, Amp steers mid-run",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "4c99d339e273b9ae",
+   "title": "How I cut coding agent costs with model and harness routing",
+   "url": "https://arize.com/blog/how-i-cut-coding-agent-costs-with-model-harness-routing",
+   "source_name": "Arize",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "coding-agent-model-harness-routing",
+   "published_at": "2026-09-08T16:00:57Z",
+   "read_annotation": "blog post",
+   "summary": "An author writing on Arize routes the phases of a recurring coding-agent workflow to different models and harnesses and reports a large per-run cost drop.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "An engineer reports cutting the cost of a repeated task that uses artificial intelligence to write computer programs.",
+    "Different systems handle planning the work, exploring the code, writing changes, and checking the results.",
+    "The engineer says the change brought their cost per run from roughly $100 to $15-$20."
+   ]
+  },
+  "what": "A post on Arize describes splitting a recurring coding-agent workflow into four phases, planning, exploration, implementation and review, and routing those phases to different models and harnesses.",
+  "details": "The reported result is one workflow falling from roughly $100 per run to $15 to $20. The author describes routing planning, exploration, implementation and review to different models and harnesses.",
+  "yes_but": "It's one author's before-and-after on one workflow. The headline number carries no quality measure alongside it, so the claim alone can't tell you whether the cheaper run does the same work.",
+  "yes_but_waived": null,
+  "why": "If you run a recurring agent job on one frontier model end to end, this suggests checking how the harness routes work. The author routes planning, exploration, implementation and review to different models, but the reported cost figures alone do not establish the effect on quality."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "86a61fa9f7fea172",
+     "title": "RASER: Resilient Agent Scheduling and Execution Runtime for HPC Clusters",
+     "url": "https://arxiv.org/abs/2609.03598",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "infra-sandboxes"
+     ],
+     "cluster": "raser-hpc-agent-runtime",
+     "published_at": "2026-09-03T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "RASER runs agent workflows on Slurm with work stealing through shared-filesystem queues, application-level checkpointing paired with Slurm requeue, and Apptainer isolation without image changes. It reports nearly 39% lower makespan than static partitioning at near-full CPU utilization, and it tests recovery after simulated preemption.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built software to organize unpredictable tasks performed by artificial intelligence across groups of powerful computers.",
+      "When one computer finishes its work, it can take waiting tasks from a shared list.",
+      "The software saves progress so interrupted tasks can restart.",
+      "In tests, large computing jobs took nearly 39% less time than when computers received fixed task assignments."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-09/86a61fa9f7fea172-light.webp",
+      "dark": "/images/brief/issues/2026-09-09/86a61fa9f7fea172-dark.webp",
+      "alt": "Five boxes on a shelf reach down to a shared tray of tickets; one box is unplugged and its ticket is pinned back on the tray with a clip."
+     }
+    },
+    {
+     "story_id": "419738e6501efeb6",
+     "title": "What Happens When the Model Eats the Stack? Rethinking the Research Agenda for Data Agents to Withstand the Bitter Lesson",
+     "url": "https://arxiv.org/abs/2609.03141",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "memory-context"
+     ],
+     "cluster": "data-agents-persistent-semantic-context",
+     "published_at": "2026-09-02T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A position paper argues that as models improve they absorb the system layers built to cover their limits, and that what stays worth building is persistent semantic context about the data environment, served as a first-class abstraction.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers argue that better artificial intelligence could make some tools built around today's systems unnecessary.",
+      "Those tools make up for limitations that future systems may overcome on their own.",
+      "The researchers propose storing reusable background information that helps the software understand the data it works with.",
+      "The researchers argue this background information could help software answer questions about huge, complicated collections of data."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-09/419738e6501efeb6-light.webp",
+      "dark": "/images/brief/issues/2026-09-09/419738e6501efeb6-dark.webp",
+      "alt": "A large sphere has absorbed three of four shelves of small machines; the top shelf, holding one card-index box, stands apart above it."
+     }
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "7396f347ac4661ca",
+     "title": "Organizing Context in a Multi-Agent Harness",
+     "url": "https://www.langchain.com/blog/organizing-context-in-a-multi-agent-harness",
+     "source_name": "LangChain",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "memory-context"
+     ],
+     "cluster": "deepagents-context-modes",
+     "published_at": "2026-09-08T18:07:23Z",
+     "read_annotation": "blog post",
+     "summary": "Deepagents now lets a subagent fork the supervisor's context or start isolated, which LangChain frames as the answer to what each subagent should see. Speed, cost and focus are stated as aims, not measurements.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "LangChain added a way to choose what information each artificial intelligence helper starts with.",
+      "A helper can copy the information available to the coordinating system or start separately without inheriting it.",
+      "LangChain says these choices are intended to make work involving several helpers faster, cheaper, and more focused."
+     ]
+    },
+    {
+     "story_id": "20af789d18627166",
+     "title": "Automated agent evaluation with Amazon Bedrock AgentCore and GitHub Actions",
+     "url": "https://aws.amazon.com/blogs/machine-learning/automated-agent-evaluation-with-amazon-bedrock-agentcore-and-github-actions",
+     "source_name": "AWS ML Blog",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "agentcore-github-actions-evals",
+     "published_at": "2026-09-08T16:23:21Z",
+     "read_annotation": "blog post",
+     "summary": "A GitHub Actions pipeline deploys an agent and an OAuth-protected MCP server to AgentCore runtime, fires test prompts, scores the answers and blocks the pull request when behaviour regresses. Vendor walkthrough, but the shape, agent evals as a merge gate, transfers.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Amazon describes automatic checks for proposed changes to software that uses artificial intelligence.",
+      "The setup runs the software, gives it test instructions, and scores its answers.",
+      "If test results get worse, developers can automatically block the code change from being accepted."
+     ]
+    },
+    {
+     "story_id": "be58d8943bdf3656",
+     "title": "Qwen3-0.6B (400 MB) on a Samsung Note 8 (2017) phone drives a real desktop Chrome",
+     "url": "https://www.reddit.com/r/LocalLLaMA/comments/1wapzjg/qwen306b_400_mb_on_a_samsung_note_8_2017_phone",
+     "source_name": "r/LocalLLaMA",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "qwen-phone-browser-perception-harness",
+     "published_at": "2026-09-08T14:29:24Z",
+     "read_annotation": "Reddit thread",
+     "summary": "A 400 MB Qwen3-0.6B on a 2017 Galaxy Note 8 drives desktop Chrome by picking one named element from a structured page of about 10 links or fields. Extraction, clicking and verification sit in the surrounding stack, which the poster helps build, so the scaffold is the story.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A project contributor demonstrated artificial intelligence running on an old Samsung phone directing a computer's web browser.",
+      "The phone chooses one item by name from a short list of links or fields.",
+      "Other software prepares the choices, clicks the selected item, reads the facts, and checks the results.",
+      "For developers using small artificial intelligence systems, the example shows how supporting software can do most of the browser work."
+     ]
+    },
+    {
+     "story_id": "17a985a894408798",
+     "title": "vLLM x AgentX: Optimizing for Real-World Agentic Serving",
+     "url": "https://vllm.ai/blog/2026-09-08-vllm-agentx",
+     "source_name": "vLLM Blog",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "infra-sandboxes"
+     ],
+     "cluster": "vllm-agentx-agentic-serving",
+     "published_at": "2026-09-08T00:00:00Z",
+     "read_annotation": null,
+     "summary": "vLLM walks through KV cache management, parallelism, scheduling and prefill/decode disaggregation for agent traffic, and reports up to 130K tokens per GPU-second on SemiAnalysis AgentX plus a 14.6x to 106x serving-cost advantage over Opus 5. Those are the project's own numbers.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A software team explained how it runs artificial intelligence systems that carry out tasks while keeping computing costs down.",
+      "The software reuses saved information from earlier processing.",
+      "It separates the work of reading requests from the work of producing answers.",
+      "The team reports lower computing costs than Opus 5 for companies running these tasks, based on its own tests."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "264cf0a55d51afe4",
+     "title": "Steer, Don't Queue",
+     "url": "https://ampcode.com/news/steer-dont-queue",
+     "source_name": "Amp (Sourcegraph)",
+     "kind": "company",
+     "section": "product",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "amp-steer-dont-queue",
+     "published_at": "2026-09-08T00:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Amp now delivers a message you send mid-run at the next possible opportunity instead of holding it until the turn ends, so a correction lands before the agent runs verification you no longer want. Ship, Review and other built-in actions still queue.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Amp now lets you redirect its artificial intelligence assistant while it is still working.",
+      "Your message reaches the assistant at its next opportunity, instead of waiting until its current work ends.",
+      "Built-in actions such as Ship and Review still wait until the assistant finishes its current work.",
+      "Users can change instructions before the assistant spends time checking work they no longer want."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [
+  {
+   "story_id": "2097374640582668336",
+   "title": "OpenAI says a group of ~10,000 agents on an unreleased model beyond GPT-6 Astra produced a Navier-Stokes Millennium Prize solution in 88 hours",
+   "url": "https://x.com/OpenAI/status/2097374640582668336",
+   "source_name": "@OpenAI",
+   "kind": "x",
+   "section": "community",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "x-2097374640582668336",
+   "published_at": "2026-09-08T17:20:56.000Z",
+   "read_annotation": "X post",
+   "summary": "OpenAI says around 10,000 coordinating agents on a next-generation model it calls significantly more capable than GPT-6 Astra produced an analytical proof and a Lean formalization that a Navier-Stokes fluid can develop a finite-time singularity, in 88 hours. It's OpenAI's own claim; the thread does not say the proof has been independently reviewed.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "OpenAI says its artificial intelligence solved a major mathematics problem about how fluids move.",
+    "The proposed proof describes fluid spiraling inward and stretching until the mathematics describing its movement breaks down.",
+    "The company says cooperating programs produced both a mathematical argument and a version written for a computer to check.",
+    "The post does not say whether independent experts have reviewed the claimed proof.",
+    "If confirmed, the result would help mathematicians understand when equations describing fluid movement can break down."
+   ]
+  }
+ ],
+ "quick_links": [
+  {
+   "story_id": "16169d530ca6c4a0",
+   "title": "I-have-ADHD: A skill to stop coding agents from burying the answer",
+   "url": "https://github.com/ayghri/i-have-adhd",
+   "source_name": "Hacker News",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "i-have-adhd-agent-skill",
+   "published_at": "2026-09-08T14:13:26Z",
+   "read_annotation": "HN thread",
+   "summary": "A skill that makes coding agents put the answer first",
+   "via": null,
+   "paywalled": false,
+   "hn_points": 282
+  },
+  {
+   "story_id": "1821a570f7f954db",
+   "title": "Extending concurrent separation logic to the hardware level to verify the xv6 OS kernel on RISC-V with AI agents",
+   "url": "https://arxiv.org/abs/2609.04043",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "machcsl-xv6-agent-verification",
+   "published_at": "2026-09-03T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Agents help verify xv6 at the RISC-V hardware level, finding nine bugs",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "55954a80c92faf25",
+   "title": "I Asked 100 Agents to Hack Me",
+   "url": "https://blog.sshh.io/p/i-asked-100-agents-to-hack-me",
+   "source_name": "Shrivu Shankar",
+   "kind": "individual",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "100-agents-hacking-experiment",
+   "published_at": "2026-09-08T14:23:34Z",
+   "read_annotation": "blog post",
+   "summary": "One hundred safety-stripped open-source agents, one target, one write-up",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "a142264086c540cf",
+   "title": "Inside the ID-JAG: How enterprise-managed authorization actually works",
+   "url": "https://workos.com/blog/mcp-enterprise-managed-authorization-id-jag",
+   "source_name": "WorkOS",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "mcp-enterprise-authorization-id-jag",
+   "published_at": "2026-09-08T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "What your MCP server must validate once consent screens stop deciding",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "24e4f3f55b8446b8",
+   "title": "Announcing Mastra Factory Beta",
+   "url": "https://mastra.ai/blog/announcing-mastra-factory-beta",
+   "source_name": "Mastra",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "mastra-factory-beta",
+   "published_at": null,
+   "read_annotation": null,
+   "summary": "Mastra open-sources the agent factory it says writes 25-35% of its PRs",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "a0a3338303052afa",
+   "title": "Optimizing delta weight syncs for managed rollouts",
+   "url": "https://www.baseten.co/blog/optimizing-delta-weight-syncs-for-managed-rollouts",
+   "source_name": "Baseten",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "baseten-delta-weight-syncs",
+   "published_at": null,
+   "read_annotation": null,
+   "summary": "Baseten syncs RL weight deltas across clusters in under 40 seconds",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "718ed2aea5683924",
+   "title": "Latency-Aware Orchestration for Multi-Agent LLM Workflows on Heterogeneous GPUs",
+   "url": "https://arxiv.org/abs/2609.03335",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "latency-aware-multi-agent-gpu-orchestration",
+   "published_at": "2026-09-03T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Prediction-guided scheduling for multi-agent workflows on mixed GPU pools",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "a8d7ab958cc49a0a",
+   "title": "Evolving transition-state search with agentic large language models",
+   "url": "https://www.semanticscholar.org/paper/f4dcc55c8ce083f10f985d1b3cbbf1f626e24a13",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "agentic-transition-state-search",
+   "published_at": "2026-09-03T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "An evolutionary LLM loop rewrites transition-state search for unsolved reactions",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "419738e6501efeb6",
+   "text": "This paper and today's lead pull in opposite directions, and I think both hold. Scaffolding that covers a model's weaknesses gets eaten as models improve. Scaffolding that covers a model's price doesn't, because the frontier model stays the expensive one. Routing by phase (/newsletter/story/4c99d339e273b9ae) is the second kind, so I'd expect it to outlive most harness tricks."
+  },
+  {
+   "after_story": "2097374640582668336",
+   "text": "The checkable part is the Lean formalization, and a Lean proof either compiles or it doesn't. Until someone outside OpenAI has run it, treat the 88 hours and the 10,000 agents as a description of the bill, not the result."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-09-09/2026-09-09-am-m1.webp",
+  "alt": "A tall glass museum case on an orange base holds a column of soil in four horizontal layers. Cards to the left read, top to bottom, GREAT QUESTION, CONTEXT, CAVEATS and THE PLAN, with THE PLAN the thickest band. At the bottom a tiny spiral fossil sits beside a small card reading yes. One rope barrier stands to the right.",
+  "alt_joke": "Fossil record confirms an answer was present.",
+  "caption": "The question was whether the tests passed.",
+  "concept": "A museum core sample of one coding-agent reply, in labeled strata, with a tiny fossil at the very bottom labeled yes.",
+  "story_id": "16169d530ca6c4a0"
+ },
+ "hedge": null,
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-09-09T02:25:03Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-09-09/cover-light.webp",
+  "dark": "/images/brief/issues/2026-09-09/cover-dark.webp",
+  "alt": "Four small workstations in a row on a bench, linked by a thin line, with a paper ticket travelling between them and a coin slot of a different size beside each."
+ }
+}

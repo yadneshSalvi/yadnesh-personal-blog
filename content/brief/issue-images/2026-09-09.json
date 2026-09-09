@@ -1,0 +1,87 @@
+{
+ "issue_id": "2026-09-09",
+ "type": "daily",
+ "renders": 7,
+ "cost_usd": 1.75,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "Four small workstations in a row on a bench, linked by a thin line, with a paper ticket travelling between them and a coin slot of a different size beside each.",
+   "bytes": [
+    79870,
+    77072
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 1,
+   "prompt": "Four small workstations in a row on a long bench, centred in the frame with wide margins: a drafting table, a lantern over a map, a bench with hand tools, and a magnifying lens on a stand. A single paper ticket travels between them along a thin line. Beside each station sits a coin slot, and the four slots are visibly different sizes. Nothing else on the bench.",
+   "labels": [
+    "PLAN",
+    "EXPLORE",
+    "BUILD",
+    "REVIEW"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-09T00:20:13Z"
+  },
+  {
+   "key": "86a61fa9f7fea172",
+   "story_id": "86a61fa9f7fea172",
+   "light_name": "86a61fa9f7fea172-light.webp",
+   "dark_name": "86a61fa9f7fea172-dark.webp",
+   "alt": "Five boxes on a shelf reach down to a shared tray of tickets; one box is unplugged and its ticket is pinned back on the tray with a clip.",
+   "bytes": [
+    29014,
+    28310
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A row of five identical compute boxes on a shelf, centred in the frame, each with a short arm reaching down to one shared tray of paper tickets sitting below them. One box is unplugged and dark, and its half-finished ticket has been pinned back onto the tray with a small bookmark clip so a neighbouring box can pick it up. Plenty of empty wall around the shelf.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-09T00:21:42Z"
+  },
+  {
+   "key": "419738e6501efeb6",
+   "story_id": "419738e6501efeb6",
+   "light_name": "419738e6501efeb6-light.webp",
+   "dark_name": "419738e6501efeb6-dark.webp",
+   "alt": "A large sphere has absorbed three of four shelves of small machines; the top shelf, holding one card-index box, stands apart above it.",
+   "bytes": [
+    37310,
+    35636
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A stack of four shelves on the left half of the frame, each holding a small mechanical contraption. A large smooth sphere on the right has rolled over and swallowed the bottom three shelves, which are visible as faint outlines inside it. The top shelf, holding a single card-index box, stands untouched above the sphere. Everything sits well inside the frame with open space around it.",
+   "labels": [
+    "CONTEXT"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-09T00:24:06Z"
+  }
+ ]
+}

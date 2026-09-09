@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-09-09",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-08-pm-m1",
+   "image": "/images/brief/memes/2026-09-09/2026-09-08-pm-m1.webp",
+   "alt": "Three panels. In the first, a large robot walks into a shrinking booth and a much smaller robot steps out the other side beside a wall chart reading 99% reasoning and 15% size. In the second, a person at a desk asks the small robot to write a loop. In the third, the small robot stands on the keyboard saying while, while, while, while, and the screen behind it is filling with the same word.",
+   "alt_joke": "Still reasoning. Just not about when to stop.",
+   "caption": "The missing one percent was the exit condition.",
+   "concept": "A robot shrunk to fifteen percent of its size keeps ninety-nine percent of its reasoning, is asked to write a loop, and says while forever.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-08-pm-m2",
+   "image": "/images/brief/memes/2026-09-09/2026-09-08-pm-m2.webp",
+   "alt": "A robot barber holds electric clippers to the head of a customer seated in a barber chair. The customer says, Actually, shorter. In the mirror the customer's hair is long and styled on one side and buzzed very short on the other, with a sharp vertical line exactly where the clippers are.",
+   "alt_joke": "Nobody waited for the turn to finish.",
+   "caption": "Delivered at the next available opportunity. Review is still queued.",
+   "concept": "A robot barber mid-cut hears 'Actually, shorter' and turns the clippers the same instant, leaving one side long, one side buzzed and a crisp seam.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-09-am-m1",
+   "image": "/images/brief/memes/2026-09-09/2026-09-09-am-m1.webp",
+   "alt": "A tall glass museum case on an orange base holds a column of soil in four horizontal layers. Cards to the left read, top to bottom, GREAT QUESTION, CONTEXT, CAVEATS and THE PLAN, with THE PLAN the thickest band. At the bottom a tiny spiral fossil sits beside a small card reading yes. One rope barrier stands to the right.",
+   "alt_joke": "Fossil record confirms an answer was present.",
+   "caption": "The question was whether the tests passed.",
+   "concept": "A museum core sample of one coding-agent reply, in labeled strata, with a tiny fossil at the very bottom labeled yes.",
+   "winner": true
+  },
+  {
+   "id": "2026-09-09-am-m2",
+   "image": "/images/brief/memes/2026-09-09/2026-09-09-am-m2.webp",
+   "alt": "A small old smartphone with a cracked screen rests upright on a velvet cushion on an ornate throne in a palace hall. Its screen shows only a single arrow. Around the throne a dozen robots act as courtiers. One kneels holding a silver tray with three large buttons labeled LOGIN, SEARCH and NEXT, and the phone's arrow points at SEARCH. One holds a huge magnifying glass over a webpage unrolled across the floor like a scroll. One waits at a desk with a desktop computer, hand over the mouse. One holds a large rubber stamp reading VERIFIED. Two fan the phone with palm leaves and a small robot page carries its charging cable like the train of a robe.",
+   "alt_joke": "The phone points. The court walks.",
+   "caption": "Runs on a 2017 phone. Staff not included.",
+   "concept": "A cracked 2017 phone on a velvet cushion holds court while a dozen robot courtiers unroll the page, hold up three buttons on a tray, wait at the mouse and stamp the result.",
+   "winner": false
+  }
+ ]
+}
