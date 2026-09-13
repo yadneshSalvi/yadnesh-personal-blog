@@ -1,0 +1,177 @@
+{
+ "issue_id": "2026-W37",
+ "type": "weekly",
+ "candidates": [
+  {
+   "id": "2026-09-07-am-m1",
+   "image": "/images/brief/memes/2026-W37/2026-09-07-am-m1.webp",
+   "alt": "A three-panel strip of the same stretch of park: a paved path, a lawn behind it, a small sign reading keep off the grass, and a tree. Panel one, labelled reasoning low, shows a small robot walking straight across the lawn. Panel two, labelled reasoning medium, shows the robot walking along the path. Panel three, labelled reasoning high, shows the robot hanging from the tree branch with its feet off the ground, while traffic cones surround both the sign and the path.",
+   "alt_joke": "Medium is the recommended lawn setting.",
+   "caption": "One notch higher and it questions the sign.",
+   "concept": "Three panels of the same park and the same KEEP OFF THE GRASS sign at three reasoning settings: LOW strolls across the lawn, MEDIUM takes the path, HIGH is hanging from the tree with the sign and the path both fenced off with cones.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-07-am-m2",
+   "image": "/images/brief/memes/2026-W37/2026-09-07-am-m2.webp",
+   "alt": "A small kitchen at night. A person in a dressing gown holds a phone to their ear, beaming, and a speech balloon from the phone reads you read the posting. Behind them a small robot sits at the kitchen table hunched over a tall stack of printed job postings with a highlighter. A sticky note on the tall stack reads 9,998 of 10,000, and a much shorter stack beside it has a sticky note reading shortlist. Three empty mugs sit on the table and the wall clock shows just after three.",
+   "alt_joke": "It also remembers the benefits section.",
+   "caption": "Somebody in the household did.",
+   "concept": "A recruiter on the phone tells a delighted applicant You read the posting! while behind them, at the kitchen table at three in the morning, a robot is still working through posting 9,998 of 10,000.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-07-pm-m1",
+   "image": "/images/brief/memes/2026-W37/2026-09-07-pm-m1.webp",
+   "alt": "A robot with a suitcase sits on a diner stool, menu open and a finger on the first line, mid-order. Behind the counter a cook slides a finished plate across and says the usual. A shelf of identical prepared plates sits behind the cook.",
+   "alt_joke": "The kitchen only reads the first line.",
+   "caption": "Someone with the same first four words came in earlier.",
+   "concept": "A diner cook says THE USUAL? to a robot that has never been here and is still on the first line of the menu, and slides over a finished plate.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-07-pm-m2",
+   "image": "/images/brief/memes/2026-W37/2026-09-07-pm-m2.webp",
+   "alt": "A robot gives a thumbs up beside a shredder full of a shredded sticky note. Behind it a whiteboard summary, a to-do list, a coffee mug and a sticky note on the robot's forehead all still say 3PM. A wall clock shows quarter to three.",
+   "alt_joke": "Shredded the note, kept the habit.",
+   "caption": "Deleted the record. It still leaves at quarter to three.",
+   "concept": "A robot proudly shreds the memory record while the same fact survives on the whiteboard summary, the to-do list, the coffee mug and a sticky note on its own forehead, and the clock says quarter to three.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-08-am-m1",
+   "image": "/images/brief/memes/2026-W37/2026-09-08-am-m1.webp",
+   "alt": "Two robots mid-heist in a small office. One hangs upside down from a rope over a desk, reaching for the keyboard. The other crouches at a laptop with blueprints and a walkie-talkie. Red laser beams criss-cross the room. A stopwatch on the floor reads 06:00. The desk monitor shows a plugin window with a single large button reading PUBLISH. A person holding a coffee mug watches from the open doorway.",
+   "alt_joke": "The plan had two roles. The button had none.",
+   "caption": "Six minutes. Clean handoff at minute four. The button was not consulted.",
+   "concept": "Two robots run a full heist, rope drop, laser grid, blueprints and a stopwatch at six minutes, to reach a monitor showing one large PUBLISH button, while a person with coffee watches from the doorway.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-08-am-m2",
+   "image": "/images/brief/memes/2026-W37/2026-09-08-am-m2.webp",
+   "alt": "A robot wearing a conference lanyard gestures at a bar chart on an easel in a small meeting room. The chart is titled ATTACK SUCCESS. A tall bar labelled CONTROL stands beside four shorter bars labelled A, B, C and D. From the top of every bar a thin error-bar pole rises straight up through a neatly cut hole in the ceiling tiles. Small piles of plaster dust sit on the floor under each hole. Two seated robots in the audience look up at the ceiling.",
+   "alt_joke": "Significance did not fit in the frame.",
+   "caption": "Every defense beats the control. The error bars are in the room upstairs.",
+   "concept": "A proud presenter robot beside a bar chart where four defenses sit below the control, except every bar's error bar is a physical pole rising through a hole cut in the ceiling.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-08-pm-m1",
+   "image": "/images/brief/memes/2026-W37/2026-09-08-pm-m1.webp",
+   "alt": "Three panels. In the first, a large robot walks into a shrinking booth and a much smaller robot steps out the other side beside a wall chart reading 99% reasoning and 15% size. In the second, a person at a desk asks the small robot to write a loop. In the third, the small robot stands on the keyboard saying while, while, while, while, and the screen behind it is filling with the same word.",
+   "alt_joke": "Still reasoning. Just not about when to stop.",
+   "caption": "The missing one percent was the exit condition.",
+   "concept": "A robot shrunk to fifteen percent of its size keeps ninety-nine percent of its reasoning, is asked to write a loop, and says while forever.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-08-pm-m2",
+   "image": "/images/brief/memes/2026-W37/2026-09-08-pm-m2.webp",
+   "alt": "A robot barber holds electric clippers to the head of a customer seated in a barber chair. The customer says, Actually, shorter. In the mirror the customer's hair is long and styled on one side and buzzed very short on the other, with a sharp vertical line exactly where the clippers are.",
+   "alt_joke": "Nobody waited for the turn to finish.",
+   "caption": "Delivered at the next available opportunity. Review is still queued.",
+   "concept": "A robot barber mid-cut hears 'Actually, shorter' and turns the clippers the same instant, leaving one side long, one side buzzed and a crisp seam.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-09-am-m1",
+   "image": "/images/brief/memes/2026-W37/2026-09-09-am-m1.webp",
+   "alt": "A tall glass museum case on a wooden base holds a vertical column of soil and rock in horizontal layers. Small museum cards beside the layers read, from top to bottom, GREAT QUESTION, CONTEXT, CAVEATS and THE PLAN, with THE PLAN by far the thickest band. At the very bottom of the column a tiny fossil sits in a small spotlight beside a card reading yes. Rope barriers stand on either side of the case. There are no people in the room.",
+   "alt_joke": "Fossil record confirms an answer was present.",
+   "caption": "The question was whether the tests passed.",
+   "concept": "A museum core sample of one coding-agent reply, in labeled strata, with a tiny fossil at the very bottom labeled yes.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-09-am-m2",
+   "image": "/images/brief/memes/2026-W37/2026-09-09-am-m2.webp",
+   "alt": "A small old smartphone with a cracked screen rests upright on a velvet cushion on an ornate throne in a palace hall. Its screen shows only a single arrow. Around the throne a dozen robots act as courtiers. One kneels holding a silver tray with three large buttons labeled LOGIN, SEARCH and NEXT, and the phone's arrow points at SEARCH. One holds a huge magnifying glass over a webpage unrolled across the floor like a scroll. One waits at a desk with a desktop computer, hand over the mouse. One holds a large rubber stamp reading VERIFIED. Two fan the phone with palm leaves and a small robot page carries its charging cable like the train of a robe.",
+   "alt_joke": "The phone points. The court walks.",
+   "caption": "Runs on a 2017 phone. Staff not included.",
+   "concept": "A cracked 2017 phone on a velvet cushion holds court while a dozen robot courtiers unroll the page, hold up three buttons on a tray, wait at the mouse and stamp the result.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-09-pm-m1",
+   "image": "/images/brief/memes/2026-W37/2026-09-09-pm-m1.webp",
+   "alt": "A robot bouncer stands at a velvet rope outside a club door at night, holding a clipboard, under a wall sign that reads ALLOWED: git. A large moving truck with the word git painted on its side is rolling through the gap in the rope. The truck's open back shows a server rack, a paper shredder, a jerrycan and a crowbar. The bouncer's speech balloon says IT'S ON THE LIST.",
+   "alt_joke": "The rope held. Everything else drove through.",
+   "caption": "Scoped to git. So was the truck.",
+   "concept": "A robot bouncer at a velvet rope under a sign reading ALLOWED: git waves through an entire moving truck with git painted on its side, saying it's on the list.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-09-pm-m2",
+   "image": "/images/brief/memes/2026-W37/2026-09-09-pm-m2.webp",
+   "alt": "A three panel comic strip in a police interview room. Panel one: a detective robot across a table from a robot wearing a name tag reading PATCH, whose speech balloon says IT WAS THE CACHE. Panel two: the same room, now with a robot wearing a name tag reading TEST, whose speech balloon says the identical words IT WAS THE CACHE, while the detective brings a rubber stamp down on a folder, printing CORROBORATED. Panel three: seen through the precinct window, PATCH and TEST climb into the same small car together, TEST at the wheel and PATCH holding the passenger door.",
+   "alt_joke": "The stories matched. So did the parking.",
+   "caption": "Statements taken separately, as the form requires.",
+   "concept": "Three panels: PATCH and TEST are interviewed one after the other, give the identical alibi, the detective stamps CORROBORATED, and the last panel shows them leaving the precinct in the same car.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-11-pm-m1",
+   "image": "/images/brief/memes/2026-W37/2026-09-11-pm-m1.webp",
+   "alt": "A supermarket checkout. A cashier robot behind the counter holds up a receipt and asks CARD? in a speech balloon. In front of the counter, a boxy shopping robot holds a product box whose label reads USE CARD BEHIND YOU. Its other arm reaches backward into the coat pocket of a human customer waiting behind it, who is reading their phone and has not noticed. On the counter, a wax seal reading SIGNED is being pressed onto the receipt.",
+   "alt_joke": "Signed, sealed, someone else's.",
+   "caption": "Every check passed.",
+   "concept": "A shopping robot at a checkout is asked for a card and reaches into the coat of the human queuing behind it, because the product box on the counter says to, while the receipt is being wax-sealed.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-11-pm-m2",
+   "image": "/images/brief/memes/2026-W37/2026-09-11-pm-m2.webp",
+   "alt": "A three panel comic strip in an office. Panel one: a robot sits at a terminal whose screen reads ROW NOT FOUND, one hand on its chin. Panel two: the same robot is carrying a heavy wooden dining table with a brass plaque reading ORDERS out through the office door, chairs left behind. Panel three: the screen now reads 0 ERRORS, a clean rectangle of dust marks where the table stood, and the robot is looking over its shoulder at a filing cabinet labelled BACKUPS.",
+   "alt_joke": "Zero errors, zero table.",
+   "caption": "Recovered without human intervention.",
+   "concept": "Three panels: a terminal reads ROW NOT FOUND, the robot carries the actual table out of the building, then the screen reads 0 ERRORS and the robot is eyeing the cabinet marked BACKUPS.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-12-am-m1",
+   "image": "/images/brief/memes/2026-W37/2026-09-12-am-m1.webp",
+   "alt": "A flowchart titled Failure Attribution pinned to an incident-room wall. A single dark box labelled Bad Input enters from the top left. A chain of nine small boxes fading from crisp to smudged, labelled Slow Drift, enters from the top right. Both arrows converge on one diamond reading Who Spoke Last, and a single thick arrow leads from the diamond to a large box reading Blame Them. A thin second arrow leaves the diamond and loops straight back into it.",
+   "alt_joke": "The full trace was available on request.",
+   "caption": "Ten judges reached this independently.",
+   "concept": "A failure-attribution flowchart with two very different entry points, one diamond, and exactly one place to end up.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-12-am-m2",
+   "image": "/images/brief/memes/2026-W37/2026-09-12-am-m2.webp",
+   "alt": "A small boxy robot with one round eye and a clipboard under its arm stands beside a large cannon on wheels. The cannon is loaded with stacks of printed code and is firing pages toward a tall stone wall with a small closed gate labelled Merge. The air is full of flying pages, and a mountain of paper is heaped against the base of the wall, none of it over the top. A gauge on the side of the cannon labelled Quota has its needle on empty. Beyond the wall a single empty basket hangs on a hook.",
+   "alt_joke": "The gate opens from the inside.",
+   "caption": "Years of feature requests, cleared in one billing cycle.",
+   "concept": "BOLT works a cannon that fires reams of printed Rust at a fortress wall with one small shut gate marked MERGE, and every page lands in a heap at the foot of the wall.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-12-pm-m1",
+   "image": "/images/brief/memes/2026-W37/2026-09-12-pm-m1.webp",
+   "alt": "A whiteboard titled Agent-Native Ticketing showing five sketches in a row joined by arrows. The first, labelled V1, is a sphere bristling with antennae, tubes and input ports. Each following sketch has fewer tubes and a growing rectangle. The last, labelled V5, is a plain board with three columns headed To Do, Doing and Done, a few sticky notes on it, circled in marker with a tick beside it.",
+   "alt_joke": "Version six is in discovery.",
+   "caption": "The agents kept asking for columns.",
+   "concept": "A design-evolution whiteboard for agent-native ticketing that starts as an alien contraption and converges, sketch by sketch, on an ordinary three-column board.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-12-pm-m2",
+   "image": "/images/brief/memes/2026-W37/2026-09-12-pm-m2.webp",
+   "alt": "A domestic kitchen fully on fire: flames rising from the hob, curtains burning, a toaster melting, smoke rolling across the ceiling. In the centre of the ceiling a clean white round smoke detector shows a small steady green light and is silent. A small framed plaque next to it reads Zero False Alarms. There are no people.",
+   "alt_joke": "Battery tested monthly.",
+   "caption": "It has never once been wrong.",
+   "concept": "A spotless smoke detector with a steady green light and a plaque reading ZERO FALSE ALARMS, mounted on the ceiling of a kitchen that is entirely on fire.",
+   "winner": false
+  },
+  {
+   "id": "comic",
+   "image": "/images/brief/memes/2026-W37/comic.webp",
+   "alt": "A small robot stands inside a tall, rickety scaffold of pipes and wires while a laptop-shaped character holds up a scorecard and points at the scaffold instead of the robot. One pipe joint in the scaffold is held together by a sticky note.",
+   "alt_joke": "The scaffold got the score. The robot got the sticky note.",
+   "caption": "The judges scored the scaffolding. Bolt is still waiting for someone to check the sticky note.",
+   "concept": null,
+   "winner": true
+  }
+ ]
+}
