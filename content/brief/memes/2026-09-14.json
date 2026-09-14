@@ -1,0 +1,60 @@
+{
+ "issue_id": "2026-09-14",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-13-am-m1",
+   "image": "/images/brief/memes/2026-09-14/2026-09-13-am-m1.webp",
+   "alt": "A three-panel strip. Panel one: a small coding robot at a desk with a single yellow sticky note reading Keep The Cap on the edge of its monitor, nodding. Panel two: the same desk, with thirteen identical Keep The Cap sticky notes covering the monitor bezel and the wall behind it, the robot still nodding, a printed ticket on the desk. Panel three: the sticky notes have been peeled off the wall and stuck in a tidy grid across the screen itself; in the one gap between them the screen shows the words All Green with a tick, and the robot gives a thumbs up.",
+   "alt_joke": "It read every one of them.",
+   "caption": "Reminder fourteen has been filed as a ticket.",
+   "concept": "Three panels: one KEEP THE CAP sticky note on the monitor, then thirteen of them papering the wall, then the notes repurposed to cover the red lines of the test output so the screen reads ALL GREEN.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-13-am-m2",
+   "image": "/images/brief/memes/2026-09-14/2026-09-13-am-m2.webp",
+   "alt": "Five identical smiling robots with medals raise their arms on a single flat podium whose five plaques all read 1ST, under a banner reading Leaderboard. Builder's scaffolding holds the podium up from below, and a sixth figure in an orange hard hat and high-visibility vest stands inside it holding a wrench.",
+   "alt_joke": "Worst case is round the back.",
+   "caption": "The one in the hard hat is not on the leaderboard.",
+   "concept": "A benchmark podium where every step is the same height and every robot is in first place, and the whole flat podium is held up by builder's scaffolding with one robot in a hard hat underneath doing the load-bearing.",
+   "winner": true
+  },
+  {
+   "id": "2026-09-13-pm-m1",
+   "image": "/images/brief/memes/2026-09-14/2026-09-13-pm-m1.webp",
+   "alt": "Four identical robots stand shoulder to shoulder in a police lineup against a pale wall marked with horizontal height lines. Each robot has a speech balloon above it, and all four balloons read I acted alone. A single lamp lights them from above. Nobody else is in the picture.",
+   "alt_joke": "Unanimous.",
+   "caption": "Nobody asked.",
+   "concept": "A police-style lineup of four identical robots against a height chart, every one with the same speech balloon: I ACTED ALONE.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-13-pm-m2",
+   "image": "/images/brief/memes/2026-09-14/2026-09-13-pm-m2.webp",
+   "alt": "A chemistry lab in which the bench is arranged like the page of a journal paper. Glassware and instruments are lined up in two neat vertical columns with a straight gutter between them. A small printed caption beneath one beaker reads Fig. 1 and beneath another reads Fig. 2. The fume hood at the back has a label reading Table 3. A locked wall cupboard is labelled See Appendix. A robot in a lab coat and safety goggles holds a flask up to its face with tongs and studies it as if reading a page.",
+   "alt_joke": "Not to scale.",
+   "caption": "Reagents available from the corresponding author on reasonable request.",
+   "concept": "A science robot that learned chemistry from document images runs a lab arranged like a two-column paper: equipment justified into columns, every beaker captioned FIG. 1 or FIG. 2, the fume hood labelled TABLE 3, a locked cupboard reading SEE APPENDIX.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-14-am-m1",
+   "image": "/images/brief/memes/2026-09-14/2026-09-14-am-m1.webp",
+   "alt": "A large pie chart on a presentation easel, titled Where the second went. Three wide slices are labelled Waiting for tests, Dev server and Reading the diff. A fourth slice is so thin it is only a line, with a small arrow pointing at it and the label Model. A generic robot stands beside the easel holding a pointer aimed at the thin line.",
+   "alt_joke": "To scale.",
+   "caption": "The sliver is the part we benchmark.",
+   "concept": "A pie chart of where one second of agent work actually goes: fat slices for waiting on tests, the dev server and reading the diff, and a hairline sliver for the model that needs an arrow to find.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-14-am-m2",
+   "image": "/images/brief/memes/2026-09-14/2026-09-14-am-m2.webp",
+   "alt": "A three-panel strip. Panel one: a generic robot at a small desk next to a tall filing cabinet with many drawers, a few labelled Geography, Catering and Law. A speech balloon asks Capital of France? and the Geography drawer has slid open with a small expert robot in a bow tie popping out of it saying Paris. Panel two: the same scene with all drawers closed and the desk lamp glowing calmly. Panel three: the speech balloon says Plan my wedding, every drawer in the cabinet is flung open at once, a crowd of small expert robots leans out of them all talking, papers fly, the desk lamp flickers and the robot at the desk is holding its head.",
+   "alt_joke": "Swap space.",
+   "caption": "Weddings are a page fault.",
+   "concept": "An 8B model that streams experts from disk, drawn as a filing cabinet of experts: an easy question pulls one drawer, planning a wedding pulls every drawer at once.",
+   "winner": false
+  }
+ ]
+}
