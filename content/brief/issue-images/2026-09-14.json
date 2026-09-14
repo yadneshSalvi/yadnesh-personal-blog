@@ -1,0 +1,92 @@
+{
+ "issue_id": "2026-09-14",
+ "type": "daily",
+ "renders": 6,
+ "cost_usd": 1.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "Thirteen identical signposts form a fence across a field. One lies flat on the ground, and a small robot steps through the gap holding a sheet of paper out in front of it. A large check mark floats behind the fence.",
+   "bytes": [
+    63756,
+    60300
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 3,
+   "cost_usd": 0.75,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A row of thirteen identical wooden signposts planted in a straight line across the middle of the frame, forming a loose fence, all facing the viewer and all carrying the same short rule. One signpost near the centre has been pulled up and laid flat on the ground. A small featureless robot walks through the gap it left, holding a single sheet of paper out ahead of it like a pass. Behind the fence a large check mark hangs in the air. Everything sits in the middle third of the frame with open ground on every side.",
+   "labels": [
+    "KEEP THE CAP",
+    "TICKET"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-14T00:16:25Z"
+  },
+  {
+   "key": "5995e63e430e3d98",
+   "story_id": "5995e63e430e3d98",
+   "light_name": "5995e63e430e3d98-light.webp",
+   "dark_name": "5995e63e430e3d98-dark.webp",
+   "alt": "Two side-by-side drawings. On the left a robot sits inside a frame of struts whose mechanical arms pull a row of levers. On the right the frame is gone and the robot pulls the same levers itself. An arrow points from left to right.",
+   "bytes": [
+    52004,
+    47630
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A diagram in two halves, side by side, well inside the frame. On the left, a small featureless robot sits inside a rigid frame of struts and brackets, and mechanical arms belonging to the frame are pulling a row of levers while the robot only watches. On the right, the same row of levers with the frame gone and the robot's own arms on the levers. A single plain arrow runs from the left half to the right half.",
+   "labels": [
+    "SCAFFOLD",
+    "MODEL"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-14T00:18:58Z"
+  },
+  {
+   "key": "c8ef7a7e9ddae8a2",
+   "story_id": "c8ef7a7e9ddae8a2",
+   "light_name": "c8ef7a7e9ddae8a2-light.webp",
+   "dark_name": "c8ef7a7e9ddae8a2-dark.webp",
+   "alt": "Four stations arranged in a circle and joined by clockwise arrows: a notepad, a keyboard, a furnace and a set of scales. A robot in the centre turns a crank. A human figure outside the circle holds a dial, and a counter sits above the loop.",
+   "bytes": [
+    47224,
+    45886
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A circular loop diagram in the centre of the frame made of four stations joined by curved arrows running clockwise: a notepad, a keyboard, a small furnace, and a set of scales. A small featureless robot stands in the middle of the loop turning a crank. Outside the loop a human figure rests one hand on a large dial that sets the loop's pace. A small counter above the loop shows a number.",
+   "labels": [
+    "PROPOSE",
+    "IMPLEMENT",
+    "TRAIN",
+    "EVALUATE",
+    "297"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-14T00:20:27Z"
+  }
+ ]
+}
