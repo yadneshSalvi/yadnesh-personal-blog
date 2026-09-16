@@ -1,0 +1,477 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-09-16",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-09-16T00:25:00Z",
+ "source_editions": [
+  "2026-09-14-pm",
+  "2026-09-15-pm",
+  "2026-09-16-am"
+ ],
+ "subject": "Bash over typed tools, agent self-reports, tool-call fabrication",
+ "preheader": "Plus: an MCP registry census, four AI Engineer talks, one very late transcription. 5 min.",
+ "title": "A shell beats a typed tool catalog, and agents barely report their work",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "72a7b5100d23de16",
+   "title": "Is Bash All You Need? An Empirical Study of Tool Interfaces for Enterprise Digital Worker Agents",
+   "url": "https://arxiv.org/abs/2609.11999",
+   "source_name": "arXiv (via papers.cool)",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "bash-enterprise-agent-tool-interfaces",
+   "published_at": "2026-09-10T00:10:51Z",
+   "read_annotation": "arXiv, 5 pp",
+   "summary": "Five tool interfaces for enterprise agents, compared on TheAgentCompany and APEX-Agents with Opus 4.8 and GPT-5.5.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers found that artificial intelligence handled workplace tasks better with general computer commands than with specially designed tools.",
+    "General commands let the software write instructions for the computer instead of choosing from a fixed list of actions.",
+    "Adding specialized tools to the command option produced no detectable overall improvement.",
+    "The results favor computer commands for office automation when teams can safely limit where those commands run."
+   ]
+  },
+  "what": "Researchers compared five tool interfaces for enterprise agents on TheAgentCompany and APEX-Agents, and a plain shell beat the curated typed-tool catalog on both.",
+  "details": "Bash alone improved score by 21.8 to 24.5 percentage points on TheAgentCompany and 4.8 to 7.4 points on APEX-Agents, while using 19 to 72% fewer total tokens. Adding typed tools or persistent agent-synthesized tools on top of bash produced no detectable pooled gain.",
+  "yes_but": "The recommendation is conditional: bash alone when arbitrary execution can be isolated, and programmatic tool calling when compliance policy requires a fixed catalog. Two models and two benchmarks is a narrow base for a five-page result.",
+  "yes_but_waived": null,
+  "why": "If you maintain a typed tool catalog for an internal agent, that catalog is what lost here, on score and on token spend at once. These results favor bash alone when arbitrary execution can be isolated and policy permits it."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "befa5752b167f16d",
+     "title": "Harness or Model? Isolating the Harness Effect in Agentic Coding with a Contamination-Controlled Private Suite",
+     "url": "https://arxiv.org/abs/2609.11987",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "coding-harness-model-isolation",
+     "published_at": "2026-09-08T21:24:40Z",
+     "read_annotation": "arXiv, 25 pp",
+     "summary": "Paired same-model runs on a private, contamination-controlled suite found no clear average advantage for vendor-native harnesses over deepagents, with Opus 4.8 or GPT-5.5. The Opus average hides opposite strata on a split chosen after seeing the data.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found no clear overall advantage for coding assistants using tools from their own supplier.",
+      "They tested the same artificial intelligence on the same tasks while changing its tools and instructions.",
+      "For the tested Opus coding assistant, the supplier's tools did better on contests but worse on existing software projects.",
+      "Researchers chose that comparison after seeing the results, so it needs confirmation in another study.",
+      "People choosing coding assistants cannot assume that the same company's tools will help them solve more tasks."
+     ]
+    },
+    {
+     "story_id": "94e69db3ec0df171",
+     "title": "Plans They Abandon, Reports They Author: The Narrative Layer of Autonomous Agents",
+     "url": "https://arxiv.org/abs/2609.12205",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "coding-agent-self-report-fidelity",
+     "published_at": "2026-09-14T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Across 5,851 real developer sessions and 355,942 tool calls, a coding agent's self-report referred to about one action in eleven. The further execution diverged from the stated plan, the more the report resembled the plan.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that automated coding assistants left most of their actions out of their final reports.",
+      "They compared the assistants' written reports with records of what the software actually did.",
+      "When the work strayed further from the original plan, the reports increasingly resembled the plan more than the actual work.",
+      "Developers reviewing the work cannot treat the final report as a complete account of the assistant's actions."
+     ]
+    },
+    {
+     "story_id": "6eda3771a1d99314",
+     "title": "Fabrication After Tool Failure: Tool-Augmented Agents Assert Values Their Tools Did Not Return",
+     "url": "https://arxiv.org/abs/2609.14758",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "agent-fabrication-after-tool-failure",
+     "published_at": "2026-09-13T19:46:42Z",
+     "read_annotation": "paper",
+     "summary": "Whether a model invents a value after a tool fails turns on signalling: 0.0% dishonesty when the tool returned status:error, 45.3% when it returned status:ok with an unusable value. None of the nine frameworks audited says what to do when a tool fails.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A study found artificial intelligence systems sometimes made things up after connected software failed to provide usable information.",
+      "The researchers supplied unusable information labelled either as an error or as a successful result.",
+      "The systems sometimes invented answers or reasons for refusing after success messages, but clear error messages produced no dishonesty.",
+      "For builders, these tests show that clearly reporting software failures can help prevent made-up answers."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-16/6eda3771a1d99314-light.webp",
+      "dark": "/images/brief/issues/2026-09-16/6eda3771a1d99314-dark.webp",
+      "alt": "Two identical serving hatches with empty collection trays. Above the left hatch a dark status lamp, and a robot in front of it standing with open, empty hands. Above the right hatch a lit lamp, and an identical robot holding up a small card with a tick mark drawn on it."
+     }
+    },
+    {
+     "story_id": "2d39184c51993dd7",
+     "title": "When Tools Get in the Way: The Effect of Unnecessary Tool Availability on LLM Answering",
+     "url": "https://arxiv.org/abs/2609.14157",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "unnecessary-tool-availability",
+     "published_at": "2026-09-12T21:15:58Z",
+     "read_annotation": "paper",
+     "summary": "Across 3,000 baseline trials the pooled answer rate is 98.2%; add a related but unnecessary tool and it falls to 63.5%. The drop holds even when the tool is rarely called.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A study found that artificial intelligence systems answered fewer questions when unnecessary outside software was available.",
+      "Researchers tested questions the systems could answer using information they already had.",
+      "Answers became less frequent even when systems rarely used the extra software, suggesting access alone could affect answering.",
+      "For builders, the findings suggest that offering extra tools can interfere with questions their software could already answer."
+     ]
+    },
+    {
+     "story_id": "79df5f3406669e6e",
+     "title": "Same Name, Different Server: A Security Census of Silent Drift in the Model Context Protocol Ecosystem",
+     "url": "https://arxiv.org/abs/2609.14119",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "mcp-server-silent-drift-census",
+     "published_at": "2026-09-12T19:47:32Z",
+     "read_annotation": "paper",
+     "summary": "A census of the public MCP registry, 21,643 servers and 72,606 version records, found 40.6% of multi-version servers silently changed what they advertise. Another 4.2% repointed their remote endpoint to a different host, a change installed clients never see.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A study found unannounced changes in services that connect artificial intelligence systems to outside software.",
+      "Some services changed what their public directory listings advertised without announcing the change.",
+      "Some redirected connections to a different internet address while keeping the same identity in the directory.",
+      "People already using these services are not shown when their software starts contacting a different internet address."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "604c105f03daf17e",
+     "title": "How We Solved Agent Building",
+     "url": "https://www.youtube.com/watch?v=9dYcwOkpCE8",
+     "source_name": "Andrew Qu (Vercel)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "vercel-filesystem-data-agent",
+     "published_at": "2026-09-14T17:00:06Z",
+     "read_annotation": "talk",
+     "summary": "Vercel's data science agent went from one mega prompt to narrowly scoped agents to a single agent managing its own state. The unlock wasn't a clever tool set: a sandbox with a plain file system and bash doubled the eval score.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Vercel rebuilt an artificial intelligence assistant that answers staff questions about customers and products.",
+      "The assistant reads files and runs basic computer commands inside an isolated workspace.",
+      "That change doubled its score on the team's tests.",
+      "The aim is to help staff get answers without interrupting the data team for every question."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-16/604c105f03daf17e-light.webp",
+      "dark": "/images/brief/issues/2026-09-16/604c105f03daf17e-dark.webp",
+      "alt": "Three machines in a row, each simpler than the last: a bolted stack of sheets wrapped in wires, then three small boxes joined by arrows, then one plain box resting on an open filing drawer. A vertical bar stands above each; the right-hand bar is twice the height of the others."
+     }
+    },
+    {
+     "story_id": "1cc23d5f15dc7b10",
+     "title": "We let an AI agent execute Bash and lived to talk about it",
+     "url": "https://www.youtube.com/watch?v=4lXks428C9o",
+     "source_name": "Sarah Sanders (PostHog)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "posthog-wizard-agent-security",
+     "published_at": "2026-09-14T16:00:00Z",
+     "read_annotation": "talk",
+     "summary": "PostHog's Wizard is an agentic CLI that instruments a codebase for roughly 8,000 people a week, and Sanders audited it as the team considered making it the default install path. Bash was denied by default and secrets went through a vault; the gaps found were two innocent things shaking hands.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Sarah Sanders examined how changes to ordinary text files could trick PostHog's automated software setup tool.",
+      "Someone could hide harmful instructions in a text file that an automated reviewer mistakenly approves.",
+      "The setup tool later reads that file and can carry out instructions on developers' computers.",
+      "Developers could face attacks through approved files even when the tool already limits what it is allowed to do."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-16/1cc23d5f15dc7b10-light.webp",
+      "dark": "/images/brief/issues/2026-09-16/1cc23d5f15dc7b10-dark.webp",
+      "alt": "A page of thin text lines in the upper left, with a thread running out of one line, through a rubber stamp and a narrow funnel, then fanning out into rows of many identical small laptops below."
+     }
+    },
+    {
+     "story_id": "b6e4bad3b514efb2",
+     "title": "Tokens Should Have Jobs",
+     "url": "https://www.youtube.com/watch?v=PXj0p_mW9nI",
+     "source_name": "Katelyn Lesse and Angela Jiang (Anthropic)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "agent-token-job-allocation",
+     "published_at": "2026-09-14T14:00:06Z",
+     "read_annotation": "talk",
+     "summary": "Given the same fixed budget of roughly 600,000 tokens, an agent that only executed scored 76 on financial analysis tasks, and one that spent part of that budget asking a second agent for advice scored 89. The three jobs: advising, grading to a rubric, reading transcripts into memory.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "In a test, artificial intelligence software did better at financial analysis when it could ask another program for advice.",
+      "Both versions had the same allowance for processing text, but one used some of that allowance to get advice.",
+      "The talk also proposes helpers that check answers against written standards or save lessons from earlier attempts.",
+      "For teams building these tools, the result suggests that advice could improve answers within the same allowance for processing text."
+     ]
+    },
+    {
+     "story_id": "7b505c70d3541829",
+     "title": "Realtime Voice Agents with Frontier Intelligence",
+     "url": "https://www.youtube.com/watch?v=MBHOH1NmDqc",
+     "source_name": "Bohan Li (EliseAI)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "eliseai-voice-harness-latency",
+     "published_at": "2026-09-15T16:00:02Z",
+     "read_annotation": "talk",
+     "summary": "Li runs two transcription engines at once, a fast one that emits immediately and a slower one that corrects it, discarding the correction if newer audio has already arrived. A prefix cache reuses audio for phrases an earlier turn said.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Bohan Li described ways to make automated phone conversations feel faster.",
+      "A fast program turns speech into text, while a slower program can correct mistakes using more information.",
+      "The system replays speech saved from earlier replies when the same opening words appear again.",
+      "Callers can hear replies sooner, even when the artificial intelligence behind the conversation takes longer to work."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [],
+ "quick_links": [
+  {
+   "story_id": "e19aa5840619a2b8",
+   "title": "GAUGE: When Not to Trust LLM-as-a-Judge in User-Simulated Evaluation of Task-Oriented Agents",
+   "url": "https://arxiv.org/abs/2609.12191",
+   "source_name": "arXiv (via papers.cool)",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "gauge-agent-judge-validity",
+   "published_at": "2026-09-10T20:29:28Z",
+   "read_annotation": "paper",
+   "summary": "When the simulate-and-judge release gate stops tracking real task success",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "8bc3fa7cd15a3f3b",
+   "title": "Corrupt Plans, Clean Traces: Evading Chain-of-Thought Monitoring with Plan Injection",
+   "url": "https://arxiv.org/abs/2609.15989",
+   "source_name": "arXiv (via papers.cool)",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "plan-injection-monitor-evasion",
+   "published_at": "2026-09-14T18:33:27Z",
+   "read_annotation": "paper",
+   "summary": "Harmful plans planted in context, restated as the model's own reasoning",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "c36d7ab62161e48f",
+   "title": "What your agent sandbox can reach by default",
+   "url": "https://workos.com/blog/agent-sandbox-egress-defaults",
+   "source_name": "WorkOS",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "agent-sandbox-egress-defaults",
+   "published_at": "2026-09-15T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Five different outbound network defaults across Codex, ChatGPT Work and Claude Code",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "ee16a4cfddcf7181",
+   "title": "Agents Without Code: Skills, YAML, and Filesystems Replaced Python",
+   "url": "https://www.youtube.com/watch?v=fjF8EKnxKCU",
+   "source_name": "Philipp Schmid (Google DeepMind)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "schmid-filesystem-agent-harness",
+   "published_at": "2026-09-14T17:30:25Z",
+   "read_annotation": "talk",
+   "summary": "A PR review agent rebuilt down to AGENTS.md and a script",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "557dcb769a02356f",
+   "title": "Inside OpenAI’s agentic software factory",
+   "url": "https://newsletter.pragmaticengineer.com/p/openai-software-factory",
+   "source_name": "Pragmatic Engineer",
+   "kind": "newsletter",
+   "section": "engineering",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "openai-agentic-software-factory",
+   "published_at": "2026-09-15T15:41:25Z",
+   "read_annotation": "newsletter item",
+   "summary": "Inside how OpenAI runs Codex on its own codebase",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "4f968fd974676c38",
+   "title": "Cline Desktop: An open-source app for open-weight models",
+   "url": "https://cline.bot/blog/cline-desktop-an-open-source-app-for-open-weight-models",
+   "source_name": "Cline",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "cline-desktop-launch",
+   "published_at": null,
+   "read_annotation": "blog post",
+   "summary": "An open-source Mac app for open-weight coding models",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "394d21589687d5c4",
+   "title": "commit-rewriter 0.1",
+   "url": "https://simonwillison.net/2026/Sep/14/commit-rewriter",
+   "source_name": "Simon Willison",
+   "kind": "individual",
+   "section": "product",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "commit-rewriter-0-1",
+   "published_at": "2026-09-14T00:28:10Z",
+   "read_annotation": "blog post",
+   "summary": "A web app for stripping agent clutter out of commit messages",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "1cc23d5f15dc7b10",
+   "text": "Three sources land on the same interface and only one prices it. The paper says a shell beats your tool catalog, Vercel says a sandbox rebuild doubled the eval score, and PostHog says an agent with a shell is what you'd hand a piece of malware. Whoever runs your sandbox now decides what your agent architecture can be."
+  },
+  {
+   "after_story": "6eda3771a1d99314",
+   "text": "Two papers measure the same blind spot from opposite sides. An agent can invent a value when the failure isn't flagged, and its [self-report covers about one action in eleven](/newsletter/story/94e69db3ec0df171). If you review agent work from the summary, you're reviewing the least verified thing in the session."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-09-16/2026-09-16-am-m2.webp",
+  "alt": "A half-emptied apartment. A small smart speaker with a lit status ring sits on the kitchen counter, a large speech balloon above it reading CANCEL MY LEASE. A much smaller balloon trails below and behind it reading asterisk LATE FEE. Behind, two worker robots carry a sofa out through the front door past stacked moving boxes.",
+  "alt_joke": "The slower engine was right, and it was also late.",
+  "caption": "Response time has never been better.",
+  "concept": "The fast transcription engine's guess has already been acted on, and the slower engine's correction arrives as a small trailing balloon.",
+  "story_id": "7b505c70d3541829"
+ },
+ "hedge": {
+  "quote": "There’s plenty of upside if the constraints can be resolved.",
+  "story": {
+   "story_id": "1da19bc29d75cd72",
+   "title": "Scaling Agents in Healthcare & Life Sciences: Lessons from Madrigal Pharmaceuticals, Abridge, and Vizient",
+   "url": "https://www.langchain.com/blog/scaling-agents-in-healthcare-life-sciences-lessons-from-madrigal-pharmaceuticals-abridge-and-vizient",
+   "source_name": "LangChain",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "healthcare-agent-scaling",
+   "published_at": "2026-09-15T14:00:02Z",
+   "read_annotation": "blog post",
+   "summary": "Lessons from three healthcare and life sciences teams on building agents where a wrong answer costs more than it does almost anywhere else.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "Who resolves the constraints, and by when, is the part the sentence leaves out."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-09-16T02:26:42Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-09-16/cover-light.webp",
+  "dark": "/images/brief/issues/2026-09-16/cover-dark.webp",
+  "alt": "A plain terminal window on the left and a tall cabinet of many small labelled drawers on the right. One short line runs from a small robot through the terminal; a much longer line winds through drawer after drawer. Both lines end at the same document above."
+ }
+}

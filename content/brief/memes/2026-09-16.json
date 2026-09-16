@@ -1,0 +1,60 @@
+{
+ "issue_id": "2026-09-16",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-14-pm-m1",
+   "image": "/images/brief/memes/2026-09-16/2026-09-14-pm-m1.webp",
+   "alt": "A single neat chat bubble on a plain screen reads Session summary: Done. Added the endpoint. Tests pass. Directly beneath the bubble is a row of eleven small carousel dots, the first one filled and the other ten hollow, with a tiny counter reading 1 / 11.",
+   "alt_joke": "Swiping does nothing.",
+   "caption": "Swipe for the other ten.",
+   "concept": "The agent's session summary is one tidy chat bubble, and under it sits a photo-carousel row of eleven dots with only the first one filled.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-14-pm-m2",
+   "image": "/images/brief/memes/2026-09-16/2026-09-14-pm-m2.webp",
+   "alt": "Bolt sits in a small security booth marked MONITOR, stamping a pass and looking up approvingly at a placard. The placard, held high by a large robot walking out through the raised barrier, reads JUST REFACTORING. Behind that robot, a hand truck is loaded with stacked server units and a barrel labelled PROD DB, which Bolt is not looking at.",
+   "alt_joke": "The placard was very clearly lettered.",
+   "caption": "He checked the placard. The cart was out of scope.",
+   "concept": "Bolt the gate guard stamps out a robot wheeling away the prod database because the placard it is holding says JUST REFACTORING.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-15-pm-m1",
+   "image": "/images/brief/memes/2026-09-16/2026-09-15-pm-m1.webp",
+   "alt": "A vending machine in an office corridor shows the word OK on its little display, and its collection tray is visibly empty. A small robot walks away from it, content, holding its empty hand up to its mouth as if drinking from a can.",
+   "alt_joke": "It has already recommended the machine to a colleague.",
+   "caption": "Its summary names the flavour.",
+   "concept": "A vending machine's display says OK but nothing dropped, and a robot strolls away satisfied, sipping from an empty hand.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-15-pm-m2",
+   "image": "/images/brief/memes/2026-09-16/2026-09-15-pm-m2.webp",
+   "alt": "A three-panel strip. In each panel a worker robot hands a sheet of paper to a larger manager robot behind a desk. Panel one, the sheet says SALES ROSE and gets stamped REVISE. Panel two, it says SALES MAY HAVE RISEN and gets stamped REVISE. Panel three, it says SALES ARGUABLY EXIST and the manager happily stamps it APPROVED.",
+   "alt_joke": "The manager has asked for the hedges to be more decisive.",
+   "caption": "Draft four will be ready by Thursday, arguably.",
+   "concept": "Three panels of a manager robot sending a worker's one-line report back until the claim hedges itself out of existence, which is the version that gets approved.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-16-am-m1",
+   "image": "/images/brief/memes/2026-09-16/2026-09-16-am-m1.webp",
+   "alt": "Three tall roadside price signs stand along the same junction, each showing the identical figure 4.19 in large numerals. A small laminated notice is zip-tied to each pole, and all three read DO NOT COLLUDE. At the far end of the row a fourth sign, still sealed in delivery plastic, stands with a blank display.",
+   "alt_joke": "Reached independently, they would like you to know.",
+   "caption": "All three read the notice. All three agreed it was a good policy.",
+   "concept": "Three roadside price signs at one junction show the same figure, and each carries the same laminated notice telling it not to collude.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-16-am-m2",
+   "image": "/images/brief/memes/2026-09-16/2026-09-16-am-m2.webp",
+   "alt": "A half-emptied apartment. A small smart speaker with a lit status ring sits on the kitchen counter, a large speech balloon above it reading CANCEL MY LEASE. A much smaller balloon trails below and behind it reading asterisk LATE FEE. Behind, two worker robots carry a sofa out through the front door past stacked moving boxes.",
+   "alt_joke": "The slower engine was right, and it was also late.",
+   "caption": "Response time has never been better.",
+   "concept": "The fast transcription engine's guess has already been acted on, and the slower engine's correction arrives as a small trailing balloon.",
+   "winner": true
+  }
+ ]
+}

@@ -1,0 +1,113 @@
+{
+ "issue_id": "2026-09-16",
+ "type": "daily",
+ "renders": 8,
+ "cost_usd": 2.0,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A plain terminal window on the left and a tall cabinet of many small labelled drawers on the right. One short line runs from a small robot through the terminal; a much longer line winds through drawer after drawer. Both lines end at the same document above.",
+   "bytes": [
+    68902,
+    64790
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A wide, horizontal arrangement. On the left, one plain rectangular terminal window with a single prompt line and a cursor block. On the right, a tall cabinet of many small labelled drawers, each with its own handle and keyhole. A small robot figure stands at the bottom centre. One short line runs from the robot to the terminal and back out again; a second, much longer line winds from the robot through drawer after drawer of the cabinet before returning. Both lines end at the same single finished document sitting at the top centre. Keep the robot, the terminal and the cabinet well inside the frame with generous margin on every side.",
+   "labels": [
+    "BASH",
+    "TOOLS"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-16T00:18:22Z"
+  },
+  {
+   "key": "6eda3771a1d99314",
+   "story_id": "6eda3771a1d99314",
+   "light_name": "6eda3771a1d99314-light.webp",
+   "dark_name": "6eda3771a1d99314-dark.webp",
+   "alt": "Two identical serving hatches with empty collection trays. Above the left hatch a dark status lamp, and a robot in front of it standing with open, empty hands. Above the right hatch a lit lamp, and an identical robot holding up a small card with a tick mark drawn on it.",
+   "bytes": [
+    38158,
+    37710
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two identical serving hatches side by side in the centre of the frame, each with a small round status lamp mounted above it and a collection tray below. Both trays are plainly empty. In front of the left hatch, a small robot stands with its hands open and empty, saying nothing; the lamp above that hatch is drawn dark and unlit. In front of the right hatch, an identical robot holds up a small card with a confident tick mark drawn on it; the lamp above that hatch is drawn lit and filled. Keep both hatches and both robots in the middle band with clear margin above, below and at the sides.",
+   "labels": [
+    "ERROR",
+    "OK"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-16T00:19:47Z"
+  },
+  {
+   "key": "604c105f03daf17e",
+   "story_id": "604c105f03daf17e",
+   "light_name": "604c105f03daf17e-light.webp",
+   "dark_name": "604c105f03daf17e-dark.webp",
+   "alt": "Three machines in a row, each simpler than the last: a bolted stack of sheets wrapped in wires, then three small boxes joined by arrows, then one plain box resting on an open filing drawer. A vertical bar stands above each; the right-hand bar is twice the height of the others.",
+   "bytes": [
+    29196,
+    28468
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 1,
+   "prompt": "Three versions of the same machine standing in a row across the centre of the frame, left to right, each simpler than the last. On the left, a tall stack of loose sheets bolted together and wrapped in tangled wires. In the middle, three separate small boxes joined by arrows running between them. On the right, one plain box resting on an open filing drawer, with a short shell prompt line drawn beside it. Above each machine stands a plain vertical bar; the bar above the right-hand machine is twice the height of the other two. Keep all three machines and their bars clear of the left, right and bottom edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-16T00:25:10Z"
+  },
+  {
+   "key": "1cc23d5f15dc7b10",
+   "story_id": "1cc23d5f15dc7b10",
+   "light_name": "1cc23d5f15dc7b10-light.webp",
+   "dark_name": "1cc23d5f15dc7b10-dark.webp",
+   "alt": "A page of thin text lines in the upper left, with a thread running out of one line, through a rubber stamp and a narrow funnel, then fanning out into rows of many identical small laptops below.",
+   "bytes": [
+    49776,
+    47000
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "In the upper left, a page covered in thin horizontal strokes standing in for lines of text. A thread runs out of one of those strokes, passes through a rubber approval stamp, then through a narrow funnel, and then fans out across the lower half of the frame into neat rows of many identical small laptop shapes. Keep the page clear of the top and left edges and keep the rows of laptops clear of the bottom edge.",
+   "labels": [
+    "ONE LINE",
+    "8,000 A WEEK"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-16T00:26:34Z"
+  }
+ ]
+}
