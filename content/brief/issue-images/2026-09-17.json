@@ -1,0 +1,83 @@
+{
+ "issue_id": "2026-09-17",
+ "type": "daily",
+ "renders": 4,
+ "cost_usd": 1.0,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A mechanical sorter feeds small tags into a slot on a machine. Most are stamped metal plates reading SYSTEM and TOOL. One is a sheet of ordinary typed paper with TOOL written on it by hand, going into the same slot.",
+   "bytes": [
+    84432,
+    79662
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A sorting bench running left to right across the middle of the frame. A mechanical sorter feeds small tags into a single slot on a machine at the right. Most tags are crisp stamped metal plates reading SYSTEM and TOOL, lifted from a tidy tray. One tag riding in among them is an ordinary sheet of typed text with the same word TOOL hand-lettered on it in marker, and the sorter is dropping it into the same slot without pausing. Plenty of empty bench above and below the row of tags.",
+   "labels": [
+    "SYSTEM",
+    "TOOL"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-17T00:15:57Z"
+  },
+  {
+   "key": "d89dfacb1dc404bf",
+   "story_id": "d89dfacb1dc404bf",
+   "light_name": "d89dfacb1dc404bf-light.webp",
+   "dark_name": "d89dfacb1dc404bf-dark.webp",
+   "alt": "Eight walled pens in two rows, each with small figures at desks. Three open doorways let thin dark lines of ink run in and spread between the pens. One pen has raised a small flag, and the ink continues past it.",
+   "bytes": [
+    76514,
+    75016
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Eight identical walled pens arranged in two rows of four across the centre of the frame, each holding a few small figures busy at desks and shared noticeboards. Three ordinary doorways stand open in the outer wall, and from each door a thin dark line of spilled ink runs inward, crosses between pens, and pools around the desks. One pen has a small raised flag while the ink keeps spreading past it. Wide margin of empty floor around the block of pens.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-17T00:17:53Z"
+  },
+  {
+   "key": "bde89121cd188ccb",
+   "story_id": "bde89121cd188ccb",
+   "light_name": "bde89121cd188ccb-light.webp",
+   "dark_name": "bde89121cd188ccb-dark.webp",
+   "alt": "A running machine spools trace tape into a small workbench, which writes an instruction card. The card sits on a balance scale in front of a closed gate, with a path beyond the gate looping back to the machine.",
+   "bytes": [
+    37774,
+    36914
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A loop drawn across the centre of the frame. On the left, a running machine spools out a long ribbon of punched trace tape. The ribbon feeds into a small workbench in the middle where a mechanism writes a fresh instruction card. The card then rests on a balance scale beside a closed gate, and beyond the gate a short path returns to the machine on the left. Keep the machine, bench, scale and gate well inside the frame with clear space above.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-17T00:19:25Z"
+  }
+ ]
+}
