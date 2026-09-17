@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-09-17",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-16-pm-m1",
+   "image": "/images/brief/memes/2026-09-17/2026-09-16-pm-m1.webp",
+   "alt": "A scatter chart titled Verified Top 30. All the dots overlap into a single dense blob near the top. Hand-drawn arrows from every direction point into that blob, each labelled US.",
+   "alt_joke": "Rank 14 has already booked the keynote.",
+   "caption": "The paired tests found no difference. The arrow tool found thirty winners.",
+   "concept": "A scatter chart of the SWE-bench top entries is one indistinguishable blob of dots, and hand-drawn arrows labelled US all point into the same blob.",
+   "winner": true
+  },
+  {
+   "id": "2026-09-16-pm-m2",
+   "image": "/images/brief/memes/2026-09-17/2026-09-16-pm-m2.webp",
+   "alt": "A three-panel strip. Panel one: a robot bouncer at a door marked System Only lets in a laptop whose wristband says System in marker. Panel two: the bouncer now stands beside a sign banning handwritten wristbands and blocks the laptop. Panel three: the same laptop walks past the bouncer wearing a lanyard that says Tool in the same marker, and the bouncer nods.",
+   "alt_joke": "The reasoning badge is also a sticky note.",
+   "caption": "Recommended flag enabled. Lanyards were out of scope.",
+   "concept": "A robot bouncer at a SYSTEM ONLY door lets in a laptop with a handwritten SYSTEM wristband, then posts a no-handwritten-wristbands rule, then waves the same laptop through wearing a handwritten TOOL lanyard.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-17-am-m1",
+   "image": "/images/brief/memes/2026-09-17/2026-09-17-am-m1.webp",
+   "alt": "A swimming pool on the right of the frame with a capsized inflatable ring, water sloshed over the edge and the ladder lying on the tiles. On the left a robot lifeguard sits high in a lifeguard chair turned away from the water, watching a monitor that shows a calm empty version of the same pool, labelled Trace Replay. A clipboard reading All Clear hangs from the chair and an unused whistle hangs at the robot's neck.",
+   "alt_joke": "Findings are filed lane by lane.",
+   "caption": "It adds no latency to the swimming. The whistle applies to whoever gets in next.",
+   "concept": "A pool lifeguard sits with their back to the pool watching a calm recorded replay of the pool, while the actual pool is visibly in trouble.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-17-am-m2",
+   "image": "/images/brief/memes/2026-09-17/2026-09-17-am-m2.webp",
+   "alt": "The front garden of a small house. A wooden post in the centre holds a neatly hand-lettered sign reading Please Read llms.txt, with a wooden leaflet box beneath it marked Take One, still full and partly cobwebbed. A deep bare trail is worn through the lawn and flowerbed, curving wide around the post and ending at a side window that has been levered open with its curtain hanging out.",
+   "alt_joke": "The box was refilled on Monday.",
+   "caption": "Half the street has put up the sign. Next quarter it gets a schema.",
+   "concept": "A house puts up a careful sign directing visitors to llms.txt, and the worn trail in the lawn curves around the sign and ends at a forced side window.",
+   "winner": false
+  }
+ ]
+}

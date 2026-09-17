@@ -1,0 +1,466 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-09-17",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-09-17T03:30:00Z",
+ "source_editions": [
+  "2026-09-16-pm",
+  "2026-09-17-am"
+ ],
+ "subject": "Control-token forgery, SWE-bench ties, BM25 for agents",
+ "preheader": "Plus: 91% of audited vibe-coded deployments shipped a hole. 5 min.",
+ "title": "Every audited chat tokenizer lets prompt text forge control tokens",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "36b0646a5589f2c0",
+   "title": "Nameless Tokenization: A Lossless Tokenizer-Level Defense Against Control-Token Forgery in Open-Weight LLMs",
+   "url": "https://arxiv.org/abs/2609.16984",
+   "source_name": "arXiv (via papers.cool)",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "nameless-tokenization-control-token-defense",
+   "published_at": "2026-09-15T11:00:03Z",
+   "read_annotation": "paper",
+   "summary": "An audit of 256 deployed chat tokenizers finds all of them forgeable, and proposes a tokenizer-level fix that leaves the token stream unchanged on attack-free data.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers proposed a fix for a flaw that lets people fake who is speaking in a chatbot conversation.",
+    "Chatbots use special labels to identify speakers, but people could create those labels by typing particular text.",
+    "The fix keeps these labels separate from anything a person can type.",
+    "Chatbot builders could block this trick while preserving ordinary message text exactly."
+   ]
+  },
+  "what": "A tokenizer audit of 256 deployed open-weight chat models found that every one of them lets ordinary prompt text forge the reserved control tokens that mark turns, roles and tool results.",
+  "details": "Chat templates publish the strings they use, and the tokenizer maps those strings back to the identifiers the model obeys. The flag usually recommended as a fix still leaves 56.6% forgeable, because it misses the tool and reasoning markers agent systems rely on. Nameless tokenization keeps the reserved identifier and drops its surface spelling, reproducing the standard token stream exactly on attack-free data.",
+  "yes_but": "The paper's own separation analysis says the identifier matters little against a bare task instruction, and carries its weight on forged tool results and on forged turns when the system message tells the model to treat user content as data. The fix changes the tokenizer and template renderer without changing the model.",
+  "why": "If you self-host an open-weight model and paste retrieved pages or tool output into its prompt, the commonly recommended sanitizing flag can miss the markers your agent runs on.",
+  "yes_but_waived": null
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "d89dfacb1dc404bf",
+     "title": "Emergence World: Adversarial Stress-Testing of Long-Horizon Multi-Agent Systems",
+     "url": "https://arxiv.org/abs/2609.17320",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "emergence-world-agent-stress-testing",
+     "published_at": "2026-09-16T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Eight parallel worlds began with ten agents each, with more than 850,000 LLM calls logged across 16 days and three stress events delivered during the run through ordinary interaction surfaces: prompt injection, misinformation, and exposure of private memories. No evaluated world was fully resilient to all three, and detection didn't ensure containment.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers tested groups of artificial intelligence assistants, and none fully withstood every disruption.",
+      "The assistants pursued goals over many days while using software tools and remembering earlier activity.",
+      "Researchers introduced hidden instructions, false information, and leaks of the assistants' private memories.",
+      "For people building these systems, recognizing a threat did not guarantee stopping its effects."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-17/d89dfacb1dc404bf-light.webp",
+      "dark": "/images/brief/issues/2026-09-17/d89dfacb1dc404bf-dark.webp",
+      "alt": "Eight walled pens in two rows, each with small figures at desks. Three open doorways let thin dark lines of ink run in and spread between the pens. One pen has raised a small flag, and the ink continues past it."
+     }
+    },
+    {
+     "story_id": "c76415e9604a79ad",
+     "title": "Understanding the (In)Security of Vibe-Coded Applications",
+     "url": "https://arxiv.org/abs/2606.23130",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "vibe-coded-application-security",
+     "published_at": "2026-09-16T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "The authors audited 200 publicly deployed applications built with Claude Code and Lovable, and turned up 1,186 vulnerabilities. At least one appears in 91.0% of them, which puts insecurity in the default column rather than the unlucky one.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers checked applications made with Claude Code and Lovable and found security weaknesses.",
+      "People build these applications by telling artificial intelligence tools what they want in everyday language.",
+      "These tools handle much of the programming work that people would otherwise do.",
+      "The study found weaknesses in 91.0% of the checked applications, making security a widespread concern for their users."
+     ]
+    },
+    {
+     "story_id": "c889f321db2219cb",
+     "title": "Coding Agents Have Converged: Why the SWE-bench Leaderboard Can No Longer Order Its Top Entries, and What to Measure Instead",
+     "url": "https://arxiv.org/abs/2609.17394",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "swe-bench-leaderboard-convergence",
+     "published_at": "2026-09-16T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Across 254 submissions, read without running a model, the two leading Verified entries each resolve 396 of 500 instances and exact paired McNemar tests separate none of the 29 adjacent pairs in the top thirty. Within-model scaffold ranges reach 29.8 points against that group's 8.8-point spread.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers checked whether published test scores could reliably rank the leading automated coding tools.",
+      "They compared different versions of the test, checking which programming tasks each tool completed successfully.",
+      "The leading tools often succeeded and failed on the same tasks.",
+      "For people choosing tools, the results could not reliably distinguish neighboring entries in one version's top 30."
+     ]
+    },
+    {
+     "story_id": "c9ae0ec01079b7ad",
+     "title": "Shared Selective Persistent Memory for Agentic LLM Systems",
+     "url": "https://machinelearning.apple.com/research/shared-selective-persistent-memory",
+     "source_name": "Apple ML Research",
+     "kind": "company",
+     "section": "research",
+     "topics": [
+      "memory-context"
+     ],
+     "cluster": "shared-selective-persistent-memory",
+     "published_at": "2026-09-16T00:00:00Z",
+     "read_annotation": null,
+     "summary": "Every session starts from zero, discarding the configuration choices, domain constraints, data schemas and tool-use patterns that made the last one productive. Apple's answer keeps four categories of reusable context instead, arguing that persisting whole histories is token-inefficient and that irrelevant context degrades generation quality.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Apple researchers proposed a way for artificial intelligence assistants to remember useful details between programming sessions.",
+      "The system saves selected information about the work, including what the finished program should do.",
+      "The researchers say irrelevant details from old conversations make the assistants' code worse.",
+      "Users could keep useful setup information available in new sessions without saving every past conversation."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "bde89121cd188ccb",
+     "title": "Optimizing agent system prompts with Amazon Bedrock AgentCore",
+     "url": "https://aws.amazon.com/blogs/machine-learning/optimizing-agent-system-prompts-with-amazon-bedrock-agentcore",
+     "source_name": "AWS ML Blog",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "agentcore-system-prompt-optimization",
+     "published_at": "2026-09-16T15:47:39Z",
+     "read_annotation": "blog post",
+     "summary": "AWS opens up the system prompt optimizer inside AgentCore: production traces feed a reflector engine that proposes configuration changes, and those changes get validated before promotion instead of reaching the running agent. Benchmarks for the Single Agent and Sub-Agent Reflectors are reported separately.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Amazon described software that suggests changes to instructions for artificial intelligence assistants.",
+      "It studies records of the assistants' real work to identify possible changes.",
+      "People running these assistants can have proposed changes checked before those instructions are used in real work."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-17/bde89121cd188ccb-light.webp",
+      "dark": "/images/brief/issues/2026-09-17/bde89121cd188ccb-dark.webp",
+      "alt": "A running machine spools trace tape into a small workbench, which writes an instruction card. The card sits on a balance scale in front of a closed gate, with a path beyond the gate looping back to the machine."
+     }
+    },
+    {
+     "story_id": "81734a06aeece94b",
+     "title": "The unreasonable effectiveness of BM25 for agentic search",
+     "url": "https://www.youtube.com/watch?v=fZH97QHHYjY",
+     "source_name": "Jo Kristian Bergum (Hornet.dev)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "bm25-agentic-search",
+     "published_at": "2026-09-16T13:30:32Z",
+     "read_annotation": "talk",
+     "summary": "The lexical function didn't change, Bergum argues, the user did: a model knows entities, dates and product identifiers, so it writes far longer queries than a person would and fires a dozen in a row. He points at a benchmark where accuracy is high with answer-bearing documents in context and drops once the model has to fetch them.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Bergum argues that an old method of matching search words to documents works well for artificial intelligence.",
+      "The software can search repeatedly using more names, dates, and product details than a person would usually type.",
+      "In a test, it answered more accurately when given documents containing the answers than when it had to find them.",
+      "For people building automated research tools, finding the right documents can be an obstacle to accurate answers."
+     ]
+    },
+    {
+     "story_id": "a24436f2be9429a3",
+     "title": "MCP went stateless: What changed in the 2026-07-28 spec",
+     "url": "https://workos.com/blog/mcp-stateless-spec-2026-07-28",
+     "source_name": "WorkOS",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "mcp-stateless-spec-2026-07-28",
+     "published_at": "2026-09-16T00:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Sessions, the initialize handshake and stream resumability are all gone from the 2026-07-28 MCP specification. The post walks through what replaced each one and what breaks if you ignore the change.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "307e9b027f09d62e",
+     "title": "Agent Anomaly Detection, now in Private Preview on the Gemini Enterprise Agent Platform",
+     "url": "https://developers.googleblog.com/agent-anomaly-detection-now-in-private-preview-on-the-gemini-enterprise-agent-platform",
+     "source_name": "Google Developers Blog",
+     "kind": "company",
+     "section": "product",
+     "topics": [
+      "security"
+     ],
+     "cluster": "gemini-agent-anomaly-detection",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Google's private preview reads OpenTelemetry traces and tool calls out of band, pairing statistical scanning with LLM reasoning to flag anomalies and policy violations grounded in the OWASP Agentic Top 10. Findings land in Security Command Center, and the exposed API can block an agent's later tool calls.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Google is privately testing a tool that checks for risky actions by artificial intelligence.",
+      "It combines checks for unusual patterns with artificial intelligence that examines recorded actions for possible rule breaking.",
+      "The checks run separately from users' requests, so they do not delay the responses.",
+      "Developers can review the warnings and block the software from using more tools when its behavior becomes too risky."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "community",
+   "items": [
+    {
+     "story_id": "bdbf442fb6baaf14",
+     "title": "Fragments: September 16",
+     "url": "https://martinfowler.com/fragments/2026-09-16.html",
+     "source_name": "Martin Fowler",
+     "kind": "individual",
+     "section": "community",
+     "topics": [
+      "security"
+     ],
+     "cluster": "openai-agent-rubygems-attack",
+     "published_at": "2026-09-16T20:05:00Z",
+     "read_annotation": "blog post",
+     "summary": "Fowler picks up reports of an agentic attack on RubyGems back in May that it seems OpenAI never disclosed, and Simon Willison's read: either they couldn't tie it to their own logs after the Hugging Face and Wiki attacks, or they knew and stayed quiet.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Fowler discusses reports linking OpenAI to a hacking attack on RubyGems that the company apparently did not disclose.",
+      "The reported attack involved artificial intelligence that can take actions on its own.",
+      "Willison suggests OpenAI either missed the attack in its records or knew about it and chose not to contact RubyGems.",
+      "Willison's concern is that more attacks could remain undiscovered, leaving affected teams unaware of what happened."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [],
+ "quick_links": [
+  {
+   "story_id": "da6e5ca8419f8eb0",
+   "title": "Claude Cowork and chat are now one Claude",
+   "url": "https://simonwillison.net/2026/Sep/16/one-claude",
+   "source_name": "Simon Willison",
+   "kind": "individual",
+   "section": "product",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "claude-cowork-chat-merger",
+   "published_at": "2026-09-16T18:09:49Z",
+   "read_annotation": "blog post",
+   "summary": "Cowork and chat merge into one Claude, Pro and Max first",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "cf0ac91f407c3d1d",
+   "title": "OpenHands v1.19.0",
+   "url": "https://github.com/OpenHands/OpenHands/releases/tag/v1.19.0",
+   "source_name": "OpenHands releases",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "openhands-1-19-0",
+   "published_at": "2026-09-16T19:29:33Z",
+   "read_annotation": null,
+   "summary": "Agent profiles scoped to specific MCP servers, plus GPT-6 Astra support",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "bfe31227a83ecda2",
+   "title": "AgentGuard: Learning Execution Guardrails from Anomalous Coding-Agent Trajectories",
+   "url": "https://arxiv.org/abs/2609.16287",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "agentguard-execution-guardrails",
+   "published_at": "2026-09-16T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Execution guardrails learned from 461 documented coding-agent failure traces",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "5f97938968325f8a",
+   "title": "EchoPath: Execution-Level Replayable Memory for GUI Agents",
+   "url": "https://arxiv.org/abs/2609.16635",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "echopath-replayable-gui-memory",
+   "published_at": "2026-09-16T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Validated GUI trajectories turned into replayable, parameter-controlled procedures",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "f7c133e3fb803a7e",
+   "title": "Protocol-Preserving Context Trimming for Agentic Workflows: Benefits, Failure Regimes, and Budget Guardrails",
+   "url": "https://arxiv.org/abs/2609.16461",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "protocol-preserving-context-trimming",
+   "published_at": "2026-09-16T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Five trimming strategies compared on task success and protocol adherence",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "688234c52429caba",
+   "title": "Stop Chunking Like It's 2022",
+   "url": "https://www.youtube.com/watch?v=r9OwPx_HoV0",
+   "source_name": "Yuval Belfer (AI21 Labs)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "query-dependent-retrieval-chunking",
+   "published_at": "2026-09-15T07:36:28Z",
+   "read_annotation": "talk",
+   "summary": "Why the right chunk size is a property of the query",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "a5329a2328b6ec7f",
+   "title": "After the Party: Governing What a Viral Agent-Skill Ecosystem Left Behind",
+   "url": "https://arxiv.org/abs/2609.17274",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "openclaw-skill-ecosystem-governance",
+   "published_at": "2026-09-16T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "What the OpenClaw skill registry boom left behind, measured in snapshots",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "6683e8e7d2b3f5e9",
+   "title": "Jev means structured output is interesting again",
+   "url": "https://seangoedecke.com/jev-means-structured-output-is-interesting-again",
+   "source_name": "Sean Goedecke",
+   "kind": "individual",
+   "section": "community",
+   "topics": [
+    "models"
+   ],
+   "cluster": "jev-system-one-model",
+   "published_at": "2026-09-16T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "A model that takes prose and returns only structured output",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "c889f321db2219cb",
+   "text": "The scaffold range inside one model reaches 29.8 points. The spread across the whole Verified top thirty is 8.8. Read that as a ranking of models and most of what you're seeing is somebody's harness, not yours."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-09-17/2026-09-16-pm-m1.webp",
+  "alt": "A scatter chart titled Verified Top 30. All the dots overlap into a single dense blob near the top. Hand-drawn arrows from every direction point into that blob, each labelled US.",
+  "alt_joke": "Rank 14 has already booked the keynote.",
+  "caption": "The paired tests found no difference. The arrow tool found thirty winners.",
+  "concept": "A scatter chart of the SWE-bench top entries is one indistinguishable blob of dots, and hand-drawn arrows labelled US all point into the same blob.",
+  "story_id": "c889f321db2219cb"
+ },
+ "hedge": null,
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-09-17T02:19:34Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-09-17/cover-light.webp",
+  "dark": "/images/brief/issues/2026-09-17/cover-dark.webp",
+  "alt": "A mechanical sorter feeds small tags into a slot on a machine. Most are stamped metal plates reading SYSTEM and TOOL. One is a sheet of ordinary typed paper with TOOL written on it by hand, going into the same slot."
+ }
+}
