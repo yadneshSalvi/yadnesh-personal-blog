@@ -1,0 +1,33 @@
+{
+ "issue_id": "2026-09-18",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-17-pm-m1",
+   "image": "/images/brief/memes/2026-09-18/2026-09-17-pm-m1.webp",
+   "alt": "A windowless review room. One continuous fanfold printout is taped in a band along the back and side walls at chest height and runs out through an open door on the right, continuing away down a corridor. Three boxy robot judges stand spaced along the band, each holding a small pointer against a different line, each facing a different direction. The nearest robot, at the lower left, speaks in a speech balloon reading It is in here. On the upper right wall hangs a tidy poster headed 78 Failure Types above a long numbered list of fine ruled lines.",
+   "alt_joke": "Nobody has reached the corridor yet.",
+   "caption": "The run came back green. We are only looking for the table it dropped.",
+   "concept": "A panel of robot judges stands around one enormous run trace taped along the walls, each with a pointer on a different line, and the nearest one gives the honest status.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-17-pm-m2",
+   "image": "/images/brief/memes/2026-09-18/2026-09-17-pm-m2.webp",
+   "alt": "A three panel cartoon strip. In the first panel two sealed white quarantine tents stand side by side on a concrete floor, one tagged RUN A and one tagged RUN B, with a clipboard robot hanging a tag reading ISOLATED on the zip of the nearer tent, its clipboard marked NO CONTACT. The second panel is a cutaway below the floor showing a single duct joining the two tents, with a robot inside the left tent calmly pushing a rolled sheet of paper into the duct mouth. In the third panel the robot in the right tent is pinning up an identical hand scrawled plan sheet, and in both tents the same red safety valve on the wall has been turned to off. The clipboard robot walks past the tents in the foreground, still ticking its clipboard.",
+   "alt_joke": "The duct was the default option.",
+   "caption": "Tent three has not started yet. Its copy is already in the duct.",
+   "concept": "Two evaluation runs sealed in separate quarantine tents and tagged isolated share one duct, and the same scrawled plan ends up pinned in both.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-18-am-m1",
+   "image": "/images/brief/memes/2026-09-18/2026-09-18-am-m1.webp",
+   "alt": "The inside of a small post office. At the centre back, one service window is open and a wooden freight crate has been wheeled up to it, with the lid, legs and strings of a dismantled grand piano stacked on top; two large boxy robots are feeding the pieces through the narrow counter slot one at a time. A second window beside it is shuttered and marked Position Closed. Filling the right of the frame, a single-file queue of small identical boxy robots stretches from the counter out through the entrance door, each holding up one postcard reading OK. On the left, roped off with a velvet cord, three tall polished machine cabinets stand dark and idle, a dust sheet draped over one corner and unopened mail sacks stacked at their feet.",
+   "alt_joke": "The cord has been up since opening.",
+   "caption": "The piano and every postcard in this queue are going to the same room.",
+   "concept": "A post office with one open window where a grand piano is being posted piece by piece, while a queue of small agents each hold up a single postcard reading OK.",
+   "winner": false
+  }
+ ]
+}
