@@ -1,0 +1,83 @@
+{
+ "issue_id": "2026-09-18",
+ "type": "daily",
+ "renders": 6,
+ "cost_usd": 1.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "Three pipes enter the frame from different sides, each carrying a short paper strip with a few words on it. The pipes meet at a funnel, and past it the three strips lie end to end on one band whose words run in a continuous line toward a small open door.",
+   "bytes": [
+    47714,
+    46648
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 3,
+   "cost_usd": 0.75,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Three separate pipes enter from the left, the top and the bottom of the frame, each carrying one short paper strip with a few printed words on it. The three pipes meet at a plain funnel just right of centre, and past the funnel the three strips lie end to end along a single long band, their words now forming one continuous line that runs toward a small open door at the right. Keep the funnel and the joined band well inside the frame with clear space above and below.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-18T00:15:53Z"
+  },
+  {
+   "key": "f2c3590182a67858",
+   "story_id": "f2c3590182a67858",
+   "light_name": "f2c3590182a67858-light.webp",
+   "dark_name": "f2c3590182a67858-dark.webp",
+   "alt": "A left-to-right chain of small numbered boxes joined by connectors. An early box carries a filled dot, the chain continues unbroken, the last box carries a large tick, and a thin bracket spans the boxes in between.",
+   "bytes": [
+    19574,
+    18570
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "One agent run drawn as a horizontal chain of small numbered step boxes joined by short connectors, running left to right across the middle of the frame and well inside its edges. An early box in the chain carries a single filled dot. Every box after it continues in the same unbroken line, and the last box carries one large tick. A thin bracket runs below the boxes between the dotted box and the final one.",
+   "labels": [
+    "FIRST MISTAKE",
+    "PASS"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-18T00:18:22Z"
+  },
+  {
+   "key": "e8bc3b926262a7dd",
+   "story_id": "e8bc3b926262a7dd",
+   "light_name": "e8bc3b926262a7dd-light.webp",
+   "dark_name": "e8bc3b926262a7dd-dark.webp",
+   "alt": "Three stations in a circle joined by one-way arrows: a stack of cards, a boxy figure writing on a sheet, and a second boxy figure carrying a sheet back to the stack. One card is shaded darker, and the same shading marks a line on the carried sheet.",
+   "bytes": [
+    45948,
+    44948
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Three stations arranged as a circle in the middle of the frame, joined by arrows running one way around it: a stack of task cards, a boxy figure writing on its own instruction sheet, and a second boxy figure carrying a finished sheet back to the card stack. One card near the top of the stack is shaded darker than the rest, and the same shading appears on a line of the sheet the second figure carries. Keep all three stations well inside the frame.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-18T00:20:38Z"
+  }
+ ]
+}
