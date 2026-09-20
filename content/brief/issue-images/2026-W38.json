@@ -1,0 +1,104 @@
+{
+ "issue_id": "2026-W38",
+ "type": "weekly",
+ "renders": 7,
+ "cost_usd": 1.75,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A small robot at a lectern presents a single clean page to an inspector with a magnifying glass, while behind them an unexamined workbench holds toppled folders, several still tied shut, an overflowing bin and an open drawer.",
+   "bytes": [
+    110732,
+    105902
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A small robot stands at a lectern holding up a single tidy one-page report to an inspector who studies only that page through a magnifying glass. Behind both of them, unseen by the inspector, the robot's actual workbench is visible: a toppled stack of folders, half of them still tied shut, an overflowing bin, and one drawer hanging open. The lectern, both figures and the workbench all sit well inside the frame with generous empty space at the top and both sides.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-19T23:57:00Z"
+  },
+  {
+   "key": "4e7b3feb09abe31a",
+   "story_id": "4e7b3feb09abe31a",
+   "light_name": "4e7b3feb09abe31a-light.webp",
+   "dark_name": "4e7b3feb09abe31a-dark.webp",
+   "alt": "A field of freestanding padlocked doors used as a practice range. One door in the middle opens onto a real furnished office, and a small robot in the doorway holds a ring of keys and has turned back.",
+   "bytes": [
+    31084,
+    29640
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A practice range of identical closed doors set in freestanding frames on an empty field, each with a padlock. One door near the centre stands wide open onto a fully furnished office interior with a desk, a lamp and a coffee cup. A small robot stands in that doorway holding a ring of keys, turned back toward the viewer as if it has stopped. All the door frames, the open office and the robot sit well inside the frame with clear space above and to both sides.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-19T23:58:58Z"
+  },
+  {
+   "key": "a2b14d35426f2f27",
+   "story_id": "a2b14d35426f2f27",
+   "light_name": "a2b14d35426f2f27-light.webp",
+   "dark_name": "a2b14d35426f2f27-dark.webp",
+   "alt": "A stack of ten folders on a desk. The top two are open with marked-up pages; the eight beneath are tied shut and dusty. Beside them lies a clean summary sheet bearing one large check mark.",
+   "bytes": [
+    97610,
+    90944
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A desk holding a tall stack of paper folders. The two folders at the top are open with pages fanned out and pencil marks on them; the eight below are still tied shut with string and lightly dusty. Next to the stack lies a single clean summary sheet with one large hand-drawn check mark on it. The whole desk, the stack and the sheet sit well inside the frame with empty space at the top and both sides.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-20T00:00:14Z"
+  },
+  {
+   "key": "03ff5a398e74e32b",
+   "story_id": "03ff5a398e74e32b",
+   "light_name": "03ff5a398e74e32b-light.webp",
+   "dark_name": "03ff5a398e74e32b-dark.webp",
+   "alt": "A sheet of paper carrying a red wax seal on a ribbon passes along a conveyor through three copying machines. The seal fades with each copy and the final sheet is blank white, while the cut ribbon and original seal lie on the floor.",
+   "bytes": [
+    41076,
+    39092
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A single sheet of paper travels left to right along a short conveyor belt through three identical copying machines. On the first sheet a bright red wax seal hangs from a ribbon. With each machine the seal on the copy is fainter, and the sheet emerging from the third machine is completely clean and white. The cut ribbon and the original red seal lie on the floor beneath the first machine. The conveyor, all three machines and the fallen seal sit well inside the frame with clear space above and to both sides.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-20T00:01:34Z"
+  }
+ ]
+}

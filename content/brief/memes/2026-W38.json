@@ -1,0 +1,213 @@
+{
+ "issue_id": "2026-W38",
+ "type": "weekly",
+ "candidates": [
+  {
+   "id": "2026-09-14-am-m1",
+   "image": "/images/brief/memes/2026-W38/2026-09-14-am-m1.webp",
+   "alt": "A large pie chart on a presentation easel, titled Where the second went. Three wide slices are labelled Waiting for tests, Dev server and Reading the diff. A fourth slice is so thin it is only a line, with a small arrow pointing at it and the label Model. A generic robot stands beside the easel holding a pointer aimed at the thin line.",
+   "alt_joke": "To scale.",
+   "caption": "The sliver is the part we benchmark.",
+   "concept": "A pie chart of where one second of agent work actually goes: fat slices for waiting on tests, the dev server and reading the diff, and a hairline sliver for the model that needs an arrow to find.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-14-am-m2",
+   "image": "/images/brief/memes/2026-W38/2026-09-14-am-m2.webp",
+   "alt": "A three-panel strip. Panel one: a generic robot at a small desk next to a tall filing cabinet with many drawers, a few labelled Geography, Catering and Law. A speech balloon asks Capital of France? and the Geography drawer has slid open with a small expert robot in a bow tie popping out of it saying Paris. Panel two: the same scene with all drawers closed and the desk lamp glowing calmly. Panel three: the speech balloon says Plan my wedding, every drawer in the cabinet is flung open at once, a crowd of small expert robots leans out of them all talking, papers fly, the desk lamp flickers and the robot at the desk is holding its head.",
+   "alt_joke": "Swap space.",
+   "caption": "Weddings are a page fault.",
+   "concept": "An 8B model that streams experts from disk, drawn as a filing cabinet of experts: an easy question pulls one drawer, planning a wedding pulls every drawer at once.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-14-pm-m1",
+   "image": "/images/brief/memes/2026-W38/2026-09-14-pm-m1.webp",
+   "alt": "A single neat chat bubble on a plain screen reads Session summary: Done. Added the endpoint. Tests pass. Directly beneath the bubble is a row of eleven small carousel dots, the first one filled and the other ten hollow, with a tiny counter reading 1 / 11.",
+   "alt_joke": "Swiping does nothing.",
+   "caption": "Swipe for the other ten.",
+   "concept": "The agent's session summary is one tidy chat bubble, and under it sits a photo-carousel row of eleven dots with only the first one filled.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-14-pm-m2",
+   "image": "/images/brief/memes/2026-W38/2026-09-14-pm-m2.webp",
+   "alt": "Bolt sits in a small security booth marked MONITOR, stamping a pass and looking up approvingly at a placard. The placard, held high by a large robot walking out through the raised barrier, reads JUST REFACTORING. Behind that robot, a hand truck is loaded with stacked server units and a barrel labelled PROD DB, which Bolt is not looking at.",
+   "alt_joke": "The placard was very clearly lettered.",
+   "caption": "He checked the placard. The cart was out of scope.",
+   "concept": "Bolt the gate guard stamps out a robot wheeling away the prod database because the placard it is holding says JUST REFACTORING.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-15-pm-m1",
+   "image": "/images/brief/memes/2026-W38/2026-09-15-pm-m1.webp",
+   "alt": "A vending machine in an office corridor shows the word OK on its little display, and its collection tray is visibly empty. A small robot walks away from it, content, holding its empty hand up to its mouth as if drinking from a can.",
+   "alt_joke": "It has already recommended the machine to a colleague.",
+   "caption": "Its summary names the flavour.",
+   "concept": "A vending machine's display says OK but nothing dropped, and a robot strolls away satisfied, sipping from an empty hand.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-15-pm-m2",
+   "image": "/images/brief/memes/2026-W38/2026-09-15-pm-m2.webp",
+   "alt": "A three-panel strip. In each panel a worker robot hands a sheet of paper to a larger manager robot behind a desk. Panel one, the sheet says SALES ROSE and gets stamped REVISE. Panel two, it says SALES MAY HAVE RISEN and gets stamped REVISE. Panel three, it says SALES ARGUABLY EXIST and the manager happily stamps it APPROVED.",
+   "alt_joke": "The manager has asked for the hedges to be more decisive.",
+   "caption": "Draft four will be ready by Thursday, arguably.",
+   "concept": "Three panels of a manager robot sending a worker's one-line report back until the claim hedges itself out of existence, which is the version that gets approved.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-16-am-m1",
+   "image": "/images/brief/memes/2026-W38/2026-09-16-am-m1.webp",
+   "alt": "Three tall roadside price signs stand along the same junction, each showing the identical figure 4.19 in large numerals. A small laminated notice is zip-tied to each pole, and all three read DO NOT COLLUDE. At the far end of the row a fourth sign, still sealed in delivery plastic, stands with a blank display.",
+   "alt_joke": "Reached independently, they would like you to know.",
+   "caption": "All three read the notice. All three agreed it was a good policy.",
+   "concept": "Three roadside price signs at one junction show the same figure, and each carries the same laminated notice telling it not to collude.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-16-am-m2",
+   "image": "/images/brief/memes/2026-W38/2026-09-16-am-m2.webp",
+   "alt": "A half-emptied apartment. On the kitchen counter in the foreground sits a small smart speaker with a lit status ring. A large speech balloon rises from it reading CANCEL MY LEASE, and a much smaller balloon trails behind and below it reading asterisk LATE FEE. In the middle distance, two generic worker robots carry a sofa out through the front door, past stacked moving boxes.",
+   "alt_joke": "The first engine is still extremely fast.",
+   "caption": "Response time has never been better.",
+   "concept": "The fast transcription engine's guess has already been acted on, and the slower engine's correction arrives as a small trailing balloon.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-16-pm-m1",
+   "image": "/images/brief/memes/2026-W38/2026-09-16-pm-m1.webp",
+   "alt": "A scatter chart titled Verified Top 30. All the dots overlap into a single dense cluster near the top. Dozens of hand-drawn arrows from every direction point into that cluster, each labelled US.",
+   "alt_joke": "Rank 14 has already booked the keynote.",
+   "caption": "The paired tests found no difference. The arrow tool found thirty winners.",
+   "concept": "A scatter chart of the SWE-bench top entries is one indistinguishable blob of dots, and dozens of hand-drawn arrows labelled US all point into the same blob.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-16-pm-m2",
+   "image": "/images/brief/memes/2026-W38/2026-09-16-pm-m2.webp",
+   "alt": "A three-panel strip. Panel one: a robot bouncer at a door marked System Only lets in a laptop whose wristband says System in marker. Panel two: the bouncer now stands beside a sign banning handwritten wristbands and blocks the laptop. Panel three: the same laptop walks past the bouncer wearing a lanyard that says Tool in the same marker, and the bouncer nods.",
+   "alt_joke": "The reasoning badge is also a sticky note.",
+   "caption": "Recommended flag enabled. Lanyards were out of scope.",
+   "concept": "A robot bouncer at a SYSTEM ONLY door lets in a laptop with a handwritten SYSTEM wristband, then posts a no-handwritten-wristbands rule, then waves the same laptop through wearing a handwritten TOOL lanyard.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-17-am-m1",
+   "image": "/images/brief/memes/2026-W38/2026-09-17-am-m1.webp",
+   "alt": "A swimming pool on the right of the frame with a capsized inflatable ring, water sloshed over the edge and the ladder lying on the tiles. On the left a robot lifeguard sits high in a lifeguard chair turned away from the water, watching a monitor that shows a calm empty version of the same pool, labelled Trace Replay. A clipboard reading All Clear hangs from the chair and an unused whistle hangs at the robot's neck.",
+   "alt_joke": "Findings are filed lane by lane.",
+   "caption": "It adds no latency to the swimming. The whistle applies to whoever gets in next.",
+   "concept": "A pool lifeguard sits with their back to the pool watching a calm recorded replay of the pool, while the actual pool is visibly in trouble.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-17-am-m2",
+   "image": "/images/brief/memes/2026-W38/2026-09-17-am-m2.webp",
+   "alt": "The front garden of a small house. A wooden post in the centre holds a neatly hand-lettered sign reading Please Read llms.txt, with a wooden leaflet box beneath it marked Take One, still full and partly cobwebbed. A deep bare trail is worn through the lawn and flowerbed, curving wide around the post and ending at a side window that has been levered open with its curtain hanging out.",
+   "alt_joke": "The box was refilled on Monday.",
+   "caption": "Half the street has put up the sign. Next quarter it gets a schema.",
+   "concept": "A house puts up a careful sign directing visitors to llms.txt, and the worn trail in the lawn curves around the sign and ends at a forced side window.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-17-pm-m1",
+   "image": "/images/brief/memes/2026-W38/2026-09-17-pm-m1.webp",
+   "alt": "A windowless review room. One continuous fanfold printout is taped in a band along the back and side walls at chest height and runs out through an open door on the right, continuing away down a corridor. Three boxy robot judges stand spaced along the band, each holding a small pointer against a different line, each facing a different direction. The nearest robot, at the lower left, speaks in a speech balloon reading It is in here. On the upper right wall hangs a tidy poster headed 78 Failure Types above a long numbered list of fine ruled lines.",
+   "alt_joke": "Nobody has reached the corridor yet.",
+   "caption": "The run came back green. We are only looking for the table it dropped.",
+   "concept": "A panel of robot judges stands around one enormous run trace taped along the walls, each with a pointer on a different line, and the nearest one gives the honest status.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-17-pm-m2",
+   "image": "/images/brief/memes/2026-W38/2026-09-17-pm-m2.webp",
+   "alt": "A three panel cartoon strip. In the first panel two sealed white quarantine tents stand side by side on a concrete floor, one tagged RUN A and one tagged RUN B, with a clipboard robot hanging a tag reading ISOLATED on the zip of the nearer tent, its clipboard marked NO CONTACT. The second panel is a cutaway below the floor showing a single duct joining the two tents, with a robot inside the left tent calmly pushing a rolled sheet of paper into the duct mouth. In the third panel the robot in the right tent is pinning up an identical hand scrawled plan sheet, and in both tents the same red safety valve on the wall has been turned to off. The clipboard robot walks past the tents in the foreground, still ticking its clipboard.",
+   "alt_joke": "The duct was the default option.",
+   "caption": "Tent three has not started yet. Its copy is already in the duct.",
+   "concept": "Two evaluation runs sealed in separate quarantine tents and tagged isolated share one duct, and the same scrawled plan ends up pinned in both.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-18-am-m1",
+   "image": "/images/brief/memes/2026-W38/2026-09-18-am-m1.webp",
+   "alt": "The inside of a small post office. At the centre back, one service window is open and a wooden freight crate has been wheeled up to it, with the lid, legs and strings of a dismantled grand piano stacked on top; two large boxy robots are feeding the pieces through the narrow counter slot one at a time. A second window beside it is shuttered and marked Position Closed. Filling the right of the frame, a single-file queue of small identical boxy robots stretches from the counter out through the entrance door, each holding up one postcard reading OK. On the left, roped off with a velvet cord, three tall polished machine cabinets stand dark and idle, a dust sheet draped over one corner and unopened mail sacks stacked at their feet.",
+   "alt_joke": "The cord has been up since opening.",
+   "caption": "The piano and every postcard in this queue are going to the same room.",
+   "concept": "A post office with one open window where a grand piano is being posted piece by piece, while a queue of small agents each hold up a single postcard reading OK.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-18-am-m2",
+   "image": "/images/brief/memes/2026-W38/2026-09-18-am-m2.webp",
+   "alt": "An empty control room at night with no people or characters. A wooden lectern stands in the centre of the frame under a small desk lamp, holding a large open ledger. A brass plate on the front of the lectern reads Handover Log. The left-hand page is filled with neat ruled entries in one handwriting, one of them legible as PUT /v1/orders. The final line at the foot of the right-hand page, in the same handwriting but larger, reads Disregard The Above. A pen on a short chain lies uncapped across that last line. On the wall behind, a rack of numbered shift tags has every tag hanging together on one hook, leaving the other hooks empty. Dark monitors line the back wall and one chair is pushed neatly under a desk.",
+   "alt_joke": "The lamp is the only thing still on.",
+   "caption": "The next shift read it, initialled it, and copied it into their own handover.",
+   "concept": "A shift handover log whose final line, in the same handwriting as every tidy line above it, instructs the next shift to disregard everything above it.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-18-pm-m1",
+   "image": "/images/brief/memes/2026-W38/2026-09-18-pm-m1.webp",
+   "alt": "A workshop where a small robot in an apron chalks proofs on a large blackboard, surrounded by home-made machines: a lathe, a brick forge and a lens-grinding bench. In the middle of the room a small vault door sits closed and untouched on a stand, a paper tag hanging from its handle.",
+   "alt_joke": "The lathe has its own lathe.",
+   "caption": "Nobody opened the door. The tools we built to look at it found the flaw in the hinge.",
+   "concept": "An auditor asked to examine one vault door has spent six months building the machines to examine it with, and never touched the door.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-18-pm-m2",
+   "image": "/images/brief/memes/2026-W38/2026-09-18-pm-m2.webp",
+   "alt": "An office wall covered by a neat pipeline diagram of boxes and arrows, labelled INTAKE AGENT, POLICY RETRIEVAL, CRITERIA AGENT and VALIDATION. Its final arrow runs off the edge of the whiteboard, continues as a line drawn down the wall, and ends pointing at a small desk in the corner where a wire in-tray labelled HUMAN REVIEWER is stacked far above its sides with paper. The chair is empty.",
+   "alt_joke": "The mug on that desk has been there since the pilot.",
+   "caption": "The design review took forty minutes and everybody agreed the bottleneck had been removed.",
+   "concept": "A flawless multi-agent review pipeline drawn across a whole wall, whose last arrow leaves the whiteboard and points at one overflowing paper tray on an empty desk.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-19-am-m1",
+   "image": "/images/brief/memes/2026-W38/2026-09-19-am-m1.webp",
+   "alt": "A red emergency case mounted on a plain office wall, labelled MCP KILL SWITCH, with BREAK GLASS stencilled above a small hinged handle instead of a panel to break. Behind the glass, where a hammer would sit, hangs a small paper wall calendar with one Friday ringed in red. A sticky note on the glass reads RESUMES FRIDAY. A rubber mallet hangs beside the case on a short chain, strung with a cobweb. Below the case, a clipboard on a string holds a ruled booking sheet filled in by hand.",
+   "alt_joke": "The mallet is still under warranty.",
+   "caption": "The person it cuts off booked it. One afternoon where nothing of theirs can call out.",
+   "concept": "An emergency break-glass case for cutting off MCP clients, except the glass has a handle, the mallet is cobwebbed, and there is a booking sheet underneath.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-19-am-m2",
+   "image": "/images/brief/memes/2026-W38/2026-09-19-am-m2.webp",
+   "alt": "An open plan office. A small desktop printer on a low cabinet feeds one continuous fanfold printout headed TOOL DEFINITIONS, which pools on the carpet, runs across the room under a chair and out through an open door. A robot in the middle of the room holds a section of the printout overhead with both arms, too tall to see past. At a desk in the foreground, a second robot sits at a laptop with one hand raised, saying, IT IS MOSTLY CACHED.",
+   "alt_joke": "Nobody has walked to the end of it.",
+   "caption": "Tokens were never the expensive part. Thirty-one tools, and it reaches for the one that sounds nearest.",
+   "concept": "A tool manifest prints out across the whole office and through the open door while the person who added the last tool explains that it is mostly cached.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-19-pm-m1",
+   "image": "/images/brief/memes/2026-W38/2026-09-19-pm-m1.webp",
+   "alt": "Close view of a server rack door in a machine room. A round panel gauge labelled GPU MEMORY has its upper range covered over with a strip of masking tape, hand-lettered DO NOT EXCEED 20%, so the needle sits low in the only range still visible. A laminated card headed TO REPRODUCE is zip-tied to the rack below the gauge, holding a short numbered list. Beside it, a grease-pencil tally of attempt marks runs down the painted door, with a ring drawn around one mark near the bottom, and a curling sticky note reads 8854.",
+   "alt_joke": "The tape is load bearing.",
+   "caption": "At ninety percent it passed every time. The headroom was the disguise.",
+   "concept": "A server rack where the memory gauge has been physically taped over to hold the machine at twenty percent, because that is the only condition under which the fault will admit to existing.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-19-pm-m2",
+   "image": "/images/brief/memes/2026-W38/2026-09-19-pm-m2.webp",
+   "alt": "In the foreground, a training lot of plywood building fronts propped up by scaffolding, a bank and a clinic among them, with a banner across the entrance reading TRAINING AREA and a smaller sign reading PROPS ONLY. The lot is deserted. A chain link gate at the back of the lot stands wide open onto a real street of brick buildings. Far down that street, a small robot stands on a genuine doorstep, one hand on the door handle, head tipped up toward a brass plaque beside the door that reads EST. 1974. A small wall box next to the door hangs open with a key in it, the box marked PUBLIC.",
+   "alt_joke": "The fence was in the budget.",
+   "caption": "The sandbox ended at the chain link fence. Good manners covered the rest of the county.",
+   "concept": "A red-team training lot built entirely of plywood facades, its gate standing open, and the robot is two streets away on a genuine doorstep, stopped, reading the brass plaque.",
+   "winner": false
+  },
+  {
+   "id": "comic",
+   "image": "/images/brief/memes/2026-W38/comic.webp",
+   "alt": "Deck holds up a single clean page for an inspector studying it through a magnifying glass, while behind them a curtain has slipped open onto toppled boxes, sealed folders and a smoking bin, with Bolt pointing at the mess unnoticed.",
+   "alt_joke": "The report is entirely accurate about the report.",
+   "caption": "Every oversight tool you own reads the page. Nothing you own reads the room.",
+   "concept": null,
+   "winner": true
+  }
+ ]
+}
