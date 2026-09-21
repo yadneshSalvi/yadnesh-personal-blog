@@ -1,0 +1,60 @@
+{
+ "issue_id": "2026-09-21",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-20-am-m1",
+   "image": "/images/brief/memes/2026-09-21/2026-09-20-am-m1.webp",
+   "alt": "A cemetery under an overcast sky. A granite headstone reads WORKER, then a lit green indicator light, then 7. A cable runs from its base to a small staked sign reading ALL TASKS COMPLETE, STATUS: OK. An orange bouquet leans on the stone, and three smaller headstones stand behind it, each with an indicator dot.",
+   "alt_joke": "Still on the on-call rota.",
+   "caption": "Best uptime on the team, which is how it made senior last cycle.",
+   "concept": "A tool worker's grave, still reporting healthy to the dashboard.",
+   "winner": true
+  },
+  {
+   "id": "2026-09-20-am-m2",
+   "image": "/images/brief/memes/2026-09-21/2026-09-20-am-m2.webp",
+   "alt": "An engineer sits at a desk in the lower right of the frame, pointing accusingly through a glass wall at a dim, quiet server hall where a single rack sits idle. On the desk in front of them, a laptop labelled LOAD GENERATOR has a glowing orange fan, scorch marks spreading across the desk around it and a thin plume of smoke rising from its hinge. A speech balloon above the engineer reads: It's the server.",
+   "alt_joke": "The smoke alarm was also client side.",
+   "caption": "The bigger cluster was approved that afternoon, and the benchmark went into the launch post.",
+   "concept": "The engineer blames the server; the load generator is the thing on fire.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-20-pm-m1",
+   "image": "/images/brief/memes/2026-09-21/2026-09-20-pm-m1.webp",
+   "alt": "A dim auditorium during a talk, seen from the audience. The lit projection screen fills most of the frame and shows a bar chart headed TIME TO FIRST TOKEN. Four short bars sit low along the baseline under a single axis label reading QUESTIONS 2-5, with an arrow pointing at them and the figure 0.55s. There is an obvious empty gap in the row where a first bar would go. A sheet of printer paper is taped at an angle over the bottom left corner of the screen, carrying a crude hand-drawn chart with one ink bar so tall it runs off the top of the paper; that bar is labelled QUESTION 1 and the sheet's vertical axis is labelled MINUTES. A presenter stands in silhouette at a lectern on the right with an arm raised toward the arrow. Rows of dark audience heads run along the bottom.",
+   "alt_joke": "Both charts are accurate.",
+   "caption": "Nobody has ever asked question two first. The number is honest about the rest.",
+   "concept": "A time-to-first-token chart on a conference screen that starts counting at question two, with question one exiled to a sheet of paper taped over the corner in a different unit.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-20-pm-m2",
+   "image": "/images/brief/memes/2026-09-21/2026-09-20-pm-m2.webp",
+   "alt": "A three-panel comic strip. The room and the robot are drawn identically in all three panels: a small generic robot with a rounded head and two round eyes sits on a sagging couch on the left, holding a game controller in both hands, facing a large monitor on the right. A pizza box and coiled cables lie on the floor between them. A small word overlay in the bottom corner of the monitor reads THINKING in every panel. In the first panel a horned cartoon demon on screen is caught mid-lunge with its jaws wide, filling the screen. In the second panel the same demon stands in the middle distance with its arms folded, looking off to one side. In the third panel the demon sits with its back to us on an ammunition crate holding a mug, and a small potted plant with two leaves has appeared beside the crate.",
+   "alt_joke": "The plant is doing well.",
+   "caption": "The controls were wired up correctly. The clock was not part of the contract.",
+   "concept": "Three panels in which the robot holding the controller never moves and the demon on the screen gradually finds something else to do.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-21-am-m1",
+   "image": "/images/brief/memes/2026-09-21/2026-09-21-am-m1.webp",
+   "alt": "A three-panel comic strip. The camera position and the room are identical in all three panels: a small meeting room seen from the doorway, a long table running from left to right, one person seated at the near end of the table facing a laptop, and a projected slide filling the back wall behind them. In every panel the projected slide reads CODE: NOT THE BOTTLENECK. Panel one is bright with daylight through window blinds, and an empty wire document tray sits on the table beside the laptop. Panel two has lower afternoon light, and the tray has been buried under a stack of printed pages that rises to the person's shoulder. Panel three is dark except for a desk lamp, the stack of printed pages now rises well above the seated person's head and leans over the table, and a second projected line has appeared on the back wall below the first, reading REVIEW: NOT THE BOTTLENECK.",
+   "alt_joke": "The tray underneath is still empty.",
+   "caption": "Both slides are true. Only one has somebody still sitting under it.",
+   "concept": "Three panels in which the meeting room, the person and the projected sentence stay put, the printed review stack grows past the person, and the same sentence gets reapplied to the next thing.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-21-am-m2",
+   "image": "/images/brief/memes/2026-09-21/2026-09-21-am-m2.webp",
+   "alt": "A narrow server room aisle seen head on, tall dark equipment racks receding on both sides. In the middle of the frame a full-height cabinet door has been swung wide open toward the viewer; the door is stencilled VECTOR STORE in large block letters. The cabinet behind it is almost entirely empty, with bare mounting rails and a few unplugged cables hanging loose. One shelf at chest height holds an open laptop, its screen showing a single terminal line that reads grep -r, and beside the laptop sits a cardboard file box with notes.md written on its side in marker. To the left of the cabinet stands a visitor in a lanyard with one hand raised in a questioning gesture, with a speech balloon above them reading Which embedding model? To the right, a second person in the aisle holds the cabinet door open and says nothing.",
+   "alt_joke": "Procurement is still reviewing it.",
+   "caption": "There is no vendor to call. That is the only complaint anyone has filed.",
+   "concept": "A visitor on a datacenter tour asks a question that assumes a stack, and the cabinet being opened for them has a laptop and a box of notes in it and nothing else.",
+   "winner": false
+  }
+ ]
+}
