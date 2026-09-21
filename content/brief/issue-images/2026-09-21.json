@@ -1,0 +1,56 @@
+{
+ "issue_id": "2026-09-21",
+ "type": "daily",
+ "renders": 5,
+ "cost_usd": 1.25,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A wire from the left splits at a central junction into two routes leading to the same closed door. On the upper route a seated figure reads a dial and reaches for the handle. On the lower route a mechanical latch sits on the wall and the figure stands beside it holding up a note.",
+   "bytes": [
+    30952,
+    27914
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 3,
+   "cost_usd": 0.75,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A single wire enters from the left and reaches a junction at the centre of the frame, where it splits into two routes that both run right to the same closed door. On the upper route a figure sits at a small desk reading a round dial and reaching for the door handle. On the lower route a plain mechanical latch is mounted on the wall beside the door, and the same figure stands next to it holding up a written note toward the latch instead of touching the door. Both routes are drawn at equal weight and sit well inside the frame, with clear empty space above and below.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-21T00:18:32Z"
+  },
+  {
+   "key": "388987c3390e1497",
+   "story_id": "388987c3390e1497",
+   "light_name": "388987c3390e1497-light.webp",
+   "dark_name": "388987c3390e1497-dark.webp",
+   "alt": "A side cutaway of a machine. An upper status board shows one card marked with a tick. Below, behind an open panel, a figure sits slumped at a stopped treadmill while two probes reach in from the right, one clipped to its wrist and one resting on the belt.",
+   "bytes": [
+    38670,
+    36498
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A cutaway of one machine, seen from the side and centred in the frame. On the upper level a status board holds a single card marked with a tick. Directly below it, behind an opened panel, a small figure sits slumped and motionless at a stopped treadmill belt. Two probes reach in from the right: one is a clip on the figure's wrist trailing a pulse line, the other is a flat hand resting on the treadmill belt to feel whether it moves. The status card above is untouched. Keep the board, the figure and both probes well clear of all four edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-21T00:21:56Z"
+  }
+ ]
+}

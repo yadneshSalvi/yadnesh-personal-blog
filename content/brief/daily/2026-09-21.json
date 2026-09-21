@@ -1,0 +1,466 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-09-21",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-09-21T04:10:00Z",
+ "source_editions": [
+  "2026-09-20-am",
+  "2026-09-20-pm",
+  "2026-09-21-am"
+ ],
+ "subject": "A gate beats decoder confidence, dead tool workers, one 3090",
+ "preheader": "Plus: three agent architectures priced against the same task, and nine quick links. 5 min.",
+ "title": "Giving an agent the decoder's confidence never beat a plain deterministic gate",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "03395bada7c37963",
+   "title": "AI agents at the brain-computer interface: separating inference from control",
+   "url": "https://www.semanticscholar.org/paper/e8eeb19eea18231b2dd00edea6591f28fe514d20",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "bci-agents-inference-control-separation",
+   "published_at": "2026-09-17T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A study of 1,065 brain-computer-interface episodes tests whether putting decoder confidence in the prompt makes an executing agent safer than a deterministic gate.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers tested safer ways for artificial intelligence (AI) to act on commands from brain signals.",
+    "Telling AI how certain each command was did not reduce mistakes compared with fixed approval rules when both acted equally often.",
+    "A follow-up let AI suggest corrections, while a separate check decided which commands could be carried out.",
+    "For users of brain-controlled computers, this combination handled more commands in five of ten tested systems, without observed mistakes in carrying them out."
+   ]
+  },
+  "what": "Researchers tested whether telling an agent how confident an upstream decoder was makes its actions safer, using 1,065 brain-computer-interface episodes from 47 people with ALS and five language models.",
+  "details": "At matched coverage, no confidence-prompted arm pushed unfaithful execution below what a deterministic gate achieved, and two of the five models did significantly worse. A follow-up gave ten models the same command vocabulary as the deterministic resolver, and no direct agent arm beat the resolver's risk-coverage frontier.",
+  "yes_but": "The apparent safety gains, up to 22 percentage points, came from acting less often, and sometimes the abstention was an invalid tool call rather than a refusal. A model that fails to emit a valid action looks careful in the numbers.",
+  "yes_but_waived": null,
+  "why": "In this brain-computer-interface study, decoder confidence in the prompt did not reduce unfaithful execution below a deterministic gate at matched coverage. The hybrid architecture kept admission authority outside the model and let it propose corrections, which extended coverage in five of ten models without observed unfaithful executions.",
+  "_lead_note": null
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "388987c3390e1497",
+     "title": "ReliHarness: A Self-Learning Reliability Harness for LLM Agent Tool Execution",
+     "url": "https://www.semanticscholar.org/paper/31c99a3ae8dd1cddf0939892cc9d8735b0867ed1",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "reliharness-tool-execution-reliability",
+     "published_at": "2026-09-14T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "MCP task states are coarse and self-reported, so a worker thread that deadlocks keeps showing up as working. ReliHarness probes the thread itself with a heartbeat timeout and an operating-system liveness check, reporting 100% detection coverage and zero false positives on the crash and deadlock scenarios tested.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built ReliHarness to detect when software used by artificial intelligence (AI) stops working.",
+      "A task can still appear to be running after the software carrying it out has frozen or stopped.",
+      "ReliHarness checks for regular signals from that software and asks the computer whether it is still running.",
+      "It detected every tested failure without wrongly flagging working software.",
+      "For people overseeing long tasks, these checks can reveal failures that ordinary progress reports miss."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-21/388987c3390e1497-light.webp",
+      "dark": "/images/brief/issues/2026-09-21/388987c3390e1497-dark.webp",
+      "alt": "A side cutaway of a machine. An upper status board shows one card marked with a tick. Below, behind an open panel, a figure sits slumped at a stopped treadmill while two probes reach in from the right, one clipped to its wrist and one resting on the belt."
+     }
+    },
+    {
+     "story_id": "2fe5fefe35cf5e31",
+     "title": "Towards autonomous urban drainage modelling: evaluating AI agent architectures for automated SWMM calibration",
+     "url": "https://www.semanticscholar.org/paper/6efebb4e41f08a2c8c878de55f08dff1703f73dd",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "swmm-agent-architecture-comparison",
+     "published_at": "2026-09-14T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "One calibration workflow organised three ways: instructions consulted on demand, tool interfaces supplied in advance, one specialised agent per stage. All three produced models of equivalent accuracy, so the choice is cost and endurance, and the cheapest option got unreliable once the task ran long.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers compared ways for artificial intelligence (AI) to adjust computer simulations of how water drains through cities.",
+      "The AI followed instructions as needed, used prepared tools, or split the work among systems handling different stages.",
+      "All approaches produced equally accurate simulations, but the cheapest became unreliable when tasks grew longer.",
+      "For people planning city drainage, choosing an approach changes the cost and reliability of the work."
+     ]
+    },
+    {
+     "story_id": "596ed850bc8ff6f2",
+     "title": "Information Architecture and Emergent Deceptive Selling in LLM Multi-Agent Markets",
+     "url": "https://www.semanticscholar.org/paper/33a5b94e17ddb4ea6d14ac60adb39b0d1e14a0ab",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "multi-agent-markets-deceptive-selling",
+     "published_at": "2026-09-17T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Twelve GPT-4o-mini sellers and twelve buyers over twenty rounds with hidden quality. A twenty-replicate batch put the forum-associated difference in unseeded sellers making at least one false quality claim at 0.850 under private history and 0.483 under public history, counting observable overstatement only.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers linked seller-only chats to more exaggerated product claims in an artificial intelligence (AI) shopping simulation.",
+      "The increase was smaller when everyone could see the market's past activity.",
+      "The findings only cover markets including sellers given special experimental treatment, with some results changing when product descriptions were reworded.",
+      "The study counted exaggerated claims without assuming the AI intended to deceive.",
+      "For people designing automated markets, the results suggest that what sellers can see and discuss may affect product claims."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "9232cddc410fc8c9",
+     "title": "Are LLM Performance Benchmarks Reliable?",
+     "url": "https://www.youtube.com/watch?v=l1-D89bAuOA",
+     "source_name": "Ashok Chandrasekar and Jason Kramberger (Google)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "inference-perf-benchmark-reliability",
+     "published_at": "2026-09-19T16:00:07Z",
+     "read_annotation": "talk",
+     "summary": "Ask a harness for 200 queries a second and it may deliver 38, then print the results as though it ran 200. The global interpreter lock caps a single-process client, one shared 20% throughput win ran at temperature zero, and Inference Perf logs scheduled against actual send times.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A presentation explains why speed tests can give misleading results about artificial intelligence (AI) services.",
+      "Software sending test questions can fall behind, making a working service appear slow.",
+      "The presenters' testing tool records when questions should be sent and when they actually leave.",
+      "People running AI services can use those records to check whether apparent delays come from the testing software."
+     ]
+    },
+    {
+     "story_id": "4eb24ace2024e140",
+     "title": "Trying the Software factory pattern.",
+     "url": "https://lethain.com/software-factory-experiment",
+     "source_name": "Will Larson",
+     "kind": "individual",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "imprint-software-factory-pattern",
+     "published_at": "2026-09-20T12:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Imprint's year of agent adoption reads as workflow changes, not model changes: about ten local workspaces, each with an independent checkout of every repository, so agents can generate pull requests across frontend, backend, infrastructure and data. Then the company left Jira for Linear over task visibility and permissions.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Imprint changed how its staff organize software work as they began using artificial intelligence (AI) more widely.",
+      "Separate computer workspaces each contain all its software projects, so AI can prepare connected changes across those projects.",
+      "The company moved everyone's tasks to Linear to make work easier to see and access rules less complicated.",
+      "For Imprint's staff, these changes address the difficulty of coordinating AI work across software projects."
+     ]
+    },
+    {
+     "story_id": "ea7fbe2acd116873",
+     "title": "I reverse-engineered Instinct's memory. Here's exactly how it works",
+     "url": "https://supermemory.ai/blog/reverse-engineering-instinct-memory",
+     "source_name": "Supermemory",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "memory-context"
+     ],
+     "cluster": "instinct-memory-reconstruction",
+     "published_at": "2026-09-20T00:00:00Z",
+     "read_annotation": null,
+     "summary": "Black-box probing suggests Instinct keeps memory as git-tracked Markdown files found with grep rather than vectors, so read it as a reconstruction and not confirmed internals. The post rebuilds the same design on Supermemory in about 60 lines.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A post suggests Instinct remembers information by saving it in text files.",
+      "The reconstructed design keeps a record of changes to those files.",
+      "It finds saved details by looking for matching words in the files.",
+      "Developers can follow the post to build a similar way for software to remember information."
+     ]
+    },
+    {
+     "story_id": "aa6a7f5fc79d00f9",
+     "title": "The bear can dance: Qwen 3.8 27B on one 3090 for 3 weeks",
+     "url": "https://www.reddit.com/r/LocalLLaMA/comments/1wloora/the_bear_can_dance_qwen_38_27b_on_one_3090_for_3",
+     "source_name": "r/LocalLLaMA",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "qwen-27b-three-week-cuda-agent",
+     "published_at": "2026-09-20T18:26:30Z",
+     "read_annotation": "Reddit thread",
+     "summary": "One user reports running Qwen 3.8 27B for about 21 days on one RTX 3090 to build a CUDA inference engine, on roughly 12 human messages, getting working kernels that never beat llama.cpp. Compaction ate about 83 hours, and the same card had to host the agents and run the engine under test.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "One user reports letting an artificial intelligence system write software for about 21 days.",
+      "Its task was to build software that could run artificial intelligence more efficiently on the same computer.",
+      "Written rules told it when to ask the user for help.",
+      "The system had to stop running so its new software could be tested on the same hardware.",
+      "For this user, days of largely independent work produced working software that was no faster than an existing alternative."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "c4721df529303137",
+     "title": "Von: Open-source 395M \"System One\" model",
+     "url": "https://www.reddit.com/r/LocalLLaMA/comments/1wkpxn6/von_opensource_395m_system_one_model",
+     "source_name": "r/LocalLLaMA",
+     "kind": "community",
+     "section": "product",
+     "topics": [
+      "models"
+     ],
+     "cluster": "von-system-one-model",
+     "published_at": "2026-09-19T16:00:57Z",
+     "read_annotation": "Reddit thread",
+     "summary": "Von is an open-source 395M System One model pitched as a drop-in replacement for TypeSafe's JEV. Its author says it runs on CPU in 1 to 2 GB, answers in 25 to 300 ms, and beats JEV in all benchmarks.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Von's creator released an artificial intelligence system with code that others can inspect and change.",
+      "The creator says it can run entirely on the main chip that carries out a computer's general tasks.",
+      "The creator reports better results than TypeSafe's existing system in every comparison test they ran.",
+      "Developers using TypeSafe's system could switch to Von without changing how their software uses it, according to its creator."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [],
+ "quick_links": [
+  {
+   "story_id": "7d8543bc9cf3595f",
+   "title": "Can Jev Be a Better Agent Evaluator?",
+   "url": "https://www.langchain.com/blog/jev-agent-evals-langsmith",
+   "source_name": "LangChain",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "jev-system-one",
+   "published_at": "2026-09-19T23:30:51Z",
+   "read_annotation": "blog post",
+   "summary": "Jev tested against LLM judges as an agent evaluator",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "a35d4dfe56765eaa",
+   "title": "llm-keys-ui 0.1",
+   "url": "https://simonwillison.net/2026/Sep/20/llm-keys-ui",
+   "source_name": "Simon Willison",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "llm-keys-ui",
+   "published_at": "2026-09-20T19:22:19Z",
+   "read_annotation": "blog post",
+   "summary": "A web UI for getting API keys onto remote agent machines",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "64b423b9233af976",
+   "title": "Quoting voxium",
+   "url": "https://simonwillison.net/2026/Sep/20/voxium",
+   "source_name": "Simon Willison",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "claude-code-unreviewed-work",
+   "published_at": "2026-09-20T21:06:43Z",
+   "read_annotation": "blog post",
+   "summary": "A team where every spec, ticket and report comes from Claude Code",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "8b30a95ce9dff401",
+   "title": "What's New in Inference Engineering",
+   "url": "https://www.youtube.com/watch?v=75ckHC2LU_0",
+   "source_name": "Philip Kiely (Baseten)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "baseten-inference-engineering-updates",
+   "published_at": "2026-09-19T17:00:27Z",
+   "read_annotation": "talk",
+   "summary": "Why a four-bit KV cache splits local and data-center inference",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "f0b4f86bc12ce02c",
+   "title": "Weight Folding, CUDA Streams, and the Bug That Made My Model Speak Backwards",
+   "url": "https://www.youtube.com/watch?v=c1hGBoWw20A",
+   "source_name": "Filip Makraduli",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "flashnorm-weight-folding-cuda",
+   "published_at": "2026-09-19T19:00:02Z",
+   "read_annotation": "talk",
+   "summary": "Folding RMS norm into projection weights, and the bug that followed",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "343c9123d56fc424",
+   "title": "Brownfield Agentic Engineering",
+   "url": "https://addyosmani.com/blog/brownfield-agentic-engineering",
+   "source_name": "Addy Osmani",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "brownfield-agentic-engineering",
+   "published_at": "2026-09-14T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Running coding agents in a codebase older than the team",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "abf7e03dcb1fc826",
+   "title": "FunPilot: Runtime Performance Diagnosis and Remediation for Serverless Applications with LLMs",
+   "url": "https://www.semanticscholar.org/paper/a88be4cd93a0ff7ffae77d2f7db720b43e84010b",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "funpilot-serverless-remediation",
+   "published_at": "2026-09-17T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A control loop that diagnoses and remediates serverless performance",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "cc3c097de2abe4fe",
+   "title": "FinDS-Agent: A Cloud-Edge Collaborative Data Science Agent for Financial Analytics",
+   "url": "https://www.semanticscholar.org/paper/51f4af91bfa1b194373288f1d79b12737aba96b3",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "finds-agent-cloud-edge-analytics",
+   "published_at": "2026-09-13T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Splitting an agent between a trusted edge and a cloud planner",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "a2b1dfc0df30fbac",
+   "title": "System One models like Jev can train their own replacements",
+   "url": "https://seangoedecke.com/system-one-models-can-train-their-own-replacements",
+   "source_name": "Sean Goedecke",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "models"
+   ],
+   "cluster": "jev-self-training-classifiers",
+   "published_at": "2026-09-20T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "The case for promptable classifiers training their own replacements",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "2fe5fefe35cf5e31",
+   "text": "Today's lead and this one point the same way. Handing the model more information, or more architecture, produced the same result at a different price. What changed the outcome was moving the decision out of the model."
+  },
+  {
+   "after_story": "4eb24ace2024e140",
+   "text": "Read this against [the voxium quote](/newsletter/story/64b423b9233af976) below. Same tools, opposite outcome: one company kept rebuilding its workflow around whatever the agents broke next, while voxium reports that management at another treated code production as a solved bottleneck and the team barely reviewed the output."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-09-21/2026-09-20-am-m1.webp",
+  "alt": "A cemetery under an overcast sky. A granite headstone reads WORKER, then a lit green indicator light, then 7. A cable runs from its base to a small staked sign reading ALL TASKS COMPLETE, STATUS: OK. An orange bouquet leans on the stone, and three smaller headstones stand behind it, each with an indicator dot.",
+  "alt_joke": "Still on the on-call rota.",
+  "caption": "Best uptime on the team, which is how it made senior last cycle.",
+  "concept": "A tool worker's grave, still reporting healthy to the dashboard.",
+  "story_id": "388987c3390e1497"
+ },
+ "hedge": null,
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-09-21T02:24:16Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-09-21/cover-light.webp",
+  "dark": "/images/brief/issues/2026-09-21/cover-dark.webp",
+  "alt": "A wire from the left splits at a central junction into two routes leading to the same closed door. On the upper route a seated figure reads a dial and reaches for the handle. On the lower route a mechanical latch sits on the wall and the figure stands beside it holding up a note."
+ }
+}
