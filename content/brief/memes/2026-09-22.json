@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-09-22",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-21-pm-m1",
+   "image": "/images/brief/memes/2026-09-22/2026-09-21-pm-m1.webp",
+   "alt": "Inside a parcel office. At the right, a customer in a raincoat leans over the counter with a small padded envelope under his arm, signing on a handheld terminal a uniformed clerk holds out. A board above reads COLLECTIONS. Through the wide window behind them, a flatbed truck is loaded with a whole living room.",
+   "alt_joke": "Signed, timestamped, and nobody disputes it.",
+   "caption": "The audit log shows one parcel, signed for, on time, by the owner.",
+   "concept": "A customer at a parcel counter politely signs for one small envelope while, through the window behind him, his entire front room is winched onto a flatbed.",
+   "winner": true
+  },
+  {
+   "id": "2026-09-21-pm-m2",
+   "image": "/images/brief/memes/2026-09-22/2026-09-21-pm-m2.webp",
+   "alt": "A suburban front doorstep in late afternoon, long shadows across the path. The front door stands wide open with a bunch of keys still hanging in the lock, the job plainly finished. On the path just outside, a locksmith in overalls sits on a folding stool, hunched over a clipboard, working a large crossword grid in pencil. The clipboard's top sheet is folded back and headed WORK ORDER; a pencilled note beside the grid reads 14 DOWN. On the paving around the stool are a thermos with its cup poured, a heavy dictionary lying open, and two already completed crossword grids weighted down under a toolbox. A cat has settled on the lid of the toolbox. Behind him at the kerb, the locksmith's van stands with its back doors open and its tools still unpacked.",
+   "alt_joke": "Nine letters. He will get it.",
+   "caption": "The client made tea twice and has started on the down clues.",
+   "concept": "A locksmith finished the door in a minute and has spent the whole afternoon on the crossword printed on the back of the work order.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-22-am-m1",
+   "image": "/images/brief/memes/2026-09-22/2026-09-22-am-m1.webp",
+   "alt": "A meeting room wall with a large printed diagram taped to it. At the centre of the diagram is a single heavy box labelled REVENUE. Four arrows point into it from four smaller boxes at the corners, and each arrow has been drawn in a different colour of pen by a different hand, some neat, some scrawled. The four corner boxes read before refunds, after refunds, signed, not invoiced, and cash received. Across the top of the sheet, in confident printed capitals, is the title SINGLE SOURCE OF TRUTH. At the right edge of the sheet a person's forearm reaches in from off frame, marker in hand, mid stroke on a fifth arrow that has no box on the end of it yet. On the table below, a laptop sits open with a chat window on screen and a cold coffee beside it. Nobody else is in the room.",
+   "alt_joke": "The average is also a number, technically.",
+   "caption": "Sales and Finance stopped speaking in March. The agent read both wikis and split the difference.",
+   "concept": "A boardroom wall diagram headed SINGLE SOURCE OF TRUTH, with one box, REVENUE, fed by four arrows that each define it differently, and a fifth arrow being added by hand right now.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-22-am-m2",
+   "image": "/images/brief/memes/2026-09-22/2026-09-22-am-m2.webp",
+   "alt": "A three panel comic strip set at the pass of a restaurant kitchen. In the first panel, one chef slides a single plate onto the steel pass while an expediter in a white coat holds it up and studies it through a jeweller's loupe. A rail above them holds one paper ticket, and a small sign on the rail reads ORDERS. In the second panel, the same pass is now backed by a dozen chefs working flat out, and finished plates are stacked in leaning towers along the whole counter and up onto a shelf behind. The paper tickets on the rail have multiplied into a long unbroken ribbon that spills onto the floor and pools there. There is still exactly one expediter, still holding a single plate up to the loupe, in the same pose as the first panel. A sign hanging above the expediter reads ONE AT A TIME. In the third panel, the chefs have run out of orders to cook and have begun plating things nobody asked for: a tall tiered cake with a lit candle, a whole roast swan with its neck curled up, and a large plate holding one sprig of parsley. A small handwritten card is propped against the swan reading NOT ORDERED. Through the doorway behind them the dining room is visible and completely empty, chairs still tucked in. The expediter has not looked up.",
+   "alt_joke": "The figure has never once been disputed.",
+   "caption": "Cooking time is down sixty percent. That is the figure in the quarterly, and it is true.",
+   "concept": "Three panels at a restaurant pass: one checker is enough, then the kitchen scales up and the checker does not, then the idle chefs start plating food nobody ordered.",
+   "winner": false
+  }
+ ]
+}

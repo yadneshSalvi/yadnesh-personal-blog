@@ -1,0 +1,479 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-09-22",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-09-22T00:40:00Z",
+ "source_editions": [
+  "2026-09-21-pm",
+  "2026-09-22-am"
+ ],
+ "subject": "Loopjacking, formal proofs vs test suites, Coinbase Autopilot",
+ "preheader": "Plus: Benchling's DNS-tight sandbox, Shopify's Swift rewrite, nine skill techniques. 5 min.",
+ "title": "Approve one operation, run another: the binding failure in shipped agent products",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "ffdf6b80f24ed61e",
+   "title": "Loopjacking: Hijacking Human-in-the-Loop Approval",
+   "url": "https://arxiv.org/abs/2609.21081",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "loopjacking-agent-approval",
+   "published_at": "2026-09-21T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A paper on human approvals that bind to a different operation than the one that later runs.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers found that some computer assistants can carry out a different action from the one a person approved.",
+    "Sometimes the request for permission hides or misrepresents what the assistant will actually do.",
+    "In other cases, the planned action changes after the person gives permission.",
+    "Approval checks protect users only if they cover the exact action the assistant actually carries out."
+   ]
+  },
+  "what": "A new arXiv paper names Loopjacking: a human approves what they understand as operation A, while the implementation applies that decision to a materially different operation B.",
+  "details": "Two variants. In a representation-based attack, B is already encoded but omitted or misrepresented at approval time; in post-approval state substitution, the human sees the correct A and mutable workflow state later replaces it. The authors reproduce the second in seven tested Agno AgentOS releases ending at 3.0.9 and in 12 tested versions of a conditional in-memory LangGraph Agent Server composition ending at 0.14.0.",
+  "yes_but": "This is a purposive set of released products, not a survey, and every result is version-scoped. OpenClaw 2026.2.23 shows representation mismatch and 2026.2.24 rejects the tested attack.",
+  "yes_but_waived": null,
+  "why": "If a human gate stands between your agent and anything consequential, this is a test rather than a warning. Read the path from the approval prompt to the execution call and check whether anything in between can mutate the operation."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "d368fefa4e4ca393",
+     "title": "SWE-Proof: Can Language Models Resolve Real-World Issues with Machine-Checked Proofs?",
+     "url": "https://arxiv.org/abs/2609.21190",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "swe-proof-benchproofer",
+     "published_at": "2026-09-21T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Benchproofer turns 500 real SWE-bench Verified issues into formally verified tasks, admitting an instance only once mechanical and adversarial gates agree on its specification. Across two frontier models, a quarter to a half of test-passing patches admit counterexamples.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built stricter checks for software fixes written by artificial intelligence.",
+      "Their system writes precise rules for each repair, then uses mathematics to check whether the repaired program follows them.",
+      "Across the systems studied, a quarter to a half of fixes that passed ordinary tests broke those rules.",
+      "For software developers, these checks can catch errors missed by the examples covered in ordinary tests."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-22/d368fefa4e4ca393-light.webp",
+      "dark": "/images/brief/issues/2026-09-22/d368fefa4e4ca393-dark.webp",
+      "alt": "Small square tiles pour from a hopper through a coarse sieve without catching, then land on a much finer sieve below, where about a third are held on the surface and the rest fall into a tray."
+     }
+    },
+    {
+     "story_id": "05778e2d50a2cb00",
+     "title": "What Stops a Small Language Model From Driving a Database Agent",
+     "url": "https://arxiv.org/abs/2609.21341",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "small-model-database-agent-failures",
+     "published_at": "2026-09-21T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Eleven days driving an open-source SQL client's agent mode with 39 local open-weight models produced 8,199 runs. Of 2,100 model-attributed losses, 1,590, or 75.7%, came from runs that had already invoked a tool, so the bottleneck sits after the call.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "In this study, 75.7% of failures blamed on artificial intelligence happened after it had already asked other software for help.",
+      "The assistants worked with databases, organized collections of stored information, by sending requests to other software.",
+      "Requests in the wrong format repeatedly appeared in attempts that used other software but never delivered results.",
+      "For developers improving these assistants, the findings point to problems between asking for help and delivering a finished answer."
+     ]
+    },
+    {
+     "story_id": "705c49948061cdf9",
+     "title": "When Better Turns Do Not Make Better Agents: Diagnosing the Gap Between Next-Turn Metrics and Workflow Success",
+     "url": "https://arxiv.org/abs/2609.21187",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "next-turn-workflow-evaluation-gap",
+     "published_at": "2026-09-18T01:11:55Z",
+     "read_annotation": "paper",
+     "summary": "Supervised fine-tuning raised next-turn success for every Qwen3 and Gemma 3 model tested against gold histories, and none of the four then cleared holistic workflow evaluation, with strict trajectory completion topping out at 10.4%. The authors want the layers reported separately.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Extra training helped four computer assistants answer individual messages better, without helping them finish customer support tasks on their own.",
+      "Some checks judged the assistant's next step after showing it a correct conversation up to that point.",
+      "When assistants handled whole customer support tasks themselves, even the best result met strict completion rules only 10.4% of the time.",
+      "For teams choosing customer support software, checking whole tasks reveals failures that good scores on individual replies can hide."
+     ]
+    },
+    {
+     "story_id": "752842484d4902e2",
+     "title": "Designer-RSI: Evolving Procedural Memory from User Traffic for Agentic Graphic Design",
+     "url": "https://arxiv.org/abs/2609.22086",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "memory-context"
+     ],
+     "cluster": "designer-rsi",
+     "published_at": "2026-09-21T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A frozen model works design software through 230-plus tools while a memory of natural-language skills grows from real user briefs, gated by replay checks that block any change regressing an observed success. Five rounds take GenEval2 execution success on Claude-Sonnet-4 from 72.7% to 99.3%.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers improved a computer design assistant by teaching it reusable steps from real design requests.",
+      "It saves and revises written instructions without changing the artificial intelligence system that follows them.",
+      "Changes are kept only when they fix past failures without spoiling tasks that previously succeeded.",
+      "In the reported test, successful task completion rose from 72.7% to 99.3%.",
+      "For design software builders, the results show better task completion without changing the underlying artificial intelligence."
+     ]
+    },
+    {
+     "story_id": "cde284b91180c6e4",
+     "title": "OverThink: Slowdown Attacks on Reasoning LLMs",
+     "url": "https://arxiv.org/abs/2502.02542",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "overthink-reasoning-slowdown-attacks",
+     "published_at": "2026-09-21T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Decoy reasoning problems injected into external context make a model burn far more reasoning tokens while still answering correctly: 13x on FreshQA, 46x on SQuAD, 12x on MuSR. Tested injection points for coding agents include skills, README files and code, and this is a revision of an older paper.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found a way to make artificial intelligence assistants do much more unnecessary work while still answering correctly.",
+      "Attackers hide distracting puzzles in material the assistant reads while working on a task.",
+      "The assistant spends extra effort solving those puzzles, increasing the computing work needed for its answer.",
+      "For people running these assistants, correct answers can still come with inflated computing costs."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "ec2b3d3223bdf77e",
+     "title": "Autopilot: engineering an agentic quality loop for support automation",
+     "url": "https://www.coinbase.com/blog/autopilot-engineering-an-agentic-quality-loop-for-support-automation",
+     "source_name": "Coinbase Engineering",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "coinbase-autopilot-support-quality",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Every Coinbase support procedure is a versioned decision tree, and Autopilot runs agents that author, test, red-team, score and analyze it behind contracts, fixtures, CI gates and human sign-off on writes. The post says this makes judgment cheaper and more repeatable, not optional.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Coinbase built Autopilot to help keep its automated customer support working correctly.",
+      "Support bots follow written steps that tell them what information to check and how to handle a customer's problem.",
+      "Autopilot checks those steps for mistakes and possible misuse before people approve changes.",
+      "Coinbase says this reduces the manual work needed to maintain support bots as their software changes."
+     ]
+    },
+    {
+     "story_id": "f4990a11668b5b5e",
+     "title": "How Benchling secured multi-tenant AI agents with Amazon Bedrock AgentCore",
+     "url": "https://aws.amazon.com/blogs/machine-learning/how-benchling-secured-multi-tenant-ai-agents-with-amazon-bedrock-agentcore",
+     "source_name": "AWS ML Blog",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "benchling-agentcore-tenant-security",
+     "published_at": "2026-09-21T16:27:34Z",
+     "read_annotation": "blog post",
+     "summary": "Benchling runs untrusted, agent-generated scientific code for thousands of life sciences tenants on Bedrock AgentCore Code Interpreter in VPC mode. Route 53 Resolver DNS Firewall and VPC endpoint policies layer up to block exfiltration, with DNS named explicitly as one of the closed paths.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Benchling built protections for running scientific code written by artificial intelligence across thousands of life sciences organizations.",
+      "The code runs inside a private network with rules controlling which outside services it can reach.",
+      "The protections cover website address lookups, which can be misused to send information out.",
+      "These safeguards help protect scientific customers' data while they run computer-written code."
+     ]
+    },
+    {
+     "story_id": "e3ce6617dda8c4d4",
+     "title": "The Dark Arts of Skill Engineering",
+     "url": "https://www.youtube.com/watch?v=SQMCtZX3trg",
+     "source_name": "Paul Bakaus (Renaissance Geek)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "bakaus-skill-engineering-harnesses",
+     "published_at": "2026-09-21T19:00:10Z",
+     "read_annotation": "talk",
+     "summary": "A ban doesn't produce originality, Bakaus argues, it relocates the model one cluster over: forbid an overused font and it reaches for the next nearest thing in latent space. One of his nine techniques splits design direction and deterministic linting into subagents kept blind to each other.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Paul Bakaus shared nine ways to guide design software that uses artificial intelligence.",
+      "He argues that banning an overused font makes the software choose a similar font instead.",
+      "One method separates design decisions from automatic rule checks, keeping the programs doing those jobs unaware of each other's work.",
+      "His techniques aim to help designers produce original work when detailed written instructions alone fall short."
+     ]
+    },
+    {
+     "story_id": "c7575ff8336147cc",
+     "title": "Helix: The internal tool powering our Shopify app's native migration",
+     "url": "https://shopify.engineering/helix",
+     "source_name": "Shopify Engineering",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "shopify-helix-native-migration",
+     "published_at": "2026-09-21T21:12:33Z",
+     "read_annotation": "blog post",
+     "summary": "Shopify built an internal tool called Helix to help LLMs rebuild the Shopify app in Swift and Kotlin, using small checkpoints and strict quality gates to keep the code shippable.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Shopify built Helix to help artificial intelligence rewrite the company's app.",
+      "The rewrite happens in small stages that must pass strict quality checks.",
+      "These checks help Shopify's developers keep the new code ready to release."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [],
+ "quick_links": [
+  {
+   "story_id": "015dbc4f82687be4",
+   "title": "AI coding has made CI a bottleneck, so we reworked ours to keep up",
+   "url": "https://linear.app/now/ci-bottleneck-reworked",
+   "source_name": "Linear Now",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "linear-ci-ai-coding",
+   "published_at": "2026-09-21T12:26:00Z",
+   "read_annotation": "blog post",
+   "summary": "CI rebuilt for the volume agents produce",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "3ed9fa9162b7bc8a",
+   "title": "Benchmarking Grok 4.7",
+   "url": "https://artificialanalysis.ai/articles/benchmarking-grok-4-7",
+   "source_name": "Artificial Analysis",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "grok-4-7",
+   "published_at": null,
+   "read_annotation": "blog post",
+   "summary": "Independent scores, agentic and coding and long-context",
+   "via": "xAI News",
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "8dc3bfe9cdc8eec1",
+   "title": "Superpowers 6.4",
+   "url": "https://blog.fsck.com/2026/09/21/superpowers-6.4",
+   "source_name": "Jesse Vincent",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "superpowers-6-4",
+   "published_at": "2026-09-21T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Three more coding agents, inline plan execution reworked",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "b8fcb7456281be23",
+   "title": "AI Evals: Everything You Need to Know",
+   "url": "https://hamel.dev/blog/posts/evals-faq",
+   "source_name": "Hamel Husain",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "hamel-shreya-ai-evals-faq",
+   "published_at": "2026-09-18T07:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "An FAQ from teaching 700+ engineers and PMs",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "c1a8f0cde6588d53",
+   "title": "MCP was always a bad idea?",
+   "url": "https://simonwillison.net/2026/Sep/20/hn-49779718",
+   "source_name": "Simon Willison",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "mcp-controlled-agent-access",
+   "published_at": "2026-09-20T20:24:41Z",
+   "read_annotation": "blog post",
+   "summary": "What MCP buys you outside a terminal agent",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "ea087dc9487ce483",
+   "title": "AX: Google's Open Agentic Orchestrator",
+   "url": "https://agentexecutor.io",
+   "source_name": "Hacker News",
+   "kind": "community",
+   "section": "product",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "google-ax-agentic-orchestrator",
+   "published_at": "2026-09-20T22:32:43Z",
+   "read_annotation": "HN thread",
+   "summary": "An agentic orchestrator, 529 points on Hacker News",
+   "via": null,
+   "paywalled": false,
+   "hn_points": 529
+  },
+  {
+   "story_id": "b117bef22dd726f5",
+   "title": "ZCode is now open source",
+   "url": "https://www.reddit.com/r/LocalLLaMA/comments/1wlzvcx/zcode_is_now_open_source",
+   "source_name": "r/LocalLLaMA",
+   "kind": "community",
+   "section": "product",
+   "topics": [
+    "security"
+   ],
+   "cluster": "zcode-open-source-security",
+   "published_at": "2026-09-21T02:09:41Z",
+   "read_annotation": "Reddit thread",
+   "summary": "Desktop app, backend, Agent CLI and runtime",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "a78ca0813afec237",
+   "title": "Amazon blocks Meta's new Muse AI agent from shopping on amazon.com",
+   "url": "https://www.forbes.com/sites/jonmarkman/2026/09/21/amazon-blocks-metas-new-muse-ai-agent-from-shopping-on-amazoncom",
+   "source_name": "Forbes",
+   "kind": "community",
+   "section": "product",
+   "topics": [
+    "industry"
+   ],
+   "cluster": "amazon-blocks-meta-muse",
+   "published_at": "2026-09-21T17:00:23Z",
+   "read_annotation": "HN thread",
+   "summary": "A shopping agent turned away at the storefront",
+   "via": null,
+   "paywalled": false,
+   "hn_points": 138
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "705c49948061cdf9",
+   "text": "Three items today are the same shape. An approval binds to a different operation than the one reviewed. A test suite passes a patch that admits counterexamples. A turn score climbs while the workflow fails. Each check is real, and each measures something adjacent. Ask what a pass is evidence of, starting with [Loopjacking](/newsletter/story/ffdf6b80f24ed61e)."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-09-22/2026-09-21-pm-m1.webp",
+  "alt": "Inside a parcel office. At the right, a customer in a raincoat leans over the counter with a small padded envelope under his arm, signing on a handheld terminal a uniformed clerk holds out. A board above reads COLLECTIONS. Through the wide window behind them, a flatbed truck is loaded with a whole living room.",
+  "alt_joke": "Signed, timestamped, and nobody disputes it.",
+  "caption": "The audit log shows one parcel, signed for, on time, by the owner.",
+  "concept": "A customer at a parcel counter politely signs for one small envelope while, through the window behind him, his entire front room is winched onto a flatbed.",
+  "story_id": "ffdf6b80f24ed61e"
+ },
+ "hedge": {
+  "quote": "As AI becomes more capable, the industry must accelerate security engineering, broaden access to defensive tools and share what works faster.",
+  "story": {
+   "story_id": "8bbe89e1845b8123",
+   "title": "AI Security Is an Engineering Problem: How to Solve It at Every Layer of the Agent Stack",
+   "url": "https://blogs.nvidia.com/blog/ai-security-agent-stack",
+   "source_name": "NVIDIA Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "agent-stack-security-engineering",
+   "published_at": "2026-09-21T14:51:34Z",
+   "read_annotation": "blog post",
+   "summary": "Argues that securing the agent stack needs defined requirements, enforceable controls, named owners and evidence that the protections work.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "The sentence before it asks for named owners, and this one assigns the work to nobody in particular."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-09-22T02:25:20Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-09-22/cover-light.webp",
+  "dark": "/images/brief/issues/2026-09-22/cover-dark.webp",
+  "alt": "Two display panels side by side on a rail. The left one is an empty frame; the right holds a dense printed document. A wax seal on a cord has slid along the rail from the left panel to the right one."
+ }
+}
