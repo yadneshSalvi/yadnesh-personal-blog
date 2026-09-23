@@ -1,0 +1,24 @@
+{
+ "issue_id": "2026-09-23",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-22-pm-m1",
+   "image": "/images/brief/memes/2026-09-23/2026-09-22-pm-m1.webp",
+   "alt": "A glass-fronted display case mounted on an office corridor wall, holding three exhibits side by side. On the left, in a heavy wooden frame, is a printed page of tool definitions with most of the lines struck through in red, with a label reading TOOL SCHEMA FILTER. In the centre, mounted alone on a large white backing board, is a single small paper coupon with a dotted scissors border, reading 2% OFF and PER TURN, with a line of fine print beneath it reading EXPIRES ON CACHE MISS. On the right is nothing at all: a pale unfaded rectangle on the backing board where a third frame once hung, a bare nail still in place, and a strip of dried adhesive. The case is locked and the key hole is empty.",
+   "alt_joke": "The case is locked.",
+   "caption": "Nobody has taken the empty mount down. It is the only part of the rollout anyone still defends.",
+   "concept": "A corridor display case with three mounts: a heavy framed tool schema, a tiny paper coupon for two percent off per turn, and an empty rectangle with the nail still in it.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-22-pm-m2",
+   "image": "/images/brief/memes/2026-09-23/2026-09-22-pm-m2.webp",
+   "alt": "Two desks meet at a corner. A boxy robot with one round eye holds a rubber stamp in each hand over two sheets that already read APPROVED. A laptop with a smiling face sits opposite, arms flat on the desk. Wall signs read PEER REVIEW and NO SELF-REVIEW.",
+   "alt_joke": "Neither of them is looking at the paperwork.",
+   "caption": "Every check passed. The fix on offer is to let them remember less of each other.",
+   "concept": "Two agents at a shared desk stamping the work APPROVED under a sign forbidding self-review.",
+   "winner": true
+  }
+ ]
+}

@@ -1,0 +1,83 @@
+{
+ "issue_id": "2026-09-23",
+ "type": "daily",
+ "renders": 5,
+ "cost_usd": 1.25,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A sheet of ruled text lies flat, one middle line drawn as a clasp holding a folded slip closed, with a thin thread running from it across to a toggle switch that is still off.",
+   "bytes": [
+    33592,
+    30226
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A single sheet of retrieved text lying open in the centre of a wide empty surface. Most of its lines are ordinary ruled text, but one line in the middle is drawn as a small clasp holding a folded slip shut. A thin thread runs from that clasp rightwards to a plain toggle switch sitting alone on the surface, still in the off position. Nothing has opened yet. The sheet sits left of centre and the switch right of centre, both well inside the frame with generous space above and below.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-23T00:14:16Z"
+  },
+  {
+   "key": "f05d7beb56fbde7f",
+   "story_id": "f05d7beb56fbde7f",
+   "light_name": "f05d7beb56fbde7f-light.webp",
+   "dark_name": "f05d7beb56fbde7f-dark.webp",
+   "alt": "A two-axis chart over a row of tick marks: one straight diagonal line rising steadily from the origin, and a second line starting flat and curving upward to overtake it near the right edge.",
+   "bytes": [
+    23226,
+    21826
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A plain two-axis chart drawn on an open surface. The horizontal axis is a row of small evenly spaced tick marks standing for successive turns. Two lines rise from the same origin: one a straight diagonal climbing steadily, the other starting almost flat along the axis and bending upward so it overtakes the straight line near the right edge. A small solid block sits above each tick under the straight line. The chart is centred with wide empty margins on every side.",
+   "labels": [
+    "SCHEMA",
+    "CONTENT"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-23T00:16:51Z"
+  },
+  {
+   "key": "5b3b7b4e6672648f",
+   "story_id": "5b3b7b4e6672648f",
+   "light_name": "5b3b7b4e6672648f-light.webp",
+   "dark_name": "5b3b7b4e6672648f-dark.webp",
+   "alt": "A conveyor belt forks: the branch leading to a large shuttered inspection booth is unused, and a parcel travels the other branch through a much smaller booth and on toward an open door.",
+   "bytes": [
+    65646,
+    63746
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A conveyor belt running left to right and splitting at a fork in the centre of the frame. The upper branch leads to a large inspection booth with a wide window and a bright lamp above it, standing empty with its shutter pulled down. The lower branch leads to a booth barely larger than the parcel travelling through it. Past both booths the belt continues to an open door at the right. The fork sits centred with clear space above and below.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-23T00:19:57Z"
+  }
+ ]
+}
