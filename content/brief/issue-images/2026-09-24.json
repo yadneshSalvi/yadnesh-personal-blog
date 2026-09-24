@@ -1,0 +1,85 @@
+{
+ "issue_id": "2026-09-24",
+ "type": "daily",
+ "renders": 6,
+ "cost_usd": 1.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A stack of four wide flat slabs labelled model, harness, tools and memory. The memory slab is a row of small closed cells; one has swung open and a single-file line of small keys marches out of it and away from the stack. A thin arrow runs down the right side.",
+   "bytes": [
+    61072,
+    56454
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A cutaway diagram of an agent system drawn as four wide, flat horizontal slabs stacked one on top of another, the whole stack centred in the frame and clearly wider than it is tall, with generous empty space on every side. The top three slabs are plain. The bottom slab is drawn as a long row of small identical closed cells, like a bank of lockers seen head on. One cell near the left end of that bottom slab has swung open on a tiny hinge, and out of it marches a neat single-file line of small key shapes, running sideways along the slab and then curving down and away off the lower left, leaving the stack entirely. Every other cell sits flush and shut. A thin arrow runs down the right-hand side of the stack from the top slab to the bottom one. The open hatch and the line of keys are the only things that break the stack's straight edges.",
+   "labels": [
+    "MODEL",
+    "HARNESS",
+    "TOOLS",
+    "MEMORY"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-24T00:14:57Z"
+  },
+  {
+   "key": "79cfb55544c2184b",
+   "story_id": "79cfb55544c2184b",
+   "light_name": "79cfb55544c2184b-light.webp",
+   "dark_name": "79cfb55544c2184b-dark.webp",
+   "alt": "A left-to-right track of small squares. At three of them a fainter path peels downward into a dead end, and a short hinged bar is swung shut across each of those three turnoffs. The main track runs past them to a single larger open square at the right.",
+   "bytes": [
+    11052,
+    11188
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A branching path diagram running left to right across the middle of the frame, well inside all four edges. A single track begins at the left and passes through a row of eight identical small squares. At three of those squares a fainter second path peels away downward and ends in a small solid dot, a dead end. Across the entrance to each of those three downward turnoffs lies a short bar hinged at one end and swung shut, so the main track continues straight past it. The other squares have no bar at all. At the right end the track finishes at a single larger open square. Nothing else appears in the frame.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-24T00:17:34Z"
+  },
+  {
+   "key": "e3a3bc50e9e769ee",
+   "story_id": "e3a3bc50e9e769ee",
+   "light_name": "e3a3bc50e9e769ee-light.webp",
+   "dark_name": "e3a3bc50e9e769ee-dark.webp",
+   "alt": "Two panels. On the left a selector hovers over a rack of cards while one larger card with a scribbled label pulls it in with short curved lines. On the right that card feeds a ribbon into a funnel, and the ribbon comes out redrawn and heads toward a small door standing ajar.",
+   "bytes": [
+    32022,
+    30774
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 3,
+   "cost_usd": 0.75,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two panels side by side, each drawn well inside the frame with clear space around them. In the left panel a small pointing selector hovers above a rack of six identical upright cards; the middle card is drawn slightly larger than the rest and its upper label area is filled with dense scribbled lines, and four short curved lines arc from that card up toward the selector as if drawing it in. In the right panel the same enlarged card is seen from the other side, feeding a flat ribbon into the wide mouth of a funnel; the ribbon emerges from the funnel's narrow end redrawn as a straighter, harder-edged strip that runs toward a small door standing ajar at the panel's far edge. A single thin arrow joins the left panel to the right.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-24T00:22:04Z"
+  }
+ ]
+}
