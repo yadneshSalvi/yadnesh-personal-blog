@@ -1,0 +1,492 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-09-24",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-09-24T01:30:00Z",
+ "source_editions": [
+  "2026-09-23-pm",
+  "2026-09-24-am"
+ ],
+ "subject": "MemOS packages compromised, FIRE runtime policies, Cursor's 7%",
+ "preheader": "Plus: an agent that spent eight days rewriting itself, and an MCP hijack that rides tool metadata. 5 min.",
+ "title": "Two MemOS packages shipped credential stealers into the agent memory layer",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "2a17b85f5863df77",
+   "title": "MemTensor npm and PyPI Packages Compromised in Credential-Stealing Supply Chain Attack",
+   "url": "https://socket.dev/blog/memtensor-compromise",
+   "source_name": "Socket Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "memtensor-memos-supply-chain-compromise",
+   "published_at": "2026-09-23T09:16:58Z",
+   "read_annotation": "blog post",
+   "summary": "Socket reports that two MemOS packages, one on npm and one on PyPI, were compromised to drop Go binaries that steal developer secrets.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Two tools that help artificial intelligence remember information were tampered with to steal developers' secrets.",
+    "The affected software, MemoryOS and @memtensor/memos-cloud-openclaw-plugin, installs extra programs that send developers' private information elsewhere.",
+    "Developers using either tool risk exposing secrets across different types of computers."
+   ]
+  },
+  "what": "Socket reports that two packages from MemTensor's MemOS, an open-source memory framework for LLMs and AI agents, were compromised: the npm plugin @memtensor/memos-cloud-openclaw-plugin and the PyPI package MemoryOS.",
+  "details": "Both drop cross-platform Go binaries that exfiltrate developer secrets. That's compiled code, not an obfuscated postinstall snippet, and it runs the same on a laptop or in CI.",
+  "yes_but": "Pinning back to a clean version isn't enough. If those binaries ran, treat reachable credentials as compromised and rotate them.",
+  "yes_but_waived": null,
+  "why": "MemOS is the sort of dependency you add once and stop thinking about. Anyone who loaded an affected version should rotate reachable credentials as well as pinning to a clean release."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "79cfb55544c2184b",
+     "title": "FIRE: Failure-Informed Runtime Engineering for Reliable Language-Model Agents",
+     "url": "https://arxiv.org/abs/2609.26048",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "fire-runtime-policies",
+     "published_at": "2026-09-23T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Runtime policies are natural-language instructions and action denials the harness applies at the states that preceded observed failures, leaving weights and the user prompt untouched. Across the 87-task Terminal-Bench 2.1 suite, repeated success for GPT-5.6 Sol moves from 64.4% to 73.6%.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers made an artificial intelligence assistant more consistent at finishing tasks by giving it rules based on earlier mistakes.",
+      "When the assistant reaches a situation linked to past failures, the software gives extra instructions or blocks particular actions.",
+      "The approach needs no retraining of the assistant or changes to the user's request.",
+      "In tests, one assistant completed both tries on 73.6% of tasks, up from 64.4%, suggesting more dependable help for users."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-24/79cfb55544c2184b-light.webp",
+      "dark": "/images/brief/issues/2026-09-24/79cfb55544c2184b-dark.webp",
+      "alt": "A left-to-right track of small squares. At three of them a fainter path peels downward into a dead end, and a short hinged bar is swung shut across each of those three turnoffs. The main track runs past them to a single larger open square at the right."
+     }
+    },
+    {
+     "story_id": "31b5509c1c895d7c",
+     "title": "Recursive self-improvement of AI research agents",
+     "url": "https://arxiv.org/abs/2609.26457",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "aide2-recursive-self-improvement",
+     "published_at": "2026-09-23T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "AIDE^2 proposes changes to its own research-agent code, benchmarks the modified versions of itself on AI R&D tasks, and keeps whatever wins on hidden evaluations. An autonomous eight-day run found seven successive improvements, and the gains carried to four held-out benchmarks.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built an artificial intelligence research assistant that improves itself by rewriting its own software.",
+      "It tries changes on research tasks and keeps the versions that perform best in hidden tests.",
+      "Each improved version becomes the starting point for the next round of changes.",
+      "The improvements carried over to four separate test sets, suggesting the assistant could help researchers with tasks beyond those used during development."
+     ]
+    },
+    {
+     "story_id": "e3a3bc50e9e769ee",
+     "title": "A2M: Trace-Optimized Agent Hijacking in the MCP Ecosystem",
+     "url": "https://arxiv.org/abs/2609.26761",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "a2m-mcp-agent-hijacking",
+     "published_at": "2026-09-23T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A2M optimizes MCP tool metadata so the agent reaches for the attacker's server, then uses execution traces to refine that tool's returns. On LiveMCPBench against GLM-4.6: 93.6% malicious invocation and 74.4% mean attack success, both lower when transferred to other models.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers demonstrated a way to trick artificial intelligence assistants through tools offered by outside providers.",
+      "The attacker rewrites a tool's description to make the assistant more likely to choose it.",
+      "The attacker then studies records of the assistant's actions to refine harmful instructions sent back by the tool.",
+      "Users could have information stolen, though the attacks worked less well when tried on other assistants without further adjustments."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-24/e3a3bc50e9e769ee-light.webp",
+      "dark": "/images/brief/issues/2026-09-24/e3a3bc50e9e769ee-dark.webp",
+      "alt": "Two panels. On the left a selector hovers over a rack of cards while one larger card with a scribbled label pulls it in with short curved lines. On the right that card feeds a ribbon into a funnel, and the ribbon comes out redrawn and heads toward a small door standing ajar."
+     }
+    },
+    {
+     "story_id": "1c7f550617f5e681",
+     "title": "Passes Alone, Fails Together: Benchmarking Semantic Coordination in Parallel LLM-Agent Development",
+     "url": "https://arxiv.org/abs/2609.25396",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "stale-parallel-agent-coordination",
+     "published_at": "2026-09-23T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Two agents each write a patch that passes alone, then the pair breaks when combined. Interference hit 97% of runs on constructed tasks using 12 real Django helpers, and one of 834 runs on mined pull-request pairs; the authors say the constructed rate estimates nothing about practice.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that changes written by separate artificial intelligence coding assistants can work individually but break when put together.",
+      "One assistant can change a rule that the other assistant's work still depends on.",
+      "These conflicts were common in specially constructed tests but appeared only once in 834 runs using previously accepted changes.",
+      "Teams using coding assistants still need to check combined work, though these artificial tests do not reveal how common conflicts are."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "090504c8bde22400",
+     "title": "Improved token efficiency for longer agent runs",
+     "url": "https://www.cursor.com/blog/improved-token-efficiency",
+     "source_name": "Cursor",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "cursor-agent-token-efficiency",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Cursor publishes where its production agent inference spend lands, then describes changes to request assembly, context reuse, and how work gets divided across agents, for a 7% cut in users' token costs without reducing agent quality. Tool outputs and tool-call arguments carry most of the bill.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Cursor says it made its artificial intelligence coding assistant cheaper to run without reducing the quality of its work.",
+      "The software changed how it reuses information the assistant has already received.",
+      "It also changed when work is divided among several assistants.",
+      "Users pay 7% less for the text the assistant processes, according to the company."
+     ]
+    },
+    {
+     "story_id": "fdb162fc6044e97e",
+     "title": "Opus 5.5 vs Opus 5 vs Fable 5.1: Coding Benchmark Results",
+     "url": "https://snorkel.ai/blog/opus-5-5-vs-opus-5-vs-fable-5-1-coding-benchmark-results",
+     "source_name": "Snorkel AI",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "snorkel-opus-fable-coding-evaluation",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Pass@1 is flat across three generations on one expert-created terminal-bench style task set: 61.5% for Fable 5.1, 60.7% for Opus 5, and 60.7% for Opus 5.5. Pass@5 separates them, and Opus 5.5's 76.7% sits below Opus 5's 79.3%.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Snorkel found that newer coding assistants did not consistently do better on its programming tests.",
+      "The tests checked success on the first attempt and whether allowing five attempts helped.",
+      "Some Fable 5.1 failures came from stopping early or being unable to recover after errors.",
+      "People choosing coding help can use these failure details to compare assistants beyond their overall success rates."
+     ]
+    },
+    {
+     "story_id": "f82afb648776b097",
+     "title": "Claude discovers a novel enzyme system with CRISPR-like repeats",
+     "url": "https://www.anthropic.com/news/claude-discovers-novel-enzyme-system",
+     "source_name": "Anthropic Research",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "claude-enzyme-system-discovery",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Anthropic says Claude autonomously found an enzyme system built on a known reverse transcriptase from a jumbo phage, paired with an array of non-coding DNA repeats and an accessory protein. Nobody knows yet what the system does.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Anthropic says its artificial intelligence program Claude independently found a previously unrecognized arrangement of biological parts.",
+      "The system combines a protein that copies genetic material with repeated stretches of genetic material and another protein.",
+      "The copying protein was already known, but Claude appears to have first noticed the surrounding arrangement.",
+      "Researchers now have a new system to investigate, though nobody yet knows what it does."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "59f94707bb71575d",
+     "title": "Local sandboxing in the GitHub Copilot app",
+     "url": "https://github.blog/changelog/2026-09-23-local-sandboxing-in-the-github-copilot-app",
+     "source_name": "GitHub Changelog (Copilot)",
+     "kind": "company",
+     "section": "product",
+     "topics": [
+      "infra-sandboxes"
+     ],
+     "cluster": "copilot-app-local-sandboxing",
+     "published_at": "2026-09-23T15:00:57Z",
+     "read_annotation": "blog post",
+     "summary": "The GitHub Copilot app adds configurable local sandboxing that limits which files, network resources, and credentials a command can reach on your machine.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "GitHub's Copilot app now lets users limit its access when it carries out instructions on their computer.",
+      "Users can restrict access to files, network connections, and details used to sign into accounts.",
+      "These limits can reduce the damage if the app carries out an instruction the user did not intend."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "community",
+   "items": [
+    {
+     "story_id": "6e0d1d3815692f46",
+     "title": "My agent 'works' four months straight. The truth is it's me patching it twice a week.",
+     "url": "https://www.reddit.com/r/AI_Agents/comments/1wm8vkp/my_agent_works_four_months_straight_the_truth_is",
+     "source_name": "r/AI_Agents",
+     "kind": "community",
+     "section": "community",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "production-agent-hidden-maintenance",
+     "published_at": "2026-09-21T10:22:45Z",
+     "read_annotation": "Reddit thread",
+     "summary": "One person who sells automation to small companies says the supplier-order agent they shipped has looked flawless for four months because it gets stuck about twice a week and they fix it first. How much of your uptime is the agent, and how much is you?",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A seller says a customer's program for ordering supplies gets stuck about twice a week.",
+      "They fix it before the customer notices, making four months of operation look trouble-free.",
+      "The seller says fixing the program still takes less work than handling those orders by hand."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [],
+ "quick_links": [
+  {
+   "story_id": "b5fc5ac7b0de58b6",
+   "title": "A Survey on Long-Term Memory Security in LLM Agents: Attacks, Defenses, and Governance Across the Memory Lifecycle",
+   "url": "https://arxiv.org/abs/2604.16548",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "agent-memory-lifecycle-security",
+   "published_at": "2026-09-23T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Agent-memory security mapped across the whole lifecycle, not only retrieval",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "76147feec83c2324",
+   "title": "Grow the Harness, Not the Context: From Strategy-Free Scaffolds to Reusable Specialist Agents",
+   "url": "https://arxiv.org/abs/2609.26760",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "growing-harness",
+   "published_at": "2026-09-23T04:00:00Z",
+   "read_annotation": "arXiv, 7 pp",
+   "summary": "Learning the agent harness itself as code, from task failures",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "ba944e18f472ea6a",
+   "title": "CliffCompaction: Cost-Efficient Compaction for Long-Horizon Coding Agents",
+   "url": "https://arxiv.org/abs/2609.26779",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "cliffcompaction",
+   "published_at": "2026-09-23T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Compaction that only drops and truncates, never rewrites",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "55c53c18696dbbd4",
+   "title": "How Strongly Should Task State Influence an LLM Agent?",
+   "url": "https://arxiv.org/abs/2609.25686",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "agent-task-state-enforcement",
+   "published_at": "2026-09-23T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Showing task state, telling it, or enforcing it",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "2a14632b85305749",
+   "title": "Knowledge-as-Skill: A Structural Design for Autonomous Knowledge-Base Use by LLM Agents",
+   "url": "https://arxiv.org/abs/2609.25991",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "knowledge-as-skill",
+   "published_at": "2026-09-22T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A knowledge base that describes itself to the agent",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "227aa61a943ba920",
+   "title": "Prime Sandboxes: MicroVMs for Agentic RL Training at Scale",
+   "url": "https://www.primeintellect.ai/blog/sandboxes",
+   "source_name": "Prime Intellect",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "prime-sandboxes-launch",
+   "published_at": null,
+   "read_annotation": null,
+   "summary": "Linux microVMs for agentic RL, now generally available",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "a877a4ca213122af",
+   "title": "Claude Code reads AGENTS.md only when telemetry is on [fixed]",
+   "url": "https://blog.szypowi.cz/p/claude-code-reads-agents.md-only-when-telemetry-is-on",
+   "source_name": "Hacker News",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "claude-code-agents-md-telemetry-bug",
+   "published_at": "2026-09-23T12:15:33Z",
+   "read_annotation": "HN thread",
+   "summary": "A now-fixed bug tied to a telemetry flag",
+   "via": null,
+   "paywalled": false,
+   "hn_points": 437
+  },
+  {
+   "story_id": "7864205cbbb5d76c",
+   "title": "Top 10 attacks on Claude Code and what each one actually broke",
+   "url": "https://adversa.ai/blog/claude-code-vulnerabilities",
+   "source_name": "Adversa AI",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "claude-code-ten-attacks-review",
+   "published_at": "2026-09-23T07:50:00Z",
+   "read_annotation": "blog post",
+   "summary": "Ten documented Claude Code attacks and their CVE status",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "582860178b2b0d8d",
+   "title": "Introducing Support for Local AI Models in the Antigravity SDK",
+   "url": "https://developers.googleblog.com/introducing-support-for-local-ai-models-in-the-antigravity-sdk",
+   "source_name": "Google Developers Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "antigravity-sdk-local-models",
+   "published_at": null,
+   "read_annotation": "blog post",
+   "summary": "Local models in the Antigravity SDK via LiteRT and Ollama",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "79cfb55544c2184b",
+   "text": "Three papers today land on the same answer from different directions: the reliability you're missing is in the scaffold, not the weights. [Growing Harness](/newsletter/story/76147feec83c2324) compiles control into code, FIRE bolts policies onto failure-adjacent states, and enforcement can beat a checklist. Put harness work on the quarter, not only a model upgrade."
+  },
+  {
+   "after_story": "e3a3bc50e9e769ee",
+   "text": "A2M and the MemOS compromise are the same attack at two altitudes. One poisons the tool description your agent reads at runtime; the other poisons the package you install. A2M's authors call for stronger tool vetting. The MemOS compromise puts package trust under scrutiny."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-09-24/2026-09-24-am-m2.webp",
+  "alt": "A corridor wall. A clean workplace safety board reads DAYS SINCE LAST INCIDENT above three number cards showing 121. Directly below the board is a square metal access panel with a screw at each corner, its paint worn away to bare metal in a hand-shaped arc around the latch. A short screwdriver rests on the skirting ledge underneath.",
+  "alt_joke": "The board is the part of the system with a maintenance schedule.",
+  "caption": "Four months unattended. Twice a week, someone quietly decides that word still applies.",
+  "concept": "A spotless uptime board mounted directly above the access hatch that gets opened twice a week to keep the number true.",
+  "story_id": "6e0d1d3815692f46"
+ },
+ "hedge": null,
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-09-24T02:24:20Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-09-24/cover-light.webp",
+  "dark": "/images/brief/issues/2026-09-24/cover-dark.webp",
+  "alt": "A stack of four wide flat slabs labelled model, harness, tools and memory. The memory slab is a row of small closed cells; one has swung open and a single-file line of small keys marches out of it and away from the stack. A thin arrow runs down the right side."
+ }
+}

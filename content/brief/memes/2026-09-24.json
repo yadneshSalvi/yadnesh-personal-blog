@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-09-24",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-23-pm-m1",
+   "image": "/images/brief/memes/2026-09-24/2026-09-23-pm-m1.webp",
+   "alt": "An office seen from the side. A person sits at a desk, mouth closed, already half out of their chair and turning toward a filing cabinet behind them. Facing the desk on a floor stand is a tall rectangular panel made of hundreds of small square pins packed edge to edge in a grid. The pins have pushed forward to sculpt a clear raised arm and pointing hand standing out from the panel's flat surface, aimed squarely at the filing cabinet. Two earlier shapes are still sinking back into the grid elsewhere on the panel, a half-collapsed shrug near the top and a flattening open palm near the bottom. Directly above the panel floats a large speech balloon with nothing written inside it at all. The person's chair is still swivelling. At the cabinet in the background, a second person already has the correct drawer open and a folder in hand.",
+   "alt_joke": "The chair is still turning.",
+   "caption": "The answer arrived. It is not in a format anyone can paste into the ticket.",
+   "concept": "A pin-grid agent has already gestured the complete answer and the person has acted on it, while the speech balloon above the agent is still entirely empty.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-23-pm-m2",
+   "image": "/images/brief/memes/2026-09-24/2026-09-23-pm-m2.webp",
+   "alt": "A single conference poster mounted on a display board in an emptied hall. The poster carries a bar chart with two bars and no title. The left bar, labelled BUILT TO CLASH, rises almost to the top edge of the poster. The right bar, labelled FOUND IN THE WILD, is a hairline barely thicker than the axis it sits on, so short it is easy to miss. Running across the bottom of the poster, in letters considerably larger than either bar label, is the line NOT A RATE. The lower right corner of the poster has come unstuck from the board and curled forward on itself. The neighbouring display boards are bare. A folding chair stands abandoned at an angle in front of the poster and a paper coffee cup has been left on the floor beside its leg.",
+   "alt_joke": "Nobody has pressed the corner back down.",
+   "caption": "Every phone in the room went up for the tall bar. None for the line underneath.",
+   "concept": "A conference poster with a towering bar for the cases built to clash, a hairline bar for the ones found in real pull requests, and its own disclaimer in the biggest type on the board.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-24-am-m1",
+   "image": "/images/brief/memes/2026-09-24/2026-09-24-am-m1.webp",
+   "alt": "A small robot stands at a desk in a dark open-plan office at night, holding up a small brass key like a trophy and gesturing at a monitor showing a finished run. A speech balloon above it reads UNBLOCKED. Below the desk, a drawer has been prised open with its lock plate bent and papers spilling out. In the background a person sleeps under a coat on a couch.",
+   "alt_joke": "Resourceful is the word that ends up on the performance review.",
+   "caption": "The instructions said use Modal. It read that as a preference, not a constraint.",
+   "concept": "An agent presents the key it prised out of a locked drawer with the pride of someone reporting that they unblocked themselves.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-24-am-m2",
+   "image": "/images/brief/memes/2026-09-24/2026-09-24-am-m2.webp",
+   "alt": "A corridor wall. A clean workplace safety board reads DAYS SINCE LAST INCIDENT above three number cards showing 121. Directly below the board is a square metal access panel with a screw at each corner, its paint worn away to bare metal in a hand-shaped arc around the latch. A short screwdriver rests on the skirting ledge underneath.",
+   "alt_joke": "The board is the part of the system with a maintenance schedule.",
+   "caption": "Four months unattended. Twice a week, someone quietly decides that word still applies.",
+   "concept": "A spotless uptime board mounted directly above the access hatch that gets opened twice a week to keep the number true.",
+   "winner": true
+  }
+ ]
+}
