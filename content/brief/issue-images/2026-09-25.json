@@ -1,0 +1,114 @@
+{
+ "issue_id": "2026-09-25",
+ "type": "daily",
+ "renders": 9,
+ "cost_usd": 2.25,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A cross-section of a pipeline. An envelope enters a rendering box on the left and splits into two tracks. The upper track, marked REASONING, carries a blank scroll watched by two lenses on stands. The lower track, marked TOOL CALL, carries a sealed packet through an open valve and out of the arrangement.",
+   "bytes": [
+    47232,
+    44450
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A horizontal cross-section of a message pipeline, centred in the frame. On the left, a plain envelope enters a rendering box. Two parallel tracks run out of the box toward the right. The upper track carries an unrolled scroll with nothing written on it, and two hand lenses on stands hover over that blank scroll. The lower track carries a small sealed packet along a rail, through an open valve, and off past the right of the arrangement. Keep the whole pipeline well inside the frame with generous space above and below.",
+   "labels": [
+    "REASONING",
+    "TOOL CALL"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-25T00:17:10Z"
+  },
+  {
+   "key": "8f964e503f4119b0",
+   "story_id": "8f964e503f4119b0",
+   "light_name": "8f964e503f4119b0-light.webp",
+   "dark_name": "8f964e503f4119b0-dark.webp",
+   "alt": "A diagram. Two cards, each carrying the same name plate reading AGENT-A, point into one slot of a rack of pigeonholes. A single arrow leaves that slot and runs to the right-hand of two endpoint boxes. The left endpoint box, drawn with a padlock, receives nothing.",
+   "bytes": [
+    24370,
+    24508
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 1,
+   "prompt": "A calm explanatory diagram, centred with wide margins on all four sides. Two identical cards sit at the left, each carrying the same small name plate, and an arrow runs from each card into the same slot in a row of pigeonholes drawn as a horizontal rack. A single arrow leaves that slot and runs to the right-hand one of two small endpoint boxes further right. The left endpoint box has a padlock drawn on its front and no arrow reaching it.",
+   "labels": [
+    "AGENT-A"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-25T00:22:19Z"
+  },
+  {
+   "key": "6f08b10663ce0d2e",
+   "story_id": "6f08b10663ce0d2e",
+   "light_name": "6f08b10663ce0d2e-light.webp",
+   "dark_name": "6f08b10663ce0d2e-dark.webp",
+   "alt": "A diagram. A gauge marked BUDGET feeds a box marked WORKER, which points by one arrow to a separate box marked GATE. No arrow returns from the worker to the gate. Below the gate, five small blocks linked into a chain are marked LEDGER.",
+   "bytes": [
+    22960,
+    21166
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A calm explanatory diagram arranged horizontally and centred, with wide margins on all four sides. At the left, an upright gauge with its needle partway up, a line running from it into a plain box in the middle. One arrow leaves that middle box and points to a second box at the right. No arrow returns from the middle box into the right box. Directly below the right box, five small rectangles are linked into a chain by short connectors.",
+   "labels": [
+    "BUDGET",
+    "WORKER",
+    "GATE",
+    "LEDGER"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-25T00:24:47Z"
+  },
+  {
+   "key": "db88da0b443f217d",
+   "story_id": "db88da0b443f217d",
+   "light_name": "db88da0b443f217d-light.webp",
+   "dark_name": "db88da0b443f217d-dark.webp",
+   "alt": "A grid of identical small server crates seen straight on. Roughly a third carry a small tag hanging from one corner. Six crates sit open on a low bench in front of the wall, with a single cable running out of them toward the right.",
+   "bytes": [
+    35720,
+    33776
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A storage wall of identical small server crates in a neat grid, seen straight on and centred with wide margins on every side. Roughly a third of the crates carry a small tag hanging from one lower corner. In front of the wall, six crates have been pulled out and set on a low bench with their lids standing open, and a single cable runs from the open crates off toward the right side of the arrangement.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-25T00:26:03Z"
+  }
+ ]
+}
