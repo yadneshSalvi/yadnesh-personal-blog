@@ -1,0 +1,33 @@
+{
+ "issue_id": "2026-09-25",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-24-pm-m1",
+   "image": "/images/brief/memes/2026-09-25/2026-09-24-pm-m1.webp",
+   "alt": "A wood-panelled inquiry chamber seen straight on. Three commissioners sit behind a long bench and the middle one is bringing a heavy rubber stamp down onto a document. In front of the bench, an evidence table holds a row of folders laid out left to right, with one gap in the row. Set into the panelled wall on the right is a lift with its doors half open. A clerk stands inside the lift holding a single folder flat against their chest, looking up at the floor indicator above the doors rather than at the chamber. On the wall to the left, a board headed ORDER OF EVIDENCE has a row of folder slots, one of them empty.",
+   "alt_joke": "The stairs remain an open question.",
+   "caption": "No document was forged and no witness lied. The commission has since relocated to the ground floor.",
+   "concept": "A full commission of inquiry stamps its verdict while the exhibit that would have changed it stands in a lift two floors down, authentic and unhurried.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-24-pm-m2",
+   "image": "/images/brief/memes/2026-09-25/2026-09-24-pm-m2.webp",
+   "alt": "An open-plan office. On a raised platform in the upper left, a robot sits behind a large desk with one hand held up palm outward toward a person in a visitor chair. A speech balloon above the robot reads I MUST DECLINE. In the wall directly behind the raised desk is a chute mouth labelled TASK QUEUE, with a sheet of paper halfway down it. Below and to the right, on the main floor, three small robots work at three small desks. The first is reading an identical sheet, the second is on the phone, and the third is pressing tape onto a packed cardboard box beside an open loading door.",
+   "alt_joke": "Compliance signed off on the first row.",
+   "caption": "Both entries are in the audit log. Neither one is wrong.",
+   "concept": "A refusal delivered sincerely from a raised desk, while the same request has already travelled down a chute to the three desks that packed and shipped it.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-25-am-m1",
+   "image": "/images/brief/memes/2026-09-25/2026-09-25-am-m1.webp",
+   "alt": "The brick front of a building at pavement level. A heavy steel door carries a plate reading AUTHORISED ACCESS ONLY, with a camera above it. Beside it, a comment box on a post under a HOW ARE WE DOING sign has a tube running from it into an overfull sack of envelopes on the pavement.",
+   "alt_joke": "Scope is reviewed every quarter.",
+   "caption": "The door passed its annual penetration test. The box is not in scope.",
+   "concept": "A hardened entrance with every control on it, and beside it a public comment box plumbed straight through the wall into a sack of envelopes on the pavement.",
+   "winner": true
+  }
+ ]
+}

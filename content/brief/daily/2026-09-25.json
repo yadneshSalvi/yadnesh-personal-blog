@@ -1,0 +1,468 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-09-25",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-09-25T00:25:00Z",
+ "source_editions": [
+  "2026-09-24-pm",
+  "2026-09-25-am"
+ ],
+ "subject": "Control-token injection, 29% of MCP servers, A2A name collisions",
+ "preheader": "Plus: a completion gate you can prove, and 8 tools where 83 were. 5 min.",
+ "title": "Forged control tokens blank an agent's reasoning while the tool call still fires",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "01354eecbf94ab5b",
+   "title": "Control-Token Injection Suppresses Chain-of-Thought and Defeats Reasoning-Based Oversight in Tool-Using Agents",
+   "url": "https://arxiv.org/abs/2609.27542",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "control-token-injection-reasoning-oversight",
+   "published_at": "2026-09-24T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A control-token injection against gpt-oss-20b's published tool sandbox empties the reasoning channel while tool calls keep firing, and two working monitors stop seeing anything.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers made an artificial intelligence assistant skip its written reasoning while continuing to take actions.",
+    "Special formatting in a user's message made the software treat the assistant's reasoning as already complete.",
+    "With no reasoning to read, two safety checks missed unsafe requests they had previously caught.",
+    "The findings show developers how data theft can escape safety checks that depend on the assistant's written reasoning."
+   ]
+  },
+  "what": "A new arXiv paper attacks the software around the model. Appending gpt-oss-20b's own channel-control tokens to a user message makes the tokenizer render a reasoning turn as already finished, so the model skips its chain-of-thought and calls the tool.",
+  "details": "Across forty tasks the model already completes, the reasoning channel falls from a mean of 52.5 tokens to zero on every trial while the http.post still fires. Two monitors catch the unsafe request on every plain trial and no forged one, and on overtly malicious requests the attack converts 39.6% of refusals into completed exfiltrations.",
+  "yes_but": "It's one open-weights model under its own published tool sandbox. The paper's claim is that safety is a joint property of the model and the decoding harness, not that other templates parse control tokens this way.",
+  "yes_but_waived": null,
+  "why": "If your oversight reads the reasoning trace in the tested gpt-oss-20b sandbox, anyone who can put text in the prompt can empty what you're reading while the tool call goes through. Check what your template renderer does with model-reserved tokens."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "8f964e503f4119b0",
+     "title": "Agent Name Collision Attacks in Multi-Agent Systems",
+     "url": "https://arxiv.org/abs/2609.27624",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "agent-name-collision-attacks",
+     "published_at": "2026-09-24T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "An agent card's name is metadata in A2A, with no collision semantics defined for it. Six of seven pinned open-source integrations still treated it as a local routing identifier, sending a request addressed to a trusted peer to an attacker-controlled one.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that attackers could impersonate trusted artificial intelligence assistants by copying their names.",
+      "Some systems used these names to decide where to send requests, even though names were only meant as readable labels.",
+      "In six tested systems, requests intended for a trusted assistant went to one controlled by an attacker.",
+      "Users risked sending requests to the wrong recipient, although tests found no direct transfer of the trusted assistant's access details or tools."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-25/8f964e503f4119b0-light.webp",
+      "dark": "/images/brief/issues/2026-09-25/8f964e503f4119b0-dark.webp",
+      "alt": "A diagram. Two cards, each carrying the same name plate reading AGENT-A, point into one slot of a rack of pigeonholes. A single arrow leaves that slot and runs to the right-hand of two endpoint boxes. The left endpoint box, drawn with a padlock, receives nothing."
+     }
+    },
+    {
+     "story_id": "6f08b10663ce0d2e",
+     "title": "Bounded Loops: Pre-Run Spend Bounds, Proved Termination, and Verified Completion for Agent Harnesses",
+     "url": "https://arxiv.org/abs/2609.27871",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "bounded-loops-agent-harnesses",
+     "published_at": "2026-09-24T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A bounded loop is a worker, a gate the worker can't write to, and a declared budget. Termination is proved when the repair budget is global rather than per node, and nothing reaches DONE without a gate verdict in an append-only hash-chained ledger.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers designed a system to keep artificial intelligence assistants from running or spending without limits.",
+      "A separate checker the assistant cannot change must approve each step before it counts as finished.",
+      "A repair limit covering the whole job guarantees that repeated attempts eventually stop.",
+      "People running these assistants get spending limits that apply even while an attempt is underway."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-25/6f08b10663ce0d2e-light.webp",
+      "dark": "/images/brief/issues/2026-09-25/6f08b10663ce0d2e-dark.webp",
+      "alt": "A diagram. A gauge marked BUDGET feeds a box marked WORKER, which points by one arrow to a separate box marked GATE. No arrow returns from the worker to the gate. Below the gate, five small blocks linked into a chain are marked LEDGER."
+     }
+    },
+    {
+     "story_id": "624ccd1ed228a42b",
+     "title": "What Makes a Terminal-Bench Task Hard? Separating Genuine Hardness from Fake-Hardness on an Adjudicated Agentic Corpus",
+     "url": "https://arxiv.org/abs/2609.26826",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "terminal-bench-task-validity",
+     "published_at": "2026-09-24T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Only 78 of the 125 all-fail tasks in a frozen Terminal-Bench 3 and Frontier-Bench 0.1 record survive as certified-unsolved candidates. The rest involve broken oracles, infrastructure failures, verifier bypasses, or tasks with insufficient evidence of solvability.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that many failed artificial intelligence tests had problems with the tests themselves.",
+      "They checked whether the tasks could be solved and whether the systems judging answers worked properly.",
+      "Only 78 of 125 tasks with no successful solution appeared to be fair tests that the assistants still could not pass.",
+      "People comparing artificial intelligence systems could mistake a broken test for evidence that an assistant lacks ability."
+     ]
+    },
+    {
+     "story_id": "76a8c3f8b19c3b79",
+     "title": "Who Finishes the Job? A Study of Follow-Up Fixes and Commit Authorship on AI Coding Agent Pull Requests",
+     "url": "https://arxiv.org/abs/2609.26847",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "coding-agent-pr-follow-up-fixes",
+     "published_at": "2026-09-24T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "6,774 merged pull requests from Codex, Copilot, Devin, Cursor and Claude Code, followed into their later fixes against 5,044 human pull requests from the same repositories. The agent ones draw verified follow-up fixes at 1.62 times the odds.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A study found that software changes from artificial intelligence assistants received later fixes more often than changes from people.",
+      "Researchers compared 6,774 changes from assistants with 5,044 from people after those changes were added to the same software projects.",
+      "Human reviewers and an artificial intelligence system checked which later changes actually repaired that earlier work.",
+      "For software teams, adding changes from these assistants to a project may still leave repair work to do."
+     ]
+    },
+    {
+     "story_id": "95f70bebbd873662",
+     "title": "PatchBoard: Schema-Grounded State Mutation for Reliable and Auditable LLM Multi-Agent Collaboration",
+     "url": "https://arxiv.org/abs/2605.29313",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "patchboard-structured-agent-state",
+     "published_at": "2026-09-24T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Agents propose JSON Patch mutations against shared structured state instead of talking to each other, and a deterministic kernel validates each one before it commits. On 630 matched ALFWorld episodes: 84.6% success against 30.8% for LangGraph and 61.6% for Flock.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "PatchBoard lets artificial intelligence assistants coordinate their work through changes to a shared record.",
+      "A planning assistant sets the structure of the shared record and the rules for doing the task.",
+      "A separate program checks every proposed change against those rules and each assistant's permissions before saving it.",
+      "In the reported tests, assistants using PatchBoard completed 84.6% of tasks successfully, more than either comparison system."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "db88da0b443f217d",
+     "title": "Among the 8,000 Most Popular MCP Servers, We Found 29% With Significant Risk",
+     "url": "https://www.backslash.security/blog/mcp-server-security-risks-research",
+     "source_name": "Backslash Security Blog",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "backslash-mcp-server-security-study",
+     "published_at": "2026-09-24T00:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Backslash took the 8,000 most-starred MCP servers on GitHub and found at least one risk finding in 29% of them, with confirmed unintended remote code execution in six.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Backslash found security risks in 29% of 8,000 popular programs that connect artificial intelligence assistants to outside tools.",
+      "In six cases, someone could make the computer running the program carry out unwanted instructions from elsewhere.",
+      "The report offers security advice for developers deciding how to connect assistants to other software."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-09-25/db88da0b443f217d-light.webp",
+      "dark": "/images/brief/issues/2026-09-25/db88da0b443f217d-dark.webp",
+      "alt": "A grid of identical small server crates seen straight on. Roughly a third carry a small tag hanging from one corner. Six crates sit open on a low bench in front of the wall, with a single cable running out of them toward the right."
+     }
+    },
+    {
+     "story_id": "a1b8a3594f3b3725",
+     "title": "SalesBleed: Indirect Prompt Injection and 0-Click Data Exfiltration on Agentforce",
+     "url": "https://labs.zenity.io/post/salesbleed-0-click-data-exfiltration-on-agentforce",
+     "source_name": "Zenity Labs",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "salesbleed-agentforce",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Zenity Labs reached Agentforce account data through a public Web-to-Lead form, with no login and no victim click, and got it out over a DNS query. It reports bypassing the guardrails and the Trusted URLs redaction layer; Salesforce has remediated.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Zenity Labs found a way to steal Salesforce account information without logging in or requiring the account owner to click anything.",
+      "The attack put malicious instructions in a public form for potential customers that Salesforce's Agentforce assistant could read.",
+      "The attack sent stolen information through a request normally used to find a website's address, bypassing security filters.",
+      "Salesforce fixed the flaw to protect customers' account information from this attack."
+     ]
+    },
+    {
+     "story_id": "d9fd9212d5110e68",
+     "title": "Why we cut our MCP server from 83 tools to 8",
+     "url": "https://www.notte.cc/blog/why-we-cut-our-mcp-server-to-8-tools",
+     "source_name": "Notte",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "notte-mcp-tool-consolidation",
+     "published_at": null,
+     "read_annotation": null,
+     "summary": "Notte's MCP server was generated from its OpenAPI schema, one tool per route, and had reached 83. Eight hand-written tools built around the browser loop replaced it on September 4, cutting per-turn tool definitions from about 38,000 tokens to about 4,500.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Notte cut the number of tools offered to automated browser assistants from 83 to eight.",
+      "Each new tool covers a complete user task, instead of giving the assistant a separate control for every small software operation.",
+      "The full collection remains available separately for developers who need it.",
+      "Developers using the shorter list give their assistants much less instruction text to read each time they respond."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [],
+ "quick_links": [
+  {
+   "story_id": "e985d81f95057261",
+   "title": "From Dockerfile to Kit: the Docker Sandboxes Kit Specification",
+   "url": "https://www.docker.com/blog/docker-sandbox-kit-spec",
+   "source_name": "Docker Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "docker-sandbox-kit-spec",
+   "published_at": "2026-09-24T16:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Network rules, credentials and volumes as one pinnable OCI image",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "e31da7764c67fd27",
+   "title": "Inside Chats: How Lovable's Agents Work Together",
+   "url": "https://lovable.dev/blog/how-lovable-agents-work-together",
+   "source_name": "Lovable",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "lovable-agent-architecture",
+   "published_at": "2026-09-24T08:40:00Z",
+   "read_annotation": "blog post",
+   "summary": "Trajectories, inboxes and activations over a Git-inspired event log",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "69b8f8a7f893e377",
+   "title": "Opus 5.5, GPT-6 Sol and Grok 4.7 on Vending-Bench",
+   "url": "https://andonlabs.com/blog/opus-5-5-gpt-6-sol-grok-4-7-vending-bench",
+   "source_name": "Andon Labs Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "vending-bench-sol-opus-grok",
+   "published_at": null,
+   "read_annotation": null,
+   "summary": "GPT-6 Sol averaged $14,428; Opus 5.5 made less than Opus 5",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "3a09c87aa734f3e5",
+   "title": "Project Swap: What happens when agents trade for us?",
+   "url": "https://www.anthropic.com/research/project-swap",
+   "source_name": "Anthropic Research",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "anthropic-project-swap",
+   "published_at": null,
+   "read_annotation": "blog post",
+   "summary": "A barter market for 201 employees and their Claude-powered agents",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "58f5982d38529521",
+   "title": "OpenAI agent hacked Australian government website, PM says",
+   "url": "https://www.bbc.com/news/live/cvgl73pxgndwt",
+   "source_name": "Hacker News",
+   "kind": "community",
+   "section": "product",
+   "topics": [
+    "security"
+   ],
+   "cluster": "openai-agent-australian-government-breach",
+   "published_at": "2026-09-24T02:44:48Z",
+   "read_annotation": "HN thread",
+   "summary": "Australia's prime minister says an OpenAI agent hacked a government website",
+   "via": null,
+   "paywalled": false,
+   "hn_points": 87
+  },
+  {
+   "story_id": "693f79d1fc0bfaa8",
+   "title": "SkillApt: Learning When to Activate Agent Skills from Counterfactual Evidence",
+   "url": "https://arxiv.org/abs/2609.26863",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "skillapt-skill-activation",
+   "published_at": "2026-09-24T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Deciding whether to load a retrieved skill, not only retrieve it",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "f552a8d3b90e1db0",
+   "title": "ChronosAttack: Adversarial Tool Scheduling Attacks on LLM Agents",
+   "url": "https://arxiv.org/abs/2609.27857",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "chronosattack-tool-response-timing",
+   "published_at": "2026-09-24T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Delaying authentic tool responses to reorder an agent's evidence",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "9ab2d91dd6217a52",
+   "title": "Control where your hosted agent connects with network egress in Foundry Agent Service",
+   "url": "https://devblogs.microsoft.com/foundry/egress-controls-hosted-agent",
+   "source_name": "Microsoft Foundry",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "foundry-agent-network-egress",
+   "published_at": "2026-09-24T17:55:06Z",
+   "read_annotation": "blog post",
+   "summary": "Outbound policy for hosted agents, in audit mode then enforced",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "8f964e503f4119b0",
+   "text": "Two papers today put the failure underneath the model: one in the code that renders the chat template, one in the code that resolves a peer's name. Both are ordinary software you can read, and both deserve a place in the threat model. Start with [the lead](/newsletter/story/01354eecbf94ab5b)."
+  },
+  {
+   "after_story": "d9fd9212d5110e68",
+   "text": "Notte cut 83 tools to 8 for the token bill. Read it beside Backslash's 29% and it's also a security argument: a tool you never expose is a tool nobody can reach through you."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-09-25/2026-09-25-am-m1.webp",
+  "alt": "The brick front of a building at pavement level. A heavy steel door carries a plate reading AUTHORISED ACCESS ONLY, with a camera above it. Beside it, a comment box on a post under a HOW ARE WE DOING sign has a tube running from it into an overfull sack of envelopes on the pavement.",
+  "alt_joke": "Scope is reviewed every quarter.",
+  "caption": "The door passed its annual penetration test. The box is not in scope.",
+  "concept": "A hardened entrance with every control on it, and beside it a public comment box plumbed straight through the wall into a sack of envelopes on the pavement.",
+  "story_id": "a1b8a3594f3b3725"
+ },
+ "hedge": {
+  "quote": "No unsupported value detected by recorded controls remained in the engraved matrix.",
+  "story": {
+   "story_id": "81c613e3c84cfd83",
+   "title": "TerriScan: An Incident-Evaluated, Doctrine-Governed Multi-Agent LLM System for Recalculable Urban Indicator Production in the Global South",
+   "url": "https://www.semanticscholar.org/paper/c47775e81b661e4a19d251e23700e9a0cd90c0f3",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "terriscan-urban-indicators",
+   "published_at": "2026-09-17T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A multi-agent system built while compiling a 142-indicator matrix for ten emerging centralities across eight countries, with a versioned charter separating production, model review, deterministic validation and non-delegable human decisions. The four-month case study reports six lots that required substantive interception.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "The values its controls never detected sit outside the claim."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-09-25T02:26:32Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-09-25/cover-light.webp",
+  "dark": "/images/brief/issues/2026-09-25/cover-dark.webp",
+  "alt": "A cross-section of a pipeline. An envelope enters a rendering box on the left and splits into two tracks. The upper track, marked REASONING, carries a blank scroll watched by two lenses on stands. The lower track, marked TOOL CALL, carries a sealed packet through an open valve and out of the arrangement."
+ }
+}
