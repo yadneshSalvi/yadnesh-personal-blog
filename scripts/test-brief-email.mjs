@@ -72,6 +72,9 @@ const {
   buildApprovalEmail,
   buildNeedsReviewEmail,
   needsReviewSubject,
+  buildNotArmedEmail,
+  notArmedSubject,
+  VERCEL_DEPLOYMENTS_URL,
   reviewPrLink,
   reviewReasons,
 } = await import("../src/lib/brief/approvalEmail.ts");
@@ -849,6 +852,72 @@ test("the through line's markdown links become real anchors", () => {
     false,
     "raw markdown link syntax reached the text part",
   );
+});
+
+
+/*
+ * The published-but-never-sent mail.
+ *
+ * Ten days of failed deployments in September 2026 were visible only as a warning
+ * at the bottom of a log file on a VM, so nine issues sat in the repo unread. These
+ * assert the mail that now says so: it has to name the issue, point at the build,
+ * and carry nothing that could send an issue no reader can open.
+ */
+const NOT_ARMED = {
+  base: "https://yadneshsalvi.com",
+  type: "daily",
+  id: "2026-09-28",
+  prUrl: "https://github.com/yadneshSalvi/yadnesh-personal-blog/pull/38",
+  reasons: [
+    "The PR merged as 700b68d, but https://yadneshsalvi.com/newsletter/daily/2026-09-28 still answers 404 twenty minutes later.",
+    "That is what a failed deployment looks like from the pipeline: the content is in main, the site is serving the previous build.",
+  ],
+};
+
+test("the not-armed mail names the issue in its subject", () => {
+  const mail = buildNotArmedEmail(NOT_ARMED);
+  assert.equal(mail.subject, "[brief] NOT SENT: daily 2026-09-28");
+  assert.equal(notArmedSubject("weekly", "2026-W39"), "[brief] NOT SENT: weekly 2026-W39");
+});
+
+test("it carries what the pipeline saw and where to go look", () => {
+  const mail = buildNotArmedEmail(NOT_ARMED);
+  for (const part of ["html", "text"]) {
+    for (const reason of NOT_ARMED.reasons) {
+      const needle = part === "html" ? escapeHtml(reason) : reason;
+      assert.ok(mail[part].includes(needle), `the ${part} part is missing a reason`);
+    }
+    assert.ok(mail[part].includes(VERCEL_DEPLOYMENTS_URL), `the ${part} part is missing the build link`);
+    assert.ok(mail[part].includes(NOT_ARMED.prUrl), `the ${part} part is missing the PR link`);
+  }
+  assertNoEmDash(mail, "not-armed");
+});
+
+test("it says plainly that nothing has reached an inbox", () => {
+  const mail = buildNotArmedEmail(NOT_ARMED);
+  for (const part of ["html", "text"]) {
+    assert.ok(
+      mail[part].includes("no approval window was armed and nothing will reach an inbox"),
+      `the ${part} part does not say the send never happened`,
+    );
+  }
+});
+
+test("it can never send the issue it is complaining about", () => {
+  const mail = buildNotArmedEmail(NOT_ARMED);
+  for (const part of ["html", "text"]) {
+    assert.equal(mail[part].includes("/api/brief/send-action"), false, `${part}: an action link`);
+    assert.equal(/approve and send/i.test(mail[part]), false, `${part}: an approve affordance`);
+  }
+});
+
+test("a missing PR link still leaves the build and the JSON to look at", () => {
+  const mail = buildNotArmedEmail({ ...NOT_ARMED, prUrl: "http://evil.example.com/pr", reasons: [] });
+  for (const part of ["html", "text"]) {
+    assert.equal(mail[part].includes("evil.example.com"), false, `${part}: an unvetted PR link`);
+    assert.ok(mail[part].includes(VERCEL_DEPLOYMENTS_URL), `${part}: no way to find the build`);
+    assert.ok(mail[part].includes("No reason was recorded."), `${part}: no reason placeholder`);
+  }
 });
 
 
