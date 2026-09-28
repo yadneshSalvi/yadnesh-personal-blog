@@ -1,0 +1,108 @@
+{
+ "issue_id": "2026-09-28",
+ "type": "daily",
+ "renders": 8,
+ "cost_usd": 2.0,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "Two chutes drop equal stacks of paperwork into one central review tray. Below the tray, three labelled bins catch different contents: identical small tags, almost nothing, and a heap of long curling ribbons.",
+   "bytes": [
+    100172,
+    96038
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two chutes angle down from the upper left and upper right of the frame, each feeding a stack of identical paperwork into a single wide review tray at the centre. The left stack carries a small stamped robot mark in the corner of every sheet, the right stack a small stamped hand mark. Both stacks are the same height and the tray sits level between them. Below the tray, three open sorting bins catch what gets pulled out of the review, and the bins hold visibly different contents: the first is packed with identical small tags, the second is nearly empty, the third overflows with long curling ribbons. The bins are labelled across their fronts. Keep the chutes, tray and all three bins well inside the frame with clear margins on every side.",
+   "labels": [
+    "SQL",
+    "AUTH",
+    "N+1"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-28T00:14:41Z"
+  },
+  {
+   "key": "42cf31755bbaf808",
+   "story_id": "42cf31755bbaf808",
+   "light_name": "42cf31755bbaf808-light.webp",
+   "dark_name": "42cf31755bbaf808-dark.webp",
+   "alt": "A cutaway diagram: one card enters a machine at the left and a crowd of copies circulates inside along looping arrows before a single card exits at the right. A smaller diagram below shows three cards bundled together before entering, with far fewer copies circulating.",
+   "bytes": [
+    44268,
+    43198
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A diagram of one small card entering a machine and many cards circulating inside it. At the left of the frame, a single card marked with one short line of writing drops into the mouth of a boxy machine. Inside the machine, drawn in cutaway, the same card is copied, annotated, filed into a slot, pulled back out and refiled along a looping path of arrows, so that a crowd of near-identical cards circulates for the one that entered. At the right, a narrow slot lets exactly one card out into a small tray. Below this, a second shorter diagram shows three cards bundled together with a band before entering an identical machine, with a much smaller crowd circulating inside. Keep both machines and both paths well clear of the frame edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-28T00:16:07Z"
+  },
+  {
+   "key": "9cbdbd496a49add8",
+   "story_id": "9cbdbd496a49add8",
+   "light_name": "9cbdbd496a49add8-light.webp",
+   "dark_name": "9cbdbd496a49add8-dark.webp",
+   "alt": "A schematic of five stacked horizontal bars, each wider than the one below, joined vertically. A thin line branches from the third bar, curves around the outside and rejoins above the top bar, skipping the two widest.",
+   "bytes": [
+    13872,
+    13406
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 2,
+   "prompt": "A diagram of a verification ladder at the centre of the frame: five horizontal bars stacked vertically, each bar wider than the one below it, joined by short vertical connectors, drawn as a clean schematic rather than a physical object. A separate route branches sideways from the third bar, curves out around the stack and rejoins above the topmost bar, so the two widest bars are skipped entirely. The branch line is drawn thinner than the main connectors. Centre the stack with generous empty space on all four sides.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-28T00:20:48Z"
+  },
+  {
+   "key": "0512f4f744647ca3",
+   "story_id": "0512f4f744647ca3",
+   "light_name": "0512f4f744647ca3-light.webp",
+   "dark_name": "0512f4f744647ca3-dark.webp",
+   "alt": "Two stacked paths. Above, a long strip covered in small marks feeds a thick arrow into a densely written card. Below, the same strip funnels into one small dot, and a thin arrow leads to a much sparser card.",
+   "bytes": [
+    17376,
+    15702
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two paths compared, stacked one above the other in the centre of the frame. In the upper path, a long ribbon of execution trace runs horizontally from the left, drawn as a continuous strip densely marked with small symbols: short text runs, bracket shapes for tool calls, and a few jagged error marks. A thick arrow leads from the whole length of the ribbon to a rewritten card of text on the right, drawn with several legible-looking lines. In the lower path, the same ribbon is shown funnelling into a single small filled dot, and a much thinner arrow leads from that dot to a smaller, sparser card. Keep both ribbons, arrows and cards well inside the frame margins.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-28T00:23:46Z"
+  }
+ ]
+}

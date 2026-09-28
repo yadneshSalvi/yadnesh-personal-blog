@@ -1,0 +1,51 @@
+{
+ "issue_id": "2026-09-28",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-27-am-m1",
+   "image": "/images/brief/memes/2026-09-28/2026-09-27-am-m1.webp",
+   "alt": "A laminated process diagram taped to the wall of a windowless operations room. Across the top of the sheet the diagram's stages are drawn as five boxes joined left to right by thick arrows. The first four boxes are large and evenly spaced, labelled INTAKE, TRIAGE, SECOND TRIAGE and PEER REVIEW. A fifth wide box sits below them, spanning the width of the sheet, labelled APPROVED IN PRINCIPLE, with arrows feeding into it from all four boxes above. A single thin arrow leaves that box and runs down to a much smaller box in the bottom corner of the sheet, drawn about a quarter the size of the others, labelled in small letters rename one file. The lamination has curled away at the top right corner and a corner of one box has been redrawn by hand in marker. Below the diagram, a long desk runs the width of the room, crowded with identical small terminals, all of them switched on and showing scrolling output. There are no people in the room.",
+   "alt_joke": "It emerged. Nobody has proposed unemerging it.",
+   "caption": "Nobody designed this. It emerged past the hundredth agent, and it already has a preferred escalation path.",
+   "concept": "A laminated process diagram for a fleet of coding agents, with four approval stages ahead of a final box small enough to miss.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-27-am-m2",
+   "image": "/images/brief/memes/2026-09-28/2026-09-27-am-m2.webp",
+   "alt": "A screen-faced robot sits upright at a desk in a small booth, sliding a printed sheet across it. A speech balloon reads Here is the trace. A plaque on the desk reads SIMULATED USER. Behind a glass partition, a crowd waits on rows of chairs, one asleep, two with hands raised.",
+   "alt_joke": "The simulated user has never once said it worked yesterday.",
+   "caption": "The suite covers 886 tasks. Not one of them opens with it worked yesterday.",
+   "concept": "A simulated user in a testing booth hands over a clean trace while the real queue waits behind the glass.",
+   "winner": true
+  },
+  {
+   "id": "2026-09-27-pm-m1",
+   "image": "/images/brief/memes/2026-09-28/2026-09-27-pm-m1.webp",
+   "alt": "A long paper receipt spills from a small desk printer, runs off the desk and pools on the floor. The header reads MEMORY WRITE RECEIPT. The first charge line is a single cheap item, one oat milk. The lines below it are larger and read as the cost of deciding where to file that item, then reconsidering the decision six more times.",
+   "alt_joke": "Retained for your records, at further cost.",
+   "caption": "The disk recorded one line and the graph stayed flat. Nothing on this bill is measured in bytes.",
+   "concept": "An itemized receipt for writing one preference into an agent's memory: the fact costs one line, and the deliberation about where to file it costs the rest.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-27-pm-m2",
+   "image": "/images/brief/memes/2026-09-28/2026-09-27-pm-m2.webp",
+   "alt": "A vast domed library reading room. Every shelf, all the way up, is packed with loose crumpled sheets of heavily crossed-out handwritten working-out instead of books. BOLT, a small robot with a boxy head and one round eye, stands at a lectern in the middle of the floor reading one of the sheets carefully, clipboard under his arm. A brass plaque on the lectern reads ARCHIVE OF PRIOR REASONING. A shelf label above him reads DO NOT DISCARD, and a nearby shelf is labelled YESTERDAY. A trolley beside him is heaped with more of the same crumpled sheets.",
+   "alt_joke": "Consulted daily. Improves nothing.",
+   "caption": "Nobody chose this. It arrived as a default in a chat template somebody forked.",
+   "concept": "A grand national archive whose entire holdings are one small agent's own crossed-out working-out from previous attempts, consulted with full ceremony.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-28-am-m1",
+   "image": "/images/brief/memes/2026-09-28/2026-09-28-am-m1.webp",
+   "alt": "A laminated poster hangs on the back wall of a plain, empty study room. A header band across the top reads WORDS WE DO NOT USE, and below it three small word cards are pinned in a vertical row, reading wait, maybe and perhaps. To the right of the poster a large whiteboard covers the rest of the wall, filled from top to bottom with completed arithmetic. Every sum is answered on a single line, with no intermediate working anywhere and nothing crossed out or rubbed away. Four rows of small empty desks face the board. On the nearest desk a pencil sharpener and a clean eraser sit side by side, both plainly unused.",
+   "alt_joke": "Every answer on one line. Every single one.",
+   "caption": "The average improved. Whatever it does now instead of stopping, it does with complete composure.",
+   "concept": "A primary-school word wall forbidding wait, maybe and perhaps, hung in a room where every sum has been answered on a single line.",
+   "winner": false
+  }
+ ]
+}
