@@ -20,6 +20,10 @@ import { issueDateLabel } from "./dates";
 import { sectionLabel, type BriefIssue } from "./schema";
 import { archiveUrl } from "./urls";
 
+/** Where a failed build is diagnosed, for the "published but never sent" mail. */
+export const VERCEL_DEPLOYMENTS_URL =
+  "https://vercel.com/yadneshsalvis-projects/yadnesh-personal-blog/deployments";
+
 /** Where the issue JSON lives, for the "edit on GitHub" link. */
 export function issueSourceUrl(type: "daily" | "weekly", id: string): string {
   return `https://github.com/yadneshSalvi/yadnesh-personal-blog/blob/main/content/brief/${type}/${id}.json`;
@@ -142,6 +146,89 @@ export function buildNeedsReviewEmail(input: {
         "",
         "Fix it in the PR and merge to publish it, or close the PR to drop the issue. " +
           "The approval mail with the send decision only arrives once the PR has merged.",
+      ],
+      footer,
+    }),
+  };
+}
+
+export function notArmedSubject(type: "daily" | "weekly", id: string): string {
+  return `[brief] NOT SENT: ${type} ${id}`;
+}
+
+/**
+ * The third outcome, and the one that used to be silent: the PR merged, the issue
+ * is in main, and the deployment that was supposed to carry it never went live, so
+ * /api/brief/notify kept answering 404 and no approval window was ever armed.
+ *
+ * That happened for ten days in September 2026 (a function bundle over Vercel's
+ * 250MB limit), and the only trace was a warning at the bottom of a log file on a
+ * VM. Nine issues sat in the repo, on nobody's screen. This mail is the pipeline
+ * saying so out loud.
+ *
+ * Like the needs-review mail it reads no issue: by definition the deployment this
+ * route runs in does not have one. Everything comes off the wire, sanitized here.
+ */
+export function buildNotArmedEmail(input: {
+  base: string;
+  type: "daily" | "weekly";
+  id: string;
+  /** Raw from the pipeline. Sanitized here, so the route can pass the body through. */
+  prUrl: unknown;
+  reasons: unknown;
+}): BuiltEmail {
+  const footer: BriefEmailFooter = { archiveUrl: archiveUrl(input.base) };
+  const label = `${input.type === "daily" ? "Daily" : "Weekly"} ${input.id}`;
+  const standstill =
+    "The issue is merged and in the repo, but the site is still serving an older " +
+    "build, so no approval window was armed and nothing will reach an inbox. It " +
+    "stays that way until the deployment is fixed and the issue is armed by hand.";
+  const prUrl = reviewPrLink(input.prUrl);
+  const parsed = reviewReasons(input.reasons);
+  const reasons = parsed.length > 0 ? parsed : ["No reason was recorded."];
+
+  const bodyHtml = [
+    `<h1>${escapeHtml(`${label} published but never sent`)}</h1>`,
+    `<p class="lede">${escapeHtml(
+      `${issueDateLabel(input.type, input.id)} · the deployment carrying it did not go live`,
+    )}</p>`,
+    `<p>${escapeHtml(standstill)}</p>`,
+    `<h2>What the pipeline saw</h2>`,
+    `<ul>${reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join("")}</ul>`,
+    `<h2>Fix it</h2>`,
+    `<p>${emailLink(VERCEL_DEPLOYMENTS_URL, "Open the Vercel deployments")}<br>${
+      prUrl ? `${emailLink(prUrl, "Open the merged PR")}<br>` : ""
+    }${emailLink(issueSourceUrl(input.type, input.id), "Read the issue JSON")}</p>`,
+    `<p class="lede">${escapeHtml(
+      "Once a deployment succeeds, the run log ends with the exact curl that arms " +
+        "this issue. Until somebody runs it, the approval mail never arrives.",
+    )}</p>`,
+  ].join("\n");
+
+  return {
+    subject: notArmedSubject(input.type, input.id),
+    html: renderBriefEmailHtml({
+      preheader: `Published but not armed. ${reasons[0]}`,
+      bodyHtml,
+      footer,
+    }),
+    text: renderBriefEmailText({
+      lines: [
+        `${label} published but never sent`,
+        `${issueDateLabel(input.type, input.id)} · the deployment carrying it did not go live`,
+        "",
+        standstill,
+        "",
+        "WHAT THE PIPELINE SAW",
+        ...reasons.map((reason) => `* ${reason}`),
+        "",
+        "FIX IT",
+        `Vercel deployments: ${VERCEL_DEPLOYMENTS_URL}`,
+        ...(prUrl ? [`Merged PR: ${prUrl}`] : []),
+        `Issue JSON: ${issueSourceUrl(input.type, input.id)}`,
+        "",
+        "Once a deployment succeeds, the run log ends with the exact curl that arms " +
+          "this issue. Until somebody runs it, the approval mail never arrives.",
       ],
       footer,
     }),

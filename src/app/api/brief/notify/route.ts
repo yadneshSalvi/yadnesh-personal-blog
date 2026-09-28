@@ -21,14 +21,26 @@
 // That branch arms nothing. It cannot even look the issue up: a held issue's PR
 // is not merged, so its JSON is not in this deployment, and requiring it to be
 // there is what made the held path silent in the first place.
+//
+// And the third one, for the outcome where the PR merged but the deployment
+// carrying it never went live, so the arming call above kept answering 404:
+//
+//   { "type", "id", "not_armed": true, "pr_url": "https://github.com/...",
+//     "reasons": ["..."] }
+//
+// Same deal: it reads no issue, arms nothing, and only sends mail. It exists
+// because ten days of failed deploys in September 2026 were invisible to
+// everyone except a log file.
 
 import { NextResponse } from "next/server";
 import {
   approvalSubject,
   buildApprovalEmail,
   buildNeedsReviewEmail,
+  buildNotArmedEmail,
   issueSourceUrl,
   needsReviewSubject,
+  notArmedSubject,
 } from "@/lib/brief/approvalEmail";
 import { getIssue } from "@/lib/brief/issues";
 import { renderIssueEmail } from "@/lib/brief/issueEmail";
@@ -115,6 +127,49 @@ export async function POST(request: Request) {
       ok: true,
       needs_review: true,
       subject: needsReviewSubject(type, id),
+      armed: false,
+    });
+  }
+
+  if (body.not_armed === true) {
+    if (!isMailerConfigured()) {
+      return NextResponse.json({ ok: false, error: "No mail driver is configured." }, { status: 503 });
+    }
+    const to = process.env.BRIEF_APPROVER_EMAIL;
+    if (!to) {
+      return NextResponse.json(
+        { ok: false, error: "BRIEF_APPROVER_EMAIL is not set, so there is nobody to tell." },
+        { status: 503 },
+      );
+    }
+    // No send-state write here either. An issue the readers cannot open is not an
+    // issue anybody should be able to approve by replying to this mail.
+    const message = buildNotArmedEmail({
+      base,
+      type,
+      id,
+      prUrl: body.pr_url,
+      reasons: body.reasons,
+    });
+    try {
+      await sendBriefEmail({
+        to,
+        subject: message.subject,
+        html: message.html,
+        text: message.text,
+        kind: "transactional",
+      });
+    } catch (error) {
+      console.error("[brief] not-armed notification failed to send", error);
+      return NextResponse.json(
+        { ok: false, error: "The not-armed notification could not be sent." },
+        { status: 502 },
+      );
+    }
+    return NextResponse.json({
+      ok: true,
+      not_armed: true,
+      subject: notArmedSubject(type, id),
       armed: false,
     });
   }
