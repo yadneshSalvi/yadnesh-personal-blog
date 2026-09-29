@@ -1,0 +1,82 @@
+{
+ "issue_id": "2026-09-29",
+ "type": "daily",
+ "renders": 8,
+ "cost_usd": 2.0,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A low square fence encloses a workbench with one card on it. A line of footprints leaves the bench, passes through a gap in the fence, and branches into three trails that each end at a small closed parcel outside.",
+   "bytes": [
+    45824,
+    40726
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A low square fence encloses a small workbench with a single card lying on it, the enclosure sitting just left of centre in the middle band of the frame. One continuous line of footprints starts at the bench, circles it once, then passes through a gap in the fence and continues out to the right, where it branches into three separate trails. Each trail ends at a small closed parcel, the three parcels spaced across the right half of the frame and kept well inside its edges. Nothing else is in the scene.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-29T00:16:29Z"
+  },
+  {
+   "key": "04abf909ca219e2a",
+   "story_id": "04abf909ca219e2a",
+   "light_name": "04abf909ca219e2a-light.webp",
+   "dark_name": "04abf909ca219e2a-dark.webp",
+   "alt": "Two trays of small cards side by side, one holding three cards and one holding four with the extra card tilted. A bracket spans both columns and an arrow points at the tilted card. A lowered gate arm blocks the path to a third, empty tray.",
+   "bytes": [
+    24494,
+    23180
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 3,
+   "prompt": "Two shallow trays side by side in the centre of the frame, each holding a short upright column of small plain cards. The left tray holds three cards and carries a single tag reading APPROVED. The right tray holds four, the fourth tilted out of line with the others. A wide comparison bracket spans the two columns with a short arrow dropping from it onto the tilted card. To the right of both trays a gate arm is lowered across the path to a third, empty tray. Everything sits in the middle band with wide clear margins.",
+   "labels": [
+    "APPROVED"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-29T00:21:33Z"
+  },
+  {
+   "key": "378c7e6a655962f9",
+   "story_id": "378c7e6a655962f9",
+   "light_name": "378c7e6a655962f9-light.webp",
+   "dark_name": "378c7e6a655962f9-dark.webp",
+   "alt": "Three plain modules in a row, each with one tiny notch and a small magnifier above it showing that notch with a tick. A single line threads through all three modules and ends at an upright page with one line struck through.",
+   "bytes": [
+    21636,
+    19672
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 3,
+   "cost_usd": 0.75,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Three plain rectangular modules arranged in a row across the middle of the frame with even spacing. Each module has one tiny notch cut into its lower edge, small enough to look like nothing on its own. A single continuous line enters the leftmost module, threads through all three in order, and exits the third on the right. Above each module floats a small round magnifier showing that one notch by itself with a tick mark beside it. Where the line leaves the third module it ends at an upright page with one of its lines struck through. All three modules and the page sit well inside the frame.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-29T00:25:04Z"
+  }
+ ]
+}
