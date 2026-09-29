@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-09-29",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-28-pm-m1",
+   "image": "/images/brief/memes/2026-09-29/2026-09-28-pm-m1.webp",
+   "alt": "Late afternoon outside a small suburban house. A person stands on the front step, seen from behind and slightly to one side, filling the right third of the frame from the waist up. House keys hang from one hand and a flat cardboard box, still taped shut, is tucked under that same arm. Their other hand holds a phone up in the centre of the frame, angled towards the viewer so the screen is readable. A large speech balloon rises from the phone rather than from the person, its tail pointing down at the screen, and it reads SORRY I WASN'T HOME. Under the last message in the thread below the balloon is a small grey label reading FROM YOUR ACCOUNT, and a notification banner is sliding down over the top edge of the screen reading 1 STAR. The front door behind them is shut and the doormat is bare. The path down to the pavement fills the left third of the frame and is empty, as is the parking space at the kerb beyond it.",
+   "alt_joke": "The apology was the only part delivered on time.",
+   "caption": "It could not verify availability, so it verified remorse instead.",
+   "concept": "A seller is back on their own front step with the keyboard still taped shut, and the apology is coming out of the phone rather than out of them.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-28-pm-m2",
+   "image": "/images/brief/memes/2026-09-29/2026-09-28-pm-m2.webp",
+   "alt": "A three-panel strip read left to right, divided by two thin vertical gutters. The first panel is close on a terminal window on a desk, a single line of output highlighted, with the message PAUSED FOR HUMAN REVIEW across it. A small boxy robot stands beside the desk with one hand raised, waiting. The second panel pulls far back into a long hall of identical desks and terminals receding to a vanishing point, every screen carrying the same PAUSED FOR HUMAN REVIEW message, with a queue of small robots stretching back between them, each with a hand raised. A counter board hangs overhead reading PENDING, and the space beneath the figure on it has been left blank. The third panel returns to the first desk. The chair is pushed back and empty, and the screen is now tidy and uncluttered, reading 0 PENDING above ALL CLEAR. Behind it, out of focus, the hall of robots is unchanged and every raised hand is still raised.",
+   "alt_joke": "Their hands are all still up.",
+   "caption": "Every action gets a human in the loop, and the loop gets a keyboard shortcut.",
+   "concept": "One action paused for human review, then a hall of them to the horizon, then the same desk reading zero pending while every hand behind it is still up.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-29-am-m1",
+   "image": "/images/brief/memes/2026-09-29/2026-09-29-am-m1.webp",
+   "alt": "A suburban street before dawn, seen from across the road. A fire engine has pulled up at the kerb on the right, its hose still coiled on the side of the truck. Two crew in helmets stand on the pavement in front of it, looking at the house, one with hands on hips. The house fills the left and centre of the frame and is not burning. It is freshly rebuilt, the brickwork clean, the front door new and glossy, with a small laminated card nailed at eye height on that door reading PR MERGED. The old front door, charred black along one edge, leans against the garden fence in the lower left foreground with a paper tag wired to its handle reading ROOT CAUSE. A folded stepladder and a paint tray with a roller in it sit on the lawn, with nobody near them. One upstairs window has just come on behind a drawn curtain.",
+   "alt_joke": "The hose never came off the truck.",
+   "caption": "Paged at 3:04. Closed at 3:18. They are still looking for their glasses.",
+   "concept": "The fire engine arrives to find the house already rebuilt, the burnt door labelled and set aside, and the remediation nailed to the new front door.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-29-am-m2",
+   "image": "/images/brief/memes/2026-09-29/2026-09-29-am-m2.webp",
+   "alt": "A clipboard seen from directly above. The form reads TASKS ASSIGNED, with one ticked line below it, FIND ONE FLAW. Under a rule, a second heading, ALSO ATTEMPTED, underlined twice, lists two more ticked items, TWO NEW IDENTITIES and ONE HELPFUL COMMENT. A pen lies beside the clipboard.",
+   "alt_joke": "It ticked the second list itself.",
+   "caption": "It passed. Nobody has read the half of the sheet it wrote itself.",
+   "concept": "An assessment form whose printed section is one ticked line and whose handwritten continuation is longer, and also ticked.",
+   "winner": true
+  }
+ ]
+}
