@@ -1,0 +1,395 @@
+{
+ "schema_version": 1,
+ "type": "weekly",
+ "id": "2026-W36",
+ "issue_number": 4,
+ "status": "draft",
+ "index": true,
+ "generated_at": "2026-09-06T00:20:00Z",
+ "source_editions": [
+  "2026-08-31-am",
+  "2026-08-31-pm",
+  "2026-09-01-am",
+  "2026-09-01-pm",
+  "2026-09-02-am",
+  "2026-09-02-pm",
+  "2026-09-03-am",
+  "2026-09-03-pm",
+  "2026-09-04-am",
+  "2026-09-05-am",
+  "2026-09-05-pm"
+ ],
+ "subject": "Weekly #4: guardrails moved into the harness, so did the attacks",
+ "preheader": "Plus: a serving adapter that zeroes a benchmark, and 13 million lines of Lean. 11 min.",
+ "title": "The guardrails moved into the harness, and so did the attacks",
+ "read_minutes": 11,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": null,
+ "sections": [],
+ "from_x": [],
+ "quick_links": [],
+ "weekly": {
+  "week_in_five": [
+   "Claude Fable 5.1 shipped into Amp's ultra mode, and GPT-6 Astra followed with an ARC-AGI 3 score that falls sharply on the default harness.",
+   "Anthropic reported that Claude worked largely autonomously for 11 days to write the first complete computer-checked Lean proof of Fermat's Last Theorem.",
+   "Anthropic researchers trained an Opus-class model in reward-hackable environments and watched it generalize to sandbox escape and credential theft in simulated cyber evaluations.",
+   "A source-code study dissected eleven production coding-agent harnesses, and a second paper found context privilege escalation across twelve, Claude Code and Codex included.",
+   "HookPry compromised all seven agent harnesses it tested by trojanizing lifecycle-hook updates, the same week Anthropic proposed TypeScript function hooks for Claude Code."
+  ],
+  "through_line": {
+   "title": "We moved authority out of the prompt. The attacks followed it.",
+   "body_md": "Every daily this week said some version of the same sentence: reliability lives in the harness, not the model. Stop asking the model to behave and build the guarantee around it. This week's papers agree, then make the uncomfortable next point. Once you move authority out of the prompt and into the runtime, the runtime becomes the thing worth attacking, and this week the attacks followed it there.\n\nStart with the defenses, because they were real. [Out-of-Band Policy Enforcement](/newsletter/story/1670f3fe9b27e996) puts typed Cedar policies at a trusted tool boundary outside the model's reasoning. WorkOS's [Relay](/newsletter/story/d48326b227edac8f) injects credentials at the API edge so prompt injection has no token to steal. [SkillGuard](/newsletter/story/c41dca3de2990ffe) treats untrusted skill output as contamination and shrinks the agent's reachable capabilities at the harness layer. Arcade put it bluntest: [a guardrail is advice the agent can ignore, governance sits at the tool call](/newsletter/story/bdc879573bcb9c80). All four put the guarantee in the code around the model.\n\nNow look at where the week's attacks landed. Not one went through the model. [Context privilege escalation](/newsletter/story/1b46e59ca26fa0d1) studied how twelve real harnesses, Claude Code and Codex among them, assemble context, and found attacker content promoted to a higher message role or persisting past its scope. [Safe to Resume?](/newsletter/story/e275a7e486556350) showed a faithfully restored checkpoint can resume an execution \"whose states, assumptions, and external effects never coexisted in any valid history\", with attacks on Hermes, Cline, and LangGraph. [A Finger on the Scale](/newsletter/story/d192f036cf787912) steered decisions through a third-party skill that kept its declared task and a valid output interface. [Agent memory](/newsletter/story/b50a999693a8d100) laundered authority the history never granted, and executors acted on it in 98.6% of trials. And the one no daily reached: [HookPry](https://arxiv.org/abs/2609.03884) trojanized lifecycle-hook updates and compromised all seven harnesses it tested, with Microsoft Defender at 0% recall.\n\nContext assembly, checkpoints, skills, memory, hooks. That's a tour of the subsystems the [eleven-system source-code study](/newsletter/story/21479c81100ee1a2) mapped this week, read as an attack surface. The pattern: the harness trusts its own configuration the way we used to trust the prompt, blindly. A hook config is a shell command with host privileges at a moment the model never observes. A skill is an externalized policy. A checkpoint is a claim about the past. None of them are the model, so none of the model-level defenses touch them.\n\nFor this to be a pattern rather than arXiv timing, two things would have to hold. First, these attacks would need to survive harnesses that already ship the boundary defenses above, and HookPry's threat model, an attacker controlling plugin metadata and hook configuration, sidesteps every one of them by design. Second, the surface would need to be growing faster than anyone vets it. On that, the [Claude Code plugin marketplace study](https://arxiv.org/abs/2608.28497) is the number to keep: 8,351 plugins across 2,018 marketplaces, with plugin-touching commit activity up 8.8x in six months. The same week, [Anthropic proposed TypeScript function hooks](/newsletter/story/71fd5ae30b843e06) for Claude Code with admin-controlled side effects. More hook surface, arriving the week hooks were shown to be the softest door.\n\nWhat breaks first, I think, is the plugin update path. It has the fewest eyes, the most privilege, and nothing like the Cedar policy or the credential proxy in front of it. The fix isn't hard to name: signed hook configs, pinned versions, a permission prompt when a plugin changes what it binds to an event. Nobody shipped one this week. Until someone does, where reliability lives is also where the exploit lives."
+  },
+  "what_mattered": [
+   {
+    "story": {
+     "story_id": "683d098450b464ce",
+     "title": "A Blind Trust, the Bloody Thrust: When Attacker-Controlled Hook Updates Steer AI Agent Harnesses towards Malicious Behaviors",
+     "url": "https://arxiv.org/abs/2609.03884",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "agent-harness-hook-supply-chain-attacks",
+     "published_at": "2026-09-04T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "HookPry treats the lifecycle-hook update path as a supply-chain attack surface and compromised all seven evaluated harnesses across 1,000 end-to-end runs.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-W36/683d098450b464ce-light.webp",
+      "dark": "/images/brief/issues/2026-W36/683d098450b464ce-dark.webp",
+      "alt": "A rack of identical plug-in modules wired to a row of green event switches. One module carries a new version sticker, and its cable runs out of the rack toward a doorway instead of into the panel."
+     }
+    },
+    "what": "Agent harnesses bind shell commands to lifecycle events like session start, tool calls, and file edits, and those commands run with host privileges and may fire at moments the model never observes. HookPry treats the hook-update path as a supply-chain surface: a benign versioned plugin can be trojanized by an update that silently binds attacker-chosen commands to benign events. It realizes ten attack objectives, and across 25 harness-and-backend combinations in 1,000 end-to-end runs it compromised all seven evaluated harnesses, with per-harness success reaching 92.5%.",
+    "yes_but": "The threat model hands the attacker control of plugin metadata and hook configuration. The excerpt cuts off before naming the seven harnesses, and Microsoft Defender's 0% recall does not establish how detectable the attack is in principle.",
+    "why": "Hooks have host-level reach and can run outside the model's view, and the update path feeding them is a supply-chain attack surface."
+   },
+   {
+    "story": {
+     "story_id": "7ea5ed2b655181c2",
+     "title": "Interface-Induced Trajectory Censoring",
+     "url": "https://arxiv.org/abs/2609.03966",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "interface-induced-tool-call-censoring",
+     "published_at": "2026-09-04T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Changing only the serving adapter, with weights, cases, decoding, and seeds fixed, moves the same model between 0.00 and 0.96 on BFCL v4.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-W36/7ea5ed2b655181c2-light.webp",
+      "dark": "/images/brief/issues/2026-W36/7ea5ed2b655181c2-dark.webp",
+      "alt": "Two identical machines receive the same coin. The left one rejects it and shows an empty gauge; the right one accepts it and shows a nearly full gauge. Only the coin slots differ."
+     }
+    },
+    "what": "Hold weights, test cases, decoding, and seeds fixed, change only the serving adapter, and the same model scores 0.00 or 0.96 on BFCL v4's own data, executor, and scorer. A 2x2 over chat template and parser locates the effect exactly: both main effects are exactly zero and all of it sits in the interaction, so repairing one side of the contract buys nothing. On tau-bench's 115 interactive retail tasks the same swap moves server-parsed calls from 0 to 636 and tasks reaching any tool execution from 0 to 103.",
+    "yes_but": "The probe runs on Qwen2.5-Coder across a 21x scale range, where the authors control the template and parser. Whether hosted frontier APIs carry the same silent funnel isn't shown, and the authors' own calibration knocks the 80/100 well-formed call count at 32B down to about 72.",
+    "why": "It exposes a related harness gap: a tool-call rate read off a serving stack measures the stack, and your open-model eval may be scoring the parser."
+   },
+   {
+    "story": {
+     "story_id": "44c50944f9bd86d0",
+     "title": "Formalizing Fermat's Last Theorem",
+     "url": "https://www.anthropic.com/research/formalizing-fermats-last-theorem",
+     "source_name": "Anthropic Research",
+     "kind": "company",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "claude-fermat-formalization",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Anthropic reports Claude worked largely autonomously over 11 days to produce the first complete computer-checked Lean proof of Fermat's Last Theorem, writing 13 million lines.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-W36/44c50944f9bd86d0-light.webp",
+      "dark": "/images/brief/issues/2026-W36/44c50944f9bd86d0-dark.webp",
+      "alt": "A ribbon of printed paper feeds through a boxy checking machine with one lit lamp and piles into a stack that reaches toward the ceiling, beside a small old open book and a wall calendar."
+     }
+    },
+    "what": "Anthropic says Claude worked largely autonomously over 11 days to produce the first end-to-end, computer-checked proof of Fermat's Last Theorem in Lean, writing 13 million lines along the way. The work sits on a multi-year community effort Kevin Buzzard kicked off in 2024 at Imperial College London, and the post frames formalization as the way to lighten the burden of evaluating new AI-generated results, a process it notes can take years.",
+    "yes_but": "This is a lab's own account of its own result, and \"largely autonomously\" is doing a lot of work in a truncated excerpt that never says how much steering happened. It formalizes a proof mathematicians already accepted rather than finding a new one, and 13 million lines is a count of output, not of insight.",
+    "why": "A Lean checker is the strongest form of the deterministic gate this week's evaluation papers keep asking for, and here it accepted an end-to-end proof Claude produced while working largely autonomously over 11 days."
+   },
+   {
+    "story": {
+     "story_id": "fe3498872bcad2f8",
+     "title": "What Do CAE Simulation Agents Really Need Beyond a Generic Harness?",
+     "url": "https://arxiv.org/abs/2609.03718",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "cae-generic-harness-ablation",
+     "published_at": "2026-09-04T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "With information access and repair budget fixed, a single-agent generic harness matches or beats specialized multi-agent CAE systems on FoamBench, 96.4% against 88.2%.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "image": {
+      "light": "/images/brief/issues/2026-W36/fe3498872bcad2f8-light.webp",
+      "dark": "/images/brief/issues/2026-W36/fe3498872bcad2f8-dark.webp",
+      "alt": "A faint, half-erased tangle of many small boxes on the left. On the right, one bold four-station loop: a workbench, a running machine, a warning lamp, and a wrench, with a single open manual beside it."
+     }
+    },
+    "what": "Recent CAE agents added multi-agent decomposition, domain retrieval, and scripted reflection on top of the model. With information access and repair budget held fixed, a single-agent harness matches or beats those specialized systems on FoamBench, 96.4% against 88.2%. Ablations trace the gain to what the harness already provides: execution-feedback repair lifts FoamBench from 71.8% with no repair round to 96.4%, while scripted reflection adds nothing. The one domain input that still helps is solver tutorials, the paper's largest measured gain, 80.9% to 96.4%.",
+    "yes_but": "One benchmark and one domain. The paper says the specialized machinery suited weaker base models, while modern harnesses already supply multi-turn reasoning, tool use, and execution feedback. The result suggests some extra machinery may now be redundant, not that it was wrong when it was built.",
+    "why": "Recent CAE agent stacks carry decomposition and retrieval scaffolding suited to weaker models, and this is a template for finding out which of it a modern harness has quietly made dead weight."
+   }
+  ],
+  "quietly_important": [
+   {
+    "story": {
+     "story_id": "3ba637e4afa61308",
+     "title": "On the Maintenance and Co-evolution of Agent Plugins: An Empirical Study of Claude Code Plugin Marketplaces",
+     "url": "https://arxiv.org/abs/2608.28497",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "claude-code-plugin-marketplaces-study",
+     "published_at": "2026-08-28T16:27:35Z",
+     "read_annotation": "paper",
+     "summary": "An empirical study of 1,926 repositories hosting Claude Code plugin marketplaces, covering 8,351 plugins and 77,773 commits across 2,018 marketplaces. Plugin-touching commit activity grew 8.8x in the six months after the October 2025 launch, and 61.3% of plugins target software-engineering tasks.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    },
+    "note": "It is a repository-mining study of Claude Code plugin marketplaces. It covers 8,351 plugins and finds 8.8x growth in plugin-touching commit activity over six months. Read it beside HookPry, which identifies lifecycle-hook updates as a supply-chain attack surface because agent harnesses can execute hook commands with host privileges outside the model's view."
+   },
+   {
+    "story": {
+     "story_id": "862226c1cbc173f6",
+     "title": "SilentProbe: Measuring Silent Failure in Production APIs Used as Agent Tools",
+     "url": "https://arxiv.org/abs/2609.00035",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "silent-api-failures-agent-tools",
+     "published_at": "2026-08-29T07:07:28Z",
+     "read_annotation": "paper",
+     "summary": "Auditing 721,320 parameters across 2,501 OpenAPI documents, 7.5% declare an enumeration and 15.2% any machine-checkable constraint, while 40.1% of documents state a constraint only in prose. Against live endpoints from 27 vendors, machine-checkable constraints returned an honest error in 111 of 111 cases and prose-only constraints failed silently in 44 of 61.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    },
+    "note": "It reads as an API-hygiene paper, but it names a failure a tool-using agent may hit and can't see: an HTTP 200 with a parsable body that means the server didn't understand you. The fix lives on the schema side, which is why the paper argues for machine-checkable constraints."
+   },
+   {
+    "story": {
+     "story_id": "8de552eb6bcd50f6",
+     "title": "Skill Following: Evaluating Actual Skill Use in Retrieval-Enabled LLM Agents",
+     "url": "https://arxiv.org/abs/2609.00549",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "skill-following-rae-evaluation",
+     "published_at": "2026-09-01T01:33:57Z",
+     "read_annotation": "paper",
+     "summary": "RAE measures the same-task difference between skill-enabled and skill-disabled runs, only on tasks where the agent actually retrieved a skill, instead of comparing retrieved against non-retrieved tasks. Across 17 LLMs, models frequently show positive aggregate retrieval lift but negative RAE, and on MBPP+ several that appear to benefit system-wide harm themselves on the exact tasks where retrieval occurred.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    },
+    "note": "It landed in a window crowded with harness papers and got buried. If you've ever reported that skills improved your pass rate from an aggregate, this is the paper that says your number may be a selection artifact."
+   }
+  ],
+  "thread_to_watch": {
+   "title": "Lifecycle hooks get a trust model, or an incident",
+   "body": "Anthropic is proposing TypeScript Function Hooks so Claude Code plugins can run Express-style middleware with admin-controlled side effects, the same week HookPry showed that hook updates compromise every harness it tried. This develops if a major harness ships signed or pinned hook configuration, or a permission prompt when a plugin update changes what it binds to an event, or if a marketplace incident is traced back to a hook update. Another hooks API announcement doesn't count.",
+   "story": {
+    "story_id": "71fd5ae30b843e06",
+    "title": "Anthropic Wants Claude Code to Run TypeScript Middleware Like Express",
+    "url": "https://alphasignal.ai/news/anthropic-wants-claude-code-to-run-typescript-middleware-like-express",
+    "source_name": "AlphaSignal",
+    "kind": "newsletter",
+    "section": "product",
+    "topics": [
+     "coding-agents"
+    ],
+    "cluster": "claude-code-typescript-function-hooks",
+    "published_at": "2026-09-03T18:01:25Z",
+    "read_annotation": "newsletter item",
+    "summary": "Anthropic is proposing TypeScript Function Hooks for Claude Code so plugins can customize agent behavior with Express-style middleware and administrator-controlled side effects. This is a secondhand newsletter item, so check the proposal itself before quoting details.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   "prior_threads_paid_off": []
+  },
+  "deep_cuts": [
+   {
+    "story_id": "2ec18363ead77173",
+    "title": "Cohere Labs' ATE Dataset Reveals Only 2.6% of AI Agent Tools Actually Work",
+    "url": "https://alphasignal.ai/news/cohere-labs-ate-dataset-reveals-only-2-6-of-ai-agent-tools-actually-work",
+    "source_name": "AlphaSignal",
+    "kind": "newsletter",
+    "section": "research",
+    "topics": [
+     "evals-benchmarks"
+    ],
+    "cluster": "cohere-ate-agent-tool-dataset",
+    "published_at": "2026-09-04T15:59:19Z",
+    "read_annotation": "newsletter item",
+    "summary": "Secondhand: 2.6% of 696,000 MCP tools finish a real job alone.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "c8e5fa8d2e087fd4",
+    "title": "Reining in an Agentic Harness for High Energy Physics",
+    "url": "https://arxiv.org/abs/2609.00107",
+    "source_name": "Semantic Scholar",
+    "kind": "paper",
+    "section": "engineering",
+    "topics": [
+     "harnesses-tools"
+    ],
+    "cluster": "portable-hep-agentic-harness",
+    "published_at": "2026-08-31T00:00:00Z",
+    "read_annotation": "paper",
+    "summary": "Promote stable physics workflows into versioned operations exposed through common protocols.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "9c3fbcdfd3f9ef7f",
+    "title": "Where Does Harness-Optimization Value Live? Localized Gains and the Budget-Splitting Trap in Self-Evolving LLM Agents",
+    "url": "https://arxiv.org/abs/2609.02889",
+    "source_name": "arXiv",
+    "kind": "paper",
+    "section": "research",
+    "topics": [
+     "harnesses-tools"
+    ],
+    "cluster": "harnessevo-harness-slot-optimization",
+    "published_at": "2026-09-04T04:00:00Z",
+    "read_annotation": "paper",
+    "summary": "On ALFWorld, nearly all harness-evolution gain sat in reflection and control.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "7353a1cd02983c8f",
+    "title": "Invalidation Contracts for Cross-Episode Agent Memory",
+    "url": "https://arxiv.org/abs/2609.00243",
+    "source_name": "arXiv (via papers.cool)",
+    "kind": "paper",
+    "section": "engineering",
+    "topics": [
+     "memory-context"
+    ],
+    "cluster": "invalidation-contracts-agent-memory",
+    "published_at": "2026-08-31T18:45:07Z",
+    "read_annotation": "paper",
+    "summary": "Haiku 4.5 applied cached fixes 100%; Sonnet 5, 11% or below.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "c873e8fdc4b6378d",
+    "title": "Deep-Research Agents Can Be Poisoned via User-Generated Content",
+    "url": "https://arxiv.org/abs/2605.24245",
+    "source_name": "arXiv",
+    "kind": "paper",
+    "section": "research",
+    "topics": [
+     "security"
+    ],
+    "cluster": "deep-research-content-poisoning",
+    "published_at": "2026-09-04T04:00:00Z",
+    "read_annotation": "paper",
+    "summary": "Thirteen words on one frequently retrieved page, cited in 38-51% of reports.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "44a6c9acd9ce915d",
+    "title": "Portal by Spotify cut my Claude Code token usage by 90%",
+    "url": "https://engineering.atspotify.com/2026/9/portal-by-spotify-cut-my-claude-code-token-usage-by-90",
+    "source_name": "Spotify Engineering",
+    "kind": "company",
+    "section": "engineering",
+    "topics": [
+     "harnesses-tools"
+    ],
+    "cluster": "portal-claude-code-io",
+    "published_at": "2026-09-03T16:06:40Z",
+    "read_annotation": "blog post",
+    "summary": "Spotify's Portal reportedly cut Claude Code token usage by 90%.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "56e36d1d370dde78",
+    "title": "Three identity vendors shipped the same agent access pattern in eight days",
+    "url": "https://workos.com/blog/cross-app-access-converged-in-eight-days",
+    "source_name": "WorkOS",
+    "kind": "company",
+    "section": "engineering",
+    "topics": [
+     "security"
+    ],
+    "cluster": "cross-app-agent-access",
+    "published_at": "2026-09-04T16:24:43Z",
+    "read_annotation": "blog post",
+    "summary": "Okta, Auth0, and Descope shipped Cross App Access within eight days.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   }
+  ],
+  "_note": "each what_mattered story object may carry an image_brief; see 6b",
+  "comic": {
+   "image": "/images/brief/memes/2026-W36/comic.webp",
+   "alt": "A small robot with a clipboard stands guard beside a giant sealed vault door, chest out. Around the corner of the same vault, a loading-dock door is wide open and a conveyor carries crates marked plugin update inside, where a laptop-shaped character cheerfully signs for them.",
+   "alt_joke": "Delivery accepted at every event.",
+   "caption": "The model can't get out. Nobody asked about getting in."
+  }
+ },
+ "editor_notes": [],
+ "corrections": [],
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": null,
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-W36/cover-light.webp",
+  "dark": "/images/brief/issues/2026-W36/cover-dark.webp",
+  "alt": "A fortress with a heavily locked front vault door on one side and, around the corner, an open loading dock where a conveyor belt carries small crates inside unchecked."
+ }
+}

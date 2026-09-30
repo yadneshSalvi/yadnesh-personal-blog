@@ -1,0 +1,131 @@
+{
+ "issue_id": "2026-W36",
+ "type": "weekly",
+ "renders": 8,
+ "cost_usd": 2.0,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A fortress with a heavily locked front vault door on one side and, around the corner, an open loading dock where a conveyor belt carries small crates inside unchecked.",
+   "bytes": [
+    76734,
+    71542
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A thick fortress wall seen from a three-quarter angle. Its front gate is a massive sealed vault door with layered locks and one narrow inspection slot. Around the corner, along the side wall, a plain loading dock stands wide open, and a conveyor belt carries a line of identical small crates through it into the interior with nobody checking them. Warm light spills from the open dock while the gate side is cool and still. Wide margins around the whole structure.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-05T23:46:11Z"
+  },
+  {
+   "key": "683d098450b464ce",
+   "story_id": "683d098450b464ce",
+   "light_name": "683d098450b464ce-light.webp",
+   "dark_name": "683d098450b464ce-dark.webp",
+   "alt": "A rack of identical plug-in modules wired to a row of green event switches. One module carries a new version sticker, and its cable runs out of the rack toward a doorway instead of into the panel.",
+   "bytes": [
+    29704,
+    28396
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A control panel with a row of labelled event switches, each wired by a clean cable down to a small plug-in module slotted into a rack beneath. One module is identical to the others except for a fresh version sticker pasted over its label, and its cable runs off the back of the rack toward a doorway instead of into the panel. The switches all show green. Plenty of empty margin around the panel.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-05T23:47:29Z"
+  },
+  {
+   "key": "7ea5ed2b655181c2",
+   "story_id": "7ea5ed2b655181c2",
+   "light_name": "7ea5ed2b655181c2-light.webp",
+   "dark_name": "7ea5ed2b655181c2-dark.webp",
+   "alt": "Two identical machines receive the same coin. The left one rejects it and shows an empty gauge; the right one accepts it and shows a nearly full gauge. Only the coin slots differ.",
+   "bytes": [
+    26658,
+    25674
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two identical vending-style machines side by side on a plain floor, each fed the same shiny coin from the same hand. The left machine's display shows an empty bar and the coin sits rejected in its return tray. The right machine's display shows a nearly full bar and a small item drops into its tray. The only visible difference between the machines is the shape of the coin slot. Generous space around both machines.",
+   "labels": [
+    "0.00",
+    "0.96"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-05T23:52:53Z"
+  },
+  {
+   "key": "44c50944f9bd86d0",
+   "story_id": "44c50944f9bd86d0",
+   "light_name": "44c50944f9bd86d0-light.webp",
+   "dark_name": "44c50944f9bd86d0-dark.webp",
+   "alt": "A ribbon of printed paper feeds through a boxy checking machine with one lit lamp and piles into a stack that reaches toward the ceiling, beside a small old open book and a wall calendar.",
+   "bytes": [
+    49474,
+    47912
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A long continuous ribbon of printed paper runs from a small desk, across the floor, and up through a boxy checking machine with a single lit lamp on its front, then piles into a tall neat stack that reaches toward the ceiling. Beside the desk sits one small, old, open book. A wall calendar hangs above the desk with a short run of days marked off. Calm, quiet room with wide margins.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-05T23:54:01Z"
+  },
+  {
+   "key": "fe3498872bcad2f8",
+   "story_id": "fe3498872bcad2f8",
+   "light_name": "fe3498872bcad2f8-light.webp",
+   "dark_name": "fe3498872bcad2f8-dark.webp",
+   "alt": "A faint, half-erased tangle of many small boxes on the left. On the right, one bold four-station loop: a workbench, a running machine, a warning lamp, and a wrench, with a single open manual beside it.",
+   "bytes": [
+    36384,
+    34618
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "On the left, a tangle of many small interconnected boxes and arrows drawn faintly, as if being erased. On the right, one large clean loop of four plain stations connected by bold arrows: a workbench, a running machine, a red warning lamp, and a wrench. A single open manual rests beside the loop. Simple, diagrammatic, with generous margins.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-05T23:55:30Z"
+  }
+ ]
+}
