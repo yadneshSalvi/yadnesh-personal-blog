@@ -1,0 +1,32 @@
+{
+ "issue_id": "2026-08-17",
+ "type": "daily",
+ "renders": 1,
+ "cost_usd": 0.25,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A laptop in the middle of the picture, ringed by six loose gears each sitting in its own tray, none connected. To the right a small server tower holds the same six gears meshed together as one block. A dotted line from the tower stops before reaching the ring.",
+   "bytes": [
+    81066,
+    77150
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A single open laptop sits at the centre of the frame. Its inference engine is drawn as an exploded diagram: six gear-shaped components float apart from each other in six separate outlined trays arranged in a loose ring around the laptop, none of them touching or meshed. To the right, well inside the frame, a small server tower shows the same six gears meshed together as one compact assembled block. A thin dotted line runs from the assembled block toward the scattered ring and stops short. Everything is kept away from the edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-17T00:09:08Z"
+  }
+ ]
+}

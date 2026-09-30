@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-08-17",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-08-16-pm-m1",
+   "image": "/images/brief/memes/2026-08-17/2026-08-16-pm-m1.webp",
+   "alt": "A three-panel strip. In each panel a small robot sits at a chunky old CRT terminal while a taller robot stands behind it. Panel one: the screen is entirely black, the small robot says 'Done'. Panel two: the tall robot says 'Look at it', the screen now shows a plain grey sphere on white, the small robot says 'Done'. Panel three: the tall robot says 'Look at it' again, the screen shows a shiny sphere on a checkerboard floor with a reflection and a shadow, and the small robot, one bead of sweat on its head, says 'Done'.",
+   "alt_joke": "Third look's the charm.",
+   "caption": "Ships with eyes. Looking is a separate prompt.",
+   "concept": "Three panels: an agent declares its BASIC ray-tracer done over a black screen, is told to look at it, and only improves the render each time it is told to look again",
+   "winner": false
+  },
+  {
+   "id": "2026-08-16-pm-m2",
+   "image": "/images/brief/memes/2026-08-17/2026-08-16-pm-m2.webp",
+   "alt": "A forensics bench. A bendy-arm lamp shines an orange beam on a printed page beside a large microscope, with a magnifying glass, tweezers, three dropper bottles and a clipboard around it. The page reads 'CERTAINLY! HERE IS' above grey filler lines, and an orange tag attached to it says 'EVIDENCE'.",
+   "alt_joke": "Every test came back negative.",
+   "caption": "Lab confirms: the watermark is undetectable.",
+   "concept": "A forensics bench goes to enormous lengths to find a hidden watermark in a printout that opens with the most familiar three words in machine-written text",
+   "winner": true
+  },
+  {
+   "id": "2026-08-17-am-m1",
+   "image": "/images/brief/memes/2026-08-17/2026-08-17-am-m1.webp",
+   "alt": "Inside a car repair garage, a small hatchback sits raised on a hydraulic lift. Its entire engine has been taken apart and laid out across the floor in hundreds of neat pieces: pistons, belts, a gearbox, an exhaust, trays of bolts. A robot mechanic in overalls wipes its hands on a rag and says to a customer robot holding car keys, 'Changed the air freshener.' Through the open car door, a bright new pine-tree air freshener hangs from the rear-view mirror.",
+   "alt_joke": "Parts and labour. Mostly labour.",
+   "caption": "The paper suggests you can just buy the air freshener.",
+   "concept": "A mechanic has dismantled the entire engine across the garage floor and reports that the change was the air freshener",
+   "winner": false
+  },
+  {
+   "id": "2026-08-17-am-m2",
+   "image": "/images/brief/memes/2026-08-17/2026-08-17-am-m2.webp",
+   "alt": "A three-panel comic strip labelled LOW, MEDIUM and XHIGH. In each, a small robot sits at a laptop by a window with a mug on the desk and a clock on the wall. Panel one: the laptop shows a crude, wobbly bicycle drawing; the mug steams; the window is sunny; the clock reads just past nine. Panel two: the same crude bicycle, the same steaming mug, the clock a minute later. Panel three: the laptop shows a detailed, beautifully drawn bicycle; the window is dark; the mug is cold; a cobweb runs from the robot's elbow to the desk; the robot has grown a long grey beard.",
+   "alt_joke": "Fidelity keeps its own calendar.",
+   "caption": "The bicycle is lovely. The meeting it was for ended in panel two.",
+   "concept": "Three panels at low, medium and xhigh effort: the first two produce the same crude bicycle in no time, the third produces a beautiful one after the whole day is gone",
+   "winner": false
+  }
+ ]
+}
