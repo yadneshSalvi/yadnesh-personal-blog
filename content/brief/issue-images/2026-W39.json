@@ -1,0 +1,56 @@
+{
+ "issue_id": "2026-W39",
+ "type": "weekly",
+ "renders": 5,
+ "cost_usd": 1.25,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "An open ledger on a plinth, with a mechanical arm coming out of its own spine to write on its page, facing an empty inspector's desk and chair with a magnifying glass on it.",
+   "bytes": [
+    94186,
+    88736
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A tall open ledger resting on a plinth in an otherwise empty inspection room. A mechanical arm emerges from the ledger's own spine and writes on its open page. In front of the plinth sits an inspector's desk and chair, unoccupied, with a magnifying glass left on the desk. Keep the ledger, arm and desk grouped in the centre with generous empty floor and wall on every side.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-26T23:52:26Z"
+  },
+  {
+   "key": "4136ee8967c42861",
+   "story_id": "4136ee8967c42861",
+   "light_name": "4136ee8967c42861-light.webp",
+   "dark_name": "4136ee8967c42861-dark.webp",
+   "alt": "A signed approval slip tied to the first link of a chain, with the rest of the chain running on through small machines the slip does not cover.",
+   "bytes": [
+    32568,
+    32076
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 3,
+   "cost_usd": 0.75,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A paper approval slip, stamped and signed, tied with string to the first link of a long chain. The chain runs onward through a sequence of small machines that stamp documents, write files and open valves, none of which the slip is attached to. Keep the slip and the first link in the centre of the frame with clear space on every side.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-26T23:56:58Z"
+  }
+ ]
+}
