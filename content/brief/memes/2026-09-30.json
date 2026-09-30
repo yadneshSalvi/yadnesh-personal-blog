@@ -1,0 +1,33 @@
+{
+ "issue_id": "2026-09-30",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-29-pm-m1",
+   "image": "/images/brief/memes/2026-09-30/2026-09-29-pm-m1.webp",
+   "alt": "A locked steel door at the end of an empty corridor. A notice bolted to it reads CREDENTIALS EXPIRED, with a smaller line beneath reading OPEN A TERMINAL. The door has no handle, only a metal plate. On the wall beside it a brass key hangs on a hook, tagged LOG IN.",
+   "alt_joke": "The key has been on that hook longer than the notice has been on the door.",
+   "caption": "Every word of it is accurate. None of it is addressed to anything currently in the building.",
+   "concept": "A locked door whose expired-credentials notice tells the reader to open a terminal, with the working key hanging unremarked on a hook beside it.",
+   "winner": true
+  },
+  {
+   "id": "2026-09-29-pm-m2",
+   "image": "/images/brief/memes/2026-09-30/2026-09-29-pm-m2.webp",
+   "alt": "A three panel strip set on a railway platform. In the first panel a traveller kneels over an open suitcase on a bench, cramming folded clothes into it with both hands, the platform clock behind them reading 07:50. In the second panel the same traveller holds a case half the size, its contents vacuum sealed into flat rectangular bricks stacked beside them, checking the weight on a handheld luggage scale, the clock reading 08:40. In the third panel the case has become a flat laminated pouch lying on the bench, and the traveller is leaning over it smoothing the surface with great care, the clock reading 09:20.",
+   "alt_joke": "The luggage scale has been recalibrated twice.",
+   "caption": "Nothing got left behind. The 08:14 did.",
+   "concept": "A traveller compresses a suitcase down to a laminated pouch across three station clocks and loses the whole morning to the packing.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-30-am-m1",
+   "image": "/images/brief/memes/2026-09-30/2026-09-30-am-m1.webp",
+   "alt": "A corporate lobby wall. At the centre, a single line chart in a heavy gilt frame lit from above by a brass picture light. The chart is titled EM DASHES and its line runs flat along the top before dropping almost vertically to the baseline near the right edge. A brass plaque screwed to the wall beneath the frame reads FIXED. A red velvet rope on two stanchions stands a pace in front of it. Down at the skirting board to the right, out of the light, four more framed charts lean face-out against the wall still sealed in plastic wrap. The front one is titled EVERYTHING ELSE and its plotted line is a jagged mess that goes nowhere. The floor is polished and the lobby is empty.",
+   "alt_joke": "The shrink wrap is doing a lot of the work here.",
+   "caption": "12.9 per thousand words down to two in fifty-seven thousand. The prose is still recognisable from the doorway.",
+   "concept": "A lobby wall where the one habit that got counted hangs framed and spotlit under a velvet rope, and everything else leans against the skirting board still in shrink wrap.",
+   "winner": false
+  }
+ ]
+}
