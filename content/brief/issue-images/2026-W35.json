@@ -1,0 +1,104 @@
+{
+ "issue_id": "2026-W35",
+ "type": "weekly",
+ "renders": 6,
+ "cost_usd": 1.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "An engine on a workbench held in an adjustable metal frame with a large dial gauge above it; some of the frame's bolts are loosened and a wrench rests on the bench beside it.",
+   "bytes": [
+    101326,
+    100462
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A single engine block sits on a workbench inside a frame of adjustable metal arms that hold a large round dial gauge above it. Several arms are visibly mid-adjustment: loosened bolts, one arm swung out of position, a wrench resting on the bench. The gauge needle sits high in its range. The engine itself is untouched and central, well clear of the edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-29T23:53:27Z"
+  },
+  {
+   "key": "bcebde90c427932f",
+   "story_id": "bcebde90c427932f",
+   "light_name": "bcebde90c427932f-light.webp",
+   "dark_name": "bcebde90c427932f-dark.webp",
+   "alt": "Two identical engines in different metal frames on a workbench, each with a dial gauge showing a different reading.",
+   "bytes": [
+    59048,
+    57038
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two identical engine blocks side by side on a workbench, each bolted into a differently shaped metal frame with a large round dial gauge mounted on it. The two needles point to clearly different positions. Both engines are plainly the same object, centred with space around them.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-29T23:56:15Z"
+  },
+  {
+   "key": "293bd11dfc89432b",
+   "story_id": "293bd11dfc89432b",
+   "light_name": "293bd11dfc89432b-light.webp",
+   "dark_name": "293bd11dfc89432b-dark.webp",
+   "alt": "Ten gauges beneath a target line, a mechanical arm adjusting one, and a single fenced-off gauge standing apart.",
+   "bytes": [
+    39968,
+    38440
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Ten identical pressure gauges in a row on a laboratory wall, each needle below one target line drawn across all of them. A small mechanical arm on a rail reaches toward one gauge with a wrench. One more gauge stands apart on the right behind a low rope barrier.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-29T23:59:55Z"
+  },
+  {
+   "key": "b61c0cbcce1ef8ac",
+   "story_id": "b61c0cbcce1ef8ac",
+   "light_name": "b61c0cbcce1ef8ac-light.webp",
+   "dark_name": "b61c0cbcce1ef8ac-dark.webp",
+   "alt": "Two workbenches with identical tools, one organised on a labelled pegboard with notes, the other piled in a heap.",
+   "bytes": [
+    60698,
+    58500
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two long workbenches seen from above, each holding the same set of hand tools. On the upper bench the tools hang on a labelled pegboard with a short handwritten card beside each. On the lower bench the identical tools lie in an unsorted heap. Both benches sit well inside the frame.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-08-30T00:01:34Z"
+  }
+ ]
+}
