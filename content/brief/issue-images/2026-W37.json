@@ -1,0 +1,130 @@
+{
+ "issue_id": "2026-W37",
+ "type": "weekly",
+ "renders": 8,
+ "cost_usd": 2.0,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A large ornate test rig of pipes, clamps, and gauges holds a single small plain sphere at its centre. The gauges are attached to the rig, not the sphere, and one clamp is wrapped in tape with a blank tag hanging from it.",
+   "bytes": [
+    86012,
+    83278
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 3,
+   "cost_usd": 0.75,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A tall, elaborate laboratory test rig built from pipes, clamps, dials, and cables fills most of the frame, and at its exact centre it holds one small, plain, featureless sphere. Every measuring dial and gauge is bolted to the rig itself rather than pointed at the sphere. One clamp near the middle is wrapped in tape with a small blank paper tag hanging from it. Calm, clean composition, the rig well clear of all four edges, plenty of quiet space around it.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-13T05:11:43Z"
+  },
+  {
+   "key": "2e566356ef7b9225",
+   "story_id": "2e566356ef7b9225",
+   "light_name": "2e566356ef7b9225-light.webp",
+   "dark_name": "2e566356ef7b9225-dark.webp",
+   "alt": "Four identical spheres rest on four differently shaped stands, so each sits at a different height, with a tall ruler beside them.",
+   "bytes": [
+    19344,
+    17968
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Four identical small plain spheres sit side by side, each resting on a differently shaped stand: a low flat block, a tall thin column, a wide stepped platform, and a leaning wedge. Because the stands differ, the spheres sit at very different heights. A single tall vertical measuring ruler stands to the right of the group. Calm and explanatory, the whole arrangement centred and well clear of the edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-13T05:12:38Z"
+  },
+  {
+   "key": "21b1f81e9d6bd8f0",
+   "story_id": "21b1f81e9d6bd8f0",
+   "light_name": "21b1f81e9d6bd8f0-light.webp",
+   "dark_name": "21b1f81e9d6bd8f0-dark.webp",
+   "alt": "A tower of latched, labelled crates with one crate in the middle that has no latch and a blank label, examined through a magnifying glass.",
+   "bytes": [
+    52632,
+    49916
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A neat tower of stacked wooden crates, each crate closed with a metal latch and a small paper label. Near the middle of the tower one crate has no latch at all and its label is blank, and it sits slightly out of line with the crates above and below it. A large magnifying glass hovers just in front of that crate. Calm, explanatory, the tower centred and well clear of the edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-13T05:14:56Z"
+  },
+  {
+   "key": "6d9849ac3822e0b2",
+   "story_id": "6d9849ac3822e0b2",
+   "light_name": "6d9849ac3822e0b2-light.webp",
+   "dark_name": "6d9849ac3822e0b2-dark.webp",
+   "alt": "On the left a small gear meshes neatly with a medium gear; on the right the same small gear is pressed against a much larger gear whose teeth do not fit.",
+   "bytes": [
+    24660,
+    24134
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two scenes side by side on a plain surface. On the left, a small gear meshes cleanly with a medium gear, their teeth fitting exactly. On the right, the same small gear has been pushed against a much larger gear whose teeth are a different size and spacing, so the teeth do not fit and the small gear sits tilted against it. No motion, no sparks, just the mismatch shown plainly. Both scenes centred and well clear of the edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-13T05:16:01Z"
+  },
+  {
+   "key": "2603a757b06ab05e",
+   "story_id": "2603a757b06ab05e",
+   "light_name": "2603a757b06ab05e-light.webp",
+   "dark_name": "2603a757b06ab05e-dark.webp",
+   "alt": "A drawer of index cards where a yellowed card stamped REVOKED sits in front of a clean new card, and a gripper arm is reaching for the stamped one.",
+   "bytes": [
+    50322,
+    46516
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "An open filing-cabinet drawer seen from slightly above, full of index cards. At the very front of the drawer stands an old, yellowed card with a large stamp reading REVOKED across it. Directly behind it, partly hidden, is a fresh clean white card. A plain mechanical gripper arm reaches into the drawer and is closing on the front, stamped card. Calm and explanatory, the drawer centred and well clear of the edges.",
+   "labels": [
+    "REVOKED"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-09-13T05:17:08Z"
+  }
+ ]
+}
