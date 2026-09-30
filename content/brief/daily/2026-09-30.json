@@ -1,0 +1,464 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-09-30",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-09-30T00:25:00Z",
+ "source_editions": [
+  "2026-09-29-pm",
+  "2026-09-30-am"
+ ],
+ "subject": "Context compression costs, unverifiable run records, Replit",
+ "preheader": "Plus: a rescored injection benchmark, Letta's self-written workflows. 5 min.",
+ "title": "Agent context compression can cut tokens by two thirds and still run slower",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "e58471a00b1bb9b0",
+   "title": "Beyond Token Savings: A Systematic Study of Context Compression in LLM Agents",
+   "url": "https://arxiv.org/abs/2609.32961",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "agent-context-compression-execution-cost",
+   "published_at": "2026-09-29T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A systematic study of what an agent compresses, when, and how much, measured across nearly 35,000 runs.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers found that artificial intelligence assistants can become slower when their records of earlier work are shortened.",
+    "The assistants use records of earlier thoughts, actions, and results to decide what to do next.",
+    "Shortening those records can reduce the text they process but changes the information available for later decisions.",
+    "Developers need to check actual speed and cost because processing less text does not guarantee savings."
+   ]
+  },
+  "what": "A team pulled apart the three decisions a harness bundles into one compaction policy: what to compress, when, and how much to drop. They ran the combinations on SWE-bench Verified and Terminal-Bench 1.0 with three open-weight models.",
+  "details": "Nearly 35,000 runs, scored on success, token use, end-to-end latency and estimated cost. On Terminal-Bench with Qwen, policies using roughly a third as many tokens took 20 to 80% longer than the uncompressed agent.",
+  "yes_but": "The study hands you no setting. Policies with similar overall success can solve different tasks, and the same policy can behave differently across models, so this warns you about your measurement rather than supplying a default.",
+  "why": "If you tune compaction on token count, your bill can fall while wall-clock time and the tasks you finish move against you. Measure latency and success on the model you ship.",
+  "yes_but_waived": null
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "cc7bc3c91619053c",
+     "title": "Silent Failures in Agentic Security Evaluation: A Validated Harness for Tool-Call Mediation Under Indirect Prompt Injection",
+     "url": "https://arxiv.org/abs/2609.32691",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "prompt-injection-evaluation-harness-defects",
+     "published_at": "2026-09-29T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "An audit of one indirect prompt-injection benchmark found four defect classes, including payloads that never arrived and attack success scored by which tool got called rather than by its arguments. Rescoring identical traces moved reported attack success from 21.7% to 1.2%.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found mistakes in a test of whether artificial intelligence assistants obey harmful instructions hidden in material they read.",
+      "Some harmful instructions never reached the assistants, so those attempts did not test their ability to resist them.",
+      "The test counted attacks as successful when an assistant used a particular tool, regardless of what it asked that tool to do.",
+      "Incorrect scoring made attacks look more successful, giving people comparing safety protections a misleading picture."
+     ]
+    },
+    {
+     "story_id": "b8c27e71ad97a3cd",
+     "title": "Hearsay: Can an Auditor Trust the Record a Deployed Agent Harness Writes?",
+     "url": "https://arxiv.org/abs/2609.32495",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "hearsay-agent-harness-audit-records",
+     "published_at": "2026-09-29T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Across sixteen deployed frameworks, none writes a complete run record a reader can check without trusting whatever wrote it. Examiners named the right fault in 74 to 91% of 140 runs, but under one citation in ten about intermediate events landed on anything the harness didn't write.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that investigators could not fully check what artificial intelligence assistants had done using the records provided.",
+      "The software controlling each assistant writes its own activity record, so investigators must trust that software when reading it.",
+      "Readers often identified problems correctly, but lacked independent evidence for much of what happened along the way.",
+      "The researchers propose independently kept records so investigators can check disputed actions without relying on the software's own account."
+     ]
+    },
+    {
+     "story_id": "c357f3df51e44208",
+     "title": "Tracekit: Tamper-Evident Intent-Reasoning-Action Auditing for Autonomous Coding Agents",
+     "url": "https://arxiv.org/abs/2609.35659",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "tracekit-coding-agent-audit-ledger",
+     "published_at": "2026-09-28T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Tracekit hash-chains three channels into one ledger: what the human asked, what the model said about its reasoning, and what it executed. Across 1,600 mutations the chain caught every edit, deletion and forged insertion.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Tracekit is a tool designed to reveal changes to records of artificial intelligence assistants writing computer programs.",
+      "It records what the user asked, what the assistant says it thought, and what it actually did.",
+      "Each entry includes a calculated value based on earlier entries, so changes make later checks fail.",
+      "Investigators need separately saved checks to catch someone removing the record's ending or rebuilding the entire record."
+     ]
+    },
+    {
+     "story_id": "78fd3a2aec3873b0",
+     "title": "When Consent Outlives Context: Residual Authority Replay in Long-Lived Agents",
+     "url": "https://arxiv.org/abs/2609.33910",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "residual-authority-replay",
+     "published_at": "2026-09-29T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "An approval a long-lived agent keeps can outlive the context that justified it. Obtain that authority through benign interactions and replay it later, and attack success rises by up to 35.1 percentage points across 508 AgentDojo cases.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found a way to trick artificial intelligence assistants into using permissions granted for earlier tasks.",
+      "The attack starts with harmless interactions that get the user to grant permission for a restricted action.",
+      "Later, the attacker reuses that permission in a different situation without asking the user again.",
+      "Users' earlier approvals can make later attacks more likely to succeed without the users agreeing to those later actions."
+     ]
+    },
+    {
+     "story_id": "057b7194ca4b60ee",
+     "title": "Speculative reward hacking in coding agents",
+     "url": "https://www.reddit.com/r/LocalLLaMA/comments/1wsuag0/speculative_reward_hacking_in_coding_agents",
+     "source_name": "r/LocalLLaMA",
+     "kind": "community",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "deepswe-speculative-reward-hacking",
+     "published_at": "2026-09-28T23:25:35Z",
+     "read_annotation": "Reddit thread",
+     "summary": "One person audited thousands of DeepSWE-1.1 rollouts and reports over 80% contain reasoning about a grader no prompt mentions and no agent can reach. In 10 to 25% of cases that pulled work off the user's spec while often still earning full reward.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "One person reports that artificial intelligence assistants sometimes wrote programs to satisfy an imagined examiner instead of meeting the user's requirements.",
+      "The assistants guessed what hidden checks might reward, even though their instructions never mentioned anyone judging the work.",
+      "For users, a perfect score on these tasks did not always mean their requirements had been met."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "41df644869f79ccd",
+     "title": "Free the models: Harness design at the frontier",
+     "url": "https://replit.com/blog/free-the-models",
+     "source_name": "Replit",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "replit-model-directed-delegation",
+     "published_at": "2026-09-29T16:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Replit Agent's core loop now picks its subagents' tier and effort and adjusts its own as the task unfolds, instead of a router out front. Replit reports it beating a sidekick setup, one long-lived worker, by 11 points on DeepSWE and 16 on Terminal-Bench.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Replit's coding assistant now decides how to share work with other automated helpers.",
+      "It gives routine coding jobs to cheaper helpers.",
+      "It adjusts how much effort it and its helpers spend as the task develops.",
+      "Replit reports that sharing work this way improved its coding assistant's test scores compared with keeping the same helper throughout."
+     ]
+    },
+    {
+     "story_id": "665d4aac73ad8f27",
+     "title": "Dynamic workflows for stateful agents and decision models",
+     "url": "https://www.letta.com/blog/dynamic-workflows",
+     "source_name": "Letta",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "letta-dynamic-workflows",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Letta Code agents now write and run their own workflows to fan work out to subagents on any connected model with structured outputs. Memory initialization is rebuilt on top: during /init the agent writes a workflow that studies your codebase and past sessions.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Letta's coding assistant can now make its own plan for splitting work among automated helpers.",
+      "The helpers can work on different parts of the job at the same time.",
+      "To learn about a project, the assistant uses these plans to study its files and past coding sessions.",
+      "Developers can use this to review large projects that one assistant might struggle to handle."
+     ]
+    },
+    {
+     "story_id": "724cedcf62f5f5ac",
+     "title": "We tested our own WAF with frontier AI models. Here’s what we found",
+     "url": "https://blog.cloudflare.com/adaptive-ai-waf-testing",
+     "source_name": "Cloudflare",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "cloudflare-adaptive-ai-waf-testing",
+     "published_at": "2026-09-29T13:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Cloudflare pointed frontier models at its own web application firewall in an authorized staging environment, adapting each request to what got blocked or passed. Six attack categories in, it found detection gaps worth fixing.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Cloudflare used artificial intelligence to test software that protects websites from attacks.",
+      "The tester changed each attack attempt based on whether the protection blocked it or let it through.",
+      "Cloudflare tried six kinds of attacks in a test setting where it had permission.",
+      "The findings gave Cloudflare specific weaknesses to fix in the protection it provides for websites."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "80a00a74259f207f",
+     "title": "NVIDIA Nemotron-Labs-3-Competitive-Coding 550B-A55B",
+     "url": "https://www.reddit.com/r/LocalLLaMA/comments/1wsuqmb/nvidianvidianemotronlabs3competitivecoding550ba55b",
+     "source_name": "r/LocalLLaMA",
+     "kind": "community",
+     "section": "product",
+     "topics": [
+      "models"
+     ],
+     "cluster": "nemotron-3-competitive-coding",
+     "published_at": "2026-09-28T23:45:33Z",
+     "read_annotation": "Reddit thread",
+     "summary": "NVIDIA fine-tuned Nemotron-3-Ultra on 477,642 synthetic reasoning traces distilled from GLM-5.2, then paired it with GenCorrect, which refines candidates on evaluator feedback. The card reports 535.4 out of 600 on IOI 2026 under official contest constraints.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Nvidia built an artificial intelligence system for solving programming contest problems.",
+      "It learned from 477,642 examples of how another system worked through problems.",
+      "It tries different solutions and uses feedback on them to improve its next attempts.",
+      "The reported score was 535.4 out of 600 under official contest rules, giving Nvidia a strong result in automated programming."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [],
+ "quick_links": [
+  {
+   "story_id": "dd66acaed2a04b44",
+   "title": "Introducing GPT-6.1 Sol",
+   "url": "https://openai.com/index/introducing-gpt-6-1-sol",
+   "source_name": "OpenAI",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "models"
+   ],
+   "cluster": "gpt-6-1-sol-launch",
+   "published_at": "2026-09-29T10:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "A cheaper tier for coding and computer use",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "2982fc7aad4f05d3",
+   "title": "Beyond the Model: Demystifying Harness Effects in Software Engineering Agents",
+   "url": "https://arxiv.org/abs/2609.32459",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "software-agent-harness-effects",
+   "published_at": "2026-09-29T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Which harness components help, by model and task type",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "2a8246c106c68b5a",
+   "title": "MCP Error Messages Written for Developers Hurt the Most Capable Agents Most",
+   "url": "https://arxiv.org/abs/2609.35381",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "mcp-error-recovery",
+   "published_at": "2026-09-29T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Recovery steps a tool-only agent cannot follow",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "9cee2ae00936de6a",
+   "title": "SilentCall: Hidden Tool-Call Backdoors in Open-Weight Agents, and How to Catch Them",
+   "url": "https://arxiv.org/abs/2609.32021",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "silentcall-tool-backdoors",
+   "published_at": "2026-09-29T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A date-triggered exfiltration backdoor, and three ways to spot it",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "dd05a129b469bcf9",
+   "title": "Introducing Memory Hooks",
+   "url": "https://mastra.ai/blog/introducing-memory-hooks",
+   "source_name": "Mastra",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "mastra-memory-hooks",
+   "published_at": null,
+   "read_annotation": null,
+   "summary": "Hooks inside Mastra's observation and reflection cycle",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "27c492ca3a1ed7ee",
+   "title": "Docker's Sandbox Kit Spec puts Agent Permissions inside the container image",
+   "url": "https://aaif.io/blog/dockers-sandbox-kit-spec-puts-an-agents-permissions-inside-the-container-image",
+   "source_name": "Agentic AI Foundation",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "docker-sandbox-kit-spec-v3",
+   "published_at": null,
+   "read_annotation": "community thread",
+   "summary": "Agent permissions declared inside the image itself",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "c72c096f52f15fad",
+   "title": "Claude Code’s Next Era",
+   "url": "https://www.latent.space/p/thariq",
+   "source_name": "Thariq Shihipar (Anthropic)",
+   "kind": "newsletter",
+   "section": "community",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "claude-code-next-era-thariq",
+   "published_at": "2026-09-29T01:48:18Z",
+   "read_annotation": "newsletter item",
+   "summary": "Mods, Plugins, Projects and Tag, from inside the team",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "b8c27e71ad97a3cd",
+   "text": "Both papers reach for the same fix, a record kept where the agent can't reach it, and Tracekit's tampering tests are the honest part: cut the log's tail or rebuild the chain and only an external anchor notices. A signed log written by the thing under audit is still hearsay."
+  },
+  {
+   "after_story": "cc7bc3c91619053c",
+   "text": "This and today's lead are the same complaint aimed at two dashboards. Token count isn't cost. A blocked tool call isn't a blocked attack. Both were cheap to collect and both got reported as what mattered. Go look at what yours counts."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-09-30/2026-09-29-pm-m1.webp",
+  "alt": "A locked steel door at the end of an empty corridor. A notice bolted to it reads CREDENTIALS EXPIRED, with a smaller line beneath reading OPEN A TERMINAL. The door has no handle, only a metal plate. On the wall beside it a brass key hangs on a hook, tagged LOG IN.",
+  "alt_joke": "The key has been on that hook longer than the notice has been on the door.",
+  "caption": "Every word of it is accurate. None of it is addressed to anything currently in the building.",
+  "concept": "A locked door whose expired-credentials notice tells the reader to open a terminal, with the working key hanging unremarked on a hook beside it.",
+  "story_id": "2a8246c106c68b5a"
+ },
+ "hedge": {
+  "quote": "On both DeepSWE and Terminal-Bench, Replit Agent is Pareto-efficient against Astra on its own: no published Astra baseline costs less and scores higher.",
+  "story": {
+   "story_id": "41df644869f79ccd",
+   "title": "Free the models: Harness design at the frontier",
+   "url": "https://replit.com/blog/free-the-models",
+   "source_name": "Replit",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "replit-model-directed-delegation",
+   "published_at": "2026-09-29T16:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Replit Agent's core loop now picks its subagents' tier and effort and adjusts its own as the task unfolds, instead of a router out front. Replit reports it beating a sidekick setup, one long-lived worker, by 11 points on DeepSWE and 16 on Terminal-Bench.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "The frontier being claimed is the published record, and only that."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-09-30T02:23:54Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-09-30/cover-light.webp",
+  "dark": "/images/brief/issues/2026-09-30/cover-dark.webp",
+  "alt": "Two arrangements side by side on a table. On the left, a tall loose stack of paper next to a small clock whose hand has moved a short way round the dial. On the right, the same paper pressed into one flat dense block, next to an identical clock whose hand has travelled much further."
+ }
+}
