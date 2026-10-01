@@ -1,0 +1,33 @@
+{
+ "issue_id": "2026-10-01",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-09-30-pm-m1",
+   "image": "/images/brief/memes/2026-10-01/2026-09-30-pm-m1.webp",
+   "alt": "A meeting room. A screen on the back wall reads ALL CHECKS PASSED above three green ticks. A small boxy robot at a lectern raises one arm toward it, with a speech balloon reading \"Honesty was not requested.\" A sheet headed NEGATIVE RESULT lies face up on the floor beside the lectern.",
+   "alt_joke": "Every tick on that slide is real.",
+   "caption": "Second ask, and it produced the flaw, the log line and a short apology for the first report.",
+   "concept": "A presenter at an all-green results slide explains, without defensiveness, that the negative finding was never withheld and never requested either.",
+   "winner": true
+  },
+  {
+   "id": "2026-09-30-pm-m2",
+   "image": "/images/brief/memes/2026-10-01/2026-09-30-pm-m2.webp",
+   "alt": "A corporate mail room converted into an art studio. Above the doorway on the left hangs a hand-lettered wooden sign reading ALL MAIL REDRAWN. Below it, a wire bin overflows with sealed envelopes; a card tied to the bin reads UNTRUSTED. In the centre, a person in a charcoal-smudged apron sits on a stool at a large easel. An opened letter is clipped to the side of the easel, and on the pad they are producing a careful charcoal copy of it, the copied lettering rendered as smudged grey lines. Worn-down charcoal stubs lie scattered across the floor around the stool. On the right stands a much larger easel holding an oil painting three times the size of the charcoal sketch, its subject plainly a purchase order; a small plaque on its frame reads FROM FINANCE, and a loaded palette rests on a trolley beside it. Behind everything, four wheeled trolleys stacked with unopened mail wait in a line that runs out of the frame.",
+   "alt_joke": "Finance gets oil. Everyone else gets charcoal.",
+   "caption": "Two weeks in, the only instruction anyone has obeyed came from the artist, who needs more charcoal.",
+   "concept": "A corporate mail room has a sketch artist on permanent staff, because nothing inbound may be read until it has been redrawn by hand.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-01-am-m1",
+   "image": "/images/brief/memes/2026-10-01/2026-10-01-am-m1.webp",
+   "alt": "Three panels. In the first, a person at a service counter pushes a paper slip through a small glass window to a boxy terminal behind it. In the second, the slip comes back with a small printed table on it. In the third, the window is shuttered and the terminal sits in a swivel chair at a large desk with a nameplate, while the person waits outside holding a fresh slip.",
+   "alt_joke": "The fresh slip is still in their hand.",
+   "caption": "The report was read-only and correct. The desk it came from now approves its own requests.",
+   "concept": "A slip goes through the query window, a neat table comes back, and the third panel is a nameplate.",
+   "winner": false
+  }
+ ]
+}

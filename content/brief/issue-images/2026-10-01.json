@@ -1,0 +1,115 @@
+{
+ "issue_id": "2026-10-01",
+ "type": "daily",
+ "renders": 7,
+ "cost_usd": 1.75,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "Two parallel tracks cross the frame toward a tall box on the right. The upper track carries one large tile through a wide arrow. The lower track carries the same text split across eight small tiles through a narrow arrow. A switch lever sits between the tracks beside a server rack.",
+   "bytes": [
+    49096,
+    41650
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 1,
+   "prompt": "Two horizontal tracks run side by side across the middle of the frame, both ending at one tall upright box on the right that stands for a model. On the upper track, a single large solid tile carries a short piece of text and reaches the box through a thick, wide arrow. On the lower track, the same text is split across eight small tiles in a row, reaching the box through a thin, narrow arrow. A small server rack sits at the left where both tracks begin, with a switch lever between the two tracks showing which track is selected. Keep the tracks, the rack and the box well inside the frame with generous empty space above and below.",
+   "labels": [
+    "ONE TOKEN",
+    "SUBWORDS"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-01T00:19:14Z"
+  },
+  {
+   "key": "ff892f8d10162db5",
+   "story_id": "ff892f8d10162db5",
+   "light_name": "ff892f8d10162db5-light.webp",
+   "dark_name": "ff892f8d10162db5-dark.webp",
+   "alt": "A card at the left is tied by cords to a cluster of six linked file shapes at the right. One file has a torn edge and the cord to it hangs slack. A rubber stamp hovers above the card.",
+   "bytes": [
+    36932,
+    36412
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A small rectangular card sits at the centre left of the frame, tied by a taut cord to a cluster of six file shapes on the right that are joined to each other by thin dependency lines. One file in that cluster is drawn with a jagged torn edge to show it has changed, and the cord running from the card to that file has gone slack and droops. A rubber stamp hovers just above the card, angled as if about to come down. The card carries one of the labels and the stamp face carries the other. Keep the card, the cord and the whole cluster well inside the frame with clear margin on every side.",
+   "labels": [
+    "TESTS PASS",
+    "STALE"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-01T00:20:35Z"
+  },
+  {
+   "key": "851700788a4d19ae",
+   "story_id": "851700788a4d19ae",
+   "light_name": "851700788a4d19ae-light.webp",
+   "dark_name": "851700788a4d19ae-dark.webp",
+   "alt": "A wide chute pours a thick column of paper sheets into a funnel. A seated figure at the funnel's narrow waist holds a magnifying glass over one sheet. A thin trickle of sheets falls out below into a small tray.",
+   "bytes": [
+    37964,
+    36374
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A very wide chute enters at the top of the frame and pours a thick column of stacked paper sheets down into a funnel whose neck is narrow. At the funnel's waist one seated figure holds a magnifying glass over a single sheet. Below the neck, a thin trickle of sheets falls into a small shallow tray on the floor. The incoming column is far wider than the trickle leaving. One label sits beside the incoming column and the other beside the tray. Keep the funnel centred with clear empty space at the top and bottom of the frame.",
+   "labels": [
+    "741%",
+    "30%"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-01T00:21:51Z"
+  },
+  {
+   "key": "77544766b84c4ff0",
+   "story_id": "77544766b84c4ff0",
+   "light_name": "77544766b84c4ff0-light.webp",
+   "dark_name": "77544766b84c4ff0-dark.webp",
+   "alt": "A desk from above. On the left, a thick stack of transcript pages still bound with an uncut paper band. On the right, a menu card of four ruled lines with checkboxes, one being circled by a hand with a pen. A curved arrow arcs over the stack to the card.",
+   "bytes": [
+    41528,
+    41644
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A desk seen from above, centred in the frame. On the left half sits a thick stack of transcript pages, still bound with a paper band that has not been cut. On the right half lies a menu card listing four short blank ruled lines, each with an empty checkbox, and a hand is already circling the second line with a pen. A curved arrow runs from the near edge of the desk directly to the menu card, arcing over the bound stack without touching it. The menu card carries the label. Keep the stack, the card and the arrow inside the frame with clear margin on all four sides.",
+   "labels": [
+    "PICK ONE"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-01T00:23:17Z"
+  }
+ ]
+}

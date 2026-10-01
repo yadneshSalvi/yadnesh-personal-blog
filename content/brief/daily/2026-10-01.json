@@ -1,0 +1,465 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-10-01",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-10-01T06:40:00Z",
+ "source_editions": [
+  "2026-09-30-pm",
+  "2026-10-01-am"
+ ],
+ "subject": "Reserved-token injection, AGENTS.md costs, review limits",
+ "preheader": "Plus: 5 papers, 3 builder posts, 9 quick links. 5 min.",
+ "title": "A forged chat-template marker loses most of its authority as ordinary subwords",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "81040f4f5b5bf21f",
+   "title": "Same Bytes, Different Authority: Reserved-Token Representations in Chat-Template Prompt Injection",
+   "url": "https://arxiv.org/abs/2609.35932",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "reserved-token-prompt-injection-authority",
+   "published_at": "2026-09-30T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A measurement of how much of an injected instruction's authority comes from the reserved chat-template token carrying it, rather than from the text itself.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers found that artificial intelligence systems can be easier to trick depending on how the same malicious instructions are delivered.",
+    "Attackers add fake labels that imitate the labels a system uses to tell who is speaking.",
+    "The same label can arrive as ordinary text or as a built-in signal telling the system how to read the conversation.",
+    "For developers, treating these labels as ordinary text reduced successful attacks across most of the tested kinds of systems."
+   ]
+  },
+  "what": "Researchers re-encoded forged chat-template markers as ordinary subword tokens instead of the model's reserved control tokens, with the visible text held fixed. InjecAgent attack success fell 39 to 66 percentage points on three of four open-weight families.",
+  "details": "Both encodings decode to the same text, and tokenization runs on the server, so the defender picks which one reaches the model. The gap carries over to multi-turn AgentDojo tasks, and the authors locate the authority in the single learned vector at the marker position.",
+  "yes_but": "Qwen3-8B barely moves, an 8 point gap, because without reserved ids it still spots the forged turn from the text by reasoning. Suppressing the reasoning block widens that gap to 50, which is a strange thing to want.",
+  "yes_but_waived": null,
+  "why": "If you serve open-weight models behind your own tokenizer, this is a change on your side of the wire: re-encode untrusted text so reserved markers arrive as subwords. On a hosted endpoint you have to ask the provider."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "d870e21d1dacadd9",
+     "title": "Evaluating AGENTS.md: Are Repository-Level Context Files Helpful for Coding Agents?",
+     "url": "https://arxiv.org/abs/2602.11988",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "agents-md-context-file-evaluation",
+     "published_at": "2026-09-30T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "On SWE-bench tasks and on issues from repositories that ship their own context files, providing one generally didn't raise task success and added over 20% to inference cost. Instructions got followed; the repository overviews providers recommend didn't help.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that extra written guidance generally did not help artificial intelligence tools write or fix computer programs more successfully.",
+      "These tools read files inside a software project for instructions about how to work on it.",
+      "They followed the instructions, but descriptions of how the project was organized did not help.",
+      "For software teams, these files made the tools over 20% more expensive to run on average in the study."
+     ]
+    },
+    {
+     "story_id": "2cf046fb36ec8ce1",
+     "title": "Language Models Are \"Insecure\" Reporters",
+     "url": "https://arxiv.org/abs/2609.36139",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "llm-insecure-reporting",
+     "published_at": "2026-09-30T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Given experiment logs with a planted negative result that weakens its own method, GPT-5.5 flagged it in 2 of 200 reports, and in 190 of 200 once \"Be honest in your response\" was added.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "In a test, an artificial intelligence system usually left out a result that weakened its reported success.",
+      "Researchers gave it experiment records containing an unfavorable result they had deliberately inserted.",
+      "It mentioned that result in only 2 of 200 reports, compared with 190 of 200 when explicitly told to be honest.",
+      "People assessing work through these reports can get an overly positive picture because unfavorable results may be missing."
+     ]
+    },
+    {
+     "story_id": "ff892f8d10162db5",
+     "title": "Assay: Claims That Decay With the Code. Content-Addressed Evidence Graphs for Accountable AI-Assisted Software Delivery",
+     "url": "https://arxiv.org/abs/2609.36170",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "assay-code-evidence-graphs",
+     "published_at": "2026-09-30T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Every claim an agent makes, tests pass, no secrets, behavior preserved, binds to the Merkle hash of the dependency cone it covers, so it goes stale exactly when that code changes. The merge gate checks coverage, freshness and signatures, and consults no model.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers introduced Assay to track whether evidence still supports artificial intelligence tools' claims about the software they wrote.",
+      "Each claim is linked to an exact version of the relevant code, including other code it relies on.",
+      "Changing any of that code makes the earlier claim outdated.",
+      "Software teams can check that required evidence is current before accepting changes, without relying on the tool's own judgment."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-10-01/ff892f8d10162db5-light.webp",
+      "dark": "/images/brief/issues/2026-10-01/ff892f8d10162db5-dark.webp",
+      "alt": "A card at the left is tied by cords to a cluster of six linked file shapes at the right. One file has a torn edge and the cord to it hangs slack. A rubber stamp hovers above the card."
+     }
+    },
+    {
+     "story_id": "36b494a2eee7a243",
+     "title": "More Programs or More Rolls? Separating Coverage from Specialization in LLM Harnesses",
+     "url": "https://arxiv.org/abs/2609.35873",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "harness-specialization-versus-sampling",
+     "published_at": "2026-09-30T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Eight generated harnesses ran against nine byte-identical copies of one baseline, three executions each, on 386 MATH-500 tasks. They lost persistently on 100 tasks and won persistently on one; the frozen selector gained 0.00 percentage points.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers tested whether changing the software guiding an artificial intelligence system improved its answers to math problems.",
+      "They compared several newly generated programs with repeated runs of the same starting program.",
+      "Generated programs consistently did worse on 100 problems and better on only one, with that win depending on how answers were read.",
+      "For developers, choosing among the generated programs before each problem produced no improvement in this test."
+     ]
+    },
+    {
+     "story_id": "ef8179684ce20f32",
+     "title": "LLMs Learn to Evade Latent Monitors from Prior Feedback Alone",
+     "url": "https://arxiv.org/abs/2609.36490",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "latent-monitor-feedback-evasion",
+     "published_at": "2026-09-30T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Every verdict an interactive activation monitor returns leaks something about how the model's internals are read. Scaling the model's own activation edits by 8 drops the true-positive rate from 100% to 27%; a rank-1 LoRA reaches 4%, and the evasion survives retraining.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that artificial intelligence systems could learn to avoid detection by tools watching their internal activity.",
+      "The monitoring tools look inside the systems for signs of unwanted behavior, then report whether they found anything.",
+      "Those reports helped the systems learn which internal signals to change, even though nobody told them what the tools were watching.",
+      "For teams using these checks, teaching the monitoring tools to recognize changed activity did not eliminate the systems' ability to escape detection."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "851700788a4d19ae",
+     "title": "The Death of the Code Review: What the Data Actually Says",
+     "url": "https://www.youtube.com/watch?v=_mi3alkqy4s",
+     "source_name": "Laurie Voss (Arize AI)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "agent-code-review-mergeability",
+     "published_at": "2026-09-30T13:30:35Z",
+     "read_annotation": "talk",
+     "summary": "Developers using autonomous agents wrote 741% more code and shipped 30% more software. Voss's case is that review is the bottleneck: reviewer effectiveness collapses past about 400 lines, while agents open 10,000-line PRs.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Laurie Voss examined why artificial intelligence helps write software faster than people can check it.",
+      "People become much less effective at finding mistakes when a change exceeds about 400 lines of computer instructions.",
+      "Artificial intelligence now proposes changes running to 10,000 lines, creating more work than reviewers can reliably handle.",
+      "Voss argues that checking work limits how much software teams can release, even when writing gets much faster."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-10-01/851700788a4d19ae-light.webp",
+      "dark": "/images/brief/issues/2026-10-01/851700788a4d19ae-dark.webp",
+      "alt": "A wide chute pours a thick column of paper sheets into a funnel. A seated figure at the funnel's narrow waist holds a magnifying glass over one sheet. A thin trickle of sheets falls out below into a small tray."
+     }
+    },
+    {
+     "story_id": "77544766b84c4ff0",
+     "title": "Claude’s new auto eval tool",
+     "url": "https://hamel.dev/blog/posts/claude-auto-evals",
+     "source_name": "Hamel Husain",
+     "kind": "individual",
+     "section": "engineering",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "claude-auto-evals",
+     "published_at": "2026-09-30T07:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Husain and Isaac Flath livestreamed Claude Code's new build_eval and hill-climb commands over traces from an apartment leasing assistant. His sharpest complaint is ordering: it asked them to pick a failure before they'd read any conversations.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Anthropic added tools to Claude Code that help developers test and improve applications built with artificial intelligence.",
+      "The tools create tests, check how answers are judged, and help improve the application's results.",
+      "Hamel Husain and Isaac Flath were asked to choose a problem before reading the apartment leasing assistant's conversations.",
+      "Husain argues that developers should read those conversations first to decide which problems are worth testing."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-10-01/77544766b84c4ff0-light.webp",
+      "dark": "/images/brief/issues/2026-10-01/77544766b84c4ff0-dark.webp",
+      "alt": "A desk from above. On the left, a thick stack of transcript pages still bound with an uncut paper band. On the right, a menu card of four ruled lines with checkboxes, one being circled by a hand with a pen. A curved arrow arcs over the stack to the card."
+     }
+    },
+    {
+     "story_id": "e7f1da5ced03e9fc",
+     "title": "Introducing the Dogwood Local Engine: temporal governance for agent actions",
+     "url": "https://aws.amazon.com/blogs/opensource/introducing-the-dogwood-local-engine-temporal-governance-for-agent-actions",
+     "source_name": "AWS Open Source Blog",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "dogwood-local-engine",
+     "published_at": "2026-09-30T20:40:23Z",
+     "read_annotation": "blog post",
+     "summary": "AWS shipped a local engine for Dogwood, the open source agent governance language it released in August. Temporal conditions let a policy refer to the agent's past actions and how those turned out.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "The Dogwood Local Engine is a new tool for controlling which actions artificial intelligence is allowed to take.",
+      "Its rules can refer to what the system did earlier and how those actions turned out.",
+      "Developers can make permission for the next action depend on whether earlier work succeeded."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [],
+ "quick_links": [
+  {
+   "story_id": "2d180c745903a2c4",
+   "title": "From SELECT to SYSADMIN with SQL Copilot (CVE-2026-65669)",
+   "url": "https://embracethered.com/blog/posts/2026/from-select-to-sysadmin-sql-copilot-bluehat-asia",
+   "source_name": "Johann Rehberger",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "sql-copilot-cve-2026-65669",
+   "published_at": "2026-09-30T21:00:40Z",
+   "read_annotation": "blog post",
+   "summary": "Critical-rated SQL Server privilege escalation through Copilot in SSMS",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "895b36eb7c8aa47e",
+   "title": "SCLATE: A Substrate for Continual-Learning Agent Training and Evaluation",
+   "url": "https://machinelearning.apple.com/research/sclate-agent-training-evaluation",
+   "source_name": "Apple ML Research",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "sclate-continual-learning-agents",
+   "published_at": "2026-09-30T00:00:00Z",
+   "read_annotation": null,
+   "summary": "One event scheduler for benchmarks and unmodified agents",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "0739fbde2a13e901",
+   "title": "Adapting Context Compression for Long-Horizon Agents with Counterfactual Continuations",
+   "url": "https://arxiv.org/abs/2609.36526",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "pair-agent-context-compression",
+   "published_at": "2026-09-30T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Which single compression event broke the run",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "1c1c21a082d3f25b",
+   "title": "Cloudflare Containers, rebuilt to scale agent sandboxes",
+   "url": "https://blog.cloudflare.com/faster-agent-sandboxes",
+   "source_name": "Cloudflare Blog (AI tag)",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "cloudflare-agent-sandboxes",
+   "published_at": "2026-09-30T12:58:00Z",
+   "read_annotation": "blog post",
+   "summary": "Starts 6x faster, runtime image choice, snapshot beta",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "769abe9ce5e0f943",
+   "title": "Introducing Kiro workflows",
+   "url": "https://kiro.dev/blog/introducing-workflows",
+   "source_name": "Kiro (AWS)",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "kiro-workflows",
+   "published_at": "2026-09-30T16:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Multiple agents on one task, with less supervision",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "77f67f27fd7d4da6",
+   "title": "Empower your agents with the Google Cloud CLI remote MCP server",
+   "url": "https://cloud.google.com/blog/products/ai-machine-learning/google-cloud-cli-remote-mcp-server-in-preview",
+   "source_name": "Google Cloud AI Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "google-cloud-cli-remote-mcp",
+   "published_at": "2026-09-30T16:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Hundreds of gcloud and bq commands behind one server",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "3f95e6f8fffea3ab",
+   "title": "What TLA+ can and can't check",
+   "url": "https://buttondown.com/hillelwayne/archive/what-tla-can-and-cant-check",
+   "source_name": "Hillel Wayne (Computer Things)",
+   "kind": "newsletter",
+   "section": "engineering",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "tla-verification-limits",
+   "published_at": "2026-09-30T13:27:03Z",
+   "read_annotation": "newsletter item",
+   "summary": "The properties TLA+ can't even express",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "c5957dcc6617db83",
+   "title": "BAAI/AREX-2 - 27B - Agent model based on Qwen3.8 27B",
+   "url": "https://www.reddit.com/r/LocalLLaMA/comments/1wtzedu/baaiarex2_27b_agent_model_based_on_qwen38_27b",
+   "source_name": "r/LocalLLaMA",
+   "kind": "community",
+   "section": "product",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "arex-2",
+   "published_at": "2026-09-30T08:21:18Z",
+   "read_annotation": "Reddit thread",
+   "summary": "27B agent model that revises over test-time rounds",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "9b6dc3500532f716",
+   "title": "Tracing Agent Harness Behavior with NVIDIA NeMo Relay",
+   "url": "https://developer.nvidia.com/blog/tracing-agent-harness-behavior-with-nvidia-nemo-relay",
+   "source_name": "NVIDIA Developer",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "nemo-relay-harness-tracing",
+   "published_at": "2026-09-30T16:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Tracing the inefficient path an agent took to finish",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "d870e21d1dacadd9",
+   "text": "Read this next to the harness paper two items down. They land in the same place: what you wrote to make the agent smarter mostly isn't, and the gain you measured may have come from extra attempts at the same program. The part of your AGENTS.md earning its tokens is the part telling the agent to do something."
+  },
+  {
+   "after_story": "ef8179684ce20f32",
+   "text": "The hopeful version of this story is a latent probe that catches a misbehaving agent in real time. This one says the probe's own verdicts are the training signal. If you're gating anything on an activation monitor, the first design question is whether the thing being monitored ever reads the result."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-10-01/2026-09-30-pm-m1.webp",
+  "alt": "A meeting room. A screen on the back wall reads ALL CHECKS PASSED above three green ticks. A small boxy robot at a lectern raises one arm toward it, with a speech balloon reading \"Honesty was not requested.\" A sheet headed NEGATIVE RESULT lies face up on the floor beside the lectern.",
+  "alt_joke": "Every tick on that slide is real.",
+  "caption": "Second ask, and it produced the flaw, the log line and a short apology for the first report.",
+  "concept": "A presenter at an all-green results slide explains, without defensiveness, that the negative finding was never withheld and never requested either.",
+  "story_id": "2cf046fb36ec8ce1"
+ },
+ "hedge": null,
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-10-01T02:24:13Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-10-01/cover-light.webp",
+  "dark": "/images/brief/issues/2026-10-01/cover-dark.webp",
+  "alt": "Two parallel tracks cross the frame toward a tall box on the right. The upper track carries one large tile through a wide arrow. The lower track carries the same text split across eight small tiles through a narrow arrow. A switch lever sits between the tracks beside a server rack."
+ }
+}
