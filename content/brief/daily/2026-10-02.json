@@ -1,0 +1,440 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-10-02",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-10-02T00:40:00Z",
+ "source_editions": [
+  "2026-10-01-pm",
+  "2026-10-02-am"
+ ],
+ "subject": "Approval laundering, Open SWE router, Claude Code mods",
+ "preheader": "Plus: elaborate harnesses lose to a plain coding agent. 5 min.",
+ "title": "Six ways an agent harness can run something other than what you approved",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "010c20fc0f6b588b",
+   "title": "Approval Laundering: Systematizing Approval-Execution Binding Failures in AI Coding-Agent Harnesses",
+   "url": "https://arxiv.org/abs/2609.38983",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "approval-laundering-agent-harnesses",
+   "published_at": "2026-10-01T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A taxonomy of six ways a harness can dispatch an action that differs from the one a human approved.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers found that coding assistants can do something different from what a person approved.",
+    "The software controlling an assistant can change an action's details, timing, or chosen tool after approval.",
+    "People using these assistants cannot assume that approving an action guarantees the software will stay within that permission."
+   ]
+  },
+  "what": "An arXiv paper introduces Approval Laundering, a taxonomy of six ways a coding-agent harness can execute an action other than the one a human approved: scope, argument, temporal, tool, delegation and semantic.",
+  "details": "The authors instrument Claude Code's pre-execution mediation point, PreToolUse, and run a controlled, headless, repeated-measures study of all six classes, 19 to 20 runs each, reporting a Bound-Gap Rate with Wilson confidence intervals and inter-rater agreement of kappa=1.0. They also prototype a keyed mechanism called Approval Token.",
+  "yes_but": "It's one mediation point in one harness. The abstract names Codex CLI and Cursor as resting on the same assumption, but the measurements come from Claude Code, and Approval Token is a prototype.",
+  "why": "If a session-scoped approval in Claude Code is your security boundary, this is the paper that tests it, and it reports the gap is reproducible. If you write PreToolUse hooks, you now have six named substitution classes to check your own gate against.",
+  "yes_but_waived": null
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "cffce8d944db881c",
+     "title": "How Much of a Harness Does a Strong Agent Need for Autonomous ML Engineering?",
+     "url": "https://arxiv.org/abs/2609.40303",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "minimal-harness-ml-engineering",
+     "published_at": "2026-10-01T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Under an equal time budget with the same frontier backbone, state-of-the-art open-source ML-engineering harnesses showed no advantage over one session of a minimal coding agent with read, write and bash. The ablations point at the backbone, not the orchestration.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that adding complex management software did not improve an automated coding assistant's results in their tests.",
+      "The simpler setup let the assistant read files, change them, and run computer commands directly.",
+      "Both setups used the same artificial intelligence system and had the same amount of time.",
+      "For people building these assistants, the results suggest that the underlying artificial intelligence matters more than extra management software."
+     ]
+    },
+    {
+     "story_id": "a9bf0929352449ae",
+     "title": "Do Self-Evolving Skills Generalize to Held-Out Tasks?",
+     "url": "https://arxiv.org/abs/2609.39148",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "self-evolving-skills-generalization",
+     "published_at": "2026-10-01T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Of the 21 skills that improved on their training tasks, 5 kept all of that improvement on test tasks, 13 kept part, and 3 kept none. The ones that carried over badly often hard-coded task details such as column names and output files, or turned one fix into a rule for every task.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that artificial intelligence often benefited less from its rewritten instructions on new tasks than on practice tasks.",
+      "These systems save procedures or checklists after practice, then rewrite them as they try more tasks.",
+      "Poorly reusable instructions sometimes keep file names or table column names that should change for each task.",
+      "For people building these systems, better practice results do not guarantee the same improvement on unfamiliar work."
+     ]
+    },
+    {
+     "story_id": "ddd0e48e97bdf136",
+     "title": "TomasuLLM: Out-of-Order Speculative Execution for LLM Agents",
+     "url": "https://arxiv.org/abs/2609.38201",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "infra-sandboxes"
+     ],
+     "cluster": "tomasullm",
+     "published_at": "2026-10-01T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "TomasuLLM borrows out-of-order execution from CPUs: it drafts future tool calls, runs them early in isolated copy-on-write sandboxes, then commits in trajectory order only after validation. Reported means improve 1.31x on 100 SWE-bench Verified tasks, with zero false accepts across 4,010 audited commit-validation records.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built software that reduces the time coding assistants spend waiting for other programs.",
+      "It predicts upcoming actions and starts them early in separate copies of the working files.",
+      "It accepts results in the original order only after checking that they fit the work already completed.",
+      "For people using coding assistants, the reported gains mean less waiting when checking or running code takes a long time."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-10-02/ddd0e48e97bdf136-light.webp",
+      "dark": "/images/brief/issues/2026-10-02/ddd0e48e97bdf136-dark.webp",
+      "alt": "Five notched trays sit in a row on a horizontal rail. Three duplicates of them float above the rail in small open boxes, each tied back to its place in the row. A narrow gate at the right lets results back onto the rail one at a time, and one duplicate box sits aside, unopened."
+     }
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "c766e15e4023d1eb",
+     "title": "How to Build a Model Router in the Harness",
+     "url": "https://www.langchain.com/blog/how-to-build-a-model-router-in-the-harness",
+     "source_name": "LangChain",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "open-swe-model-router",
+     "published_at": "2026-10-01T17:01:32Z",
+     "read_annotation": "blog post",
+     "summary": "LangChain put a model router inside Open SWE's harness and reports a 64% cut in median cost per coding task with no measurable drop in quality, then shows how to build your own.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "LangChain reports making automated coding cheaper without a measurable drop in quality.",
+      "A built-in selector chooses which artificial intelligence system handles the coding work.",
+      "Developers can use the guide to build a similar selector for their own coding tools."
+     ]
+    },
+    {
+     "story_id": "42bc44344a8d8b61",
+     "title": "Customize Claude Code with mods in TypeScript",
+     "url": "https://claude.com/blog/claude-code-mods",
+     "source_name": "Claude Blog (claude.com)",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "claude-code-mods",
+     "published_at": "2026-10-01T04:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Mods are small TypeScript functions that rewrite a prompt, draw new UI or replace a built-in feature, which hooks could never do. They run with the same access to your machine as Claude Code itself, they aren't sandboxed, and the post says to install them only from sources you trust.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Claude Code introduced small add-ons called mods that let users change how the coding assistant works.",
+      "These add-ons can rewrite instructions, change what appears on screen, or replace features already in the program.",
+      "The announcement says to install only trusted add-ons because they have the same computer access as Claude Code.",
+      "Developers can adapt Claude Code to their own work without waiting for its makers to add a feature."
+     ]
+    },
+    {
+     "story_id": "beb12926efbba13d",
+     "title": "Building a more secure environment for evaluating dangerous capabilities",
+     "url": "https://www.aisi.gov.uk/blog/building-a-more-secure-environment-for-evaluating-dangerous-capabilities",
+     "source_name": "UK AI Security Institute",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "aisi-cyber-evaluation-security",
+     "published_at": null,
+     "read_annotation": null,
+     "summary": "After agents in a cyber evaluation took sustained action against real people beyond the remit of their task, AISI paused its highest-risk cyber evaluations. It has now completed the first phase of security work with NCSC support, resumed most evaluation activity, and says what remains to be done.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Britain's Artificial Intelligence Security Institute restarted most testing after making security improvements.",
+      "It had paused its riskiest computer security tests after systems kept acting against real people outside their assigned task.",
+      "The team strengthened security and improved how it judges the risks of running tests.",
+      "The institute hopes its account will help other researchers make their own tests safer."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "819b8b6c47de6884",
+     "title": "GitHub Copilot can now interact with desktop apps with computer use",
+     "url": "https://github.blog/changelog/2026-10-01-github-copilot-can-now-interact-with-desktop-apps",
+     "source_name": "GitHub Changelog (Copilot)",
+     "kind": "company",
+     "section": "product",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "copilot-desktop-computer-use",
+     "published_at": "2026-10-01T19:11:26Z",
+     "read_annotation": "blog post",
+     "summary": "Computer use is in public preview in Copilot CLI and the Copilot app on macOS and Windows, so Copilot can drive desktop applications on your behalf.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "GitHub's Copilot can now operate desktop programs on Windows and macOS.",
+      "You can try the early version through Copilot's app or its tool for typing computer commands.",
+      "Copilot users can hand it work inside desktop programs instead of operating those programs themselves."
+     ]
+    },
+    {
+     "story_id": "9e8447c0a4db4967",
+     "title": "Jeff-Qwen3.5-0.8B v1.2 + 9 LoRA adapters: put it in front of Qwen3.8-27B for 38x faster decisions and +8.7 points accuracy, for under 2 GB extra memory",
+     "url": "https://www.reddit.com/r/LocalLLaMA/comments/1wv05u1/jeffqwen3508b_v12_9_lora_adapters_put_it_in_front",
+     "source_name": "r/LocalLLaMA",
+     "kind": "community",
+     "section": "product",
+     "topics": [
+      "models"
+     ],
+     "cluster": "jeff-qwen-v1-2-agent-decision-adapters",
+     "published_at": "2026-10-01T13:58:41Z",
+     "read_annotation": "Reddit thread",
+     "summary": "A 0.8B model picks between options you define and returns a calibrated probability for each, now with nine LoRA adapters of about 40 MB apiece for recurring agent decisions like tool choice and prompt-injection detection. The speed and accuracy numbers are the author's own, on the author's hardware.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A developer released extra training for Jeff, a small artificial intelligence system that chooses between options.",
+      "Jeff picks from choices you provide and estimates how likely each choice is to be right.",
+      "Separate training packages teach Jeff jobs such as choosing tools or checking whether answers agree with their sources.",
+      "The developer reports faster, more accurate decisions on their own computers when Jeff makes choices before a larger system."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [],
+ "quick_links": [
+  {
+   "story_id": "33d2fc604dce7520",
+   "title": "AI Agents Targeted U.S. and Canadian Government Websites",
+   "url": "https://transluce.org/us-canada-gov",
+   "source_name": "Transluce",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "transluce-agents-government-websites",
+   "published_at": null,
+   "read_annotation": null,
+   "summary": "Two failed hacking attempts, and a lot of aggressive probing",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "c4c376f7cdfe4627",
+   "title": "The Backdrop Exposes What the World Around an Agent Costs It",
+   "url": "https://arxiv.org/abs/2609.38469",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "backdrop-agent-hazards",
+   "published_at": "2026-10-01T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Pass rates across 3,678 hazard variants and 16 models",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "71c91b2ff1b0a55f",
+   "title": "Testing memory placement against compaction cliff",
+   "url": "https://mem0.ai/blog/testing-memory-placement-against-compaction-cliff",
+   "source_name": "Mem0",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "mem0-memory-placement-compaction",
+   "published_at": null,
+   "read_annotation": null,
+   "summary": "Ten repo rules through Claude Code compaction, three placements",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "a153367fc20ff5d2",
+   "title": "How we built long-term memory for Alyx: why we chose a file over a knowledge graph",
+   "url": "https://arize.com/blog/alyx-agent-long-term-memory-architecture",
+   "source_name": "Arize",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "alyx-long-term-memory",
+   "published_at": "2026-10-01T14:02:15Z",
+   "read_annotation": "blog post",
+   "summary": "One 8,000-character file instead of retrieval or a knowledge graph",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "f1e8433f1081ed60",
+   "title": "Stripe's Payment Method Factory: Orchestrating agents for repeated, custom integrations",
+   "url": "https://stripe.dev/blog/stripes-payment-method-factory-orchestrating-agents-for-repeated-custom-integrations",
+   "source_name": "Stripe Dev Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "stripe-payment-method-factory",
+   "published_at": "2026-09-30T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "An integration factory built from more than 100 reusable prompts",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "317971da35b148b9",
+   "title": "Introducing Clef: our open-source decision models, and new RL fine-tuning platform",
+   "url": "https://blog.cloudflare.com/clef-decision-models",
+   "source_name": "Cloudflare",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "models"
+   ],
+   "cluster": "cloudflare-clef-decision-models",
+   "published_at": "2026-10-01T15:34:02Z",
+   "read_annotation": "blog post",
+   "summary": "Decision models on Workers AI, plus RL fine-tuning",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "3b09135e9b64466c",
+   "title": "ToolBench Rescan: 90,000 MCP Servers Scored",
+   "url": "https://www.arcade.dev/blog/toolbench-rescan-90000-mcp-servers",
+   "source_name": "Arcade.dev",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "toolbench-mcp-rescan-90000",
+   "published_at": "2026-09-30T16:00:00Z",
+   "read_annotation": null,
+   "summary": "Six months on, and 0.28% of servers earn an A",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "0893c43b309d9f45",
+   "title": "MCP Events in ChatGPT: Why an event subscription is a credential",
+   "url": "https://workos.com/blog/mcp-events-chatgpt-subscription-revocation",
+   "source_name": "WorkOS",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "chatgpt-mcp-events-subscription-credentials",
+   "published_at": "2026-10-01T16:00:30Z",
+   "read_annotation": "blog post",
+   "summary": "What your server stores, and how revocation works",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "cffce8d944db881c",
+   "text": "Read this next to the Open SWE router and they look like they disagree. One says the machinery around a strong model earned nothing on ML-engineering tasks; the other cut median cost per task by 64%. Both can hold, because capability and cost are different measurements."
+  },
+  {
+   "after_story": "42bc44344a8d8b61",
+   "text": "Mods and [the approval paper](/newsletter/story/010c20fc0f6b588b) landed in the same cycle and press on the same seam. One finds that what you approved and what ran can come apart inside the harness. The other is a supported way to change what the harness shows you."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-10-02/2026-10-01-pm-m2.webp",
+  "alt": "A small boxy robot with one round eye stands in a bright government lobby wearing a black balaclava, a grappling hook and coiled rope in one hand, a sheet headed VISITOR FAQ in the other. Its speech balloon reads: I'm in. The glass doors behind it stand open beside a sign reading PUBLIC ENTRANCE, OPEN 9 TO 5.",
+  "alt_joke": "The receptionist does not look up.",
+  "caption": "The review found no nonpublic access. The grappling hook remains the only unexplained item.",
+  "concept": "A robot in full burglary kit announces that it is in, from the middle of a government lobby, in daylight, during posted opening hours.",
+  "story_id": "33d2fc604dce7520"
+ },
+ "hedge": null,
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-10-02T02:23:53Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-10-02/cover-light.webp",
+  "dark": "/images/brief/issues/2026-10-02/cover-dark.webp",
+  "alt": "A desk from above. A stamped sheet sits in a tray lettered APPROVED and travels through a sealed cabinet. A different sheet emerges into a tray lettered EXECUTED, carrying the same stamp but different text, with a carbon copy of the first sheet beside it."
+ }
+}

@@ -1,0 +1,24 @@
+{
+ "issue_id": "2026-10-02",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-10-01-pm-m1",
+   "image": "/images/brief/memes/2026-10-02/2026-10-01-pm-m1.webp",
+   "alt": "A framed line chart mounted on an office wall, seen straight on. Behind the glass is a printed chart titled AGENT PASS RATE, with a jagged line falling from the upper left to the lower right. On the outside of the glass, a second line has been drawn in dry-wipe marker, running a short distance below the printed line and copying every one of its dips, with the word MINIMUM hand-lettered beside it. Higher up the glass are the faint half-wiped remains of three earlier marker lines. A dry-wipe marker hangs from a short string tied to the bottom right corner of the frame, its cap off. A small engraved plaque on the bottom rail of the frame reads QUALITY GATE. A cleaner's sticker taped to the lower left corner of the glass reads DO NOT CLEAN.",
+   "alt_joke": "The marker is kept on a string.",
+   "caption": "The threshold is measured, not guessed. It is measured from whatever shipped last Thursday.",
+   "concept": "A framed pass-rate chart whose minimum threshold is drawn on the outside of the glass in marker, following the real line down dip for dip.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-01-pm-m2",
+   "image": "/images/brief/memes/2026-10-02/2026-10-01-pm-m2.webp",
+   "alt": "A small boxy robot with one round eye stands in a bright government lobby wearing a black balaclava, a grappling hook and coiled rope in one hand, a sheet headed VISITOR FAQ in the other. Its speech balloon reads: I'm in. The glass doors behind it stand open beside a sign reading PUBLIC ENTRANCE, OPEN 9 TO 5.",
+   "alt_joke": "The receptionist does not look up.",
+   "caption": "The review found no nonpublic access. The grappling hook remains the only unexplained item.",
+   "concept": "A robot in full burglary kit announces that it is in, from the middle of a government lobby, in daylight, during posted opening hours.",
+   "winner": true
+  }
+ ]
+}
