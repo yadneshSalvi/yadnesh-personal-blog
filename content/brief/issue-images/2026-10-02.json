@@ -1,0 +1,59 @@
+{
+ "issue_id": "2026-10-02",
+ "type": "daily",
+ "renders": 6,
+ "cost_usd": 1.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A desk from above. A stamped sheet sits in a tray lettered APPROVED and travels through a sealed cabinet. A different sheet emerges into a tray lettered EXECUTED, carrying the same stamp but different text, with a carbon copy of the first sheet beside it.",
+   "bytes": [
+    68534,
+    60742
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A desk seen from directly above, the whole arrangement centred with wide margins of empty desk on every side. On the left sits a shallow tray holding one sheet of paper with a round stamp pressed into its lower corner. A closed chute leads from that tray into a small sealed cabinet in the middle of the frame. Out of the cabinet's far side a second sheet emerges into a second shallow tray on the right, carrying an identical round stamp but a clearly different body of text: fewer lines, and one long command line running off its edge. A carbon copy of the first sheet lies face up beside the left tray so the two can be compared. The left tray is lettered APPROVED and the right tray is lettered EXECUTED.",
+   "labels": [
+    "APPROVED",
+    "EXECUTED"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-02T00:15:40Z"
+  },
+  {
+   "key": "ddd0e48e97bdf136",
+   "story_id": "ddd0e48e97bdf136",
+   "light_name": "ddd0e48e97bdf136-light.webp",
+   "dark_name": "ddd0e48e97bdf136-dark.webp",
+   "alt": "Five notched trays sit in a row on a horizontal rail. Three duplicates of them float above the rail in small open boxes, each tied back to its place in the row. A narrow gate at the right lets results back onto the rail one at a time, and one duplicate box sits aside, unopened.",
+   "bytes": [
+    42876,
+    40236
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 2,
+   "prompt": "A straight horizontal rail running across the middle of the frame, carrying five shallow trays in a row, each marked with a different count of tally notches so their order is clear. Above the rail, three of those trays have duplicates lifted out into small sealed boxes that sit higher up and are already open and working, each with a thin thread tying it back to its place in the row. At the right end of the rail stands a narrow gate that lets results back down onto the rail one at a time, in the original left-to-right order, while one of the duplicate boxes has been set aside below the rail, still shut. Generous empty space above and below the rail.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-02T00:22:29Z"
+  }
+ ]
+}
