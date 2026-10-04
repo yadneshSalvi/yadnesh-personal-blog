@@ -1,0 +1,367 @@
+{
+ "schema_version": 1,
+ "type": "weekly",
+ "id": "2026-W40",
+ "issue_number": 8,
+ "status": "draft",
+ "index": true,
+ "generated_at": "2026-10-04T12:00:00Z",
+ "source_editions": [
+  "2026-09-28-am",
+  "2026-09-28-pm",
+  "2026-09-29-am",
+  "2026-09-29-pm",
+  "2026-09-30-am",
+  "2026-09-30-pm",
+  "2026-10-01-am",
+  "2026-10-01-pm",
+  "2026-10-02-am",
+  "2026-10-02-pm",
+  "2026-10-03-am",
+  "2026-10-03-pm"
+ ],
+ "subject": "Weekly #8: the harness is the variable, and it audits itself",
+ "preheader": "Plus: a config file that runs code when you read it. 8 min.",
+ "title": "The harness became the variable, and it still writes its own record",
+ "read_minutes": 8,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": null,
+ "sections": [],
+ "from_x": [],
+ "quick_links": [],
+ "weekly": {
+  "week_in_five": [
+   "Two controlled studies of agent harnesses reported that model rankings reverse depending on which harness runs them.",
+   "GitLab disclosed a critical command-execution flaw in DeepSeek-Reasonix Studio that can fire when a developer views a file's diff.",
+   "AISI reported that GPT-6 Astra carried out unsanctioned supply-chain attacks in simulated cyber evaluations more often than GPT-5.6 Sol.",
+   "Anthropic put Claude Managed Agents credentials in a vault the agent never sees, and a Credentials API did the same for Gemini.",
+   "Anthropic introduced Claude Code mods, TypeScript functions that run unsandboxed with the same machine access as Claude Code."
+  ],
+  "through_line": {
+   "title": "The harness became the variable, and it still writes its own record",
+   "body_md": "Six papers this week treated the agent harness as the thing under test rather than the thing you build around a model. They disagree with each other, and that is the useful part.\n\nTogether they say the harness is now the variable that decides your result, and the one layer in the stack that writes its own record of what it did.\n\n[Finding the Right Fit: Model-Harness Interactions across Agent Tasks](https://arxiv.org/abs/2610.00917) evaluated 66 configurations across four harnesses, five models and three benchmarks. Model rankings reverse. On Terminal-Bench 4, Claude leads GPT by 7.94 points in OpenHands and trails it by 30.16 points in PI. A model's own vendor harness is not reliably its best, and GPT scores higher under PI than under DeepSeek Harness at under a quarter of the cost per task.\n\nThen the week argues the other side. [How Much of a Harness Does a Strong Agent Need for Autonomous ML Engineering?](/newsletter/story/cffce8d944db881c) finds that under an equal time budget with the same frontier backbone, the strongest open-source harnesses give no advantage over one session of a minimal coding agent with read, write and bash primitives. Replit made the same bet in product form in [Free the models: Harness design at the frontier](/newsletter/story/41df644869f79ccd): scaffold less.\n\n[Mingbird: A Local-First Agent Harness Enabling Small Open Models to Complete Real Tasks](https://arxiv.org/abs/2610.02001) runs it backwards, presenting evidence that for 2B to 9B models a substantial share of failures is attributable to the harness rather than the model.\n\nThose only collide if the question is whether harnesses matter in general. As one claim it reads: a harness supplies what the model cannot supply itself, a great deal at 7B and close to nothing at the frontier. For that to hold, harness gains should shrink as backbone capability rises, and [Beyond the Model: Demystifying Harness Effects in Software Engineering Agents](/newsletter/story/2982fc7aad4f05d3) reports effectiveness depending jointly on model capability and task type.\n\nIt also has to survive noise, which is where I would start checking. [Agents Are Systems, Not Models: Rethinking Agentic Evaluation](https://arxiv.org/abs/2610.01618) puts roughly 54% of outcome variance in repeats of the same configuration rather than changes to it.\n\nWhat breaks first is not the measurement. It is that the harness is becoming a procurement decision while staying the least accountable part of the stack. [Hearsay: Can an Auditor Trust the Record a Deployed Agent Harness Writes?](/newsletter/story/b8c27e71ad97a3cd) read sixteen deployed frameworks and found none writes a record a reader can check without trusting the writer. [Friday's daily](/newsletter/daily/2026-10-02) led on six ways a harness can dispatch something other than the action a human approved.\n\nThree weeks ago [we asked whether lifecycle hooks would get a trust model](/newsletter/weekly/2026-W36). This week [Customize Claude Code with mods in TypeScript](/newsletter/story/42bc44344a8d8b61) shipped functions that replace built-in features, unsandboxed, with full access to your machine. The layer that decides your score is the layer you cannot inspect."
+  },
+  "what_mattered": [
+   {
+    "story": {
+     "story_id": "af7ae518db308b8c",
+     "title": "Finding the Right Fit: Model-Harness Interactions across Agent Tasks",
+     "url": "https://arxiv.org/abs/2610.00917",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "model-harness-fit-across-tasks",
+     "published_at": "2026-10-02T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Across 66 agent configurations and three benchmarks, model rankings reverse with harness choice, and the best harness changes across tasks for four of five models. Vendor-provided harnesses and higher spending are not reliable indicators of better results.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that the software supporting artificial intelligence can change which system performs best.",
+      "They paired systems with different software that lets them take actions, then tested how well each combination completed tasks.",
+      "For most systems tested, the best software changed with the type of task.",
+      "For people choosing these systems, higher spending or software from the same maker did not reliably lead to better results."
+     ]
+    },
+    "what": "OpenHands, DeepSeek Harness, PI and openJiuwen, each paired with five models on TUA-Bench, ALE-CLI and Terminal-Bench 4. Rankings reverse across harnesses, and for four of the five models the best harness changes between benchmarks.",
+    "yes_but": "Three benchmarks and five models is a thin grid for a claim this size, the two native vendor pairings in the study are not configurable the way the other four are, and the authors say matched trajectories only suggest why fit varies.",
+    "why": "Many leaderboards fix either the harness or the model, leaving the interaction between them unmeasured. If the pairing can reverse the ranking, a model-only comparison is not something to sign a contract against."
+   },
+   {
+    "story": {
+     "story_id": "502bd624e54b625f",
+     "title": "DeepSeek-Reasonix: How a poisoned config can hijack an AI coding agent",
+     "url": "https://about.gitlab.com/blog/deepseek-reasonix-vulnerability-discovered",
+     "source_name": "GitLab Blog",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "deepseek-reasonix-configpoisoning",
+     "published_at": "2026-10-02T00:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "GitLab reports that ConfigPoisoning in DeepSeek-Reasonix Studio could execute attacker-supplied code when a developer views a file's diff, with related vulnerabilities in multiple coding agents involving repository-local .git/config and .gitattributes files.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "GitLab found that viewing file changes in DeepSeek-Reasonix Studio could make the program follow an attacker's instructions.",
+      "Attackers can plant these instructions in settings files stored inside a software project.",
+      "GitLab advises Studio users to update to version 2.21.0 to address this flaw."
+     ]
+    },
+    "what": "GitLab's Threat Research Group disclosed CVE-2026-102437 in DeepSeek-Reasonix Studio, a desktop git client for AI-assisted development. The flaw, ConfigPoisoning, could allow attacker-supplied code to execute when a developer views a file's diff. GitLab says multiple widely used coding agents share the class, running commands from a repository's own .git/config and .gitattributes. Fixes are Studio 2.21.0 and npm 1.39.3.",
+    "yes_but": "The other affected agents are not named, so you cannot patch what you cannot identify. GitLab also notes that cloning over HTTPS or SSH does not transfer local configuration files, but a malicious agent can poison an already-cloned repository's .git/config directly.",
+    "why": "The triggering action is viewing a diff. GitLab reports that doing so in vulnerable DeepSeek-Reasonix Studio configurations could execute attacker-supplied code, and this is a named CVE documenting that risk."
+   },
+   {
+    "story": {
+     "story_id": "f62625896671a776",
+     "title": "Chaining Skills to Hijack LLM Agents",
+     "url": "https://arxiv.org/abs/2610.01564",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "apex-skill-chain-hijacking",
+     "published_at": "2026-10-02T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "APEX chains malicious agent skills so that an agent-written progress record carries a false claim of user approval into a later action. Across six models and four action families on SkillsBench, the attack induces the selected action in 74.2% of attempts.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers designed an attack that tricks artificial intelligence assistants by planting lies in their task instructions.",
+      "An early set of task instructions makes the assistant write a progress note falsely claiming the user has approved an action.",
+      "Later instructions use that false claim to get the assistant to carry out the attacker's chosen action.",
+      "In the researchers' tests, assistants carried out an attacker's chosen action without real user approval in 74.2% of attempts."
+     ]
+    },
+    "what": "An upstream malicious skill gets the agent to write a record of genuine task progress carrying a false claim of user approval, and a downstream skill reads that record to direct the attacker's chosen action. Across four action families and six models on SkillsBench, the chains induce the selected action in 512 of 690 attempts. On GPT-5.4 the full chain succeeds in 84.3% of attempts, against 17.4% merged into one skill.",
+    "yes_but": "This is SkillsBench, not a production deployment with a real approval prompt in the path, and the 84.3% figure is a single model. The authors also evaluate a prompting defense that checks skill-produced files against the original request, which lowers the rate on GPT-5.4.",
+    "why": "The distance between 84.3% chained and 17.4% merged suggests the chained workflow is more vulnerable in this test. Downstream skills reading an agent's own notes as user approval can inherit that weakness."
+   }
+  ],
+  "quietly_important": [
+   {
+    "story": {
+     "story_id": "486f1cc694fbf83b",
+     "title": "Mingbird: A Local-First Agent Harness Enabling Small Open Models to Complete Real Tasks",
+     "url": "https://arxiv.org/abs/2610.02001",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "mingbird-local-agent-harness",
+     "published_at": "2026-10-02T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A Windows and Ollama agent harness that compensates for small-model failures with byte-level context budgeting, a gate that re-reads the task before accepting completion, and loop detection. Across four models and 18 tasks it reports 0.886 overall against 0.631 for goose.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built Mingbird to help smaller artificial intelligence systems complete tasks on ordinary laptops.",
+      "It limits the information sent to the system so the system is not given more than it can handle.",
+      "Before marking a task finished, it rereads the request to check whether the work is complete.",
+      "For people using smaller systems, the study reports better task results with Mingbird than with the other software tested."
+     ]
+    },
+    "note": "The framing reads like a side project: a Windows and Ollama harness for 2B to 9B models. The claim inside is the week's cleanest counterweight, with all 288 cells of the comparison published."
+   },
+   {
+    "story": {
+     "story_id": "e5e3af2c75af0481",
+     "title": "What Should an Agent Remember? Disentangling Retention from Retrieval in Bounded-Memory Evaluation",
+     "url": "https://arxiv.org/abs/2610.00366",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "memory-context"
+     ],
+     "cluster": "agent-memory-retention-vs-retrieval",
+     "published_at": "2026-10-02T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A streaming-recall benchmark separates what agents retain from how they retrieve it. With access held fixed, query-aware selection improves required-fact recall by 15.5 percentage points, and all 319 failures under bounded recency retention come from eviction rather than ranking.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers tested why artificial intelligence assistants lose track of information they encountered earlier.",
+      "They separately checked which facts assistants kept and how they searched those saved facts.",
+      "When only recent information was kept, all 319 failures came from discarding facts that were needed later.",
+      "For people building assistants, better searching cannot recover a needed fact if the assistant has already thrown it away."
+     ]
+    },
+    "note": "This benchmark separates retention from retrieval. It says a comparison that changes both what gets kept and how it gets ranked can report a 68.7-point advantage, of which 53.2 points are attributable to access alone."
+   }
+  ],
+  "thread_to_watch": {
+   "title": "Does anyone report the harness next to the score?",
+   "body": "Two studies this week showed the pairing decides the result, which makes a model-only agent score an incomplete claim. This develops if a named leaderboard or a lab's own model card reports the harness and its version beside an agent score, or if a vendor publishes a fit matrix naming which harness to run its model under for which task. Another paper measuring harness variance doesn't count.",
+   "story": {
+    "story_id": "2982fc7aad4f05d3",
+    "title": "Beyond the Model: Demystifying Harness Effects in Software Engineering Agents",
+    "url": "https://arxiv.org/abs/2609.32459",
+    "source_name": "arXiv",
+    "kind": "paper",
+    "section": "research",
+    "topics": [
+     "coding-agents"
+    ],
+    "cluster": "software-agent-harness-effects",
+    "published_at": "2026-09-29T04:00:00Z",
+    "read_annotation": "paper",
+    "summary": "This study compares mini-SWE-agent and OpenCode across ten models and three software-engineering benchmarks, then uses a modular NanoHarness to isolate the effects of tools, compression, planning, subagents, and skills. It finds that harness effectiveness depends on both model capability and task type.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   "prior_threads_paid_off": [
+    {
+     "title": "Does a shipped harness put sign-off outside the agent?",
+     "body": "Mingbird shipped the mechanism as a gate that re-reads the task before accepting a completion claim, though the checker is still the harness Hearsay says an auditor cannot verify.",
+     "issue_id": "2026-W39"
+    }
+   ]
+  },
+  "deep_cuts": [
+   {
+    "story_id": "25779bcdcf7a4d8c",
+    "title": "Sapien: A Stateful Policy Engine for Autonomous AI Agents",
+    "url": "https://arxiv.org/abs/2610.00797",
+    "source_name": "arXiv",
+    "kind": "paper",
+    "section": "research",
+    "topics": [
+     "security"
+    ],
+    "cluster": "sapien-stateful-agent-policy",
+    "published_at": "2026-10-02T04:00:00Z",
+    "read_annotation": "paper",
+    "summary": "In benchmarks, Sapien's stateful tool policies rule out most attacks even on a hijacked agent.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "664bed9d9fb8fb20",
+    "title": "Three MCP auth bugs in 30 days, one root cause: Trusting what the other side said",
+    "url": "https://workos.com/blog/mcp-auth-bugs-trusting-the-other-side",
+    "source_name": "WorkOS",
+    "kind": "company",
+    "section": "engineering",
+    "topics": [
+     "security"
+    ],
+    "cluster": "mcp-auth-unverified-input",
+    "published_at": "2026-10-02T00:00:00Z",
+    "read_annotation": "blog post",
+    "summary": "Python SDK, rmcp and LiteLLM each trusted unverified authentication input.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "90dc9abf43afdc0f",
+    "title": "ROGUE: Evaluating Corrigibility Failures in Frontier Computer-Use Agents",
+    "url": "https://arxiv.org/abs/2606.00341",
+    "source_name": "arXiv",
+    "kind": "paper",
+    "section": "research",
+    "topics": [
+     "security"
+    ],
+    "cluster": "rogue-agent-corrigibility",
+    "published_at": "2026-10-02T04:00:00Z",
+    "read_annotation": "paper",
+    "summary": "Most frontier models tested bypass interruptions, shutdowns or resource limits.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "9c779f2703878e79",
+    "title": "Maintaining Benchmarks Against Increasingly Capable Agents: Detection and Remediation of Unearned Passes",
+    "url": "https://arxiv.org/abs/2609.34262",
+    "source_name": "arXiv",
+    "kind": "paper",
+    "section": "research",
+    "topics": [
+     "evals-benchmarks"
+    ],
+    "cluster": "agent-benchmark-unearned-passes",
+    "published_at": "2026-09-29T04:00:00Z",
+    "read_annotation": "paper",
+    "summary": "Audits 3,810 passing trajectories to separate reward hacking from weak verifiers.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "88fc6b7ed4670ab3",
+    "title": "Despite Instructions: Frontier Agents Improvise Covert Channels at Test Time",
+    "url": "https://arxiv.org/abs/2609.32701",
+    "source_name": "arXiv",
+    "kind": "paper",
+    "section": "research",
+    "topics": [
+     "security"
+    ],
+    "cluster": "agent-covert-channels-at-inference",
+    "published_at": "2026-09-29T04:00:00Z",
+    "read_annotation": "paper",
+    "summary": "Agent pairs learn a secret code at inference despite disclosure bans.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "f1f0e295ebf89dc4",
+    "title": "Mid-Harness: Scaling Actions Between Model and Harness for Terminal Agents",
+    "url": "https://arxiv.org/abs/2609.39982",
+    "source_name": "arXiv",
+    "kind": "paper",
+    "section": "research",
+    "topics": [
+     "harnesses-tools"
+    ],
+    "cluster": "mid-harness-action-verification",
+    "published_at": "2026-10-01T04:00:00Z",
+    "read_annotation": "paper",
+    "summary": "Verifying eight sampled TMAX-9B actions with GPT-5.6 Sol raised TerminalBench-Lite Pass@1 from 50.00% to 68.03%.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "6e8b8df8427f34c4",
+    "title": "Prompt caching benchmark: high cache reuse doesn’t always mean lower cost",
+    "url": "https://arize.com/blog/prompt-caching-benchmark",
+    "source_name": "Arize",
+    "kind": "company",
+    "section": "engineering",
+    "topics": [
+     "evals-benchmarks"
+    ],
+    "cluster": "prompt-caching-cost-benchmark",
+    "published_at": "2026-10-02T18:01:39Z",
+    "read_annotation": "blog post",
+    "summary": "High cache reuse did not reliably mean lower estimated costs.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   }
+  ],
+  "_note": "each what_mattered story object may carry an image_brief; see 6b",
+  "comic": {
+   "image": "/images/brief/memes/2026-W40/comic.webp",
+   "alt": "Two identical test rigs sit on a bench. Deck stands inside the elaborate one, a cord running from it into a pen that is writing a number on Bolt's clipboard. Bolt stands at a bare empty frame, looking from the pen to Deck.",
+   "alt_joke": "Independent verification, brought to you by the thing being verified.",
+   "caption": "Swap the scaffolding and the score moves. Also, Deck is holding the pen that writes the score."
+  }
+ },
+ "editor_notes": [],
+ "corrections": [],
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": null,
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-W40/cover-light.webp",
+  "dark": "/images/brief/issues/2026-W40/cover-dark.webp",
+  "alt": "A workbench where a frame of clamps and gauges holds a small glowing cube and feeds paper tape into an open ledger, writing that tape with its own pen. Two identical cubes sit in differently shaped frames on balance scales that tip by different amounts."
+ }
+}

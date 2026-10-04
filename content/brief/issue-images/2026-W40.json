@@ -1,0 +1,104 @@
+{
+ "issue_id": "2026-W40",
+ "type": "weekly",
+ "renders": 10,
+ "cost_usd": 2.5,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A workbench where a frame of clamps and gauges holds a small glowing cube and feeds paper tape into an open ledger, writing that tape with its own pen. Two identical cubes sit in differently shaped frames on balance scales that tip by different amounts.",
+   "bytes": [
+    73696,
+    67502
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 2,
+   "prompt": "A wide workbench seen straight on. In the centre, a bracket of clamps, tubes and gauges cradles a small glowing cube, and a long strip of paper tape runs out of the bracket into an open ledger. The same bracket holds the pen that is writing on the tape. To the left and right, two more identical glowing cubes sit in two differently shaped brackets, each on a balance scale, and the two scales tip by different amounts. Leave plenty of empty bench surface around all three setups.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-03T23:54:20Z"
+  },
+  {
+   "key": "af7ae518db308b8c",
+   "story_id": "af7ae518db308b8c",
+   "light_name": "af7ae518db308b8c-light.webp",
+   "dark_name": "af7ae518db308b8c-dark.webp",
+   "alt": "Two identical glowing cubes sit in two differently shaped metal cradles on balance scales that tip opposite ways, beside a board whose ranked list has its top two rows swapped.",
+   "bytes": [
+    31504,
+    28592
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 2,
+   "prompt": "Two identical small glowing cubes, each seated in a differently shaped metal cradle, standing on two balance scales that tip opposite ways. Behind the scales, a simple ranked list on a board with its top two rows swapped and two curved arrows showing the swap. Centre everything and leave wide empty space at all four edges.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-04T00:00:08Z"
+  },
+  {
+   "key": "502bd624e54b625f",
+   "story_id": "502bd624e54b625f",
+   "light_name": "502bd624e54b625f-light.webp",
+   "dark_name": "502bd624e54b625f-dark.webp",
+   "alt": "An open folder on a desk conceals a small switch wired to a tiny hammer striking the desk, while a magnifying glass hovers over one of the pages as if someone is only reading.",
+   "bytes": [
+    40350,
+    36516
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "An open manila folder lying flat on a plain desk. Inside the folder, a small hidden toggle switch is wired to a tiny spring-loaded hammer that is striking the desk surface. A magnifying glass hovers above a page in the folder, as if someone is only reading it. Centre the folder on the desk and leave wide empty desk around every edge.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-04T00:01:15Z"
+  },
+  {
+   "key": "f62625896671a776",
+   "story_id": "f62625896671a776",
+   "light_name": "f62625896671a776-light.webp",
+   "dark_name": "f62625896671a776-dark.webp",
+   "alt": "Three linked carts on a track hand a paper slip along the line. The slip is blank in the first cart and carries a large wax seal by the time it reaches the third.",
+   "bytes": [
+    27580,
+    27808
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Three small linked carts in a line on a straight track, passing a single paper slip from one cart to the next. The slip is blank in the first cart, and in the third cart the same slip carries a large wax seal. Centre the three carts in the frame and leave generous empty space above, below and to the sides.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-04T00:03:31Z"
+  }
+ ]
+}
