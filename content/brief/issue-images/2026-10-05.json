@@ -1,0 +1,32 @@
+{
+ "issue_id": "2026-10-05",
+ "type": "daily",
+ "renders": 4,
+ "cost_usd": 1.0,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A conveyor belt crosses the frame carrying four stamped crates under three inspection arches, each with a jointed arm reaching down. One crate sits alone on a side spur beside the first arch. Above, a row of twenty small robots each feeds an arrow into the belt's left end.",
+   "bytes": [
+    148048,
+    141966
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 2,
+   "prompt": "A release line drawn as a conveyor belt running left to right across the middle of a wide frame. Four identical small crates ride the belt, evenly spaced, each stamped with a plain flag mark. The belt passes under three upright inspection arches; at each arch a jointed mechanical arm reaches down to the crate beneath it. Beside the first arch, one crate has been pushed onto a short side spur and sits there alone. Above the belt, a long single row of twenty small identical plain robots stands shoulder to shoulder, each feeding a short arrow down into the left end of the belt, so the arrows converge on one entry point. Keep the belt, the arches and the robot row well inside the frame, with clear floor beneath the belt and clear space above the robots.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-05T00:23:04Z"
+  }
+ ]
+}

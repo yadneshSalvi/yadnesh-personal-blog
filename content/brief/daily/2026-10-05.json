@@ -1,0 +1,492 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-10-05",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-10-05T04:10:00Z",
+ "source_editions": [
+  "2026-10-04-am",
+  "2026-10-04-pm",
+  "2026-10-05-am"
+ ],
+ "subject": "VS Code's weekly releases, Gemini Interactions API, budget caps",
+ "preheader": "Plus: an agent that writes its own tools, and a support bot at 80%. 5 min.",
+ "title": "VS Code rebuilt its release process around agents and now ships weekly",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "0a5a32156fad6237",
+   "title": "How VS Code Went from Monthly to Weekly Releases with AI",
+   "url": "https://www.youtube.com/watch?v=I2LL_wd89-A",
+   "source_name": "Harald Kirschner (Microsoft)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "vscode-weekly-releases-ai-agents",
+   "published_at": "2026-10-03T15:00:10Z",
+   "read_annotation": "talk",
+   "summary": "A principal product manager on VS Code walks through the process changes behind the move from monthly to weekly releases.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Microsoft now updates its app for writing computer programs every week instead of every month.",
+    "Artificial intelligence (AI) can operate the app to check and correct the computer instructions it writes.",
+    "The team requires AI to check proposed changes to the app.",
+    "These changes helped a small team deliver frequent updates to more than 50 million users."
+   ]
+  },
+  "what": "VS Code now ships weekly after ten years of monthly releases. Harald Kirschner's account of how is almost entirely about the system around the agents.",
+  "details": "The rebuild came in three stages: agent-ready codebases and skills plus TypeScript Go's 10x faster builds; mandatory AI code review, AI issue triage and error stacks that become auto-fix pull requests; then VSC-Bench evals and smaller squads. Agent-written code that gets committed rose from 55% to 86%.",
+  "yes_but": "These are Microsoft's numbers about Microsoft's product, from a talk, and code survival counts what got committed, not what held up. Kirschner also names what broke: CI that compounds when 20 agents hit it at once.",
+  "yes_but_waived": null,
+  "why": "If you own the build system, you pay for this first. Kirschner describes slow CI compounding when 20 agents hit it at once, alongside TypeScript Go's 10x faster builds and mandatory AI code review."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "61148e8358b16b93",
+     "title": "Security of The Model Context Protocol Ecosystem: Emerging Threats, Empirical Attack Evidence, Trust and Authorization Failures, Supply-Chain Risks, And Defensive Strategies",
+     "url": "https://www.semanticscholar.org/paper/923ffec11093959e464d2f55de69d2a4630b441c",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "mcp-ecosystem-security-review",
+     "published_at": "2026-09-29T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "An evidence-informed review of the MCP security surface: trust boundaries, tool poisoning, privilege propagation, credential use, cross-tool exfiltration and supply-chain compromise. It leans on empirical results from 2025 and 2026.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers reviewed how connecting artificial intelligence (AI) to outside tools can create security risks.",
+      "These connections let AI use information and take actions in other services.",
+      "The review examines how misleading tool descriptions can affect the AI's decisions.",
+      "Developers using these connections face risks of stolen information or actions taken without proper permission."
+     ]
+    },
+    {
+     "story_id": "f7f90d24dc756289",
+     "title": "Decomposing LLM-Based Testing with Agent Skills: A Case Study on Numerical Inconsistencies",
+     "url": "https://www.semanticscholar.org/paper/c29255dc81c6e892d5717521c2b264412c1aa434",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "agent-skills-numerical-differential-testing",
+     "published_at": "2026-10-04T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "The authors split a differential-testing pipeline into Agent Skills for program generation and feedback-guided mutation, then compare four configurations. Feedback-guided mutation gave the largest gain at 12 percentage points; adding more procedural knowledge cost 3.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers split artificial intelligence (AI) software testing into separate instructions for creating tests and improving them.",
+      "The tests look for programs giving different answers to the same calculation.",
+      "Changing tests based on earlier results raised the rate of finding conflicting answers by 12 percentage points.",
+      "For software testers, the study suggests that more detailed instructions do not always help uncover problems."
+     ]
+    },
+    {
+     "story_id": "6bb800c6aefb646d",
+     "title": "Data-reflector: an agentic exploratory data analysis platform for researchers",
+     "url": "https://www.semanticscholar.org/paper/4b0f6cf960322e0c9aaf5e48865863b72eb0ed1c",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "data-reflector-deterministic-agent-analysis",
+     "published_at": "2026-10-01T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Data-reflector confines the LLM to reading intent, picking tools and parsing filters, and routes every number through fixed functions running locally. Six participants ran it on six clinical and nonclinical datasets, scored partly on whether a second operator could reproduce the run.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built Data-reflector, a tool for exploring data through questions written in everyday language.",
+      "Artificial intelligence (AI) interprets each question to choose the right calculation tools.",
+      "Preset computer instructions carry out every calculation.",
+      "A trial with 6 participants checked accuracy and whether another person could repeat the work.",
+      "The tool is intended to make data analysis more accessible to researchers who cannot write computer programs."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "a0419ca1237f6d1e",
+     "title": "An Interaction Is All You Need",
+     "url": "https://www.youtube.com/watch?v=8aVbXXvJUY4",
+     "source_name": "Ivan Leo (Google DeepMind)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "gemini-interactions-api-managed-agents",
+     "published_at": "2026-10-03T19:30:16Z",
+     "read_annotation": "talk",
+     "summary": "Gemini's Interactions API moves conversation state server-side behind interaction IDs, so you stop hand-managing thought signatures, and adds strongly typed multimodal outputs. Managed Agents run the Antigravity harness in a persistent remote sandbox with loadable sources and a credential-injecting proxy.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Google demonstrated new tools for building artificial intelligence (AI) helpers that can carry out tasks.",
+      "The service stores conversation history so developers do not have to keep track of it themselves.",
+      "Each helper gets a separate workspace on Google's computers that stays available between tasks.",
+      "Developers have less conversation history and computer setup to manage when building helpers that work over several steps."
+     ]
+    },
+    {
+     "story_id": "f07eb1d5f79b2478",
+     "title": "The Human Is an Async API",
+     "url": "https://www.youtube.com/watch?v=jc3kbZkuHTo",
+     "source_name": "Melanie Warrick (Temporal)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "temporal-durable-human-approvals",
+     "published_at": "2026-10-04T16:30:17Z",
+     "read_annotation": "talk",
+     "summary": "Two Temporal primitives, a wait condition and a signal, let an agent pause for a human for minutes or weeks without blocking. Warrick kills the worker mid-approval in a Google ADK and LangGraph demo, then brings it back with no lost work.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Temporal showed how artificial intelligence (AI) can wait for a person's approval without losing its work.",
+      "The system remembers where a task paused and continues when the person's reply arrives.",
+      "In the demonstration, the program running the task stopped and restarted without losing completed work.",
+      "People can take minutes or weeks to respond without forcing the task to start over."
+     ]
+    },
+    {
+     "story_id": "d17476145bdb42fb",
+     "title": "We're going to need default hard budget caps on pretty much everything",
+     "url": "https://simonwillison.net/2026/Oct/3/default-hard-budget-caps",
+     "source_name": "Simon Willison",
+     "kind": "individual",
+     "section": "engineering",
+     "topics": [
+      "infra-sandboxes"
+     ],
+     "cluster": "agent-default-hard-budget-caps",
+     "published_at": "2026-10-03T23:34:02Z",
+     "read_annotation": "blog post",
+     "summary": "Willison wants pay-by-usage services to ship hard caps by default: after $X a month, cut the thing off and return errors. A warning email at midnight leaves the rogue service billing you while you sleep.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Willison wants services that charge for each use to stop when a customer reaches their spending limit.",
+      "Programs created with artificial intelligence can generate charges by using paid services.",
+      "Warning emails leave the service running, so bills can keep growing before anyone notices.",
+      "Automatic shutoffs would protect customers from bills above their chosen limits."
+     ]
+    },
+    {
+     "story_id": "b396fd1fa4181358",
+     "title": "We Built an AI Support Agent That Resolves 80% of Tickets",
+     "url": "https://www.youtube.com/watch?v=pyvRID_CZZU",
+     "source_name": "Matt Lawler (AssemblyAI)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "assemblyai-joey-support-agent",
+     "published_at": "2026-10-04T15:00:15Z",
+     "read_annotation": "talk",
+     "summary": "AssemblyAI swapped a bot that resolved 10% of conversations for Joey, which the team reports resolves 80% end to end for about $700 a month. It's the Claude Agent SDK over docs checked out as local Markdown, plus embeddings and one large CLAUDE.md.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "AssemblyAI replaced its old automated customer support helper with a new one called Joey.",
+      "Joey searches saved help documents for information relevant to customers' questions.",
+      "The team demonstrated Joey listening and speaking during a live conversation.",
+      "AssemblyAI says Joey handles 80% of customer conversations without human help for about $700 a month."
+     ]
+    },
+    {
+     "story_id": "e9e48afddf7db94c",
+     "title": "Agents That Write Their Own Tools at Runtime",
+     "url": "https://www.youtube.com/watch?v=33Oct2hqGnk",
+     "source_name": "Sandhya Subramani (AWS)",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "strands-runtime-tool-creation",
+     "published_at": "2026-10-04T21:00:13Z",
+     "read_annotation": "talk",
+     "summary": "Subramani's Strands agent starts with zero tools and writes the ones it needs at runtime, off a system prompt plus three primitives: editor, shell and load_tool. She also covers the sandboxing, constrained permissions and observability you'd want first.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Sandhya Subramani demonstrated an artificial intelligence assistant that writes extra computer programs when a task requires them.",
+      "It creates a program and starts using it immediately, without restarting.",
+      "She described limiting what it can access and tracking its actions before trusting it with real work.",
+      "Developers could let assistants tackle new tasks without having to build every tool ahead of time."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [],
+ "quick_links": [
+  {
+   "story_id": "c8ac371693b0d744",
+   "title": "From manual negotiation to automated scheduling: How AI21 manages its GPU fleet with Kueue",
+   "url": "https://www.ai21.com/blog/how-ai21-manages-its-gpu-fleet-with-kueue",
+   "source_name": "AI21 Labs Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "ai21-kueue-gpu-scheduling",
+   "published_at": null,
+   "read_annotation": null,
+   "summary": "Kueue job queueing across a shared cluster of roughly 10,000 GPUs",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "2ad697ead091eb32",
+   "title": "Agents don't need memory, they need documentation",
+   "url": "https://liao.gg/blog/agents-dont-need-memory",
+   "source_name": "liao.gg",
+   "kind": "community",
+   "section": "community",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "agent-documentation-over-memory",
+   "published_at": "2026-10-03T17:03:37Z",
+   "read_annotation": "HN thread",
+   "summary": "Linked without a summary: the fact-gate could not verify one against the source.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": 200
+  },
+  {
+   "story_id": "88bfa868e3d3a53f",
+   "title": "AI Coding Agents Are Breaking Big Codebases",
+   "url": "https://www.youtube.com/watch?v=Bdrs3uAX0_M",
+   "source_name": "Dan Adler (Sourcegraph)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "sourcegraph-agentic-batch-changes",
+   "published_at": "2026-10-04T19:30:20Z",
+   "read_annotation": "talk",
+   "summary": "Making and auditing one agent change across thousands of repositories",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "b69f647ed1fd9951",
+   "title": "Strands Decider: Why Not an Encoder?",
+   "url": "https://brooker.co.za/blog/2026/10/04/encoders.html",
+   "source_name": "Marc Brooker",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "models"
+   ],
+   "cluster": "strands-decider-encoder-comparison",
+   "published_at": "2026-10-04T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Five designs compared behind a 2B decider model",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "57d97b7b325b9edf",
+   "title": "The ultimate guide to multi-harness RL",
+   "url": "https://www.reddit.com/r/LocalLLaMA/comments/1wwk49n/the_ultimate_guide_to_multiharness_rl",
+   "source_name": "r/LocalLLaMA",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "multi-harness-rl",
+   "published_at": "2026-10-03T10:39:37Z",
+   "read_annotation": "Reddit thread",
+   "summary": "Hugging Face's RL recipe for training inside custom coding harnesses",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "2cdfae4c42cf7328",
+   "title": "How we cut time to first byte by 94% for long prompts",
+   "url": "https://docs.litellm.ai/blog/long-prompt-latency",
+   "source_name": "LiteLLM (BerriAI)",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "litellm-long-prompt-latency",
+   "published_at": "2026-10-03T09:00:00Z",
+   "read_annotation": null,
+   "summary": "Prompt-cache routing work removed from the path to first byte",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "cd0b255bdf1f519a",
+   "title": "I built a code knowledge graph tool that's actually MIT licensed (fully local, no cloud)",
+   "url": "https://www.reddit.com/r/LocalLLaMA/comments/1wws6o6/i_built_a_code_knowledge_graph_tool_thats",
+   "source_name": "r/LocalLLaMA",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "repopedia-local-code-knowledge-graph",
+   "published_at": "2026-10-03T17:01:14Z",
+   "read_annotation": "Reddit thread",
+   "summary": "A local call graph in a plain SQLite file",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "3953623996a5bf99",
+   "title": "AI Gateway Guardrails in 2026: How to Secure LiteLLM, Kong, TrueFoundry and Agent Router (and 12 Guardrail Providers Compared)",
+   "url": "https://www.pillar.security/blog/ai-gateway-guardrails-litellm-kong-truefoundry-2026",
+   "source_name": "Pillar Security Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "ai-gateway-guardrails-comparison",
+   "published_at": null,
+   "read_annotation": "blog post",
+   "summary": "Gateway guardrail options, compared by a guardrail vendor",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "ca3badba28a27026",
+   "title": "Unitree just dropped UnifoLM-WLA-1.0: a single 6B model that does 64 whole-body + tabletop tasks on a real humanoid",
+   "url": "https://www.reddit.com/r/LocalLLaMA/comments/1ww91uw/unitree_just_dropped_unifolmwla10_a_single_6b",
+   "source_name": "r/LocalLLaMA",
+   "kind": "community",
+   "section": "product",
+   "topics": [
+    "models"
+   ],
+   "cluster": "unitree-unifolm-wla-1",
+   "published_at": "2026-10-03T00:00:09Z",
+   "read_annotation": "Reddit thread",
+   "summary": "A 6B humanoid model trained on about 2,500 hours of robot data",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "021d60ff54079ed3",
+   "title": "The Rise of Overfit Inference Engines",
+   "url": "https://www.reddit.com/r/LocalLLaMA/comments/1wwu6zj/the_rise_of_overfit_inference_engines",
+   "source_name": "r/LocalLLaMA",
+   "kind": "community",
+   "section": "community",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "specialized-inference-runtimes",
+   "published_at": "2026-10-03T18:24:42Z",
+   "read_annotation": "Reddit thread",
+   "summary": "Narrow runtimes that give up generality for one configuration",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "f07eb1d5f79b2478",
+   "text": "Nothing that has to be reliable lives in the model any more. Temporal keeps the approval state, Data-reflector keeps the arithmetic, Joey keeps the docs on disk as files. The model is the part you're allowed to swap out."
+  },
+  {
+   "after_story": "d17476145bdb42fb",
+   "text": "Hard caps won't ship because they're correct. They'll ship the first time a provider eats a five-figure refund for somebody's runaway agent loop, and then every competitor will have the feature inside a quarter."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-10-05/2026-10-05-am-m2.webp",
+  "alt": "A printed comparison poster on the back wall of a small exhibition stand, headed INDEPENDENT BUYERS GUIDE above a line reading 12 PROVIDERS COMPARED. A grid of ticks fills the middle; one shaded column carries a paper rosette and the header PROVIDER 4. Small print at the foot reads PRODUCED BY PROVIDER 4.",
+  "alt_joke": "Free copies while stocks last.",
+  "caption": "The methodology is published in full. The criteria were finalised on Thursday. The results arrived Wednesday.",
+  "concept": "An independent buyers guide rates twelve providers, and the credit line at the foot of the poster names the winner as the publisher.",
+  "story_id": "3953623996a5bf99"
+ },
+ "hedge": {
+  "quote": "An exploratory evaluation with agent-native execution reveals scalability challenges for high-iteration Skill workflows.",
+  "story": {
+   "story_id": "f7f90d24dc756289",
+   "title": "Decomposing LLM-Based Testing with Agent Skills: A Case Study on Numerical Inconsistencies",
+   "url": "https://www.semanticscholar.org/paper/c29255dc81c6e892d5717521c2b264412c1aa434",
+   "source_name": "Semantic Scholar",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "agent-skills-numerical-differential-testing",
+   "published_at": "2026-10-04T00:00:00Z",
+   "read_annotation": "paper",
+   "summary": "The paper decomposes a differential-testing pipeline into Agent Skills and compares four configurations, reporting gains in percentage points.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "The paper counts its improvements in percentage points and its problems in adjectives."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-10-05T02:25:04Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-10-05/cover-light.webp",
+  "dark": "/images/brief/issues/2026-10-05/cover-dark.webp",
+  "alt": "A conveyor belt crosses the frame carrying four stamped crates under three inspection arches, each with a jointed arm reaching down. One crate sits alone on a side spur beside the first arch. Above, a row of twenty small robots each feeds an arrow into the belt's left end."
+ }
+}
