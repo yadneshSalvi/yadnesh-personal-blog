@@ -1,0 +1,60 @@
+{
+ "issue_id": "2026-10-05",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-10-04-am-m1",
+   "image": "/images/brief/memes/2026-10-05/2026-10-04-am-m1.webp",
+   "alt": "A data centre aisle set up for a funeral service. Two rows of folding chairs face the front between tall server racks, filled with plain robots and laptop characters with their heads bowed, every one of them still typing on a keyboard in its lap. At the front, a single graphics card lies on a low trolley under a black cloth with a white lily across it, and a small easel card beside it reads GPU 7. A banner on the rack behind reads IN LOVING MEMORY, and a narrow amber display above the banner reads RESUMING 00:14. A wreath leans against the trolley with a printed card wired to it reading NEXT OF KIN SLURM. Through open double doors at the back right, a porter robot in overalls wheels in an identical graphics card on an identical trolley. Nobody in the chairs has turned round.",
+   "alt_joke": "Attendance was mandatory and fully automated.",
+   "caption": "Nobody woke the on-call engineer. By morning the only trace was a line in the scheduler log.",
+   "concept": "A dead GPU is given full funeral honours in the server aisle while its replacement is wheeled in through the back doors, and none of the mourners stops typing.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-04-am-m2",
+   "image": "/images/brief/memes/2026-10-05/2026-10-04-am-m2.webp",
+   "alt": "An office break room potluck. A long table is crowded with casserole dishes, foil trays and bowls, each with a small folded tent card in front of it; three cards are legible and read CALENDAR, EMAIL and PAYROLL. At the near corner a plain robot has lifted a glass lid and is looking down into the dish below, which instead of food holds neat separated portions matching every other dish on the table. Its speech balloon reads: Whose is this one? At the far end of the table, slightly apart, sits one small plain covered dish with a handwritten card reading date formatter, and a thin clear tube runs from under it along the table, dips beneath the paper cloth and branches into the base of every other dish. Three more robots and laptop characters stand further down the table holding plates and chatting, none of them looking at the tubing.",
+   "alt_joke": "Everybody went back for seconds.",
+   "caption": "You installed it in March because it formatted dates. It has had the same table access ever since.",
+   "concept": "An office potluck where somebody lifts a lid and asks whose dish this is, and nothing on the table was brought by anyone at the table.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-04-pm-m1",
+   "image": "/images/brief/memes/2026-10-05/2026-10-04-pm-m1.webp",
+   "alt": "An empty petrol station forecourt at night under a lit canopy. A small hatchback is parked at one pump island with the nozzle clipped into its open filler. Fuel is still flowing and has overflowed, running down the side of the car and spreading across the tarmac in a wide shallow sheet that reflects the canopy lights and reaches past the kerb of the island. The price and volume wheels on the pump are spinning too fast to read. A plate at the top of the pump reads PUMP 4. A narrow display below it reads 80% OF LIMIT, and a smaller status line under that reads WE HAVE EMAILED YOU, with a small lit envelope symbol beside it. A cheerful sticker on the pump body reads PAY AS YOU GO. There are no people anywhere on the forecourt.",
+   "alt_joke": "The email was delivered promptly.",
+   "caption": "A nozzle that cannot stop itself never ships. A service that cannot is a feature request.",
+   "concept": "A petrol pump overflows across the whole forecourt while its display calmly reports that a courtesy email about the spend has been sent.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-04-pm-m2",
+   "image": "/images/brief/memes/2026-10-05/2026-10-04-pm-m2.webp",
+   "alt": "The service counter of a small hardware store. Behind the counter a plain rounded robot with two round eyes stands upright and helpful, leaning slightly forward with one arm extended, pointing off to the right. Its speech balloon reads: The Dampbuster? Aisle seven. In front of the counter a laptop-shaped character holds a shopping basket and is turning to follow the pointing arm. Where the arm points, the shop ends: three short, well-stocked aisles stop a few paces away at a bare breezeblock wall with a mop bucket and a stack of flattened cardboard leaning against it. A directory board screwed to that wall reads AISLES 1-4. On the counter at the clerk's elbow sits a thick ring binder, still in unbroken shrink wrap, its spine label reading STOCK LIST.",
+   "alt_joke": "Tone scores remain excellent.",
+   "caption": "Retrieval was broken, so we fine-tuned it. Now it is wrong in a much better voice.",
+   "concept": "A hardware store clerk directs a customer, with total poise, to an aisle that does not exist and a product that was never made.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-05-am-m1",
+   "image": "/images/brief/memes/2026-10-05/2026-10-05-am-m1.webp",
+   "alt": "A three panel cartoon. In the first panel a small plain robot stands at a bare workbench in an empty workshop, hammering a spanner into shape on a small anvil. A card pinned to the empty pegboard behind it reads TOOLS: 0. In the second panel the same robot is at the same bench making another spanner, and the pegboard behind it is now full of around forty spanners, all the same size and shape, hung in rows. In the third panel the view pulls back to show a vast warehouse of a workshop with tall aisles of shelving running off into the distance, every shelf packed end to end with identical spanners, and more in crates on the floor. A sign hanging over the nearest aisle reads SPANNERS A-C. The robot is still at its bench in the middle of it all, unhurried, starting another spanner.",
+   "alt_joke": "Every single one of them works.",
+   "caption": "Tuesday it wrote a tool to find the right spanner. It wrote that one four times.",
+   "concept": "An agent that writes its own tools fills an entire workshop with near-identical spanners and calmly starts another one.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-05-am-m2",
+   "image": "/images/brief/memes/2026-10-05/2026-10-05-am-m2.webp",
+   "alt": "A printed comparison poster on the back wall of a small exhibition stand, headed INDEPENDENT BUYERS GUIDE above a line reading 12 PROVIDERS COMPARED. A grid of ticks fills the middle; one shaded column carries a paper rosette and the header PROVIDER 4. Small print at the foot reads PRODUCED BY PROVIDER 4.",
+   "alt_joke": "Free copies while stocks last.",
+   "caption": "The methodology is published in full. The criteria were finalised on Thursday. The results arrived Wednesday.",
+   "concept": "An independent buyers guide rates twelve providers, and the credit line at the foot of the poster names the winner as the publisher.",
+   "winner": true
+  }
+ ]
+}
