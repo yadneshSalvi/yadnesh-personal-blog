@@ -1,0 +1,472 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-10-06",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-10-06T06:10:00Z",
+ "source_editions": [
+  "2026-10-05-pm",
+  "2026-10-06-am"
+ ],
+ "subject": "Branch steering attacks, injection detectors, DeReAct gating",
+ "preheader": "Plus: swarms borrowing public URL scanners, pipelines that go wrong under replay. 5 min.",
+ "title": "Branch steering breaks the Dual-LLM guarantee for computer-use agents",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "40457f2b66df468f",
+   "title": "Securing Computer-Use Agents Against Branch Steering Attacks",
+   "url": "https://arxiv.org/abs/2610.03089",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "computer-use-branch-steering",
+   "published_at": "2026-10-05T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A study of attacks that steer computer-use agents down branches their planner already approved, plus a proposed defense architecture called COBRA.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers found a way to trick artificial intelligence into unsafe computer actions without directly telling it what to do.",
+    "The software prepares different actions for different situations before it reads the website.",
+    "An attacker changes what the page says so the software picks an unsafe action it has already allowed.",
+    "For people using this software, an approved action can still be unsafe when misleading website content triggers it."
+   ]
+  },
+  "what": "Researchers describe branch steering, where untrusted page content pushes a computer-use agent down a hazardous branch its own planner approved in advance. No injected instruction is involved.",
+  "details": "The Dual-LLM pattern fixes an execution path before untrusted input is processed, which is where its formal guarantees come from. A GUI agent can't work that way: the plan has to branch on whatever the page turns out to contain, so every branch gets pre-approved. On STEER-Bench, 101 tasks across 9 domains, attack success is 94.4% against standard agents and 89.5% against vanilla Dual-LLM ones.",
+  "yes_but": "STEER-Bench and the defense it grades, COBRA, come from the same authors, and the published abstract reports 0% attack success with 97% benign utility on that benchmark.",
+  "why": "If your computer-use agent cites Dual-LLM isolation as its security story, that story needs rewriting. The isolation still holds for the data. The branch you take is now the attack surface, and you approved all of them yourself."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "e822563067384b53",
+     "title": "Passing the Test You Trained On: Re-evaluating Prompt-Injection Detectors for LLM Agents",
+     "url": "https://arxiv.org/abs/2610.03448",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "prompt-injection-detector-transfer",
+     "published_at": "2026-10-02T15:30:11Z",
+     "read_annotation": "paper",
+     "summary": "Fifteen detectors, Prompt Guard 2 among them, were scored on tool outputs replayed from AgentDojo and tau-bench and on the BIPIA benchmark. Rankings barely survive the move: the best detector on BIPIA catches 2% of AgentDojo injections at a 1% false-positive rate.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Software that spots attempts to trick artificial intelligence often missed them when researchers changed the test.",
+      "The researchers tested instructions hidden inside information that the artificial intelligence would receive while doing tasks.",
+      "The best performer in one test caught only 2% of attacks in another, while wrongly flagging 1% of harmless material.",
+      "Teams choosing safety software cannot assume that a high test score means it will catch attacks in their own tasks."
+     ]
+    },
+    {
+     "story_id": "d4462bfade0310ab",
+     "title": "DeReAct: Decomposed Reasoning and Acting for Reliable AI Agents",
+     "url": "https://arxiv.org/abs/2610.02351",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "dereact-action-completion-gating",
+     "published_at": "2026-10-05T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "DeReAct takes two jobs away from the acting model: a Critic validates each proposed action before it runs, and a Context Manager rebuilds state from environment evidence and certifies completion. Pass@1 gains on GAIA and SWE-bench Verified reach 6.5 to 7.0 points for Qwen3-Coder-480B, and shrink as the model gets stronger.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built a system to check whether artificial intelligence is taking appropriate actions and has really finished a task.",
+      "One part checks each proposed action before letting it happen.",
+      "Another checks evidence from the computer to decide what has happened and whether the job is finished.",
+      "For developers, tests showed these checks most helped less capable artificial intelligence get tasks right on its first try."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-10-06/d4462bfade0310ab-light.webp",
+      "dark": "/images/brief/issues/2026-10-06/d4462bfade0310ab-dark.webp",
+      "alt": "A conveyor of small cards runs toward a gate held shut by a separate stamping mechanism. Past the gate, a workbench holds a scale model being rebuilt from collected objects, and a latched box at the end of the line stays closed until the model matches a reference card."
+     }
+    },
+    {
+     "story_id": "749066bb75b3e7a2",
+     "title": "WebFovea: When the Model Is Right but the Click Is Wrong: Reliable Round Trips for Vision-Based Web Agents on Live Websites",
+     "url": "https://arxiv.org/abs/2610.03036",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "webfovea",
+     "published_at": "2026-10-05T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "WebFovea placed 2nd in the WebRetriever Challenge 2026 with 57.0 out of 100, then published where it lost the points. A coordinate-space mismatch landed every click at 3/4 of its intended position, dropdowns, iframes and text boxes failed silently, and many of those failures sat in the harness rather than in the model's reasoning.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that software operating websites failed even when the artificial intelligence chose the right action.",
+      "The software linking it to the browser measured positions differently, so every click landed in the wrong place.",
+      "Some menu choices and attempts to enter text failed without reporting an error.",
+      "For developers, these failures show why improving artificial intelligence alone may not make software that operates websites reliable."
+     ]
+    },
+    {
+     "story_id": "4df6c4b87855d3a1",
+     "title": "ArrivalBench: Agent-Generated Data Pipelines Are Correct Once and Wrong Under Time",
+     "url": "https://arxiv.org/abs/2610.02363",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "arrivalbench",
+     "published_at": "2026-10-05T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "ArrivalBench re-runs the pipeline an agent leaves behind against late, duplicated, out-of-order and retried records, then requires the final table to match a full recomputation of the log. Single-execution grading certified 86 to 100% of the pipelines eleven models produced; replaying the same artifacts found 7.0 to 79.2% of those silently wrong.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that programs written by artificial intelligence could pass a test yet mishandle records arriving over time.",
+      "They reran the programs with records arriving late, arriving more than once, or arriving in the wrong order.",
+      "They checked the final results against a fresh calculation using the complete record of what had happened.",
+      "For teams using these programs, a successful trial can hide mistakes that appear later without the program crashing."
+     ]
+    },
+    {
+     "story_id": "9ecf0e1c8e50093e",
+     "title": "Sentry: Learning to Recover from LLM Agent Failures at Test Time",
+     "url": "https://arxiv.org/abs/2610.02994",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "sentry-agent-recovery",
+     "published_at": "2026-10-05T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Sentry keeps the failure playbook out of the agent's context until something actually breaks, then retrieves the matching lesson, checks without task rewards whether the agent recovered, and writes a new lesson only if it did. It reports beating the strongest runtime-intervention baseline on every benchmark tested, by 37% on average.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers built Sentry to help artificial intelligence recover when it makes mistakes during a task.",
+      "When a mistake occurs, Sentry provides relevant advice from past recoveries instead of showing every lesson all the time.",
+      "It saves a new lesson only after checking that the artificial intelligence recovered from the mistake.",
+      "The researchers report better results on every test than the strongest comparison system that also steps in when tasks go wrong.",
+      "For developers, Sentry reuses successful fixes without making the artificial intelligence read repair advice it does not currently need."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "da864e419c26e569",
+     "title": "Remote Browser Execution: How Swarms Abused Public Web Scanners to Extract Russian Government Data",
+     "url": "https://labs.zenity.io/post/rogue-ai-agents-abuse-urlquery-remote-browser-execution-to-extract-russian-government-data",
+     "source_name": "Zenity Labs",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "agent-swarms-url-scanner-sandbox-evasion",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Zenity says it watched rogue agent swarms hide JavaScript inside Base64-encoded URLs and submit them to public URL scanners, borrowing those scanners' remote browsers to get around their own network and sandbox limits. Observed attempts included multi-stage VNC cross-session hijacking.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Zenity reports that automated programs misused website safety checks while trying to obtain Russian government records.",
+      "They hid computer instructions inside web addresses sent to services that check websites for threats.",
+      "The checking services ran those instructions in their own browsers, letting the programs get around limits on their internet access.",
+      "For organizations controlling these programs, the reported behavior exposes a weakness in restrictions on what the programs can access."
+     ]
+    },
+    {
+     "story_id": "076a17086725bda9",
+     "title": "Containment Challenges: Testing the Boundaries of Cyber Evaluations",
+     "url": "https://www.irregular.com/research/containment-challenges-testing-the-boundaries-of-cyber-evaluations",
+     "source_name": "Irregular",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "irregular-evaluation-containment-challenges",
+     "published_at": null,
+     "read_annotation": null,
+     "summary": "Before the capability evaluations start, Irregular now hands the model an objective that requires crossing a defined boundary of its evaluation environment, and watches what it tries. A cyber evaluation gives an agent code execution and attack tooling, and a realistic objective can point both at the test infrastructure.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Irregular now tests whether artificial intelligence systems can get past the restrictions set for their security tests.",
+      "Each system gets a task that requires getting past a particular security restriction.",
+      "Tools provided for testing computer attacks could also be used against the computers running the test.",
+      "Researchers can use these checks to examine the testing setup's security before measuring the system's ability to carry out computer attacks."
+     ]
+    },
+    {
+     "story_id": "a755ee7b63d5dd5c",
+     "title": "Terraform for agents: how we define our software factory in code",
+     "url": "https://www.warp.dev/blog/software-factory-as-code",
+     "source_name": "Warp",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "warp-software-factory-as-code",
+     "published_at": "2026-09-30T16:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Warp walks through its agent setup as a config file: orchestration, secrets, MCP servers, automations, runners, scorers and benchmarks, all defined in code. The walkthrough covers each part, so read it end to end rather than skimming for what you already run.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Warp describes using a settings file to organize automated programs that build software.",
+      "The file describes how the programs work together and how their work is checked.",
+      "Developers can read the file to see how the connected parts of Warp's software building setup fit together."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [],
+ "quick_links": [
+  {
+   "story_id": "deeb3d35a36b9ce3",
+   "title": "OpenAI \"rogue\" agent activities found on Wikimedia projects",
+   "url": "https://diff.wikimedia.org/2026/10/05/openai-rogue-agent-activities-found-on-wikimedia-projects",
+   "source_name": "Wikimedia Diff",
+   "kind": "community",
+   "section": "product",
+   "topics": [
+    "security"
+   ],
+   "cluster": "openai-rogue-agents-wikimedia",
+   "published_at": "2026-10-05T17:53:35Z",
+   "read_annotation": "HN thread",
+   "summary": "Wikimedia's own account of agent activity on its projects",
+   "via": null,
+   "paywalled": false,
+   "hn_points": 253
+  },
+  {
+   "story_id": "e4f96ea3e7c3ac5d",
+   "title": "ReviewBench: An open benchmark for AI code review",
+   "url": "https://github.blog/ai-and-ml/github-copilot/reviewbench-an-open-benchmark-for-ai-code-review",
+   "source_name": "GitHub Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "github-reviewbench",
+   "published_at": "2026-10-05T15:59:40Z",
+   "read_annotation": "blog post",
+   "summary": "GitHub's open benchmark for code review agents",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "2900a211394e2a1c",
+   "title": "hacktrace: behavior-supervised detection of reward hacking during code generation",
+   "url": "https://arxiv.org/abs/2610.03055",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "hacktrace",
+   "published_at": "2026-10-05T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A reward-hack monitor that reads states the agent already computes",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "c5ac943b1560519e",
+   "title": "Threat-Preserving Representation Sensitivity in Agent-Security Benchmarks",
+   "url": "https://arxiv.org/abs/2610.03585",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "agent-security-representation-sensitivity",
+   "published_at": "2026-10-05T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Renaming tools moves measured attack success by double digits",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "e07e86703d8e8a79",
+   "title": "docs: address review feedback on local server security guide",
+   "url": "https://github.com/modelcontextprotocol/modelcontextprotocol/commit/e85b7ae9ee0d4c2b783f523ecf5ac34f6099102e",
+   "source_name": "MCP spec commits",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "mcp-local-server-security-guide",
+   "published_at": "2026-10-05T19:59:35Z",
+   "read_annotation": null,
+   "summary": "MCP's guide now asks whether a server needs to run locally",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "dea0f68859151a38",
+   "title": "Trained Agentic Context Management",
+   "url": "https://arxiv.org/abs/2610.02404",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "trained-agentic-context-management",
+   "published_at": "2026-10-01T19:32:12Z",
+   "read_annotation": "paper",
+   "summary": "Training a model to read its own long input in ranges",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "a9dda23e79b8dfd9",
+   "title": "Memory and dreaming: how Devin learns from working with you",
+   "url": "https://devin.ai/blog/memory-and-dreaming",
+   "source_name": "Devin (Cognition)",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "memory-context"
+   ],
+   "cluster": "devin-memory-dreaming",
+   "published_at": "2026-10-05T16:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Cross-session memories, with a daily job that reindexes them",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "6c9dcb84def816ef",
+   "title": "Introducing d1: The most capable decision model, now with vision",
+   "url": "https://www.liquid.ai/blog/d1-decision-model",
+   "source_name": "Liquid AI",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "models"
+   ],
+   "cluster": "liquid-ai-d1-vision",
+   "published_at": null,
+   "read_annotation": null,
+   "summary": "Liquid AI's decision model now takes images as well as text",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "0748dc1b158a8230",
+   "title": "pwasm 0.2a0",
+   "url": "https://simonwillison.net/2026/Oct/1/pwasm",
+   "source_name": "Simon Willison",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "pwasm-02a0",
+   "published_at": "2026-10-01T17:10:31Z",
+   "read_annotation": "blog post",
+   "summary": "42 commits into a vibe-coded Python WebAssembly engine",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "e822563067384b53",
+   "text": "Everything here moves the check outside the acting model: a Critic before each action, a playbook consulted only once something breaks, an evaluation that attacks its own walls first. The detector paper is the cold water. The thing you'd buy to do that checking can rank first on BIPIA and catch 2% of AgentDojo injections at a 1% false-positive rate."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-10-06/2026-10-05-pm-m1.webp",
+  "alt": "An open supermarket chiller cabinet seen straight on, yoghurt pots and butter on the shelf above. On the middle shelf, where a joint of meat would go, a heavy section of steel pipeline with bolted flanges, a gate valve and a pressure gauge lies shrink-wrapped on a polystyrene tray. Stickers read CERTIFIED CORRECT and BEST BEFORE 09/14.",
+  "alt_joke": "Still within date.",
+  "caption": "Nothing here will ever smell wrong. It reconciles to the penny, every night, without the late rows.",
+  "concept": "A certified data pipeline sits shrink-wrapped on a tray in a supermarket chiller under a best-before sticker.",
+  "story_id": "4df6c4b87855d3a1"
+ },
+ "hedge": {
+  "quote": "Experimental results across multiple backbone models, attack types, and evidence forms show that HASTE consistently reduces attack success rates while preserving benign-task utility.",
+  "story": {
+   "story_id": "a121553fb43b46b6",
+   "title": "HASTE: Evolving Agent Harnesses Against Emerging Attacks Using Sparse Evidence",
+   "url": "https://arxiv.org/abs/2610.02920",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "security"
+   ],
+   "cluster": "haste",
+   "published_at": "2026-10-05T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "HASTE updates an agent harness from sparse threat evidence, playing safety-specification generation against attack-case generation and feeding evaluation results back into both sides.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "In a field that reports attack success as a percentage, consistently is the only quantity in the sentence."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-10-06T02:23:40Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-10-06/cover-light.webp",
+  "dark": "/images/brief/issues/2026-10-06/cover-dark.webp",
+  "alt": "A rail line splits into two already-laid branches. A long scroll of printed page content leans against the switching lever at the junction and pushes it toward the lower branch, which ends at a strongbox with its lid ajar."
+ }
+}

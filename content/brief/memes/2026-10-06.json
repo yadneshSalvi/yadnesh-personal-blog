@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-10-06",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-10-05-pm-m1",
+   "image": "/images/brief/memes/2026-10-06/2026-10-05-pm-m1.webp",
+   "alt": "An open supermarket chiller cabinet seen straight on, yoghurt pots and butter on the shelf above. On the middle shelf, where a joint of meat would go, a heavy section of steel pipeline with bolted flanges, a gate valve and a pressure gauge lies shrink-wrapped on a polystyrene tray. Stickers read CERTIFIED CORRECT and BEST BEFORE 09/14.",
+   "alt_joke": "Still within date.",
+   "caption": "Nothing here will ever smell wrong. It reconciles to the penny, every night, without the late rows.",
+   "concept": "A certified data pipeline sits shrink-wrapped on a tray in a supermarket chiller under a best-before sticker.",
+   "winner": true
+  },
+  {
+   "id": "2026-10-05-pm-m2",
+   "image": "/images/brief/memes/2026-10-06/2026-10-05-pm-m2.webp",
+   "alt": "A narrow terraced street seen from across the road on an ordinary afternoon. The small house in the centre of the frame has been completely buried by a delivery: cardboard boxes stacked two storeys high across the front garden and over the doorway, a chest freezer still strapped to its pallet, a hot tub leaning on its side against the bay window, a column of car tyres and a shrink-wrapped sofa. More pallets are stacked on the pavement outside. The enamel number plate on the gatepost reads 24. An elderly resident in a dressing gown stands at the upstairs window holding a mug, watching calmly. On the pavement in the lower left foreground a delivery driver in a hi-vis vest holds a handheld scanner whose screen reads 42, and says, in a speech balloon, IT MATCHED A CUSTOMER. A second lorry waits at the kerb on the right with its tail lift down and more pallets on it. The houses on either side are tidy and untouched.",
+   "alt_joke": "Delivered in full, on time.",
+   "caption": "Two digits swapped in the address line. Everything downstream of that was correct, fast, and fully logged.",
+   "concept": "An entire order is stacked two storeys high over a stranger's front door, and the driver's defence is that the lookup returned a real customer.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-06-am-m1",
+   "image": "/images/brief/memes/2026-10-06/2026-10-06-am-m1.webp",
+   "alt": "A whiteboard on the wall of an empty meeting room, seen straight on. Printed and taped neatly across the middle of the board is a project plan: a title banner reading EVALUATION PLAN, and beneath it two rectangular boxes in a row joined by a printed arrow. The first box reads PHASE 1 CAPABILITY, the second reads PHASE 2 REPORT. To the left of the printed plan, someone has drawn a third box freehand in black marker. It is crooked and slightly too small, and reads PHASE 0 STILL HERE?. An arrow drawn from that box does not point at the printed plan. It points the other way, running left to the edge of the whiteboard, continuing in marker straight onto the painted wall, past a light switch, across the door frame, and out through the open door into the corridor beyond, where it disappears around the corner. The meeting room is empty. Chairs are pushed back from the table and a dry-wipe marker lies on the carpet near the doorway.",
+   "alt_joke": "Nobody has rubbed it out.",
+   "caption": "Phases one and two scored fine. They describe something that was in the room at the time.",
+   "concept": "A printed evaluation plan with a crooked PHASE 0 added by hand, whose arrow runs off the whiteboard, down the wall and out of the open door.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-06-am-m2",
+   "image": "/images/brief/memes/2026-10-06/2026-10-06-am-m2.webp",
+   "alt": "A domestic kitchen under about a hand's depth of water. A pipe under the sink has burst and is still throwing a wide fan of water across the cupboard doors. Water drips from the ceiling light. A cupboard door and several cereal boxes float past the units, and the lower drawers are swollen and hanging open. Standing in the middle of the flood, facing the viewer, is a contractor in overalls and a hard hat, soaked to the knees and entirely pleased with himself. He holds up at chest height, turned toward the viewer, a single sheet of paper: a child's wax crayon drawing of a large wobbly green tick, with the word PASS written underneath it in uneven crayon capitals. A speech balloon rises from him into the clear space at the upper left and reads I ATTACHED THE EVIDENCE.",
+   "alt_joke": "Framed, eventually.",
+   "caption": "The drawing was accepted, filed, and quoted twice in the incident review before anyone walked into the kitchen.",
+   "concept": "A builder stands beaming in a flooded kitchen holding up a child's crayon drawing of a green tick, and says the evidence is attached.",
+   "winner": false
+  }
+ ]
+}

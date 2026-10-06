@@ -1,0 +1,63 @@
+{
+ "issue_id": "2026-10-06",
+ "type": "daily",
+ "renders": 5,
+ "cost_usd": 1.25,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A rail line splits into two already-laid branches. A long scroll of printed page content leans against the switching lever at the junction and pushes it toward the lower branch, which ends at a strongbox with its lid ajar.",
+   "bytes": [
+    108042,
+    104038
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 4,
+   "cost_usd": 1.0,
+   "inspected": true,
+   "defects": 3,
+   "prompt": "A branching track diagram seen from slightly above, centred with generous empty margin on every side. One approved rail enters from the left and splits at a junction into two rails that both continue to the right. Both branches are drawn as finished, already-laid track, equally solid, so neither looks improvised. A switching lever stands at the junction. A long ribbon of printed page content, drawn as a scroll of ruled lines and small boxes, arrives from below the junction and rests its end against the lever, pushing it over so the route continues onto the lower branch. The lower branch ends at a closed strongbox with its lid open a crack. Nothing touches the edges of the frame.",
+   "labels": [
+    "APPROVED",
+    "PAGE DATA"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-06T00:22:04Z"
+  },
+  {
+   "key": "d4462bfade0310ab",
+   "story_id": "d4462bfade0310ab",
+   "light_name": "d4462bfade0310ab-light.webp",
+   "dark_name": "d4462bfade0310ab-dark.webp",
+   "alt": "A conveyor of small cards runs toward a gate held shut by a separate stamping mechanism. Past the gate, a workbench holds a scale model being rebuilt from collected objects, and a latched box at the end of the line stays closed until the model matches a reference card.",
+   "bytes": [
+    30886,
+    30210
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Three separate stations in a row across the centre of the frame, with wide empty space above and below. On the left, a short conveyor carries a stack of small action cards toward a closed gate. Above the gate hangs a separate mechanism holding a stamp, lowered across the lane so nothing passes until it lifts. Past the gate, a workbench holds a small scale model of a room being rebuilt piece by piece from objects taken off the conveyor. At the end of the bench sits a closed box with a latch that only springs when the model matches a reference card propped beside it. No people. Keep all three stations well inside the frame.",
+   "labels": [
+    "PROPOSE",
+    "APPROVE",
+    "CERTIFY"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-06T00:23:17Z"
+  }
+ ]
+}
