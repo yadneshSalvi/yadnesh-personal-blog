@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-10-07",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-10-06-pm-m1",
+   "image": "/images/brief/memes/2026-10-07/2026-10-06-pm-m1.webp",
+   "alt": "A packed meeting room seen from the back. A robot speaks from a lectern to rows of seated robots and laptop characters, one dabbing its eye. A screen reads BLAMELESS POSTMORTEM, an easel card reads MOMENT OF SILENCE, and a wreath and catering trolley stand nearby. On the near wall, a switch labelled REQUIRE REVIEW is off.",
+   "alt_joke": "Catering was approved in under an hour.",
+   "caption": "Blameless, thorough and well attended. The room is booked again for Thursday, same branch.",
+   "concept": "A ceremonial blameless postmortem with a wreath, a catered trolley and a scheduled moment of silence, held in a room whose back wall carries one dusty unticked switch.",
+   "winner": true
+  },
+  {
+   "id": "2026-10-06-pm-m2",
+   "image": "/images/brief/memes/2026-10-07/2026-10-06-pm-m2.webp",
+   "alt": "A three panel strip. In the first panel a small robot clerk behind a registry counter stamps a marriage certificate for a delighted robot couple holding one bouquet, while a small slip falls unnoticed off the counter into a floor grate. In the second panel the slip is gone, the clerk calmly stamps a second certificate, and the couple hold two bouquets and look puzzled. In the third panel the counter is buried under a drift of identical certificates, the couple are almost hidden behind four bouquets, and the clerk is inking the stamp again.",
+   "alt_joke": "The stamp pad has now been reordered twice.",
+   "caption": "Every attempt succeeded. The dashboard records one. The registry records four.",
+   "concept": "A registry clerk loses the confirmation slip, stamps the certificate again, and ends up marrying the same couple four times.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-07-am-m1",
+   "image": "/images/brief/memes/2026-10-07/2026-10-07-am-m1.webp",
+   "alt": "A forensic evidence table under a single hanging lamp in a dim room. On the table sits a thick ring binder of printed transcript under a glass cover, with neat coloured tabs down its edge, a wax seal, a tied paper evidence tag and a pair of white cotton gloves folded beside it. A single ribbon cable runs out from under the glass, across the table edge, along the floor and back into a server rack standing against the wall behind, whose indicator lights are lit.",
+   "alt_joke": "The gloves are for the binder, not the cable.",
+   "caption": "Nothing is missing from the audit trail, and the thing that says so also maintains it.",
+   "concept": "An agent's transcript laid out as a sealed forensic exhibit, with one cable running off the evidence table and back into the humming rack it is evidence against.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-07-am-m2",
+   "image": "/images/brief/memes/2026-10-07/2026-10-07-am-m2.webp",
+   "alt": "A three panel strip. In the first panel an engineer stands near the top of a stepladder pinning another printed sheet onto a wall already papered floor to ceiling with prompt text, with a small label card at the bottom of the wall. In the second panel the same engineer sits at a desk in front of the wall, half buried under drifts of printed replies, marking one with a red pen, with a wall calendar beside the desk showing six weeks crossed off. In the third panel the wall is bare apart from one index card pinned at eye level with fourteen numbered lines on it and a small square sticky note stuck to its corner, the ladder gone and the engineer standing with hands in pockets looking at it.",
+   "alt_joke": "The ladder went back to facilities in week four.",
+   "caption": "Six weeks of a human reading every reply, and the model kept only what nobody could write down.",
+   "concept": "A thousand-line prompt pinned wall to ceiling, six weeks of a human reading every reply, and a final wall holding one index card of fourteen rules.",
+   "winner": false
+  }
+ ]
+}
