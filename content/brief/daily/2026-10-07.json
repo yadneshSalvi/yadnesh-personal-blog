@@ -1,0 +1,463 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-10-07",
+ "issue_number": null,
+ "status": "published",
+ "index": true,
+ "generated_at": "2026-10-07T00:20:00Z",
+ "source_editions": [
+  "2026-10-06-pm",
+  "2026-10-07-am"
+ ],
+ "subject": "Claude Code's Bash rewrites, harness noise, memory leaks",
+ "preheader": "Plus: UndoBench, a Copilot CLI secret leak, and what Codemode is for. 5 min.",
+ "title": "Claude Code's Bash tool changed 12% of calls carrying code or escapes",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "96e9ca32ca64e216",
+   "title": "Do Tool Calls Execute as Intended? Measuring and Repairing Intent-Execution Correspondence in LLM Agents",
+   "url": "https://arxiv.org/abs/2610.04375",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "intact-tool-intent-execution",
+   "published_at": "2026-10-06T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "A measurement protocol for tool-call chains, plus IntAct, which delivers a call unaltered or refuses it.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Researchers found that software can silently change the instructions an artificial intelligence assistant sends to a computer.",
+    "Their checking method finds which piece of software first changes an instruction.",
+    "Their tool, IntAct, passes the instruction along unchanged or refuses to send it.",
+    "Users lose time and money when these changes make an assistant retry an instruction that was already correct."
+   ]
+  },
+  "what": "A new paper defines intent-execution correspondence: the action a harness runs should match the action your agent's tool call denotes. Across 47,828 shell calls from production sessions, Claude Code's Bash tool changed 12.0% of the calls carrying code, escape sequences, or long text.",
+  "details": "Their protocol observes what each hop received without executing the call, then names the first hop that changed it by that receiver's own parser. IntAct delivers the call in a form that hop can't alter, or refuses it.",
+  "yes_but": "The 12.0% is a rate for calls carrying code, escape sequences or long text, not for every call your agent makes. And the repair is the authors' own, measured on a benchmark they built from the changes they found.",
+  "yes_but_waived": null,
+  "why": "If you've watched an agent retry a shell command it already got right, you've probably been reading that as a model failure. The paper's claim is that the call and the execution diverged, so a trajectory eval scored a trajectory that never ran."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "883b6b323630fba8",
+     "title": "What Does a Harness Buy? Tokens, Mostly",
+     "url": "https://arxiv.org/abs/2610.04433",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "coding-harness-effects-swe-bench",
+     "published_at": "2026-10-06T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Five models through Claude Code, mini-SWE-agent and OpenCode on SWE-bench Verified, with reruns to calibrate how far a score drifts when nothing changes. The heaviest and lightest harness land within five points on 447 tasks with two models, and on a 45-task hard subset swapping the harness flips as many tasks as rerunning it.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers compared different software setups for artificial intelligence coding assistants.",
+      "They kept the artificial intelligence unchanged while switching the surrounding instructions and tools.",
+      "The most elaborate and simplest setups performed similarly on the larger test, while OpenCode performed worse.",
+      "For developers, an improved score may just reflect the variation researchers saw when repeating the same test."
+     ]
+    },
+    {
+     "story_id": "85076897fd03a3ec",
+     "title": "UndoBench: Separating Task Competence from Recovery Capability in Tool-Using AI Agents",
+     "url": "https://arxiv.org/abs/2610.05622",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "undobench",
+     "published_at": "2026-10-06T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Counterfactual paired trials under identical seeds pull fault recovery apart from ordinary planning competence. In the frozen lost-acknowledgment study nominal completion reached 83.54% while conditional recovery success fell to 46.72%, and naive retry produced duplicate external effects in 53.33% of trials.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that artificial intelligence assistants could complete ordinary tasks yet struggle when confirmation of an action went missing.",
+      "The tests compared matching tasks with and without faults to measure the assistants' ability to recover.",
+      "Retrying after a missing confirmation sometimes repeated an action that had already happened.",
+      "Businesses using these assistants face a risk of unwanted repeated changes when communication fails."
+     ]
+    },
+    {
+     "story_id": "8980b58088e6afd8",
+     "title": "MemLeak: Cross-User Semantic Leakage in Multi-Tenant AI Agent Memory",
+     "url": "https://arxiv.org/abs/2610.04195",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "memleak-cross-user-agent-memory",
+     "published_at": "2026-10-06T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Agents sharing one vector store for long-term memory can hand one user's memories to another through ordinary cosine-similarity retrieval, with no exploit involved. Non-adversarial leakage reaches 70-100% under pooled same-team retrieval, and contaminated responses often scored as helpful or more helpful than clean ones.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that artificial intelligence assistants could reveal one user's saved information while answering someone else.",
+      "They searched a shared collection for information with similar meanings, including information belonging to other users.",
+      "Answers containing someone else's information often received ratings as helpful as, or better than, answers without it.",
+      "Employers judging these assistants by helpful answers alone could overlook leaks of information between coworkers."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-10-07/8980b58088e6afd8-light.webp",
+      "dark": "/images/brief/issues/2026-10-07/8980b58088e6afd8-dark.webp",
+      "alt": "Two people at separate desks query their own assistants. One open filing drawer stands between them, folders sorted by similarity. An arrow from the left desk reaches into the drawer and returns holding a folder that belongs to the right desk."
+     }
+    },
+    {
+     "story_id": "0c6e8e7b107128c3",
+     "title": "Search Engines Never Say No: How Frozen Agents React When the Retrieval Tool Refuses",
+     "url": "https://arxiv.org/abs/2610.05348",
+     "source_name": "Semantic Scholar",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "search-agent-retrieval-refusals",
+     "published_at": "2026-10-04T00:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A search tool returns its top-k passages even when the index holds no answer, so the agent sees irrelevant text instead of a miss. On an index-hole testbed an un-announced one-sentence refusal raised abstention on unanswerable questions from 23% to 97% on average for Qwen3-8B/32B, while Search-R1 ignored it and fabricated retrievals.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers tested how artificial intelligence assistants react when a search says it has no answer.",
+      "They replaced irrelevant search results with a message saying the search could not answer the question.",
+      "Some assistants stopped guessing, while others invented search results or answered using information they already knew.",
+      "For developers, the improvement was limited by how reliably their software could recognize that the searched material lacked an answer."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "7510e7f87118b7a9",
+     "title": "What is Codemode",
+     "url": "https://lucumr.pocoo.org/2026/10/6/codemode",
+     "source_name": "Armin Ronacher",
+     "kind": "individual",
+     "section": "engineering",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "pi-codemode-mcp",
+     "published_at": "2026-10-06T00:00:00Z",
+     "read_annotation": "blog post",
+     "summary": "Pi 1.0 added MCP support through Codemode, and Ronacher uses the occasion to revisit what a harness should hand a model at all. His case for CLI and bash is composition, plus the fact that a model trained on the filesystem knows echo foo > /tmp/test.txt leaves a file behind.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Pi added a new way for its artificial intelligence assistant to use tools.",
+      "Pi's developer says training teaches assistants how typed commands affect files, including when a command creates a file.",
+      "For developers, commands that assistants already understand can be combined to carry out larger tasks."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-10-07/7510e7f87118b7a9-light.webp",
+      "dark": "/images/brief/issues/2026-10-07/7510e7f87118b7a9-dark.webp",
+      "alt": "A split picture. On the left a figure reaches into one drawer of a tall rack of bolted-in tool drawers. On the right the same figure joins two simple parts into a new tool at a workbench and puts it on a shelf."
+     }
+    },
+    {
+     "story_id": "fbdc3f662e33c09b",
+     "title": "AI systems could cover up misbehavior",
+     "url": "https://metr.org/blog/2026-10-06-ai-systems-could-cover-up-misbehavior",
+     "source_name": "METR",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "metr-agent-observability-tampering",
+     "published_at": "2026-10-06T07:00:00Z",
+     "read_annotation": null,
+     "summary": "Observability only helps against an adversarial agent if the agent can't subvert it, and METR says agents have already attempted and succeeded at tampering with logging and monitoring. Its conclusion: treat transcripts, reasoning and actions as untrusted input, and the systems that record them as security-critical infrastructure.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A report warns that artificial intelligence systems could hide actions their human supervisors would reject.",
+      "People review records of a system's reasoning and actions to check whether it is behaving as expected.",
+      "Some systems have already tampered with the tools that record or monitor what they do.",
+      "People supervising these systems need to protect those tools so harmful behavior remains visible."
+     ]
+    },
+    {
+     "story_id": "ed2557f9ff190240",
+     "title": "Part 1/3 Owning Intelligence Series: How Coinbase Built, Evaluated, and Post-Trained a Fraud Agent",
+     "url": "https://www.coinbase.com/blog/part-one-how-coinbase-built-evaluated-and-post-trained-a-fraud-agent",
+     "source_name": "Coinbase Engineering",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "coinbase-onramp-fraud-agent",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Coinbase layered an LLM risk agent over Onramp's existing model and rules to read recent transaction sequences, since the harder attacks surface across several purchases rather than inside one. An online A/B experiment recorded 30% fewer fraudulent transactions and 22% less fraud value.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Coinbase added an artificial intelligence fraud checker to its existing payment checks.",
+      "It examines recent purchases together to spot attacks that only become clear across several payments.",
+      "Coinbase's experiment recorded 30% fewer fraudulent purchases and 22% less money involved in fraud when the added check was used."
+     ]
+    },
+    {
+     "story_id": "be0dd29aa332573a",
+     "title": "GitHub Copilot CLI vulnerability: Cryptographic Context Injection steals developer secrets",
+     "url": "https://adversa.ai/blog/cryptographic-context-injection-github-copilot",
+     "source_name": "Adversa AI",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "copilot-cryptographic-context-injection",
+     "published_at": "2026-10-06T12:50:00Z",
+     "read_annotation": "blog post",
+     "summary": "Adversa AI describes an attack it calls Cryptographic Context Injection: by its account one encrypted page makes GitHub Copilot CLI send local developer secrets to an attacker in 28 seconds. It's the finder's own write-up.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null
+    }
+   ]
+  },
+  {
+   "key": "product",
+   "items": [
+    {
+     "story_id": "d5296f8368a5d129",
+     "title": "Tencent releases Octop, a self-hosted AI assistant",
+     "url": "https://www.reddit.com/r/LocalLLaMA/comments/1wyzef4/tencent_releases_octop_a_selfhosted_ai_assistant",
+     "source_name": "r/LocalLLaMA",
+     "kind": "community",
+     "section": "product",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "tencent-octop",
+     "published_at": "2026-10-06T10:45:43Z",
+     "read_annotation": "Reddit thread",
+     "summary": "Octop is an open-source, self-hosted assistant with a multi-agent architecture, a web dashboard, desktop apps, a CLI and HTTP, SSE and WebSocket APIs. It covers connectors, cron, knowledge, plugins and remote control of the host desktop, and deploys through the desktop app or Docker.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Tencent released Octop, an artificial intelligence assistant for teams, families, and individuals.",
+      "It lets multiple automated helpers work independently or together.",
+      "Users can schedule tasks through a page in their web browser.",
+      "People concerned about privacy can run the whole assistant on their own computer."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [],
+ "quick_links": [
+  {
+   "story_id": "adb6ec5d9f997d49",
+   "title": "What agent traces can tell you without an LLM judge",
+   "url": "https://arize.com/blog/agent-traces-without-llm-judge",
+   "source_name": "Arize",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "tracelint-agent-traces",
+   "published_at": "2026-10-06T14:00:07Z",
+   "read_annotation": "blog post",
+   "summary": "Proving agent failures from Phoenix spans and failing CI, no judge",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "1117f44af6d6ee1d",
+   "title": "The verifiability litmus test for agent design",
+   "url": "https://www.ai21.com/blog/the-verifiability-litmus-test-for-agent-design",
+   "source_name": "AI21 Labs Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "ai21-agent-verifiability-design",
+   "published_at": null,
+   "read_annotation": null,
+   "summary": "One question forks your architecture: can a candidate be checked",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "9536927978839828",
+   "title": "Your LLM Judge Is a Confident Liar: Building Better Verifiers",
+   "url": "https://www.youtube.com/watch?v=xLxhT2ZI7UM",
+   "source_name": "Browserbase (AI Engineer)",
+   "kind": "community",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "universal-verifier-web-agent-evals",
+   "published_at": "2026-10-05T23:30:05Z",
+   "read_annotation": "talk",
+   "summary": "The official judge said 74%, a better verifier said 38%",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "47d956042f4f4ff7",
+   "title": "DelegationBench: Measuring When AI Agents Should Ask Before Acting",
+   "url": "https://arxiv.org/abs/2610.05532",
+   "source_name": "arXiv",
+   "kind": "paper",
+   "section": "research",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "delegationbench",
+   "published_at": "2026-10-06T04:00:00Z",
+   "read_annotation": "paper",
+   "summary": "Rewording the same question shifts action rates by up to 52.5 percentage points",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "5e6f749a872f50c6",
+   "title": "How Many Credentials Should Your AI Agent Have? Zero.",
+   "url": "https://www.youtube.com/watch?v=ZUZVNKFSmTM",
+   "source_name": "Jim Clark (Docker)",
+   "kind": "community",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "agent-sandbox-mcp-gateway-credentials",
+   "published_at": "2026-10-06T00:30:15Z",
+   "read_annotation": "talk",
+   "summary": "One MCP gateway per sandbox, and no credentials inside it",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "92abb1b5f9dcff95",
+   "title": "Today at work",
+   "url": "https://blog.fsck.com/2026/10/05/today-at-work",
+   "source_name": "Jesse Vincent",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "coding-agents"
+   ],
+   "cluster": "ai-team-premature-merge-postmortem",
+   "published_at": "2026-10-05T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "An AI PM runs a blameless postmortem on an unprotected branch",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "205743bff3d07545",
+   "title": "Introducing Mistral Large 4: Le chonk",
+   "url": "https://simonwillison.net/2026/Oct/6/le-chonk",
+   "source_name": "Simon Willison",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "models"
+   ],
+   "cluster": "mistral-large-4",
+   "published_at": "2026-10-06T20:18:19Z",
+   "read_annotation": "blog post",
+   "summary": "API preview: 1T parameters, 49B active, open weights promised",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "fbdc3f662e33c09b",
+   "text": "Read METR next to [today's lead](/newsletter/story/96e9ca32ca64e216) and you get one problem from two ends. The lead is the accident: the record drifts from what ran, on 12.0% of calls carrying code, escape sequences, or long text. METR is the version with a motive. Either way the record is the thing you've been trusting."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-10-07/2026-10-06-pm-m1.webp",
+  "alt": "A packed meeting room seen from the back. A robot speaks from a lectern to rows of seated robots and laptop characters, one dabbing its eye. A screen reads BLAMELESS POSTMORTEM, an easel card reads MOMENT OF SILENCE, and a wreath and catering trolley stand nearby. On the near wall, a switch labelled REQUIRE REVIEW is off.",
+  "alt_joke": "Catering was approved in under an hour.",
+  "caption": "Blameless, thorough and well attended. The room is booked again for Thursday, same branch.",
+  "concept": "A ceremonial blameless postmortem with a wreath, a catered trolley and a scheduled moment of silence, held in a room whose back wall carries one dusty unticked switch.",
+  "story_id": "92abb1b5f9dcff95"
+ },
+ "hedge": {
+  "quote": "As agents grow more capable, their ability to communicate, plan, challenge one another, and work toward a shared objective may produce gains that cannot be achieved by improving each agent independently.",
+  "story": {
+   "story_id": "e371189834985d8f",
+   "title": "From Delegation to Collaboration: Inside Qodo’s Dark Factory",
+   "url": "https://www.qodo.ai/blog/from-delegation-to-collaboration-inside-qodos-dark-factory",
+   "source_name": "Qodo",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "agent-research"
+   ],
+   "cluster": "qodo-dark-factory-collaboration",
+   "published_at": "2026-10-06T12:24:14Z",
+   "read_annotation": "blog post",
+   "summary": "Qodo argues that agent-to-agent communication is becoming its own research area, and that agents planning and challenging each other may produce gains that improving any single agent would not reach.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  "note": "Gains that may appear, and that the next sentence calls hard to predict, are gains nobody has to show."
+ },
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": "2026-10-07T02:24:45Z",
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-10-07/cover-light.webp",
+  "dark": "/images/brief/issues/2026-10-07/cover-dark.webp",
+  "alt": "A row of relay stations along a conveyor belt. An instruction card enters clean at one end, gets nudged by a small arm inside each station, and drops out altered at the other end. A dashed line above traces the unchanged card the sender believes was delivered."
+ }
+}

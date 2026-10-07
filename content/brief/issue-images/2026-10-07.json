@@ -1,0 +1,88 @@
+{
+ "issue_id": "2026-10-07",
+ "type": "daily",
+ "renders": 5,
+ "cost_usd": 1.25,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A row of relay stations along a conveyor belt. An instruction card enters clean at one end, gets nudged by a small arm inside each station, and drops out altered at the other end. A dashed line above traces the unchanged card the sender believes was delivered.",
+   "bytes": [
+    74916,
+    71126
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 1,
+   "cost_usd": 0.25,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "An instruction card travels left to right along a horizontal conveyor through four boxed relay stations. At the left end a figure hands over a card carrying one clean line of code. Inside each boxed station a small mechanical arm reaches down and nudges a character on the card. At the right end the card drops into a tray, its line visibly bent and different from the one handed over. Above the conveyor, a thin dashed line runs straight from the first card to the tray, showing the unchanged card the sender believes arrived. Keep the conveyor horizontal and centred, with wide empty margins above and below and both end figures well inside the frame.",
+   "labels": [
+    "EMITTED",
+    "EXECUTED"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-07T00:15:41Z"
+  },
+  {
+   "key": "8980b58088e6afd8",
+   "story_id": "8980b58088e6afd8",
+   "light_name": "8980b58088e6afd8-light.webp",
+   "dark_name": "8980b58088e6afd8-dark.webp",
+   "alt": "Two people at separate desks query their own assistants. One open filing drawer stands between them, folders sorted by similarity. An arrow from the left desk reaches into the drawer and returns holding a folder that belongs to the right desk.",
+   "bytes": [
+    50628,
+    49346
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "Two people sit at separate desks on either side of the frame, each speaking to their own small assistant. Between them, drawn large and dead centre, stands one shared filing drawer pulled open, its folders arranged by how similar their contents look rather than by whose they are. An arrow runs from the left person's question into the drawer and comes back out carrying a folder whose tab matches the right person's desk. Keep the drawer centred and both desks well inside the frame.",
+   "labels": [
+    "SHARED STORE"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-07T00:19:21Z"
+  },
+  {
+   "key": "7510e7f87118b7a9",
+   "story_id": "7510e7f87118b7a9",
+   "light_name": "7510e7f87118b7a9-light.webp",
+   "dark_name": "7510e7f87118b7a9-dark.webp",
+   "alt": "A split picture. On the left a figure reaches into one drawer of a tall rack of bolted-in tool drawers. On the right the same figure joins two simple parts into a new tool at a workbench and puts it on a shelf.",
+   "bytes": [
+    47970,
+    43620
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A split arrangement with a clear vertical gap down the middle. On the left, a figure stands before a tall rack of labelled tool drawers bolted into its frame, reaching into one of them; the drawers cannot be moved or recombined. On the right, the same figure stands at a plain workbench beside a pegboard of simple parts, fitting two of them together into a new tool and setting it on a shelf above. Keep both halves well inside the frame with margin all round.",
+   "labels": [
+    "FIXED",
+    "COMPOSABLE"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-07T00:22:49Z"
+  }
+ ]
+}
