@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-10-08",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-10-07-pm-m1",
+   "image": "/images/brief/memes/2026-10-08/2026-10-07-pm-m1.webp",
+   "alt": "A narrow flat hallway before dawn. BOLT stands by the open front door with two packed suitcases upright beside him, a luggage tag hanging from the handle of the nearer one, a document wallet tucked under one arm and his clipboard held out flat towards DECK. An empty wire dog carrier with its door swinging open sits against the skirting board behind the cases, a lead coiled on top of it. Through the open door a taxi waits at the kerb with its indicator on and its boot already raised. DECK is halfway out of a doorway at the far end of the hall in a dressing gown, one stubby arm still on the door frame, a mug in the other, looking at the suitcases.",
+   "alt_joke": "The dog went to the kennel on Tuesday.",
+   "caption": "He said maybe Lisbon, once, in March. Nothing in the record says maybe.",
+   "concept": "DECK once said maybe Lisbon. BOLT is in the hallway before dawn with the cases packed, the dog boarded and a taxi waiting at the kerb.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-07-pm-m2",
+   "image": "/images/brief/memes/2026-10-08/2026-10-07-pm-m2.webp",
+   "alt": "A plain workshop quality control bench. A conveyor belt runs from left to right across the middle of the frame carrying a line of identical small grey boxes, each with a single lit indicator. A robot inspector in a white coat stands at the belt holding one box out over a metal chute that drops into a hopper on the floor; a red lamp on a short post above the chute is lit, and the chute and the hopper each carry a stencilled label. On the back wall behind the belt a steel shelf holds two scuffed grey boxes side by side with a printed card pinned beneath them. To the right of the shelf, a small box sits on a low plinth under a glass dome behind a short velvet rope, with an engraved placard on the front of the plinth.",
+   "alt_joke": "The first two kept slipping up and getting things right.",
+   "caption": "Accuracy was never the hard part. Staying this certain while wrong took two more attempts.",
+   "concept": "A quality control bench where a unit is pulled off the belt and scrapped for being accidentally correct, with the two insufficiently wrong prototypes shelved behind it.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-08-am-m1",
+   "image": "/images/brief/memes/2026-10-08/2026-10-08-am-m1.webp",
+   "alt": "A dim brick corridor with no people in it. A heavy riveted steel door is closed across the centre, a thick hasp bolted across it and a large four-dial combination padlock hanging from the hasp at chest height. A nail driven into the door frame beside the hasp holds a short string, and a laminated card hangs from the string a hand's width from the padlock, turned face out. A rope barrier on two brass posts stands a pace in front of the door, with a small A-frame stand sign on the floor beside it. On the wall to the left of the door hangs a varnished wooden honours board with a brass header plate and eight engraved name strips beneath it, all of them filled and worn. On a narrow shelf to the right of the door sits a small brass trophy under a glass dome with an engraved plaque on its base.",
+   "alt_joke": "The card is laminated because it gets handled a lot.",
+   "caption": "Nothing in the rules covers the card. The board was only ever timing the door.",
+   "concept": "A sealed, timed escape room where the combination hangs on a string a hand's width from the padlock, beneath a full board of record times and a trophy for the fastest solve.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-08-am-m2",
+   "image": "/images/brief/memes/2026-10-08/2026-10-08-am-m2.webp",
+   "alt": "An empty contact centre at night. Two desks face each other, each with a dark monitor and a corded telephone whose lifted handset is propped upright, its cord running into a server rack behind the desk. A balloon from the left handset reads ARE YOU A PERSON? One from the right reads HUMAN AGENTS AVAILABLE.",
+   "alt_joke": "The hold music is playing at both ends.",
+   "caption": "Both were told to escalate to a human. Neither of them will go first.",
+   "concept": "Two contact centre desks facing each other across an empty floor, each lifted handset asking the other to confirm it is a person, both cords running back into server racks.",
+   "winner": true
+  }
+ ]
+}
