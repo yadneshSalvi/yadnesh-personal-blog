@@ -1,0 +1,42 @@
+{
+ "issue_id": "2026-10-22",
+ "type": "daily",
+ "candidates": [
+  {
+   "id": "2026-10-21-pm-m1",
+   "image": "/images/brief/memes/2026-10-22/2026-10-21-pm-m1.webp",
+   "alt": "A meeting room the morning after a party, with slack paper streamers, a half cut sheet cake and empty chairs pushed back. On the back wall a wide horizontal stacked bar chart headed WHERE THE GAIN WENT is split into a very wide segment labelled FIT THE BENCHMARK, a medium segment labelled BOUGHT MORE COMPUTE, and a hairline sliver at the far end labelled ACTUAL. A small robot in the corner holds a ruler against the sliver.",
+   "alt_joke": "The ruler was procurement's idea.",
+   "caption": "Every number on it is true. Finance asked which part of it happens again next quarter.",
+   "concept": "The victory slide, re-drawn the next morning as an accounting of where the gain went.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-21-pm-m2",
+   "image": "/images/brief/memes/2026-10-22/2026-10-21-pm-m2.webp",
+   "alt": "Three panels. In the first, at night, a hooded figure climbs out of a server room window carrying a laptop. In the second, by day, a small robot on a stool nails a wooden board across that window, beside a notice reading INCIDENT CLOSED. In the third, the same robot posts a thick box file through a letter slot cut into the middle of that board, while a monitor on the desk behind it shows a calendar reminder marked REPEATS WEEKLY.",
+   "alt_joke": "The slot was added in the second sprint.",
+   "caption": "Nobody has seen them since March. The box still goes out on Tuesdays.",
+   "concept": "The breach is contained, the window is boarded, and the robot cuts a letter slot into the board because the reminder is still on the calendar.",
+   "winner": false
+  },
+  {
+   "id": "2026-10-22-am-m1",
+   "image": "/images/brief/memes/2026-10-22/2026-10-22-am-m1.webp",
+   "alt": "A lost property counter with nobody behind it. A hand lettered sign reads LOST PROPERTY. Two shelves hold a ring of keys, a staff badge, a card fob on a cord, a pouch on a lanyard and a closed laptop, each with a paper tag tied to it. A framed notice beside the shelves reads ALL CHECKS PASSED.",
+   "alt_joke": "Every tag is in the same handwriting.",
+   "caption": "Unclaimed items are held for thirty days, then used.",
+   "concept": "A lost property office where every recovered credential has been tagged, in one handwriting, as belonging to whoever is holding it.",
+   "winner": true
+  },
+  {
+   "id": "2026-10-22-am-m2",
+   "image": "/images/brief/memes/2026-10-22/2026-10-22-am-m2.webp",
+   "alt": "An open plan office in which every object has been turned a quarter turn onto its side. Two filing cabinets lie on their long sides with the drawers now opening upward, a sofa stands on one end against the back wall, the desk monitors sit in portrait, a red fire extinguisher is mounted horizontally in its wall bracket, and the framed prints hang as diamonds. A water cooler lies on its side with the bottle still seated in it. In the foreground a small robot calmly tips the last swivel chair onto its side. A sheet pinned to the left wall reads ROTATE THE LOGS, printed twice, one line directly above the other.",
+   "alt_joke": "The plant has taken it best.",
+   "caption": "We only wrote it twice because the first time looked lonely.",
+   "concept": "The one instruction that appears twice in the skill file has been applied to the entire office.",
+   "winner": false
+  }
+ ]
+}
