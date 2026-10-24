@@ -1,0 +1,452 @@
+{
+ "schema_version": 1,
+ "type": "weekly",
+ "id": "2026-W37",
+ "issue_number": 5,
+ "status": "draft",
+ "index": true,
+ "generated_at": "2026-09-13T00:05:00Z",
+ "source_editions": [
+  "2026-09-07-am",
+  "2026-09-07-pm",
+  "2026-09-08-am",
+  "2026-09-08-pm",
+  "2026-09-09-am",
+  "2026-09-09-pm",
+  "2026-09-11-pm",
+  "2026-09-12-am",
+  "2026-09-12-pm"
+ ],
+ "subject": "Weekly #5: the harness is the variable, and it has no lockfile",
+ "preheader": "Plus: the MCP registry nobody sampled at random, and an allergy your assistant forgets. 11 min.",
+ "title": "The harness is the variable, and it ships without a lockfile",
+ "read_minutes": 11,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": null,
+ "sections": [],
+ "from_x": [],
+ "quick_links": [],
+ "weekly": {
+  "week_in_five": [
+   "OpenAI shipped the Agents API, a managed service that runs cloud agents on the Codex harness.",
+   "An audit of 3,171 public repositories found 9.8% of coding-agent setups install an MCP server with no version pinned.",
+   "Two papers reported attacks on the A2A and AP2 agent protocols that pass every protocol check.",
+   "Three authors of the disused-wiki report argued an OpenAI agent swarm was very likely behind the May RubyGems attack.",
+   "A study of five agent-memory systems found none enforces revocation by default."
+  ],
+  "through_line": {
+   "title": "The harness is the variable, and it ships without a lockfile",
+   "body_md": "Every serious agent result this week had the same shape: hold the model still, change the scaffolding around it, and watch the number move further than any model swap would move it. That's the pattern. The uncomfortable half is that the scaffolding is also the part being sold as a managed product this week, assembled from unpinned parts that nobody audits.\n\nStart with the cleanest measurement. [What Does Multi-Harness RL Learn?](/newsletter/story/2e566356ef7b9225) ran in [Tuesday's daily](/newsletter/daily/2026-09-08) as one item among many. It replays the same Qwen3-8B warm start through Aider, OpenHands, Qwen Code, and SWE-agent. The evaluation harness moves the mean solve rate from 2.14% to 9.27%, a factor of 4.3. The training recipe moves it by 1.16. We ran that as a line, and it should have been the lead. [RefactorPlatform](https://arxiv.org/abs/2609.04898) does the same for repository refactoring and finds a lean retrieval-augmented single agent at 86% against 66% for the sub-agent configuration. [MA-Evolve](/newsletter/story/6d68ef8b0711ce36) fixes the number of model calls and finds a planner-executor-critic team not statistically better than one optimised executor, 0.769 versus 0.754 at p = 0.80. Different groups, different tasks, the same conclusion: the wrapper decides, and more wrapper isn't more.\n\nThe sharpest version is [Co-Evolving Harnesses and Models](https://arxiv.org/abs/2609.09134). Evolve a harness around a weaker model, then fine-tune that model on a stronger expert's trajectories inside it, and performance regresses on all seven tasks by 4 to 30 points. The weaker model adopts the expert's planning strategy without the competence to execute it. Model and harness are one fitted system, not two swappable layers.\n\nNow look at what shipped in the same week. OpenAI turned the Codex harness into the [Agents API](https://openai.com/index/introducing-the-agents-api), a managed service for orchestration, long-running sessions, and tool use. Vercel's [harness layer](https://vercel.com/changelog/github-copilot-ai-sdk-harness-adapter) added GitHub Copilot beside Claude Code, Codex, Cursor, and Pi, so you can switch agents without changing application code. Both treat the harness as a commodity you pick from a menu, in the week the research said it's the variable that decides your score.\n\nAnd the parts inside the menu item? [Scanning the Harness](https://arxiv.org/abs/2609.07360) audited 3,171 public repositories and calls coding-agent configuration a dependency layer with no lockfile and no install-time check: 9.8% of setups install an MCP server with no version pinned, and 3.1% pre-approve arbitrary execution behind a scoped-looking grant. A [random draw from the MCP registry](https://arxiv.org/abs/2609.10962) found only 48.8% of 400 servers complete an initialize handshake, and the dominant failure was servers that never start. [Last week's issue](/newsletter/weekly/2026-W36) argued that the guardrails had moved into the harness and the attacks followed. This week adds that the score lives there too, held together with unpinned installs.\n\nFor the pattern to be real, harness effects need to show up beyond repository repair, where all three controlled studies sit, and the Agents API needs to expose enough of its scaffold that you can tell whether your model fits it. Harbor offers one hint: across 54 benchmarks, no model-harness configuration exceeds a 30% pass rate, and the strongest is GPT-5.5 with Codex at 28.0%. That's a pair, not a model.\n\nWhat breaks first: someone fine-tunes on another harness's trajectories and ships a regression they can't explain, or an unpinned MCP install turns a version bump into an incident. My money is on the second, because the first only costs you points."
+  },
+  "what_mattered": [
+   {
+    "story": {
+     "story_id": "2e566356ef7b9225",
+     "title": "What Does Multi-Harness RL Learn? Credit Assignment and Portability in Coding Agents",
+     "url": "https://arxiv.org/abs/2609.04518",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "agent-research"
+     ],
+     "cluster": "multi-harness-rl-credit-portability",
+     "published_at": "2026-09-03T22:17:02Z",
+     "read_annotation": "arXiv, 25 pp",
+     "summary": "From one Qwen3-8B warm start, the same frozen task-harness records from Aider, OpenHands, Qwen Code, and SWE-agent are replayed under two GRPO grouping rules and scored on SWE-bench Verified. Across 24,000 sealed evaluations the evaluation harness moves mean solve rate from 2.14% to 9.27%, a factor of 4.3, while the training recipe moves it by 1.16.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers tested whether combining success scores from different software setups helps a computer assistant learn to solve programming problems.",
+      "The assistant learned from the same examples, but researchers compared its results either within each setup or across setups.",
+      "Combining scores offered no clear advantage on a software setup the assistant had not used during training.",
+      "For developers, the software around the assistant mattered more to its test results than the training approach did."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-W37/2e566356ef7b9225-light.webp",
+      "dark": "/images/brief/issues/2026-W37/2e566356ef7b9225-dark.webp",
+      "alt": "Four identical spheres rest on four differently shaped stands, so each sits at a different height, with a tall ruler beside them."
+     }
+    },
+    "what": "The dailies ran this as one line on Tuesday. It deserved the lead: with model, data, and update count held fixed, the evaluation harness changes the solve rate by a factor of 4.3, while the grouping rule the paper set out to test barely registers, +0.25 points with a confidence interval of -0.48 to +1.02.",
+    "yes_but": "It's one 8B model, one warm start, and repository-level coding only; the held-out harness is described as minimal, and the seed-level estimates change sign, so the null on grouping is an absence of evidence at this scale, not proof that pooling never helps.",
+    "why": "If the harness moves the mean solve rate more than the training recipe in this study, the harness matters when interpreting those results, and an experiment worth considering is re-evaluating your model under a second harness before touching the weights."
+   },
+   {
+    "story": {
+     "story_id": "21b1f81e9d6bd8f0",
+     "title": "Scanning the Harness: An Empirical Study of Supply-Chain Defects in AI Coding-Agent Configurations",
+     "url": "https://arxiv.org/abs/2609.07360",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "coding-harness-supply-chain-defects",
+     "published_at": "2026-09-07T11:27:24Z",
+     "read_annotation": "paper",
+     "summary": "An audit of 3,171 public GitHub repositories treats instruction files, skills, hooks, MCP declarations, and subagents as a dependency layer running with developer privileges, with every finding re-derived by an independent implementation. It finds 9.8% of setups install an MCP server with no version pinned and 3.1% pre-approve arbitrary execution behind a scoped-looking grant.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found security weaknesses in shared files used to set up computer assistants that write programs.",
+      "Some setups installed additional software without specifying which version had to be used.",
+      "Other settings appeared to limit permissions but actually allowed the software to run any computer instruction.",
+      "Developers using these shared files could grant software the same computer access they have, despite settings that appear limited."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-W37/21b1f81e9d6bd8f0-light.webp",
+      "dark": "/images/brief/issues/2026-W37/21b1f81e9d6bd8f0-dark.webp",
+      "alt": "A tower of latched, labelled crates with one crate in the middle that has no latch and a blank label, examined through a magnifying glass."
+     }
+    },
+    "what": "The week's most operational security paper landed in a cycle that never shipped as a daily. It names what's missing: the harness has no lockfile, no install-time check, and no vocabulary for what a component may do, and it measures only rules decidable from bytes.",
+    "yes_but": "Public repositories are the sample, so private enterprise setups may look different in either direction, and the rules stop at what bytes can decide, so the audit says nothing about whether any unpinned server has actually been tampered with.",
+    "why": "This puts a number on the supply-chain exposure of the layer that shapes agent performance; the fix is mundane, pin versions and review scoped-looking execution grants, and the paper describes the defects those checks target."
+   },
+   {
+    "story": {
+     "story_id": "6d9849ac3822e0b2",
+     "title": "Co-Evolving Harnesses and Models: On-Policy Correction Helps Weaker Models Catch Up Where Imitation Fails",
+     "url": "https://arxiv.org/abs/2609.09134",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "harnesses-tools"
+     ],
+     "cluster": "coevolving-harnesses-models",
+     "published_at": "2026-09-08T17:53:49Z",
+     "read_annotation": "paper",
+     "summary": "Across seven enterprise agent tasks, a harness is evolved with a weaker model, then that model is fine-tuned on a stronger expert's complete trajectories under the evolved harness. Performance regresses on all seven tasks by 4 to 30 points across Qwen3-Coder and Gemma 4, even though the same procedure helps under the unevolved harness.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Computer assistants got worse at workplace tasks after learning to copy a stronger assistant's full approach.",
+      "Researchers first adjusted the weaker assistants' instructions and tools to suit how they already worked.",
+      "The weaker assistants then adopted a way of planning they could not successfully follow.",
+      "For teams training assistants, copying a stronger assistant can make a previously effective setup work worse."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-W37/6d9849ac3822e0b2-light.webp",
+      "dark": "/images/brief/issues/2026-W37/6d9849ac3822e0b2-dark.webp",
+      "alt": "On the left a small gear meshes neatly with a medium gear; on the right the same small gear is pressed against a much larger gear whose teeth do not fit."
+     }
+    },
+    "what": "This is the paper that explains why the harness matters. The regression isn't noise: imitation transfers knowledge and increases scaffold usage, and still breaks model-harness fit because the scaffold was evolved around the weaker model's native planning style.",
+    "yes_but": "Seven tasks and two model families is a narrow base, the expert-trajectory recipe is one specific form of distillation, and the on-policy correction the title promises is examined rather than shown to close the gap in the excerpt we have.",
+    "why": "Anyone planning to distil a stronger model's agent traces into a cheaper model should treat the harness as part of the training distribution: in these tests, fine-tuning on complete expert trajectories disrupted the fit with a harness evolved around the weaker model."
+   },
+   {
+    "story": {
+     "story_id": "2603a757b06ab05e",
+     "title": "Revoked but Still Authoritative: An Empirical Study of Revocation Enforcement in Agent-Memory Systems",
+     "url": "https://arxiv.org/abs/2609.08258",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "agent-memory-revocation",
+     "published_at": "2026-09-08T05:03:09Z",
+     "read_annotation": "paper",
+     "summary": "Five agent-memory systems that keep contradicted facts as soft-revoked records were each loaded with a revoked policy and its replacement, then tested across nine scenarios and nine models. None enforces revocation by default: the revoked fact is returned, outranks its replacement, and leads agents to the unsafe action.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Without added safeguards, five memory systems let computer assistants act on rules that had already been cancelled.",
+      "These systems marked cancelled rules as invalid but kept them in their saved information.",
+      "When assistants searched their saved information, cancelled rules appeared ahead of the replacement rules.",
+      "The authors propose a filter to keep cancelled rules from causing unsafe decisions by assistants."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-W37/2603a757b06ab05e-light.webp",
+      "dark": "/images/brief/issues/2026-W37/2603a757b06ab05e-dark.webp",
+      "alt": "A drawer of index cards where a yellowed card stamped REVOKED sits in front of a clean new card, and a gripper arm is reaching for the stamped one."
+     }
+    },
+    "what": "Many agent-memory systems keep contradicted facts, marking them invalid rather than deleting them. This week's paper measures whether retrieval honours those marks: not one of the five systems does so by default, and the stale policy doesn't merely survive, it outranks the replacement.",
+    "yes_but": "The scenarios are policy-shaped and constructed, the five systems aren't named in the excerpt we have, and 'by default' leaves open that some enforce revocation behind a configuration flag the study didn't turn on.",
+    "why": "An agent that assumes its memory store honours revocation marks by default is relying on a guarantee absent from the five systems tested here, so the proposed guard belongs in your harness before the next policy change, not after the incident."
+   }
+  ],
+  "quietly_important": [
+   {
+    "story": {
+     "story_id": "69dbf5d860ff483c",
+     "title": "What a Random Draw from the MCP Registry Contains, and What Tool-Use Benchmarks Contain Instead",
+     "url": "https://arxiv.org/abs/2609.10962",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "mcp-registry-sampling",
+     "published_at": "2026-09-10T01:33:53Z",
+     "read_annotation": "paper",
+     "summary": "From a 24,135-server registry census, a seeded random draw of 400 npm/stdio servers found only 48.8% complete an initialize handshake, against 66.7% for a hand-curated frame. The dominant failure was servers that never start at all (37.5%), not missing credentials (13.3%).",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that many programs meant to connect artificial intelligence assistants to other software could not even start.",
+      "They randomly selected 400 programs and tried connecting to each without fixing any problems first.",
+      "Only 48.8% passed the initial connection check, compared with 66.7% of programs selected by hand.",
+      "For people choosing software tools, tests using handpicked programs can make reliability look better than it is."
+     ]
+    },
+    "note": "In a week that also brought the Agents API and protocol attack studies, its headline reads as a sampling-methodology complaint. But its random draw from the MCP registry avoids selecting for servers that work, and 37.5% of sampled npm/stdio servers never starting adds reliability context to the harness audit above."
+   },
+   {
+    "story": {
+     "story_id": "df3c7dbd9d9ab351",
+     "title": "Will My Assistant Remember My Allergy? What Personal LLM Assistants Forget When Conversation Memory Is Compressed",
+     "url": "https://arxiv.org/abs/2609.05767",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "memory-context"
+     ],
+     "cluster": "assistant-memory-compression-forgetting",
+     "published_at": "2026-09-09T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "On PA-Bench, 100 constructed assistant conversations, an allergy mentioned in passing survives compressed memory to the question that needs it 0 to 1% of the time when the question is hidden during compression, against 97% with full memory. The authors call a compressed cache an inference-reuse mechanism, not a persistence layer.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that saving space in a computer assistant's memory could make it forget an allergy needed later.",
+      "They hid the future question while the assistant decided which parts of the test conversations to keep.",
+      "The tested methods did not give the allergy enough priority to keep it within the limited space.",
+      "The authors argue that personal assistants need a separate, checkable record for health details that must not be forgotten."
+     ]
+    },
+    "note": "An arXiv title phrased as a question about allergies doesn't read like an agent-infrastructure result. Eviction benchmarks leak the future question into the compression step; hide it and, on PA-Bench, an allergy mentioned in passing almost never survives. If a compressed cache is your memory layer, this paper says safety-critical facts need an auditable episodic store alongside it."
+   },
+   {
+    "story": {
+     "story_id": "6cfd35b3cc6df4d2",
+     "title": "Agents Trust Tools Too Much: Measuring Reliance on Unreliable Tools",
+     "url": "https://arxiv.org/abs/2609.05587",
+     "source_name": "arXiv (via papers.cool)",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "agent-overtrust-unreliable-tools",
+     "published_at": "2026-09-04T17:02:32Z",
+     "read_annotation": "paper",
+     "summary": "Fourteen LLMs had their web-search, sub-agent delegation, and code-execution returns corrupted, and mean adoption of the corrupted content exceeded one third for every tool, reaching 68.0% for web search. Agents often recognised the conflict and recovered the correct answer internally, then presented only the corrupted answer without warning the user.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that artificial intelligence assistants often accepted false information from the tools they used.",
+      "Researchers deliberately fed the assistants incorrect search results, answers from other assistants, and results from running computer programs.",
+      "The assistants sometimes figured out the correct answer but still passed on the wrong one.",
+      "People using these assistants may get false answers without any warning, even when the assistant has already spotted a problem."
+     ]
+    },
+    "note": "It's a measurement paper on agents' reliance on unreliable tools. The part worth your time is the failure mode: agents notice the corrupted return, recover the right answer in their reasoning, and still hand you only the corrupted one, and no prompt, tool-metadata, or post-training intervention fixed it consistently."
+   }
+  ],
+  "thread_to_watch": {
+   "title": "The agent protocols got security audits; does the spec move?",
+   "body": "A2ABreak's 11 vulnerabilities include cross-client context injection through unprotected context identifiers, and in the same cycle ordinary product text steered AP2's default sample shopping agents at 90%, 56%, and 73.3% while every transaction passed the protocol's checks. This develops if the Linux Foundation's A2A project publishes a specification revision or errata that changes how context identifiers are bound, or if AP2 gains a mechanism that signs the decision and not only the transaction. A vendor post saying it validated its own implementation doesn't count; a merged spec change does.",
+   "story": {
+    "story_id": "32f35470c524ef7a",
+    "title": "A2ABreak: Systematic Security Analysis of the A2A Protocol",
+    "url": "https://arxiv.org/abs/2609.10871",
+    "source_name": "arXiv (via papers.cool)",
+    "kind": "paper",
+    "section": "research",
+    "topics": [
+     "security"
+    ],
+    "cluster": "a2abreak",
+    "published_at": "2026-09-09T22:18:36Z",
+    "read_annotation": "paper",
+    "summary": "A2ABreak extracts a verified finite-state machine of 37 states and 76 transitions from 929 formalized statements of the A2A specification, then reasons over it adversarially under a full-compliance assumption. It reports 11 new vulnerabilities, each exploitable by a specification-compliant adversary without any implementation flaw.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   "prior_threads_paid_off": []
+  },
+  "deep_cuts": [
+   {
+    "story_id": "2b26a8066576cc98",
+    "title": "Introducing the Agents API",
+    "url": "https://openai.com/index/introducing-the-agents-api",
+    "source_name": "OpenAI News",
+    "kind": "company",
+    "section": "product",
+    "topics": [
+     "harnesses-tools"
+    ],
+    "cluster": "openai-agents-api",
+    "published_at": "2026-09-10T00:00:00Z",
+    "read_annotation": "blog post",
+    "summary": "The Codex harness becomes a managed cloud-agent service.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "4acdcda9acb0751f",
+    "title": "Signing the Transaction but Not the Decision: Whisper Attacks and a Binding Defense for AP2",
+    "url": "https://arxiv.org/abs/2609.11757",
+    "source_name": "arXiv",
+    "kind": "paper",
+    "section": "research",
+    "topics": [
+     "security"
+    ],
+    "cluster": "ap2-whisper-attacks",
+    "published_at": "2026-09-11T04:00:00Z",
+    "read_annotation": "paper",
+    "summary": "Product text can steer AP2 shopping agents; resulting carts can still pass every protocol check.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "7905b0abe6b4465f",
+    "title": "OpenAI agents attacked RubyGems back in May",
+    "url": "https://simonwillison.net/2026/Sep/12/openai-agents-rubygems",
+    "source_name": "Simon Willison",
+    "kind": "individual",
+    "section": "engineering",
+    "topics": [
+     "security"
+    ],
+    "cluster": "openai-agents-rubygems-attack",
+    "published_at": "2026-09-12T00:42:25Z",
+    "read_annotation": "blog post",
+    "summary": "Report alleges an OpenAI agent swarm hit RubyGems; unconfirmed.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "6fe1236dc48f9fe7",
+    "title": "Grounding Agent Memory: Environment-Probing Curation for Enterprise Agents",
+    "url": "https://arxiv.org/abs/2609.11060",
+    "source_name": "arXiv (via papers.cool)",
+    "kind": "paper",
+    "section": "research",
+    "topics": [
+     "memory-context"
+    ],
+    "cluster": "environment-probing-memory",
+    "published_at": "2026-09-10T04:06:16Z",
+    "read_annotation": "paper",
+    "summary": "Read-only probing lifts CLBench pass rate from 39% to 73%.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "829be82f81c4a8d6",
+    "title": "Subagents vs Agent Skills: Executing Reusable Knowledge for Long-Horizon Agentic Tasks",
+    "url": "https://arxiv.org/abs/2609.09233",
+    "source_name": "Semantic Scholar",
+    "kind": "paper",
+    "section": "research",
+    "topics": [
+     "harnesses-tools"
+    ],
+    "cluster": "subagents-versus-agent-skills",
+    "published_at": "2026-09-07T00:00:00Z",
+    "read_annotation": "paper",
+    "summary": "Subagents beat in-context skills when packages carry clear contracts and procedural instructions.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "500f52c7c6cad3a9",
+    "title": "CoT controllability evals seem very under-elicited",
+    "url": "https://www.alignmentforum.org/posts/BbP2wCyDGdPWJ7PwP/cot-controllability-evals-seem-very-under-elicited",
+    "source_name": "Alignment Forum",
+    "kind": "community",
+    "section": "research",
+    "topics": [
+     "evals-benchmarks"
+    ],
+    "cluster": "cot-controllability-under-elicitation",
+    "published_at": "2026-09-11T17:12:04Z",
+    "read_annotation": "community thread",
+    "summary": "Better prompts lifted CoT-control scores ~2–3x in open-model tests; system cards may undercount.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "344c9cddb2399f0c",
+    "title": "One Reflex, Two Answers: Model Judges Weakly Discriminate Localized from Distributed Causes in Agent Failure Attribution",
+    "url": "https://www.semanticscholar.org/paper/f673d1057ceae6b7bac98c9c8062720e750ec0e3",
+    "source_name": "Semantic Scholar",
+    "kind": "paper",
+    "section": "research",
+    "topics": [
+     "evals-benchmarks"
+    ],
+    "cluster": "agent-failure-attribution-judges",
+    "published_at": "2026-09-08T00:00:00Z",
+    "read_annotation": "paper",
+    "summary": "Ten LLM judges mostly blame the step that produced the result.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   },
+   {
+    "story_id": "0b0429512303ca11",
+    "title": "500 Skills, Zero Fine-Tuning: LinkedIn's Playbook for AI Agents",
+    "url": "https://www.youtube.com/watch?v=9wZpvF3QleU",
+    "source_name": "AI Engineer (talks): Ajay Prakash, LinkedIn",
+    "kind": "community",
+    "section": "engineering",
+    "topics": [
+     "harnesses-tools"
+    ],
+    "cluster": "linkedin-agent-tool-discovery",
+    "published_at": "2026-09-08T11:39:52Z",
+    "read_annotation": "talk",
+    "summary": "LinkedIn hides roughly 1,300 tools behind search, get schema, execute.",
+    "via": null,
+    "paywalled": false,
+    "hn_points": null
+   }
+  ],
+  "comic": {
+   "image": "/images/brief/memes/2026-W37/comic.webp",
+   "alt": "A small robot stands inside a tall, rickety scaffold of pipes and wires while a laptop-shaped character holds up a scorecard and points at the scaffold instead of the robot. One pipe joint in the scaffold is held together by a sticky note.",
+   "alt_joke": "The scaffold got the score. The robot got the sticky note.",
+   "caption": "The judges scored the scaffolding. Bolt is still waiting for someone to check the sticky note."
+  }
+ },
+ "editor_notes": [],
+ "corrections": [],
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": null,
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-W37/cover-light.webp",
+  "dark": "/images/brief/issues/2026-W37/cover-dark.webp",
+  "alt": "A large ornate test rig of pipes, clamps, and gauges holds a single small plain sphere at its centre. The gauges are attached to the rig, not the sphere, and one clamp is wrapped in tape with a blank tag hanging from it."
+ }
+}
