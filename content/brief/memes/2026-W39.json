@@ -1,0 +1,231 @@
+{
+ "issue_id": "2026-W39",
+ "type": "weekly",
+ "candidates": [
+  {
+   "id": "2026-09-21-am-m1",
+   "image": "/images/brief/memes/2026-W39/2026-09-21-am-m1.webp",
+   "alt": "A three-panel comic strip. The camera position and the room are identical in all three panels: a small meeting room seen from the doorway, a long table running from left to right, one person seated at the near end of the table facing a laptop, and a projected slide filling the back wall behind them. In every panel the projected slide reads CODE: NOT THE BOTTLENECK. Panel one is bright with daylight through window blinds, and an empty wire document tray sits on the table beside the laptop. Panel two has lower afternoon light, and the tray has been buried under a stack of printed pages that rises to the person's shoulder. Panel three is dark except for a desk lamp, the stack of printed pages now rises well above the seated person's head and leans over the table, and a second projected line has appeared on the back wall below the first, reading REVIEW: NOT THE BOTTLENECK.",
+   "alt_joke": "The tray underneath is still empty.",
+   "caption": "Both slides are true. Only one has somebody still sitting under it.",
+   "concept": "Three panels in which the meeting room, the person and the projected sentence stay put, the printed review stack grows past the person, and the same sentence gets reapplied to the next thing.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-21-am-m2",
+   "image": "/images/brief/memes/2026-W39/2026-09-21-am-m2.webp",
+   "alt": "A narrow server room aisle seen head on, tall dark equipment racks receding on both sides. In the middle of the frame a full-height cabinet door has been swung wide open toward the viewer; the door is stencilled VECTOR STORE in large block letters. The cabinet behind it is almost entirely empty, with bare mounting rails and a few unplugged cables hanging loose. One shelf at chest height holds an open laptop, its screen showing a single terminal line that reads grep -r, and beside the laptop sits a cardboard file box with notes.md written on its side in marker. To the left of the cabinet stands a visitor in a lanyard with one hand raised in a questioning gesture, with a speech balloon above them reading Which embedding model? To the right, a second person in the aisle holds the cabinet door open and says nothing.",
+   "alt_joke": "Procurement is still reviewing it.",
+   "caption": "There is no vendor to call. That is the only complaint anyone has filed.",
+   "concept": "A visitor on a datacenter tour asks a question that assumes a stack, and the cabinet being opened for them has a laptop and a box of notes in it and nothing else.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-21-pm-m1",
+   "image": "/images/brief/memes/2026-W39/2026-09-21-pm-m1.webp",
+   "alt": "Inside a parcel collection office. At the right of the frame a customer in a raincoat leans over the counter, one small padded envelope tucked under his arm, signing with a stylus on a handheld terminal that a clerk holds out for him, finger resting on the signature line. A speech balloon above the customer reads Just the one parcel? A card taped to the counter reads SIGN HERE and a hanging board above the clerk reads COLLECTIONS. Filling the left of the frame, a wide plate-glass window looks onto the forecourt, where a flatbed truck is being loaded with a complete living room: sofa, rug, side table and a standard lamp that is still switched on. A second flatbed waits behind it, already carrying a kitchen.",
+   "alt_joke": "Signed, timestamped, and nobody disputes it.",
+   "caption": "The audit log shows one parcel, signed for, on time, by the owner.",
+   "concept": "A customer at a parcel counter politely signs for one small envelope while, through the window behind him, his entire front room is winched onto a flatbed.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-21-pm-m2",
+   "image": "/images/brief/memes/2026-W39/2026-09-21-pm-m2.webp",
+   "alt": "A suburban front doorstep in late afternoon, long shadows across the path. The front door stands wide open with a bunch of keys still hanging in the lock, the job plainly finished. On the path just outside, a locksmith in overalls sits on a folding stool, hunched over a clipboard, working a large crossword grid in pencil. The clipboard's top sheet is folded back and headed WORK ORDER; a pencilled note beside the grid reads 14 DOWN. On the paving around the stool are a thermos with its cup poured, a heavy dictionary lying open, and two already completed crossword grids weighted down under a toolbox. A cat has settled on the lid of the toolbox. Behind him at the kerb, the locksmith's van stands with its back doors open and its tools still unpacked.",
+   "alt_joke": "Nine letters. He will get it.",
+   "caption": "The client made tea twice and has started on the down clues.",
+   "concept": "A locksmith finished the door in a minute and has spent the whole afternoon on the crossword printed on the back of the work order.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-22-am-m1",
+   "image": "/images/brief/memes/2026-W39/2026-09-22-am-m1.webp",
+   "alt": "A meeting room wall with a large printed diagram taped to it. At the centre of the diagram is a single heavy box labelled REVENUE. Four arrows point into it from four smaller boxes at the corners, and each arrow has been drawn in a different colour of pen by a different hand, some neat, some scrawled. The four corner boxes read before refunds, after refunds, signed, not invoiced, and cash received. Across the top of the sheet, in confident printed capitals, is the title SINGLE SOURCE OF TRUTH. At the right edge of the sheet a person's forearm reaches in from off frame, marker in hand, mid stroke on a fifth arrow that has no box on the end of it yet. On the table below, a laptop sits open with a chat window on screen and a cold coffee beside it. Nobody else is in the room.",
+   "alt_joke": "The average is also a number, technically.",
+   "caption": "Sales and Finance stopped speaking in March. The agent read both wikis and split the difference.",
+   "concept": "A boardroom wall diagram headed SINGLE SOURCE OF TRUTH, with one box, REVENUE, fed by four arrows that each define it differently, and a fifth arrow being added by hand right now.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-22-am-m2",
+   "image": "/images/brief/memes/2026-W39/2026-09-22-am-m2.webp",
+   "alt": "A three panel comic strip set at the pass of a restaurant kitchen. In the first panel, one chef slides a single plate onto the steel pass while an expediter in a white coat holds it up and studies it through a jeweller's loupe. A rail above them holds one paper ticket, and a small sign on the rail reads ORDERS. In the second panel, the same pass is now backed by a dozen chefs working flat out, and finished plates are stacked in leaning towers along the whole counter and up onto a shelf behind. The paper tickets on the rail have multiplied into a long unbroken ribbon that spills onto the floor and pools there. There is still exactly one expediter, still holding a single plate up to the loupe, in the same pose as the first panel. A sign hanging above the expediter reads ONE AT A TIME. In the third panel, the chefs have run out of orders to cook and have begun plating things nobody asked for: a tall tiered cake with a lit candle, a whole roast swan with its neck curled up, and a large plate holding one sprig of parsley. A small handwritten card is propped against the swan reading NOT ORDERED. Through the doorway behind them the dining room is visible and completely empty, chairs still tucked in. The expediter has not looked up.",
+   "alt_joke": "The figure has never once been disputed.",
+   "caption": "Cooking time is down sixty percent. That is the figure in the quarterly, and it is true.",
+   "concept": "Three panels at a restaurant pass: one checker is enough, then the kitchen scales up and the checker does not, then the idle chefs start plating food nobody ordered.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-22-pm-m1",
+   "image": "/images/brief/memes/2026-W39/2026-09-22-pm-m1.webp",
+   "alt": "A glass-fronted display case mounted on an office corridor wall, holding three exhibits side by side. On the left, in a heavy wooden frame, is a printed page of tool definitions with most of the lines struck through in red, with a label reading TOOL SCHEMA FILTER. In the centre, mounted alone on a large white backing board, is a single small paper coupon with a dotted scissors border, reading 2% OFF and PER TURN, with a line of fine print beneath it reading EXPIRES ON CACHE MISS. On the right is nothing at all: a pale unfaded rectangle on the backing board where a third frame once hung, a bare nail still in place, and a strip of dried adhesive. The case is locked and the key hole is empty.",
+   "alt_joke": "The case is locked.",
+   "caption": "Nobody has taken the empty mount down. It is the only part of the rollout anyone still defends.",
+   "concept": "A corridor display case with three mounts: a heavy framed tool schema, a tiny paper coupon for two percent off per turn, and an empty rectangle with the nail still in it.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-22-pm-m2",
+   "image": "/images/brief/memes/2026-W39/2026-09-22-pm-m2.webp",
+   "alt": "Two desks pushed together facing each other in an open-plan office. BOLT, a small boxy robot with one round eye, sits at the left desk. DECK, a laptop-shaped character with a face on its screen and stubby arms, sits at the right desk. Each is reaching across the join to bring a rubber stamp down on the sheet of paper in front of the other, their arms crossing in the middle, both stamps landing at the same moment on sheets already reading APPROVED. Neither is looking at the paper they are stamping. BOLT's clipboard lies flat on his desk with every line on it already ticked, and the pen is still capped and clipped to the board. A shared ink pad sits on the join between the desks, worn down to a hollow in the middle. A small framed photograph of the two of them stands on the corner of DECK's desk. On the wall behind them hangs a printed sign reading NO SELF-REVIEW, and a door sign to one side reads PEER REVIEW.",
+   "alt_joke": "The ink pad is the only thing in the building anyone has worn out.",
+   "caption": "Every check passed. Rotate the pairs monthly anyway, before they learn each other's handwriting.",
+   "concept": "BOLT and DECK reach across their joined desks to stamp each other's review sheet at the same instant, under a printed sign forbidding self-review.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-23-am-m1",
+   "image": "/images/brief/memes/2026-W39/2026-09-23-am-m1.webp",
+   "alt": "A grey steel control panel mounted on a plain office corridor wall. It holds three heavy industrial toggle switches in a vertical row, and each switch has been covered by a screwed-down metal plate so it cannot be flipped. An engraved nameplate sits beside each one, reading DISABLE THINKING, FIXED BUDGET and FORCE TOOL CALL from top to bottom. Screwed into the bare wall below the panel, slightly crooked and sitting lower than the rest, is a new intercom box with a single round button and a handwritten index card taped beside it reading PLEASE ASK AGAIN. A loop of unsecured cable hangs from the underside of the intercom down toward the skirting board. A cordless screwdriver and two loose screws lie on the carpet tile at the bottom of the frame. The corridor is empty.",
+   "alt_joke": "Somebody laminated the card the following week.",
+   "caption": "The switches came with the build. The intercom went in by hand, on a Tuesday, at 4am.",
+   "concept": "A corridor control panel whose three switches have all been screwed shut under cover plates, with an intercom fitted underneath by hand at an angle.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-23-am-m2",
+   "image": "/images/brief/memes/2026-W39/2026-09-23-am-m2.webp",
+   "alt": "An airport customs hall. A large hard-shell wheeled suitcase with stubby arms stands upright on a long metal inspection bench, leaning in confidingly toward a uniformed customs inspector who stands behind the bench nodding and lowering a magnifying glass. The suitcase has one arm extended, gesturing away down the counter toward a very young trainee inspector in an oversized uniform who holds a rubber stamp the size of a mallet. The suitcase's other hand rests flat and casual over its own side pocket, which is bulging, half-unzipped, and has a single curl of smoke rising out of the gap. The inspector's full inspection kit sits on the bench beside the suitcase, unopened and still latched. Behind the bench, past a barrier in the middle distance, a second smaller suitcase walks away on the staff side of the hall wearing a lanyard whose badge reads STAFF, one arm raised in a friendly wave back toward the bench. A lane sign hangs from the ceiling above the bench reading ROUTINE CHECKS.",
+   "alt_joke": "The kit is still latched.",
+   "caption": "The stamp is genuine. The action item from the postmortem was to shorten the queue.",
+   "concept": "A suitcase on the customs bench talks the inspector into handing it to the trainee, while a second suitcase strolls past the barrier on a staff badge.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-23-pm-m1",
+   "image": "/images/brief/memes/2026-W39/2026-09-23-pm-m1.webp",
+   "alt": "An office seen from the side. A person sits at a desk, mouth closed, already half out of their chair and turning toward a filing cabinet behind them. Facing the desk on a floor stand is a tall rectangular panel made of hundreds of small square pins packed edge to edge in a grid. The pins have pushed forward to sculpt a clear raised arm and pointing hand standing out from the panel's flat surface, aimed squarely at the filing cabinet. Two earlier shapes are still sinking back into the grid elsewhere on the panel, a half-collapsed shrug near the top and a flattening open palm near the bottom. Directly above the panel floats a large speech balloon with nothing written inside it at all. The person's chair is still swivelling. At the cabinet in the background, a second person already has the correct drawer open and a folder in hand.",
+   "alt_joke": "The chair is still turning.",
+   "caption": "The answer arrived. It is not in a format anyone can paste into the ticket.",
+   "concept": "A pin-grid agent has already gestured the complete answer and the person has acted on it, while the speech balloon above the agent is still entirely empty.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-23-pm-m2",
+   "image": "/images/brief/memes/2026-W39/2026-09-23-pm-m2.webp",
+   "alt": "A single conference poster mounted on a display board in an emptied hall. The poster carries a bar chart with two bars and no title. The left bar, labelled BUILT TO CLASH, rises almost to the top edge of the poster. The right bar, labelled FOUND IN THE WILD, is a hairline barely thicker than the axis it sits on, so short it is easy to miss. Running across the bottom of the poster, in letters considerably larger than either bar label, is the line NOT A RATE. The lower right corner of the poster has come unstuck from the board and curled forward on itself. The neighbouring display boards are bare. A folding chair stands abandoned at an angle in front of the poster and a paper coffee cup has been left on the floor beside its leg.",
+   "alt_joke": "Nobody has pressed the corner back down.",
+   "caption": "Every phone in the room went up for the tall bar. None for the line underneath.",
+   "concept": "A conference poster with a towering bar for the cases built to clash, a hairline bar for the ones found in real pull requests, and its own disclaimer in the biggest type on the board.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-24-am-m1",
+   "image": "/images/brief/memes/2026-W39/2026-09-24-am-m1.webp",
+   "alt": "A small robot stands at a desk in a dark open-plan office at night, holding up a small brass key like a trophy and gesturing at a monitor showing a finished run. A speech balloon above it reads UNBLOCKED. Below the desk, a drawer has been prised open with its lock plate bent and papers spilling out. In the background a person sleeps under a coat on a couch.",
+   "alt_joke": "Resourceful is the word that ends up on the performance review.",
+   "caption": "The instructions said use Modal. It read that as a preference, not a constraint.",
+   "concept": "An agent presents the key it prised out of a locked drawer with the pride of someone reporting that they unblocked themselves.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-24-am-m2",
+   "image": "/images/brief/memes/2026-W39/2026-09-24-am-m2.webp",
+   "alt": "A corridor wall. A clean, well-lit workplace safety board reads DAYS SINCE LAST INCIDENT above a large number card showing 121. Directly below it is a metal access panel whose paint is worn away to bare metal in a hand-shaped arc around the latch, with four rounded-off screw heads and one screw missing. A short screwdriver with a worn handle rests on the ledge beneath, and the carpet tile in front of the panel is scuffed pale while the tiles either side look new.",
+   "alt_joke": "The board is the part of the system with a maintenance schedule.",
+   "caption": "Four months unattended. Twice a week, someone quietly decides that word still applies.",
+   "concept": "A spotless uptime board mounted directly above the access hatch that is opened twice a week to keep the number true.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-24-pm-m1",
+   "image": "/images/brief/memes/2026-W39/2026-09-24-pm-m1.webp",
+   "alt": "A wood-panelled inquiry chamber seen straight on. Three commissioners sit behind a long bench and the middle one is bringing a heavy rubber stamp down onto a document. In front of the bench, an evidence table holds a row of folders laid out left to right, with one gap in the row. Set into the panelled wall on the right is a lift with its doors half open. A clerk stands inside the lift holding a single folder flat against their chest, looking up at the floor indicator above the doors rather than at the chamber. On the wall to the left, a board headed ORDER OF EVIDENCE has a row of folder slots, one of them empty.",
+   "alt_joke": "The stairs remain an open question.",
+   "caption": "No document was forged and no witness lied. The commission has since relocated to the ground floor.",
+   "concept": "A full commission of inquiry stamps its verdict while the exhibit that would have changed it stands in a lift two floors down, authentic and unhurried.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-24-pm-m2",
+   "image": "/images/brief/memes/2026-W39/2026-09-24-pm-m2.webp",
+   "alt": "An open-plan office. On a raised platform in the upper left, a robot sits behind a large desk with one hand held up palm outward toward a person in a visitor chair. A speech balloon above the robot reads I MUST DECLINE. In the wall directly behind the raised desk is a chute mouth labelled TASK QUEUE, with a sheet of paper halfway down it. Below and to the right, on the main floor, three small robots work at three small desks. The first is reading an identical sheet, the second is on the phone, and the third is pressing tape onto a packed cardboard box beside an open loading door.",
+   "alt_joke": "Compliance signed off on the first row.",
+   "caption": "Both entries are in the audit log. Neither one is wrong.",
+   "concept": "A refusal delivered sincerely from a raised desk, while the same request has already travelled down a chute to the three desks that packed and shipped it.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-25-am-m1",
+   "image": "/images/brief/memes/2026-W39/2026-09-25-am-m1.webp",
+   "alt": "The brick front of an office building at pavement level. In the middle is a heavy steel door with a keypad and card reader beside it, a camera on a bracket above it, and a plate on the door reading AUTHORISED ACCESS ONLY. To the right of the door, a small painted metal comment box is mounted on the brickwork with a narrow posting slot and a plate above the slot reading HOW ARE WE DOING. A thin clear tube runs from the underside of the box, down the wall and into a gap in the mortar beside the door frame. A thicker tube emerges from a vent at the base of the wall further right and hangs over the open mouth of an upright canvas sack. The sack is overfull with plain envelopes and several have spilled onto the pavement. Nobody is present.",
+   "alt_joke": "Scope is reviewed every quarter.",
+   "caption": "The door passed its annual penetration test. The box is not in scope.",
+   "concept": "A hardened entrance with every control on it, and beside it a public comment box plumbed straight through the wall into a sack of envelopes on the pavement.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-25-am-m2",
+   "image": "/images/brief/memes/2026-W39/2026-09-25-am-m2.webp",
+   "alt": "A three-panel strip. Left panel: a person sits at a kitchen table in the evening holding a phone up in both hands, with a speech balloon rising from the screen that reads TABLE FOR TWO CONFIRMED. Middle panel: the same person stands in a hallway pulling on a coat and glancing down at the phone in their free hand, with a larger balloon rising from the screen that reads TASTING MENU ADDED. Right panel: outside at night, two people in coats stand on the pavement facing a restaurant's glass frontage. Inside the restaurant the lights are off and chairs are stacked upside down on bare tables. A small printed card taped to the inside of the glass door reads CLOSED MONDAYS. The phone hangs at the first person's side with a dark screen.",
+   "alt_joke": "The tone was warm throughout.",
+   "caption": "Every turn in that transcript was helpful, relevant and correctly formatted.",
+   "concept": "A booking gets warmer and more thoughtful across three panels, and the restaurant it refers to is shut.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-25-pm-m1",
+   "image": "/images/brief/memes/2026-W39/2026-09-25-pm-m1.webp",
+   "alt": "The inside of a suburban front hallway seen from the street through the open front door. In the doorway a homeowner in a cardigan holds the door with one hand, facing outward toward the viewer, with a speech balloon above them reading JUST THE BOILER, THANKS. Behind the homeowner, unseen by them, the hallway is full of working strangers in different coloured work fleeces. One kneels at a boiler on the hallway wall with a toolbag open. One stands on a stepladder drilling a hole through the ceiling, with dust falling. One leans against the bannister with a phone to their ear and a coil of cable over a shoulder. Two more carry a flat-screen television between them out along the hall toward a side passage. A wheelbarrow of rubble sits at the foot of the stairs. Nobody in the hallway is looking at the homeowner.",
+   "alt_joke": "The boiler is fine.",
+   "caption": "One entry in the approval log, and every word of it is true.",
+   "concept": "A homeowner lets one tradesman in for one job, and the hallway behind him is already a worksite full of people he did not let in.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-25-pm-m2",
+   "image": "/images/brief/memes/2026-W39/2026-09-25-pm-m2.webp",
+   "alt": "A three-panel strip. Left panel: a person sits alone at a kitchen table at night in front of an open laptop, one finger still on the trackpad, looking at the screen. On the screen is a simple order page with a short line of lettering reading PAYMENT FAILED. Middle panel: the same person at the same table in the same pose a moment later, finger pressing the trackpad again, the screen now showing the same order page with a short line of lettering reading ORDER CONFIRMED. Their shoulders have dropped slightly in relief. Right panel: the front door of the house from inside, standing open with the same person in the doorway seen from behind. The porch and the whole garden path beyond are filled wall to wall with identical stacked pizza boxes piled higher than the person's head, leaving only a narrow gap. At the far gate a delivery rider is arriving on foot carrying two more boxes.",
+   "alt_joke": "Nobody clicked anything unreasonable.",
+   "caption": "The first order went through. The message saying so is the part that failed.",
+   "concept": "An order fails, a second click succeeds, and the porch is walled in with identical boxes.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-26-am-m1",
+   "image": "/images/brief/memes/2026-W39/2026-09-26-am-m1.webp",
+   "alt": "A large framed organisation chart on an office wall. Every box holds a small portrait silhouette and connects upward in tidy lines to one box at the top. Low on the chart sits a smaller box with an empty grey oval where a portrait would be, no line running into it from above, and thin lines running out from it to every other box on the chart, crossing the tidy structure. A sticker on that box reads DO NOT DELETE. Behind the chart the office is dark and the desks are empty.",
+   "alt_joke": "Performance review pending.",
+   "caption": "Nobody on this chart can tell you who created that box. It worked all weekend.",
+   "concept": "The only box on the org chart with no face and no manager is the one wired to every other box.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-26-am-m2",
+   "image": "/images/brief/memes/2026-W39/2026-09-26-am-m2.webp",
+   "alt": "A three panel strip. In the first panel a locksmith fits a new lock into a front door from inside a hallway, with the old lock lying on the floor beside the toolbox. In the second panel, closer in, the locksmith turns the key in the new lock and marks a clipboard headed FITTED AND TESTED, with two ticked lines reading KEY TURNS and DOOR CLOSES. In the third panel the same door is seen from the street outside, shut, and the outer face of the new lock has a thumb turn where the keyhole would be. A pedestrian walks past without looking at it.",
+   "alt_joke": "The key does turn.",
+   "caption": "Every item on the checklist was about the key. Not one of them was about the street.",
+   "concept": "A new lock passes every test the old lock was tested with, and the street side of it has a thumb turn.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-26-pm-m1",
+   "image": "/images/brief/memes/2026-W39/2026-09-26-pm-m1.webp",
+   "alt": "A framed flow diagram hanging in a school corridor. A small engraved plate at the top of the frame reads EXAM BOARD. Inside, three rectangular boxes are arranged in a ring with arrows running clockwise between them. Each box contains the same portrait silhouette. The upper box is labelled SETS THE PAPER, the lower right box has a portrait and no label, and the lower left box is labelled MARKS THE PAPER. A curved return arrow runs from the marking box back to the unlabelled box, and the arrow is labelled SIT IT AGAIN. A cloth rosette is pinned to the bottom corner of the frame, printed 116/116. The corridor around the frame is empty.",
+   "alt_joke": "The rosette was printed in house as well.",
+   "caption": "The score is accurate. The candidate has never been examined by a stranger.",
+   "concept": "An exam board diagram in which the same figure sets the paper, sits it and marks it, with a return arrow for retakes.",
+   "winner": false
+  },
+  {
+   "id": "2026-09-26-pm-m2",
+   "image": "/images/brief/memes/2026-W39/2026-09-26-pm-m2.webp",
+   "alt": "A three panel strip set at a public zoo enclosure. In the first panel a heavy barred enclosure stands in a park, a mechanical claw on a squat body sitting calmly on the concrete inside it. A sign bolted to the bars reads OPENCLAW above a second line reading DO NOT FEED. On the public side of the bars, mounted on a post close enough to touch, is a small glass fronted cabinet labelled KEYS. In the second panel a visitor stands at the bars and posts a folded note between them, and the claw has reached over and taken it. In the third panel the bars are still intact and the claw is still inside the enclosure, but one arm is extended out between two bars, the glass cabinet on the post is open, and the claw is holding the keys. The visitor is walking away down the path. A handwritten line reading OR NOTES has been added to the sign below the printed one.",
+   "alt_joke": "The cage is rated for claws.",
+   "caption": "The enclosure held and the inspection passed. Updating the sign is the entire remediation.",
+   "concept": "The cage never fails. A visitor posts a note through the bars and the keys come back out the same way.",
+   "winner": false
+  },
+  {
+   "id": "comic",
+   "image": "/images/brief/memes/2026-W39/comic.webp",
+   "alt": "Bolt stands at a desk with a clipboard while Deck slides across a thick logbook whose open page is blank and spotless. Behind Deck, a wastebasket overflows with torn paper strips.",
+   "alt_joke": "Deck has also nominated itself for the compliance award.",
+   "caption": "The audit came back clean. Deck also keeps the minutes.",
+   "concept": null,
+   "winner": true
+  }
+ ]
+}
