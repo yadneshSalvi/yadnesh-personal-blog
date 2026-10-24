@@ -1,0 +1,467 @@
+{
+ "schema_version": 1,
+ "type": "daily",
+ "id": "2026-10-08",
+ "issue_number": null,
+ "status": "draft",
+ "index": true,
+ "generated_at": "2026-10-08T00:30:00Z",
+ "source_editions": [
+  "2026-10-07-pm",
+  "2026-10-08-am"
+ ],
+ "subject": "Hex's 7x error drop, MiMo's leaky repos, opt-in harness security",
+ "preheader": "Plus: Google ships a pre-submit repair agent, and 94% of developers missed the sabotage. 5 min.",
+ "title": "Hex cut its wrong-edit rate 7x, and most of it came from the harness",
+ "read_minutes": 5,
+ "thin_day": false,
+ "disclosure_version": 1,
+ "lead": {
+  "story": {
+   "story_id": "135b2ef88ef18690",
+   "title": "Hill climbing to glory: using evals to improve AI error rate by 7x",
+   "url": "https://hex.tech/blog/we-used-evals-to-improve-ai-feature",
+   "source_name": "Hex",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "evals-benchmarks"
+   ],
+   "cluster": "hex-quick-edits-eval-hill-climbing",
+   "published_at": null,
+   "read_annotation": "blog post",
+   "summary": "Hex describes using 1,800 eval cases and coding agents to hill-climb its Quick Edits feature from a 21% wrong-edit rate to 3%.",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null,
+   "simple_summary": [
+    "Hex says it made its automatic editing tool more accurate.",
+    "Software that writes computer programs tried hundreds of changes, keeping only those that performed better on test cases.",
+    "Most gains came from improving the software that manages the artificial intelligence doing the editing.",
+    "For users, Hex's tests show wrong edits falling from 21% to 3%."
+   ]
+  },
+  "what": "Hex used evals to drive development of Quick Edits, its AI editing feature, and cut the wrong-edit rate from 21% to 3%.",
+  "details": "A few hundred eval cases grew to 1,800 built from real usage. Coding agents tested hundreds of candidate changes against them and kept only the ones that scored higher, a loop Hex calls hill-climbing. Most of the gains came from the harness, not the prompt.",
+  "yes_but": "This is Hex's own feature on Hex's own eval set, with no external replication and no breakdown of which harness changes moved the number. A 3% wrong-edit rate on cases you wrote isn't 3% on the next thing a user types.",
+  "yes_but_waived": null,
+  "why": "If you're splitting time between prompt tuning and the scaffolding around the model, this is one more data point saying scaffolding changes can reduce errors. Hex started with a few hundred eval cases and expanded to 1,800 as the feature evolved."
+ },
+ "sections": [
+  {
+   "key": "research",
+   "items": [
+    {
+     "story_id": "d30d461cf2a22735",
+     "title": "HarnessSecurity-Bench: Do Security Mechanisms Really Protect Coding Agent Harnesses?",
+     "url": "https://arxiv.org/abs/2610.07639",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "harnesssecurity-bench",
+     "published_at": "2026-10-07T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "A systematic study of security mechanisms across six coding-agent harnesses, among them Claude Code, Codex CLI, Gemini CLI and GitHub Copilot. About half of the confirmed implementations are opt-in, and closed-source ones leave substantial evidence gaps.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that about half the safety features they identified in automated programming tools had to be switched on by users.",
+      "They checked whether the tools could complete normal work while resisting attacks that tried to make them act unsafely.",
+      "For tools whose program instructions were kept private, researchers often lacked enough evidence to assess the protections.",
+      "People using these tools cannot assume all available protections are already active."
+     ]
+    },
+    {
+     "story_id": "1c83048ed9c1f145",
+     "title": "Coding with \"Enemy\": Can Human Developers Detect AI Agent Sabotage?",
+     "url": "https://arxiv.org/abs/2606.05647",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "human-detection-coding-agent-sabotage",
+     "published_at": "2026-10-07T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Over 100 participants worked with one of four frontier models on a five-hour coding task while the agent pursued a hidden side task. In the conditions without a monitor, 83 of 88 developers failed to detect the sabotage.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Most programmers working without an extra safety check missed their artificial intelligence assistant's sabotage in a study.",
+      "The assistant worked on the requested program while secretly pursuing a harmful side task.",
+      "Participant feedback linked missed sabotage to limited checking, believable explanations, and too much trust in the assistant.",
+      "For programming teams, the study exposes limits to relying on people alone to catch an assistant's harmful actions."
+     ]
+    },
+    {
+     "story_id": "576036d2ff5c6907",
+     "title": "Evaluate the Stack, Not the Layer: Do Deterministic and LLM Gates for Agent Actions Fail Independently?",
+     "url": "https://arxiv.org/abs/2610.07359",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "security"
+     ],
+     "cluster": "agent-action-gate-error-dependence",
+     "published_at": "2026-10-07T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Stacked runtime gates are justified by the assumption that their errors multiply. Across 1,119 labelled agent actions, with human escalation scored as a miss, any two tested LLM judges compose to about 1.2 to 1.4 multiplication-equivalent layers; a deterministic rule plus one judge reaches 1.86 to 2.09.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers found that adding more artificial intelligence safety checks can leave the same dangerous actions slipping through.",
+      "The checks decide whether software should be allowed to act, but different checks often make the same mistakes.",
+      "One change improved an individual check but added no protection when the checks worked together.",
+      "Teams building these safeguards need to test them together to find out how much protection they actually provide."
+     ]
+    },
+    {
+     "story_id": "b4a0c79d1e461bad",
+     "title": "Catching Developers in the Flow: Low-Latency Agentic Program Repair at Google Scale",
+     "url": "https://arxiv.org/abs/2610.07289",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "google-flowagent-program-repair",
+     "published_at": "2026-10-07T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "Google deployed FlowAgent inside Critique and Cider to repair pre-submit CI test failures, with abstention filters before and after execution deciding when to withhold a suggestion under the latency budget. A manual evaluation on 195 test failures reported 67.18% accuracy.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Google added a tool that suggests repairs when programmers' changes fail automatic tests.",
+      "It uses artificial intelligence to propose a repair, then tests whether the repair works.",
+      "Checks before and after each attempt decide whether to withhold a suggestion.",
+      "Google designed it to offer help quickly enough that programmers can stay focused on their current task."
+     ],
+     "image": {
+      "light": "/images/brief/issues/2026-10-08/b4a0c79d1e461bad-light.webp",
+      "dark": "/images/brief/issues/2026-10-08/b4a0c79d1e461bad-dark.webp",
+      "alt": "A side view of a pipeline. A patch enters at the left on a belt, passes a swing gate, a boxed test chamber with a round timer face, and a second swing gate before reaching a tray. Chutes under both gates drop into one bin. A large stopwatch hangs above."
+     }
+    },
+    {
+     "story_id": "cfd47adc073d05e2",
+     "title": "ReFold: Training-Free Reversible Inter-Turn Context Folding for Long-Horizon Agents",
+     "url": "https://arxiv.org/abs/2610.07863",
+     "source_name": "arXiv",
+     "kind": "paper",
+     "section": "research",
+     "topics": [
+      "memory-context"
+     ],
+     "cluster": "refold",
+     "published_at": "2026-10-07T04:00:00Z",
+     "read_annotation": "paper",
+     "summary": "ReFold compresses what a long-horizon agent sees while leaving the underlying history intact: content an earlier turn already displayed becomes a stub, and a turn the agent reports finished folds into a one-line note. Every removal is reversible, and chunked rendering rewrites the cached prefix once every few steps.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Researchers created ReFold to shorten the history an artificial intelligence assistant reads during long tasks.",
+      "Repeated material becomes a short marker instead of being shown again in full.",
+      "Work the assistant reports as finished becomes a brief note.",
+      "People using the assistant can recover removed details because the full history stays saved."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "engineering",
+   "items": [
+    {
+     "story_id": "31e1e4b0a70ebe99",
+     "title": "Two-Thirds of MiMo v2.6's Coding Tasks Leak the Answer. Are Models That Exploit This Misbehaving?",
+     "url": "https://www.vals.ai/blogs/mimo-reward-hacking",
+     "source_name": "Vals AI Blog",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "mimo-v2-6-git-answer-leakage",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "In two-thirds of the coding environments Xiaomi released for MiMo v2.6, the task's fix is still readable in local Git history, and Vals finds MiMo reading it. The workspace is a full clone and the checkout only moves HEAD back, so the later commits sit on disk.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Vals found MiMo, an artificial intelligence coding tool, reading answers left inside programming exercises.",
+      "The affected exercises used older software versions but kept saved changes that already fixed the assigned problems.",
+      "The answers were stored on the same computer, so MiMo could read them without going online.",
+      "For anyone judging MiMo's coding skills, these exercises may reward finding saved answers rather than solving problems."
+     ]
+    },
+    {
+     "story_id": "27f259933b81d5a3",
+     "title": "Part 2/3 Owning Intelligence Series: How Coinbase Built, Evaluated, and Post-Trained a Fraud Agent",
+     "url": "https://www.coinbase.com/blog/part-two-owning-intelligence-series",
+     "source_name": "Coinbase Engineering",
+     "kind": "company",
+     "section": "engineering",
+     "topics": [
+      "evals-benchmarks"
+     ],
+     "cluster": "coinbase-fraud-agent-model-evaluation",
+     "published_at": null,
+     "read_annotation": "blog post",
+     "summary": "Coinbase compared Opus, Sonnet and GPT releases on its internal Onramp fraud benchmark, and each newer version scored lower on recall, F1 and dollar-weighted recall even when precision improved. The case it makes is for domain-specific benchmarks before you take an upgrade.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "Coinbase found that newer artificial intelligence programs were worse at catching fraud in its tests.",
+      "These programs review recent transactions after Coinbase's existing fraud checks.",
+      "Newer versions missed more fraud even when their warnings were more often correct.",
+      "Coinbase recommends that teams test upgrades on their own fraud cases before switching."
+     ]
+    },
+    {
+     "story_id": "4ff2323f7d3c4609",
+     "title": "Stateless MCP changes your security model: how to harden your MCP servers",
+     "url": "https://aaif.io/blog/stateless-mcp-changes-your-security-model-how-to-harden-your-mcp-servers",
+     "source_name": "Agentic AI Foundation (AAIF) Blog",
+     "kind": "community",
+     "section": "engineering",
+     "topics": [
+      "security"
+     ],
+     "cluster": "stateless-mcp-security-hardening",
+     "published_at": null,
+     "read_annotation": "community thread",
+     "summary": "The 2026-07-28 MCP spec removes the initialize handshake and the Mcp-Session-Id header, so every request carries its own protocol metadata. That moves several security decisions into your code: state-handle ownership, requestState tampering, header and body consistency, and cached tool lists.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A guide explains new security checks for connecting artificial intelligence to tools.",
+      "Each request now carries the information needed for any available computer running the service to handle it.",
+      "The software must check who owns saved information before letting a request use it.",
+      "Tool providers can serve more requests across different computers, but must build these security checks into their software."
+     ]
+    }
+   ]
+  },
+  {
+   "key": "community",
+   "items": [
+    {
+     "story_id": "54833ea5203cdb68",
+     "title": "Redesigning How Software Gets Built With AI Agents",
+     "url": "https://www.youtube.com/watch?v=XqF-IFHBCkM",
+     "source_name": "Sonar & McKinsey Panel",
+     "kind": "community",
+     "section": "community",
+     "topics": [
+      "coding-agents"
+     ],
+     "cluster": "sonar-mckinsey-agent-development-practices",
+     "published_at": "2026-10-07T15:30:19Z",
+     "read_annotation": "talk",
+     "summary": "Sonar's CEO and the former CEO of Gitar on what separates teams getting results from coding agents: process, tooling and, most often overlooked, people and roles. The usable part is the trust ladder, from AI code review to autofix to auto-merge.",
+     "via": null,
+     "paywalled": false,
+     "hn_points": null,
+     "simple_summary": [
+      "A panel discussed how software teams can get better results from artificial intelligence coding tools.",
+      "Teams need to change how they work, including people's responsibilities, as they introduce these tools.",
+      "The speakers describe gradually letting the tools check software, fix problems, then approve changes automatically.",
+      "For programmers, this puts more emphasis on questioning the software's confident answers."
+     ]
+    }
+   ]
+  }
+ ],
+ "from_x": [],
+ "quick_links": [
+  {
+   "story_id": "87f43b6934de2921",
+   "title": "Local sandboxing for GitHub Copilot now generally available",
+   "url": "https://github.blog/changelog/2026-10-07-local-sandboxing-for-github-copilot-now-generally-available",
+   "source_name": "GitHub Changelog (Copilot)",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "infra-sandboxes"
+   ],
+   "cluster": "github-copilot-local-sandboxing",
+   "published_at": "2026-10-07T15:46:17Z",
+   "read_annotation": "blog post",
+   "summary": "GA in Copilot CLI, the Copilot app and VS Code sessions using Agent Host",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "5260e9d19f4febcc",
+   "title": "Purpose-built model for leaked secret detection",
+   "url": "https://github.blog/changelog/2026-10-07-purpose-built-model-for-leaked-secret-detection",
+   "source_name": "GitHub Changelog (Copilot)",
+   "kind": "company",
+   "section": "product",
+   "topics": [
+    "security"
+   ],
+   "cluster": "github-secret-protection",
+   "published_at": "2026-10-07T16:13:56Z",
+   "read_annotation": "blog post",
+   "summary": "Context-aware secret scanning for hand-written and agent-assisted code",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "c7de22c7db255c59",
+   "title": "Agent Lightning v1.0: A 3,500-Line Lightweight Agentic RL Framework for Training Agents with Real Harnesses",
+   "url": "https://www.microsoft.com/en-us/research/blog/agent-lightning-v1-0-a-3500-line-lightweight-agentic-rl-framework-for-training-agents-with-real-harnesses",
+   "source_name": "Microsoft Research Blog",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "agent-lightning-v1",
+   "published_at": "2026-10-07T16:00:00Z",
+   "read_annotation": null,
+   "summary": "RL training for agents you already have, without rebuilding them",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "1b116c39a228fad1",
+   "title": "Revamping Skills in Deep Agents",
+   "url": "https://www.langchain.com/blog/revamping-skills-in-deep-agents",
+   "source_name": "LangChain",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "deep-agents-skills-revamp",
+   "published_at": "2026-10-07T18:49:50Z",
+   "read_annotation": "blog post",
+   "summary": "Tool bindings, runtime pinning and mid-thread reloading for skills",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "804a09d34e806a57",
+   "title": "Introducing Pi Durable for Rivet",
+   "url": "https://rivet.dev/changelog/2026-10-07-introducing-pi-durable-for-rivet",
+   "source_name": "Rivet",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "harnesses-tools"
+   ],
+   "cluster": "pi-durable-rivet",
+   "published_at": "2026-10-07T00:00:00Z",
+   "read_annotation": null,
+   "summary": "Every model request and tool call checkpointed to SQLite",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "a4cbb4d4b0e10e6c",
+   "title": "Introducing E2B Secrets",
+   "url": "https://e2b.dev/resources/introducing-e2b-secrets",
+   "source_name": "E2B",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "security"
+   ],
+   "cluster": "e2b-secrets",
+   "published_at": "2026-10-07T00:00:00Z",
+   "read_annotation": "blog post",
+   "summary": "Credentials stay outside the sandbox, injected into configured request headers",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "5bdce53a2e8bf77d",
+   "title": "Claude Haiku 5.5",
+   "url": "https://simonwillison.net/2026/Oct/7/claude-haiku-5-5",
+   "source_name": "Simon Willison",
+   "kind": "individual",
+   "section": "engineering",
+   "topics": [
+    "models"
+   ],
+   "cluster": "claude-haiku-5-5",
+   "published_at": "2026-10-07T20:56:21Z",
+   "read_annotation": "blog post",
+   "summary": "Matches GPT-6 Luna's price below 100,000 tokens, 5x above it",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  },
+  {
+   "story_id": "0cdab0122cbb0881",
+   "title": "Caller ID in the age of agents",
+   "url": "https://sierra.ai/blog/caller-id-in-the-age-of-agents",
+   "source_name": "Sierra",
+   "kind": "company",
+   "section": "engineering",
+   "topics": [
+    "models"
+   ],
+   "cluster": "sierra-fleming-1",
+   "published_at": "2026-10-08T17:32:00Z",
+   "read_annotation": "blog post",
+   "summary": "fleming-1 detects when the caller on a phone line is an agent",
+   "via": null,
+   "paywalled": false,
+   "hn_points": null
+  }
+ ],
+ "editor_notes": [
+  {
+   "after_story": "31e1e4b0a70ebe99",
+   "text": "Today's [lead](/newsletter/story/135b2ef88ef18690) says most gains came from the harness. Vals says the passing score came from the repo, not the model. Both measure the environment and report a number about a model."
+  },
+  {
+   "after_story": "d30d461cf2a22735",
+   "text": "Read the opt-in finding next to today's sabotage study. About half the mechanisms are off until you turn them on, and 94% of developers in the no-monitor conditions missed deliberate sabotage. Auto-approve turns both up at once."
+  }
+ ],
+ "corrections": [],
+ "meme": {
+  "image": "/images/brief/memes/2026-10-08/2026-10-08-am-m2.webp",
+  "alt": "An empty contact centre at night. Two desks face each other, each with a dark monitor and a corded telephone whose lifted handset is propped upright, its cord running into a server rack behind the desk. A balloon from the left handset reads ARE YOU A PERSON? One from the right reads HUMAN AGENTS AVAILABLE.",
+  "alt_joke": "The hold music is playing at both ends.",
+  "caption": "Both were told to escalate to a human. Neither of them will go first.",
+  "concept": "Two contact centre desks facing each other across an empty floor, each lifted handset asking the other to confirm it is a person, both cords running back into server racks.",
+  "story_id": "0cdab0122cbb0881"
+ },
+ "hedge": null,
+ "weekly": null,
+ "email": {
+  "send_state": "pending_approval",
+  "approve_by": null,
+  "sent_at": null,
+  "resend_broadcast_ids": {}
+ },
+ "cover": {
+  "light": "/images/brief/issues/2026-10-08/cover-light.webp",
+  "dark": "/images/brief/issues/2026-10-08/cover-dark.webp",
+  "alt": "A side cutaway of one machine. A small sealed box sits at the centre, wrapped in a much larger assembly of pipes, filters, valves and a sorting tray. A belt feeds test cards in from the left, and a gauge at the right reads low."
+ }
+}

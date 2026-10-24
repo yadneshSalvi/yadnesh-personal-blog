@@ -1,0 +1,59 @@
+{
+ "issue_id": "2026-10-08",
+ "type": "daily",
+ "renders": 5,
+ "cost_usd": 1.25,
+ "images": [
+  {
+   "key": "cover",
+   "story_id": null,
+   "light_name": "cover-light.webp",
+   "dark_name": "cover-dark.webp",
+   "alt": "A side cutaway of one machine. A small sealed box sits at the centre, wrapped in a much larger assembly of pipes, filters, valves and a sorting tray. A belt feeds test cards in from the left, and a gauge at the right reads low.",
+   "bytes": [
+    58816,
+    55510
+   ],
+   "size": [
+    1536,
+    864
+   ],
+   "renders": 3,
+   "cost_usd": 0.75,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A side cutaway of a single machine, centred in the frame with clear space above and below. At the centre sits a small sealed box with two ports, no bigger than a lunch tin. Wrapped around it and filling most of the width, a much larger assembly of pipes, filters, valves and a sorting tray feeds into the box and catches what comes back out. A short belt carries a line of small test cards into the assembly from the left. A tall gauge stands at the right of the assembly with its needle low on the dial.",
+   "labels": [
+    "MODEL",
+    "HARNESS"
+   ],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-08T00:21:03Z"
+  },
+  {
+   "key": "b4a0c79d1e461bad",
+   "story_id": "b4a0c79d1e461bad",
+   "light_name": "b4a0c79d1e461bad-light.webp",
+   "dark_name": "b4a0c79d1e461bad-dark.webp",
+   "alt": "A side view of a pipeline. A patch enters at the left on a belt, passes a swing gate, a boxed test chamber with a round timer face, and a second swing gate before reaching a tray. Chutes under both gates drop into one bin. A large stopwatch hangs above.",
+   "bytes": [
+    24302,
+    24632
+   ],
+   "size": [
+    1200,
+    900
+   ],
+   "renders": 2,
+   "cost_usd": 0.5,
+   "inspected": true,
+   "defects": 0,
+   "prompt": "A horizontal pipeline seen from the side, centred in the frame with wide margins at both ends. A single candidate patch enters from the left on a short belt, passes through a swing gate, then through a boxed test chamber with a round timer face on its front, then through a second swing gate before arriving in a small tray at the right. Below each gate a short chute drops into one shared bin resting on the floor. A large stopwatch hangs above the whole run, its hand near the top of the dial.",
+   "labels": [],
+   "model": "gpt-image-1",
+   "quality": "high",
+   "created_at": "2026-10-08T00:24:06Z"
+  }
+ ]
+}
